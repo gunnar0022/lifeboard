@@ -1,0 +1,119 @@
+.cycle-overview {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.cycle-overview__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.cycle-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+}
+
+.cycle-stat__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.cycle-stat--income .cycle-stat__icon {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-income);
+}
+
+.cycle-stat--expense .cycle-stat__icon {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-expense);
+}
+
+.cycle-stat--days .cycle-stat__icon {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-info);
+}
+
+.cycle-stat__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cycle-stat__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cycle-stat__value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cycle-stat--positive .cycle-stat__value { color: var(--color-income); }
+.cycle-stat--negative .cycle-stat__value { color: var(--color-expense); }
+
+/* Budget bar */
+.cycle-overview__budget-bar {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-light);
+}
+
+.budget-bar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-sm);
+}
+
+.budget-bar__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.budget-bar__pct {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.budget-bar__track {
+  height: 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budget-bar__fill {
+  height: 100%;
+  background: var(--color-finance);
+  border-radius: var(--radius-full);
+}
+
+.budget-bar__fill--warning { background: var(--color-warning); }
+.budget-bar__fill--alert { background: var(--color-alert); }
+
+.budget-bar__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

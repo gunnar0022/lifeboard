@@ -1,0 +1,218 @@
+.accounts-strip {
+  margin-bottom: var(--space-lg);
+}
+
+.accounts-strip__cards {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.account-card {
+  flex-shrink: 0;
+  min-width: 180px;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  cursor: default;
+}
+
+.account-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-finance) 12%, transparent);
+  color: var(--color-finance);
+}
+
+.account-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-card__name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.account-card__balance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.account-card__type {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.account-card--add {
+  background: transparent;
+  border: 2px dashed var(--border-medium);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 100px;
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+.account-card--add:hover {
+  border-color: var(--color-finance);
+  color: var(--color-finance);
+  background: color-mix(in srgb, var(--color-finance) 4%, transparent);
+  box-shadow: none;
+  transform: none;
+}
+
+.accounts-strip__totals {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.accounts-strip__total {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.accounts-strip__total-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.accounts-strip__total-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Modal styles (shared) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: var(--space-lg);
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-xl);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.modal-close:hover {
+  background: var(--bg-hover);
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-group label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.form-error {
+  font-size: 0.8125rem;
+  color: var(--color-alert);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: var(--radius-sm);
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.btn--primary {
+  background: var(--color-finance);
+  color: var(--text-inverse);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn--secondary:hover {
+  background: var(--border-light);
+}

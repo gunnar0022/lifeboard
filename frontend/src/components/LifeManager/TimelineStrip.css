@@ -1,0 +1,99 @@
+.timeline-strip {
+  margin-bottom: var(--space-lg);
+}
+
+.timeline-strip__scroll {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  scrollbar-width: thin;
+}
+
+.timeline-day {
+  flex-shrink: 0;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  cursor: default;
+  transition: background 0.2s;
+}
+
+.timeline-day:hover {
+  background: var(--bg-hover);
+}
+
+.timeline-day--today {
+  background: color-mix(in srgb, var(--color-life-manager) 12%, transparent);
+  border: 2px solid var(--color-life-manager);
+}
+
+.timeline-day--today:hover {
+  background: color-mix(in srgb, var(--color-life-manager) 18%, transparent);
+}
+
+.timeline-day--overdue {
+  border: 2px solid var(--color-alert);
+}
+
+.timeline-day__name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timeline-day--today .timeline-day__name {
+  color: var(--color-life-manager);
+}
+
+.timeline-day__num {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.timeline-day--today .timeline-day__num {
+  color: var(--color-life-manager);
+}
+
+.timeline-day__dots {
+  display: flex;
+  gap: 3px;
+  min-height: 16px;
+}
+
+.timeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.timeline-dot--event {
+  background: color-mix(in srgb, #6366f1 20%, transparent);
+  color: #6366f1;
+}
+
+.timeline-dot--task {
+  background: color-mix(in srgb, #22c55e 20%, transparent);
+  color: #22c55e;
+}
+
+.timeline-dot--bill {
+  background: color-mix(in srgb, #f59e0b 20%, transparent);
+  color: #f59e0b;
+}
+
+.timeline-dot--overdue {
+  background: color-mix(in srgb, var(--color-alert) 20%, transparent);
+  color: var(--color-alert);
+}

@@ -1,0 +1,60 @@
+.budget-bars {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.budget-bars__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.budget-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.budget-bar-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.budget-bar-item__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.budget-bar-item__values {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.budget-bar-item__track {
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budget-bar-item__fill {
+  height: 100%;
+  background: var(--color-finance);
+  border-radius: var(--radius-full);
+}
+
+.budget-bar-item__fill--warning {
+  background: var(--color-warning);
+}
+
+.budget-bar-item__fill--over {
+  background: var(--color-alert);
+}
+
+.budget-bar-item__pct {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  align-self: flex-end;
+}

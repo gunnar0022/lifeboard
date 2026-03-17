@@ -1,0 +1,102 @@
+.recurring-manager {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.recurring-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.recurring-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-sm);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.recurring-item:last-child {
+  border-bottom: none;
+}
+
+.recurring-item:hover {
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.recurring-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-finance) 12%, transparent);
+  color: var(--color-finance);
+  flex-shrink: 0;
+}
+
+.recurring-item__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recurring-item__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.recurring-item__meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.recurring-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.recurring-item__amount {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.recurring-item__badges {
+  display: flex;
+  gap: 4px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.badge--autopay {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-success);
+}
+
+.badge--manual {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-warning);
+}
+
+.recurring-item__due {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

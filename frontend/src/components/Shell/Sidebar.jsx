@@ -1,0 +1,131 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Home,
+  DollarSign,
+  CalendarCheck,
+  HeartPulse,
+  TrendingUp,
+  Briefcase,
+  FolderKanban,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import './Sidebar.css';
+
+const ICON_MAP = {
+  'home': Home,
+  'dollar-sign': DollarSign,
+  'calendar-check': CalendarCheck,
+  'heart-pulse': HeartPulse,
+  'trending-up': TrendingUp,
+  'briefcase': Briefcase,
+  'folder-kanban': FolderKanban,
+  'book-open': BookOpen,
+};
+
+export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse }) {
+  return (
+    <motion.aside
+      className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}
+      animate={{ width: collapsed ? 72 : 260 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+    >
+      <div className="sidebar__header">
+        <AnimatePresence mode="wait">
+          {!collapsed && (
+            <motion.span
+              className="sidebar__logo"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              LifeBoard
+            </motion.span>
+          )}
+        </AnimatePresence>
+        <button
+          className="sidebar__toggle"
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+      </div>
+
+      <nav className="sidebar__nav">
+        <SidebarItem
+          icon="home"
+          label="Home"
+          isActive={activePanel === 'home'}
+          onClick={() => onNavigate('home')}
+          collapsed={collapsed}
+          accentColor="var(--text-primary)"
+        />
+
+        <div className="sidebar__divider" />
+
+        {agents.map((agent) => {
+          const isPlaceholder = !agent.v1;
+          return (
+            <SidebarItem
+              key={agent.id}
+              icon={agent.icon}
+              label={agent.name}
+              isActive={activePanel === agent.id}
+              onClick={() => !isPlaceholder && onNavigate(agent.id)}
+              collapsed={collapsed}
+              accentColor={agent.accent_color}
+              disabled={isPlaceholder}
+              comingSoon={isPlaceholder}
+            />
+          );
+        })}
+      </nav>
+    </motion.aside>
+  );
+}
+
+function SidebarItem({ icon, label, isActive, onClick, collapsed, accentColor, disabled, comingSoon }) {
+  const IconComponent = ICON_MAP[icon] || Home;
+
+  return (
+    <button
+      className={`sidebar__item ${isActive ? 'sidebar__item--active' : ''} ${disabled ? 'sidebar__item--disabled' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        '--item-accent': accentColor,
+      }}
+      title={collapsed ? label : undefined}
+    >
+      <span className="sidebar__item-icon">
+        <IconComponent size={20} />
+      </span>
+      <AnimatePresence mode="wait">
+        {!collapsed && (
+          <motion.span
+            className="sidebar__item-label"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: 'auto' }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {label}
+            {comingSoon && <span className="sidebar__coming-soon">Soon</span>}
+          </motion.span>
+        )}
+      </AnimatePresence>
+
+      {isActive && (
+        <motion.div
+          className="sidebar__active-indicator"
+          layoutId="activeIndicator"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+    </button>
+  );
+}

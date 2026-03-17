@@ -1,0 +1,78 @@
+.spending-chart {
+  padding: var(--space-lg);
+}
+
+.chart-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.spending-chart__container {
+  position: relative;
+}
+
+.spending-chart__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.spending-chart__total {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.spending-chart__total-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.spending-chart__legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--space-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.legend-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}

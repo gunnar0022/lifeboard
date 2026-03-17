@@ -1,0 +1,52 @@
+.placeholder-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--space-xl);
+}
+
+.placeholder-panel__card {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-2xl);
+  max-width: 400px;
+}
+
+.placeholder-panel__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--agent-color) 10%, transparent);
+  color: var(--agent-color);
+  margin-bottom: var(--space-lg);
+}
+
+.placeholder-panel__name {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.placeholder-panel__desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+}
+
+.placeholder-panel__badge {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--agent-color);
+  background: color-mix(in srgb, var(--agent-color) 10%, transparent);
+  padding: 6px 20px;
+  border-radius: var(--radius-full);
+}

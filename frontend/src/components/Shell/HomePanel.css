@@ -1,0 +1,124 @@
+.home-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+}
+
+.home-panel__greeting {
+  margin-bottom: var(--space-2xl);
+}
+
+.home-panel__greeting-text {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.home-panel__date {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.home-panel__pulse-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Pulse card */
+.pulse-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
+  border-left: 4px solid var(--agent-color);
+  transition: box-shadow var(--duration-normal) ease, transform var(--duration-normal) ease;
+  cursor: pointer;
+}
+
+.pulse-card:hover:not(.pulse-card--placeholder) {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.pulse-card--placeholder {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.pulse-card--placeholder:hover {
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+
+.pulse-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.pulse-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--agent-color) 12%, transparent);
+  color: var(--agent-color);
+}
+
+.pulse-card__name {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pulse-card__coming-soon {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--space-sm) 0;
+}
+
+.pulse-card__metrics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.pulse-card__skeleton {
+  height: 20px;
+  width: 80%;
+}
+
+.pulse-card__skeleton:nth-child(2) {
+  width: 60%;
+}
+
+.pulse-card__skeleton:nth-child(3) {
+  width: 70%;
+}
+
+/* Pulse metric */
+.pulse-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pulse-metric__value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pulse-metric__label {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
