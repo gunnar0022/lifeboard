@@ -92,6 +92,9 @@ async def execute_action(action_data: dict, action_registry: dict) -> dict:
 async def _execute_multi_action(action_data: dict, action_registry: dict) -> dict:
     """Execute multiple sub-actions (LM-19). Max 10. Partial success OK."""
     sub_actions = action_data.get("actions", [])
+    # LLM sometimes nests actions inside "data" following the standard format
+    if not sub_actions:
+        sub_actions = action_data.get("data", {}).get("actions", [])
     if not sub_actions:
         return {"success": False, "result": None, "reply": "No actions to execute."}
 

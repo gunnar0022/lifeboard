@@ -25,6 +25,37 @@ def _get_client() -> AsyncAnthropic:
     return _client
 
 
+def _extract_json(text: str) -> dict:
+    """Extract a JSON object from LLM response text, handling preamble/postamble."""
+    text = text.strip()
+
+    # Try markdown code blocks first
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0].strip()
+    elif "```" in text:
+        candidate = text.split("```")[1].split("```")[0].strip()
+        if candidate.startswith("{"):
+            text = candidate
+
+    # Try direct parse
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Find first { and last } — extract JSON object from surrounding text
+    first_brace = text.find("{")
+    last_brace = text.rfind("}")
+    if first_brace != -1 and last_brace > first_brace:
+        try:
+            return json.loads(text[first_brace:last_brace + 1])
+        except json.JSONDecodeError:
+            pass
+
+    # Nothing worked
+    raise json.JSONDecodeError("No valid JSON found", text, 0)
+
+
 async def process_message(
     system_prompt: str,
     user_message: str,
@@ -79,14 +110,8 @@ async def process_message(
 
         response_text = response.content[0].text.strip()
 
-        # Parse JSON from response (handle markdown code blocks)
-        json_str = response_text
-        if "```json" in json_str:
-            json_str = json_str.split("```json")[1].split("```")[0].strip()
-        elif "```" in json_str:
-            json_str = json_str.split("```")[1].split("```")[0].strip()
-
-        action = json.loads(json_str)
+        # Parse JSON from response
+        action = _extract_json(response_text)
         return action
 
     except json.JSONDecodeError:

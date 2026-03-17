@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { CalendarCheck } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import TimelineStrip from './TimelineStrip';
@@ -8,16 +7,6 @@ import TaskBoard from './TaskBoard';
 import DocumentRegistry from './DocumentRegistry';
 import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } },
-};
 
 export default function LifeManagerPanel() {
   const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline');
@@ -61,12 +50,7 @@ export default function LifeManagerPanel() {
 
   if (!hasData) {
     return (
-      <motion.div
-        className="life-panel"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
+      <div className="life-panel">
         <div className="life-panel__header">
           <div className="life-panel__title-group">
             <span className="life-panel__icon"><CalendarCheck size={24} /></span>
@@ -88,42 +72,30 @@ export default function LifeManagerPanel() {
           </p>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          style={{ marginTop: 'var(--space-lg)' }}
-        >
+        <div style={{ marginTop: 'var(--space-lg)' }}>
           <QuickAddBar
             currencySymbol={currencySymbol}
             onSuccess={refetchAll}
           />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      className="life-panel"
-      variants={stagger}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div variants={fadeUp} className="life-panel__header">
+    <div className="life-panel">
+      <div className="life-panel__header">
         <div className="life-panel__title-group">
           <span className="life-panel__icon"><CalendarCheck size={24} /></span>
           <h2 className="life-panel__title">Life Manager</h2>
         </div>
-      </motion.div>
+      </div>
 
       {/* Section A — Timeline */}
-      <motion.div variants={fadeUp}>
-        <TimelineStrip timeline={timeline || []} />
-      </motion.div>
+      <TimelineStrip timeline={timeline || []} />
 
       {/* Section B — Bills & Tasks (2-column grid) */}
-      <motion.div variants={fadeUp} className="life-panel__grid">
+      <div className="life-panel__grid">
         <BillsTracker
           bills={bills || []}
           currencySymbol={currencySymbol}
@@ -133,21 +105,17 @@ export default function LifeManagerPanel() {
           tasks={tasks || []}
           onRefresh={refetchAll}
         />
-      </motion.div>
+      </div>
 
       {/* Section C — Quick Add & Documents */}
-      <motion.div variants={fadeUp}>
-        <QuickAddBar
-          currencySymbol={currencySymbol}
-          onSuccess={refetchAll}
-        />
-      </motion.div>
+      <QuickAddBar
+        currencySymbol={currencySymbol}
+        onSuccess={refetchAll}
+      />
 
-      <motion.div variants={fadeUp}>
-        <DocumentRegistry
-          documents={documents || []}
-        />
-      </motion.div>
-    </motion.div>
+      <DocumentRegistry
+        documents={documents || []}
+      />
+    </div>
   );
 }

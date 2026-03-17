@@ -1,10 +1,14 @@
 """
 Life Manager agent — API routes (LM-08: namespaced under /api/life).
 """
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from backend.agents.life_manager import queries
+
+DATA_DIR = Path(__file__).parent.parent.parent.parent / "data" / "files"
 
 router = APIRouter(prefix="/api/life", tags=["life_manager"])
 
@@ -243,10 +247,15 @@ async def list_documents(
     search: Optional[str] = None,
     limit: int = 50,
 ):
-    return await queries.get_documents(
+    docs = await queries.get_documents(
         category=category, expiring_within_days=expiring_within_days,
         search=search, limit=limit,
     )
+    # Enrich with linked file info
+    for doc in docs:
+        files = await queries.get_files_for_document(doc["id"])
+        doc["files"] = files
+    return docs
 
 
 @router.get("/documents/{doc_id}")
@@ -291,6 +300,23 @@ async def update_document(doc_id: int, body: DocumentUpdate):
 async def remove_document(doc_id: int):
     await queries.delete_document(doc_id)
     return {"success": True}
+
+
+# ──────────────────────── Files ────────────────────────
+
+@router.get("/files/{file_id}/view")
+async def view_file(file_id: int):
+    """Serve a stored file (photo/document) for viewing."""
+    file_info = await queries.get_file(file_id=file_id)
+    if not file_info or not file_info.get("file_path"):
+        raise HTTPException(status_code=404, detail="File not found")
+    full_path = DATA_DIR / file_info["file_path"]
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail="File missing from disk")
+    return FileResponse(
+        full_path,
+        media_type=file_info.get("mime_type", "application/octet-stream"),
+    )
 
 
 # ──────────────────────── Overdue & Today ────────────────────────

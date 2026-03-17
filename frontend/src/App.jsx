@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './components/Shell/Sidebar';
 import TopBar from './components/Shell/TopBar';
 import HomePanel from './components/Shell/HomePanel';
@@ -80,17 +79,7 @@ export default function App() {
           marginLeft: sidebarCollapsed ? 72 : 260,
         }}
       >
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={activePanel}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {renderPanel()}
-          </motion.div>
-        </AnimatePresence>
+        {renderPanel()}
       </main>
     </div>
   );

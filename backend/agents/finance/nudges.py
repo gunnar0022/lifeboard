@@ -47,8 +47,7 @@ async def check_nudges() -> list[dict]:
             days_until = (due - today).days
 
             if not item.get("is_autopay") and 0 <= days_until <= 3:
-                config = get_config()
-                symbol = "¥" if config.get("primary_currency") == "JPY" else "$"
+                symbol = get_currency_symbol()
                 if days_until == 0:
                     nudges.append({
                         "text": f"{item['name']} ({symbol}{abs(item['amount']):,}) is due today",

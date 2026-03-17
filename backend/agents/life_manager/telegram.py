@@ -32,6 +32,8 @@ async def process_message(update: Update, text: str) -> str:
         conversation_history=_conversation_history,
     )
 
+    logger.info(f"LLM action: {action_data.get('action')} | data keys: {list(action_data.get('data', {}).keys())}")
+
     # Update conversation history
     _conversation_history.append({"role": "user", "content": text})
 
@@ -116,6 +118,11 @@ async def process_photo(update: Update, caption: str = None) -> str:
         image_media_type="image/jpeg",
     )
 
+    logger.info(f"Photo LLM action: {action_data.get('action')} | keys: {list(action_data.get('data', {}).keys()) if action_data.get('data') else 'no data'}")
+    if action_data.get("action") == "multi_action":
+        for i, sub in enumerate(action_data.get("actions", [])):
+            logger.info(f"  sub-action[{i}]: {sub.get('action')} | data keys: {list(sub.get('data', {}).keys()) if sub.get('data') else 'no data'}")
+
     _conversation_history.append({"role": "user", "content": f"[Photo] {message_text}"})
 
     # Inject file info into store_file actions
@@ -127,7 +134,9 @@ async def process_photo(update: Update, caption: str = None) -> str:
         action_data["data"]["mime_type"] = "image/jpeg"
         action_data["data"]["file_size"] = len(image_data)
     elif action_data.get("action") == "multi_action":
-        for sub in action_data.get("actions", []):
+        # Check both top-level and nested actions (LLM may nest in data.actions)
+        sub_list = action_data.get("actions", []) or action_data.get("data", {}).get("actions", [])
+        for sub in sub_list:
             if sub.get("action") == "store_file":
                 if "data" not in sub:
                     sub["data"] = {}

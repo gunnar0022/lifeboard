@@ -86,7 +86,7 @@
   gap: var(--space-xs);
 }
 
-.doc-item__file-badge {
+.doc-item__photo-badge {
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -94,7 +94,7 @@
   font-weight: 600;
   background: color-mix(in srgb, var(--color-life-manager) 12%, transparent);
   color: var(--color-life-manager);
-  padding: 1px 6px;
+  padding: 2px 5px;
   border-radius: 10px;
 }
 
@@ -111,11 +111,89 @@
 .doc-item__expiry--expiring { color: #f59e0b; font-weight: 600; }
 .doc-item__expiry--expired { color: var(--color-alert); font-weight: 600; }
 
+/* Expanded detail area */
+.doc-item__detail {
+  overflow: hidden;
+  padding: 0 var(--space-md) var(--space-sm);
+}
+
 .doc-item__notes {
   font-size: 0.8125rem;
   color: var(--text-secondary);
-  padding: var(--space-xs) var(--space-md) var(--space-sm);
   line-height: 1.5;
-  overflow: hidden;
   white-space: pre-wrap;
+  padding: var(--space-xs) 0;
+}
+
+/* Extracted data fields */
+.doc-item__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-xs) 0;
+}
+
+.doc-item__field {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: 3px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-light) 50%, transparent);
+}
+
+.doc-item__field:last-child {
+  border-bottom: none;
+}
+
+.doc-item__field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.doc-item__field-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+/* View photo button */
+.doc-item__view-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-info);
+  background: color-mix(in srgb, var(--color-info) 8%, transparent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  margin-top: var(--space-xs);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.doc-item__view-photo:hover {
+  background: color-mix(in srgb, var(--color-info) 15%, transparent);
+}
+
+/* Photo viewer */
+.doc-item__photo {
+  margin-top: var(--space-sm);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
+
+.doc-item__photo img {
+  width: 100%;
+  height: auto;
+  display: block;
 }

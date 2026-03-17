@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FileText, ChevronDown, ChevronRight, AlertCircle, Paperclip,
+  FileText, ChevronDown, ChevronRight, AlertCircle, Camera,
   Home, Shield, Scale, Heart, Wallet, FolderOpen,
 } from 'lucide-react';
 import './DocumentRegistry.css';
@@ -26,9 +26,47 @@ function getExpiryStatus(expiryDate) {
   return { text: exp.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), className: 'normal' };
 }
 
-export default function DocumentRegistry({ documents, files }) {
+function parseExtractedData(file) {
+  if (!file?.extracted_data) return null;
+  try {
+    const data = typeof file.extracted_data === 'string'
+      ? JSON.parse(file.extracted_data)
+      : file.extracted_data;
+    if (typeof data === 'object' && data !== null) return data;
+  } catch { /* ignore */ }
+  return null;
+}
+
+function formatFieldLabel(key) {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function ExtractedFields({ data }) {
+  if (!data) return null;
+  const entries = Object.entries(data).filter(
+    ([, v]) => v != null && v !== '' && typeof v !== 'object'
+  );
+  if (entries.length === 0) return null;
+
+  return (
+    <div className="doc-item__fields">
+      {entries.map(([key, value]) => (
+        <div key={key} className="doc-item__field">
+          <span className="doc-item__field-label">{formatFieldLabel(key)}</span>
+          <span className="doc-item__field-value">{String(value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function DocumentRegistry({ documents }) {
   const [expanded, setExpanded] = useState(true);
   const [expandedDoc, setExpandedDoc] = useState(null);
+  const [viewingPhoto, setViewingPhoto] = useState(null);
 
   // Group by category
   const grouped = {};
@@ -36,18 +74,6 @@ export default function DocumentRegistry({ documents, files }) {
     const cat = doc.category || 'other';
     if (!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(doc);
-  }
-
-  // Count files per document
-  const filesByDoc = {};
-  if (files) {
-    for (const f of files) {
-      const docId = f.linked_document_id;
-      if (docId) {
-        if (!filesByDoc[docId]) filesByDoc[docId] = [];
-        filesByDoc[docId].push(f);
-      }
-    }
   }
 
   return (
@@ -88,21 +114,25 @@ export default function DocumentRegistry({ documents, files }) {
                     </div>
                     {docs.map(doc => {
                       const expiry = getExpiryStatus(doc.expiry_date);
-                      const docFiles = filesByDoc[doc.id] || [];
+                      const files = doc.files || [];
+                      const photoFile = files.find(f => f.file_path && f.mime_type?.startsWith('image/'));
+                      const extractedData = files.reduce((acc, f) => acc || parseExtractedData(f), null);
                       const isExpanded = expandedDoc === doc.id;
 
                       return (
                         <div key={doc.id} className="doc-item">
                           <button
                             className="doc-item__row"
-                            onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}
+                            onClick={() => {
+                              setExpandedDoc(isExpanded ? null : doc.id);
+                              if (isExpanded) setViewingPhoto(null);
+                            }}
                           >
                             <span className="doc-item__name">
                               {doc.name}
-                              {docFiles.length > 0 && (
-                                <span className="doc-item__file-badge" title={`${docFiles.length} file${docFiles.length > 1 ? 's' : ''}`}>
-                                  <Paperclip size={10} />
-                                  {docFiles.length}
+                              {photoFile && (
+                                <span className="doc-item__photo-badge" title="Has photo">
+                                  <Camera size={10} />
                                 </span>
                               )}
                             </span>
@@ -115,14 +145,40 @@ export default function DocumentRegistry({ documents, files }) {
                           </button>
 
                           <AnimatePresence>
-                            {isExpanded && doc.notes && (
+                            {isExpanded && (
                               <motion.div
-                                className="doc-item__notes"
+                                className="doc-item__detail"
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
                               >
-                                {doc.notes}
+                                {extractedData ? (
+                                  <ExtractedFields data={extractedData} />
+                                ) : doc.notes ? (
+                                  <div className="doc-item__notes">{doc.notes}</div>
+                                ) : null}
+
+                                {photoFile && (
+                                  <button
+                                    className="doc-item__view-photo"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setViewingPhoto(viewingPhoto === photoFile.id ? null : photoFile.id);
+                                    }}
+                                  >
+                                    <Camera size={12} />
+                                    {viewingPhoto === photoFile.id ? 'Hide photo' : 'View original'}
+                                  </button>
+                                )}
+
+                                {viewingPhoto === photoFile?.id && (
+                                  <div className="doc-item__photo">
+                                    <img
+                                      src={`/api/life/files/${photoFile.id}/view`}
+                                      alt={doc.name}
+                                    />
+                                  </div>
+                                )}
                               </motion.div>
                             )}
                           </AnimatePresence>
