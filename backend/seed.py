@@ -468,13 +468,14 @@ async def seed_investing():
         print(f"  [OK] Investing account links ({len(links)})")
 
         # --- Portfolio snapshots (90 days, LM-33) ---
-        # Base total in JPY: ~3.5M with gradual growth
-        base_value = 3200000
+        # FX-converted total: JPY holdings ~692K + USD holdings ~1,069K = ~1,761K
+        # Start lower and trend up to current level over 90 days
+        base_value = 1600000
         for i in range(90):
             d = today - timedelta(days=90 - i)
             # Gradual upward trend with daily noise
-            noise = random.randint(-25000, 30000)
-            trend = int(i * 4000)  # ~4k/day growth
+            noise = random.randint(-12000, 15000)
+            trend = int(i * 1800)  # ~1.8k/day growth -> ends ~1,762K
             total = base_value + trend + noise
 
             # Breakdown by asset class (rough proportions)

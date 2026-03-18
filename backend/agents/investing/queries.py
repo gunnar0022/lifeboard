@@ -6,9 +6,50 @@ Portfolio snapshots are NEVER compressed (LM-33).
 avg_cost_per_share uses weighted average (LM-34).
 """
 import json
+import logging
+import time
 from datetime import date, datetime, timedelta
 from backend.database import get_db
 from backend.config import get_config
+
+logger = logging.getLogger("lifeboard")
+
+# --- FX rate cache for portfolio aggregation ---
+_fx_cache: dict = {"rates": None, "updated_at": 0}
+_FX_TTL = 3600  # 1 hour
+
+
+async def _get_fx_rates_to_primary() -> dict[str, float]:
+    """
+    Get cached FX rates that convert each currency's smallest unit to JPY.
+    Returns {currency: multiplier} where multiplier converts smallest-unit to JPY.
+    USD is stored in cents (LM-06), so rate = usd_to_jpy / 100.
+    """
+    now = time.time()
+    if _fx_cache["rates"] and (now - _fx_cache["updated_at"]) < _FX_TTL:
+        return _fx_cache["rates"]
+
+    config = get_config()
+    primary = config.get("primary_currency", "JPY")
+    rates = {primary: 1.0}
+
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get("https://api.frankfurter.app/latest?from=USD&to=JPY")
+            resp.raise_for_status()
+            data = resp.json()
+            usd_to_jpy = data["rates"]["JPY"]
+            # USD stored in cents; 1 cent = usd_to_jpy/100 yen
+            rates["USD"] = usd_to_jpy / 100
+    except Exception as e:
+        logger.warning(f"FX rate fetch failed in queries: {e}")
+        # Fallback estimate
+        rates["USD"] = 1.50
+
+    _fx_cache["rates"] = rates
+    _fx_cache["updated_at"] = now
+    return rates
 
 
 # --- Holdings ---
@@ -363,27 +404,44 @@ async def get_latest_snapshot() -> dict | None:
 # --- Aggregation ---
 
 async def get_portfolio_summary() -> dict:
-    """Return total value, cost basis, gain/loss, breakdown by asset class."""
+    """Return total value, cost basis, gain/loss, breakdown by asset class.
+
+    All values are converted to the user's primary currency (JPY) using
+    live FX rates, so USD-cent holdings are properly aggregated.
+    """
     holdings = await get_holdings()
     if not holdings:
         return {
             "total_value": 0, "total_cost": 0, "gain_loss": 0,
             "gain_loss_pct": 0, "breakdown": {}, "holding_count": 0,
+            "currency": "JPY",
         }
 
-    total_value = sum(h["market_value"] for h in holdings)
-    total_cost = sum(h["cost_basis"] for h in holdings)
-    gain_loss = total_value - total_cost
-    gain_loss_pct = round((gain_loss / total_cost) * 100, 2) if total_cost > 0 else 0
+    config = get_config()
+    primary = config.get("primary_currency", "JPY")
+    fx_rates = await _get_fx_rates_to_primary()
 
+    total_value = 0
+    total_cost = 0
     breakdown = {}
+
     for h in holdings:
+        rate = fx_rates.get(h["currency"], 1.0)
+        mv = int(h["market_value"] * rate)
+        cb = int(h["cost_basis"] * rate)
+
+        total_value += mv
+        total_cost += cb
+
         cls = h["asset_class"]
         if cls not in breakdown:
             breakdown[cls] = {"value": 0, "cost": 0, "count": 0}
-        breakdown[cls]["value"] += h["market_value"]
-        breakdown[cls]["cost"] += h["cost_basis"]
+        breakdown[cls]["value"] += mv
+        breakdown[cls]["cost"] += cb
         breakdown[cls]["count"] += 1
+
+    gain_loss = total_value - total_cost
+    gain_loss_pct = round((gain_loss / total_cost) * 100, 2) if total_cost > 0 else 0
 
     return {
         "total_value": total_value,
@@ -392,6 +450,7 @@ async def get_portfolio_summary() -> dict:
         "gain_loss_pct": gain_loss_pct,
         "breakdown": breakdown,
         "holding_count": len(holdings),
+        "currency": primary,
     }
 
 
