@@ -117,6 +117,15 @@
   color: var(--color-investing) !important;
 }
 
+.accounts-strip__fx-toggle--net {
+  color: var(--color-investing);
+  background: color-mix(in srgb, var(--color-investing) 10%, transparent);
+}
+
+.accounts-strip__fx-toggle--net:hover {
+  background: color-mix(in srgb, var(--color-investing) 20%, transparent);
+}
+
 .accounts-strip__fx-toggle {
   font-size: 0.6875rem;
   font-weight: 700;

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Calculator } from 'lucide-react';
 import './ProjectionCalculator.css';
 
@@ -12,10 +12,18 @@ const CHART_H = 140;
 const PAD = { top: 10, right: 20, bottom: 24, left: 60 };
 
 function formatCompact(value, symbol) {
-  if (value >= 100000000) return `${symbol}${(value / 100000000).toFixed(1)}B`;
-  if (value >= 1000000) return `${symbol}${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `${symbol}${(value / 1000).toFixed(0)}K`;
+  const abs = Math.abs(value);
+  if (abs >= 1000000000) return `${symbol}${(value / 1000000000).toFixed(1)}B`;
+  if (abs >= 1000000) return `${symbol}${(value / 1000000).toFixed(1)}M`;
+  if (abs >= 1000) return `${symbol}${(value / 1000).toFixed(0)}K`;
   return `${symbol}${Math.round(value).toLocaleString()}`;
+}
+
+function convertToDisplay(jpyValue, currency, fxRate) {
+  if (currency === 'USD' && fxRate) {
+    return Math.round(jpyValue * fxRate.jpy_to_usd);
+  }
+  return jpyValue;
 }
 
 function calculateProjection(startingValue, monthlyContribution, annualReturn, years) {
@@ -39,13 +47,24 @@ function calculateProjection(startingValue, monthlyContribution, annualReturn, y
   return points;
 }
 
-export default function ProjectionCalculator({ currentValue, currencySymbol }) {
+export default function ProjectionCalculator({ currentValue, currencySymbol, displayCurrency, fxRate }) {
   const sym = currencySymbol || '¥';
-  const [startValue, setStartValue] = useState(currentValue || 0);
-  const [monthly, setMonthly] = useState(50000);
+  const dc = displayCurrency || 'JPY';
+  const prevCurrency = useRef(dc);
+  const [startValue, setStartValue] = useState(() => convertToDisplay(currentValue || 0, dc, fxRate));
+  const [monthly, setMonthly] = useState(dc === 'USD' ? 350 : 50000);
   const [returnRate, setReturnRate] = useState(7);
   const [years, setYears] = useState(20);
   const [expanded, setExpanded] = useState(false);
+
+  // Re-initialize values when currency changes
+  useEffect(() => {
+    if (prevCurrency.current !== dc) {
+      setStartValue(convertToDisplay(currentValue || 0, dc, fxRate));
+      setMonthly(dc === 'USD' ? 350 : 50000);
+      prevCurrency.current = dc;
+    }
+  }, [dc, currentValue, fxRate]);
 
   const projection = useMemo(
     () => calculateProjection(startValue, monthly, returnRate, years),

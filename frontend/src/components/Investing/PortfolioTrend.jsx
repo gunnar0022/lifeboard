@@ -14,17 +14,43 @@ const RANGES = [
   { label: 'ALL', days: 99999 },
 ];
 
-function formatCompact(value, symbol) {
-  if (value >= 1000000) return `${symbol}${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `${symbol}${(value / 1000).toFixed(0)}K`;
-  return `${symbol}${value.toLocaleString()}`;
+function formatCompactCurrency(rawValue, currency) {
+  // Convert to display units first (USD cents -> dollars)
+  const value = currency === 'USD' ? rawValue / 100 : rawValue;
+  const sym = currency === 'USD' ? '$' : '¥';
+
+  const abs = Math.abs(value);
+  if (abs >= 1000000000) return `${sym}${(value / 1000000000).toFixed(1)}B`;
+  if (abs >= 1000000) return `${sym}${(value / 1000000).toFixed(1)}M`;
+  if (abs >= 1000) return `${sym}${(value / 1000).toFixed(0)}K`;
+  if (currency === 'USD') return `${sym}${value.toFixed(0)}`;
+  return `${sym}${Math.round(value).toLocaleString()}`;
 }
 
-export default function PortfolioTrend({ snapshots, portfolio, currencySymbol }) {
+function convertValue(value, fromCurrency, toCurrency, fxRate) {
+  if (!fxRate || fromCurrency === toCurrency) return value;
+  if (fromCurrency === 'JPY' && toCurrency === 'USD') {
+    return Math.round(value * fxRate.jpy_to_usd * 100);
+  }
+  if (fromCurrency === 'USD' && toCurrency === 'JPY') {
+    return Math.round((value / 100) * fxRate.usd_to_jpy);
+  }
+  return value;
+}
+
+function formatValue(value, currency) {
+  if (currency === 'USD') {
+    return `$${(value / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `¥${Math.round(value).toLocaleString()}`;
+}
+
+export default function PortfolioTrend({ snapshots, portfolio, currencySymbol, displayCurrency, fxRate }) {
   const [range, setRange] = useState('3M');
-  const [hover, setHover] = useState(null);
+  const [hoverIdx, setHoverIdx] = useState(null);
 
   const sym = currencySymbol || '¥';
+  const dc = displayCurrency || 'JPY';
 
   const data = useMemo(() => {
     if (!snapshots || snapshots.length === 0) return [];
@@ -35,8 +61,11 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
 
     return snapshots
       .filter(s => range === 'ALL' || s.date >= cutoffStr)
-      .map(s => ({ date: s.date, value: s.total_value }));
-  }, [snapshots, range]);
+      .map(s => ({
+        date: s.date,
+        value: convertValue(s.total_value, s.currency || 'JPY', dc, fxRate),
+      }));
+  }, [snapshots, range, dc, fxRate]);
 
   if (data.length < 2) {
     return (
@@ -66,14 +95,16 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
   const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${PAD.top + plotH} L ${points[0].x} ${PAD.top + plotH} Z`;
 
-  // Trend
-  const first = data[0].value;
-  const last = data[data.length - 1].value;
-  const diff = last - first;
-  const diffPct = first > 0 ? ((diff / first) * 100).toFixed(1) : 0;
-  const isUp = diff > 0;
-  const TrendIcon = diff > 0 ? TrendingUp : diff < 0 ? TrendingDown : Minus;
-  const trendColor = isUp ? 'var(--color-success)' : diff < 0 ? 'var(--color-alert)' : 'var(--text-tertiary)';
+  // Converted portfolio values for display
+  const snapshotCurrency = snapshots?.[0]?.currency || 'JPY';
+  const displayTotal = convertValue(portfolio?.total_value || 0, snapshotCurrency, dc, fxRate);
+  const displayGain = convertValue(portfolio?.gain_loss || 0, snapshotCurrency, dc, fxRate);
+  const totalGainPct = portfolio?.gain_loss_pct || 0;
+
+  // Trend direction
+  const isUp = displayGain > 0;
+  const TrendIcon = displayGain > 0 ? TrendingUp : displayGain < 0 ? TrendingDown : Minus;
+  const trendColor = isUp ? 'var(--color-success)' : displayGain < 0 ? 'var(--color-alert)' : 'var(--text-tertiary)';
 
   // Y-axis ticks
   const ticks = [];
@@ -82,9 +113,28 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
     ticks.push(minV + step * i);
   }
 
-  // Total gain/loss from portfolio
-  const totalGain = portfolio?.gain_loss || 0;
-  const totalGainPct = portfolio?.gain_loss_pct || 0;
+  // Mouse move handler: find nearest point by X coordinate
+  const handleMouseMove = (e) => {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const svgX = ((e.clientX - rect.left) / rect.width) * CHART_W;
+
+    if (svgX < PAD.left || svgX > CHART_W - PAD.right) {
+      setHoverIdx(null);
+      return;
+    }
+
+    let nearest = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const dist = Math.abs(points[i].x - svgX);
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = i;
+      }
+    }
+    setHoverIdx(nearest);
+  };
 
   return (
     <div className="portfolio-trend card">
@@ -92,15 +142,21 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
         <div className="portfolio-trend__left">
           <h3 className="portfolio-trend__title">Portfolio Value</h3>
           <div className="portfolio-trend__value mono">
-            {sym}{(portfolio?.total_value || last).toLocaleString()}
+            {formatValue(hoverIdx !== null ? points[hoverIdx].value : displayTotal, dc)}
           </div>
-          <div className="portfolio-trend__gain" style={{ color: trendColor }}>
-            <TrendIcon size={14} />
-            <span className="mono">
-              {isUp ? '+' : ''}{sym}{totalGain.toLocaleString()} ({isUp ? '+' : ''}{totalGainPct}%)
-            </span>
-            <span className="portfolio-trend__gain-label">total return</span>
-          </div>
+          {hoverIdx !== null ? (
+            <div className="portfolio-trend__gain" style={{ color: 'var(--text-secondary)' }}>
+              <span className="mono">{points[hoverIdx].date}</span>
+            </div>
+          ) : (
+            <div className="portfolio-trend__gain" style={{ color: trendColor }}>
+              <TrendIcon size={14} />
+              <span className="mono">
+                {isUp ? '+' : ''}{formatValue(displayGain, dc)} ({isUp ? '+' : ''}{totalGainPct}%)
+              </span>
+              <span className="portfolio-trend__gain-label">total return</span>
+            </div>
+          )}
         </div>
         <div className="portfolio-trend__ranges">
           {RANGES.map(r => (
@@ -118,7 +174,8 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
       <svg
         viewBox={`0 0 ${CHART_W} ${CHART_H}`}
         className="portfolio-trend__svg"
-        onMouseLeave={() => setHover(null)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHoverIdx(null)}
       >
         <defs>
           <linearGradient id="portfolioGrad" x1="0" y1="0" x2="0" y2="1">
@@ -137,7 +194,7 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
                 stroke="var(--border-subtle)" strokeDasharray="3,3"
               />
               <text x={PAD.left - 6} y={y + 3} textAnchor="end" className="portfolio-trend__tick">
-                {formatCompact(Math.round(v), sym)}
+                {formatCompactCurrency(Math.round(v), dc)}
               </text>
             </g>
           );
@@ -152,18 +209,13 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
           stroke="var(--color-investing)" strokeWidth="2" strokeLinejoin="round"
         />
 
-        {/* Data points (only on hover) */}
-        {points.map((p, i) => (
+        {/* Hover indicator dot */}
+        {hoverIdx !== null && (
           <circle
-            key={i}
-            cx={p.x} cy={p.y} r={hover === i ? 5 : 2}
-            fill={hover === i ? 'var(--color-investing)' : 'transparent'}
-            stroke={hover === i ? 'var(--color-investing)' : 'transparent'}
-            strokeWidth="2"
-            onMouseEnter={() => setHover(i)}
-            style={{ cursor: 'default' }}
+            cx={points[hoverIdx].x} cy={points[hoverIdx].y} r={5}
+            fill="var(--color-investing)" stroke="white" strokeWidth="2"
           />
-        ))}
+        )}
 
         {/* X-axis date labels */}
         {[0, Math.floor(data.length * 0.25), Math.floor(data.length * 0.5), Math.floor(data.length * 0.75), data.length - 1].map(i => {
@@ -181,32 +233,22 @@ export default function PortfolioTrend({ snapshots, portfolio, currencySymbol })
           );
         })}
 
-        {/* Hover tooltip */}
-        {hover !== null && (
-          <g>
-            <line
-              x1={points[hover].x} y1={PAD.top}
-              x2={points[hover].x} y2={PAD.top + plotH}
-              stroke="var(--color-investing)" strokeOpacity="0.3" strokeDasharray="3,3"
-            />
-            <text
-              x={points[hover].x}
-              y={points[hover].y - 12}
-              textAnchor="middle"
-              className="portfolio-trend__hover-label"
-            >
-              {sym}{points[hover].value.toLocaleString()}
-            </text>
-            <text
-              x={points[hover].x}
-              y={PAD.top + plotH + 16}
-              textAnchor="middle"
-              className="portfolio-trend__hover-date"
-            >
-              {points[hover].date}
-            </text>
-          </g>
+        {/* Hover vertical line */}
+        {hoverIdx !== null && (
+          <line
+            x1={points[hoverIdx].x} y1={PAD.top}
+            x2={points[hoverIdx].x} y2={PAD.top + plotH}
+            stroke="var(--color-investing)" strokeOpacity="0.3" strokeDasharray="3,3"
+          />
         )}
+
+        {/* Invisible overlay for mouse tracking */}
+        <rect
+          x={PAD.left} y={PAD.top}
+          width={plotW} height={plotH}
+          fill="transparent"
+          style={{ cursor: 'crosshair' }}
+        />
       </svg>
     </div>
   );

@@ -18,33 +18,50 @@ function formatBalance(amount, currency) {
 }
 
 function NetWorth({ byCurrency, fxRate, investingSnapshot }) {
+  const [targetCurrency, setTargetCurrency] = useState('JPY');
+
   if (!investingSnapshot || !investingSnapshot.total_value) return null;
   if (!byCurrency || byCurrency.length === 0) return null;
+  if (!fxRate) return null;
 
-  // Calculate bank total in JPY
-  let bankTotalJpy = 0;
+  // Calculate bank totals in target currency
+  let bankTotal = 0;
   for (const g of byCurrency) {
-    if (g.currency === 'JPY') {
-      bankTotalJpy += g.total;
-    } else if (g.currency === 'USD' && fxRate) {
-      bankTotalJpy += Math.round((g.total / 100) * fxRate.usd_to_jpy);
+    if (g.currency === targetCurrency) {
+      bankTotal += g.total;
+    } else if (g.currency === 'USD' && targetCurrency === 'JPY') {
+      bankTotal += Math.round((g.total / 100) * fxRate.usd_to_jpy);
+    } else if (g.currency === 'JPY' && targetCurrency === 'USD') {
+      bankTotal += Math.round(g.total * fxRate.jpy_to_usd * 100);
     }
   }
 
-  // Investing snapshot total_value is already in smallest unit of its currency
-  let investTotalJpy = investingSnapshot.total_value;
-  if (investingSnapshot.currency === 'USD' && fxRate) {
-    investTotalJpy = Math.round((investingSnapshot.total_value / 100) * fxRate.usd_to_jpy);
+  // Convert investing snapshot to target currency
+  let investTotal = investingSnapshot.total_value;
+  const snapCurrency = investingSnapshot.currency || 'JPY';
+  if (snapCurrency !== targetCurrency) {
+    if (snapCurrency === 'JPY' && targetCurrency === 'USD') {
+      investTotal = Math.round(investingSnapshot.total_value * fxRate.jpy_to_usd * 100);
+    } else if (snapCurrency === 'USD' && targetCurrency === 'JPY') {
+      investTotal = Math.round((investingSnapshot.total_value / 100) * fxRate.usd_to_jpy);
+    }
   }
 
-  const netWorth = bankTotalJpy + investTotalJpy;
+  const netWorth = bankTotal + investTotal;
 
   return (
     <div className="accounts-strip__total accounts-strip__total--net-worth">
       <span className="accounts-strip__total-label">Net Worth</span>
       <span className="accounts-strip__total-value accounts-strip__total-value--net mono">
-        {formatBalance(netWorth, 'JPY')}
+        {formatBalance(netWorth, targetCurrency)}
       </span>
+      <button
+        className="accounts-strip__fx-toggle accounts-strip__fx-toggle--net"
+        onClick={() => setTargetCurrency(t => t === 'JPY' ? 'USD' : 'JPY')}
+        title={`1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})`}
+      >
+        {targetCurrency}
+      </button>
     </div>
   );
 }

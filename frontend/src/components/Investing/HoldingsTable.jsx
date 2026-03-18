@@ -13,9 +13,20 @@ const CLASS_LABELS = {
 
 const CLASS_ORDER = ['stock', 'etf', 'crypto', 'bond', 'other'];
 
+function convertValue(value, fromCurrency, toCurrency, fxRate) {
+  if (!fxRate || fromCurrency === toCurrency) return value;
+  if (fromCurrency === 'JPY' && toCurrency === 'USD') {
+    return Math.round(value * fxRate.jpy_to_usd * 100);
+  }
+  if (fromCurrency === 'USD' && toCurrency === 'JPY') {
+    return Math.round((value / 100) * fxRate.usd_to_jpy);
+  }
+  return value;
+}
+
 function formatCurrency(amount, currency) {
-  if (currency === 'JPY') return `¥${Math.round(amount).toLocaleString()}`;
-  return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (currency === 'USD') return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `¥${Math.round(amount).toLocaleString()}`;
 }
 
 function formatShares(shares) {
@@ -23,9 +34,11 @@ function formatShares(shares) {
   return shares.toLocaleString(undefined, { maximumFractionDigits: 6 });
 }
 
-export default function HoldingsTable({ holdings, currencySymbol }) {
+export default function HoldingsTable({ holdings, currencySymbol, displayCurrency, fxRate }) {
   const [collapsed, setCollapsed] = useState({});
   const [selectedHolding, setSelectedHolding] = useState(null);
+
+  const dc = displayCurrency || 'JPY';
 
   if (!holdings || holdings.length === 0) return null;
 
@@ -58,7 +71,9 @@ export default function HoldingsTable({ holdings, currencySymbol }) {
       {sortedClasses.map(cls => {
         const groupHoldings = groups[cls];
         const isCollapsed = collapsed[cls];
-        const groupValue = groupHoldings.reduce((sum, h) => sum + h.market_value, 0);
+        const groupValue = groupHoldings.reduce((sum, h) => {
+          return sum + convertValue(h.market_value, h.currency, dc, fxRate);
+        }, 0);
 
         return (
           <div key={cls} className="holdings-table__group">
@@ -72,12 +87,15 @@ export default function HoldingsTable({ holdings, currencySymbol }) {
               </span>
               <span className="holdings-table__group-count">{groupHoldings.length}</span>
               <span className="holdings-table__group-value mono">
-                {currencySymbol}{groupValue.toLocaleString()}
+                {formatCurrency(groupValue, dc)}
               </span>
             </button>
 
             {!isCollapsed && groupHoldings.map(h => {
-              const isPositive = h.gain_loss >= 0;
+              const displayPrice = convertValue(h.current_price, h.currency, dc, fxRate);
+              const displayMV = convertValue(h.market_value, h.currency, dc, fxRate);
+              const displayGL = convertValue(h.gain_loss, h.currency, dc, fxRate);
+              const isPositive = displayGL >= 0;
               return (
                 <button
                   key={h.id}
@@ -92,15 +110,15 @@ export default function HoldingsTable({ holdings, currencySymbol }) {
                     {formatShares(h.total_shares)}
                   </span>
                   <span className="holdings-table__col-price mono">
-                    {formatCurrency(h.current_price, h.currency)}
+                    {formatCurrency(displayPrice, dc)}
                   </span>
                   <span className="holdings-table__col-value mono">
-                    {formatCurrency(h.market_value, h.currency)}
+                    {formatCurrency(displayMV, dc)}
                   </span>
                   <div className={`holdings-table__col-gain ${isPositive ? 'gain' : 'loss'}`}>
                     {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                     <span className="mono">
-                      {isPositive ? '+' : ''}{formatCurrency(h.gain_loss, h.currency)}
+                      {isPositive ? '+' : ''}{formatCurrency(displayGL, dc)}
                     </span>
                     <span className="holdings-table__gain-pct mono">
                       ({isPositive ? '+' : ''}{h.gain_loss_pct}%)

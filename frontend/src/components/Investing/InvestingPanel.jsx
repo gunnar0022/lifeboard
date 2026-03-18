@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
@@ -23,8 +23,11 @@ export default function InvestingPanel() {
   const { data: snapshots } = useApi('/api/investing/snapshots?days=365');
   const { data: holdings, refetch: refetchHoldings } = useApi('/api/investing/holdings');
   const { data: config } = useApi('/api/config');
+  const { data: fxRate } = useApi('/api/finance/exchange-rate');
 
-  const currencySymbol = config?.currency_symbol || '¥';
+  const [displayCurrency, setDisplayCurrency] = useState('JPY');
+
+  const currencySymbol = displayCurrency === 'JPY' ? '¥' : '$';
   const hasData = portfolio && portfolio.holding_count > 0;
 
   if (portfolioLoading) {
@@ -84,6 +87,13 @@ export default function InvestingPanel() {
           <span className="investing-panel__icon"><TrendingUp size={24} /></span>
           <h2 className="investing-panel__title">Investing</h2>
         </div>
+        <button
+          className="investing-panel__currency-toggle"
+          onClick={() => setDisplayCurrency(c => c === 'JPY' ? 'USD' : 'JPY')}
+          title={fxRate ? `1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()}` : ''}
+        >
+          {displayCurrency}
+        </button>
       </motion.div>
 
       <motion.div variants={fadeUp}>
@@ -91,6 +101,8 @@ export default function InvestingPanel() {
           snapshots={snapshots || []}
           portfolio={portfolio}
           currencySymbol={currencySymbol}
+          displayCurrency={displayCurrency}
+          fxRate={fxRate}
         />
       </motion.div>
 
@@ -99,6 +111,8 @@ export default function InvestingPanel() {
           breakdown={portfolio.breakdown}
           totalValue={portfolio.total_value}
           currencySymbol={currencySymbol}
+          displayCurrency={displayCurrency}
+          fxRate={fxRate}
         />
       </motion.div>
 
@@ -106,6 +120,8 @@ export default function InvestingPanel() {
         <HoldingsTable
           holdings={holdings || []}
           currencySymbol={currencySymbol}
+          displayCurrency={displayCurrency}
+          fxRate={fxRate}
         />
       </motion.div>
 
@@ -113,6 +129,8 @@ export default function InvestingPanel() {
         <ProjectionCalculator
           currentValue={portfolio.total_value}
           currencySymbol={currencySymbol}
+          displayCurrency={displayCurrency}
+          fxRate={fxRate}
         />
       </motion.div>
     </motion.div>

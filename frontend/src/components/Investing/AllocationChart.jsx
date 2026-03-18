@@ -18,14 +18,30 @@ const CLASS_LABELS = {
   other: 'Other',
 };
 
-function formatAmount(value, symbol) {
-  return `${symbol}${Math.round(value).toLocaleString()}`;
+function convertValue(value, fromCurrency, toCurrency, fxRate) {
+  if (!fxRate || fromCurrency === toCurrency) return value;
+  if (fromCurrency === 'JPY' && toCurrency === 'USD') {
+    return Math.round(value * fxRate.jpy_to_usd * 100);
+  }
+  if (fromCurrency === 'USD' && toCurrency === 'JPY') {
+    return Math.round((value / 100) * fxRate.usd_to_jpy);
+  }
+  return value;
 }
 
-export default function AllocationChart({ breakdown, totalValue, currencySymbol }) {
+function formatAmount(value, currency) {
+  if (currency === 'USD') {
+    return `$${(value / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  }
+  return `¥${Math.round(value).toLocaleString()}`;
+}
+
+export default function AllocationChart({ breakdown, totalValue, currencySymbol, displayCurrency, fxRate }) {
   if (!breakdown || totalValue <= 0) return null;
 
-  const sym = currencySymbol || '¥';
+  const dc = displayCurrency || 'JPY';
+  const nativeCurrency = 'JPY'; // snapshots/portfolio store in JPY
+
   const entries = Object.entries(breakdown)
     .filter(([, data]) => data.value > 0)
     .sort((a, b) => b[1].value - a[1].value);
@@ -33,12 +49,13 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol 
   if (entries.length === 0) return null;
 
   const total = entries.reduce((sum, [, data]) => sum + data.value, 0);
+  const displayTotal = convertValue(total, nativeCurrency, dc, fxRate);
 
-  // Donut chart math
-  const radius = 70;
-  const cx = 90;
-  const cy = 90;
-  const innerRadius = 45;
+  // Donut chart math — 50% bigger than original (radius 70->105, cx/cy 90->135, inner 45->67)
+  const radius = 105;
+  const cx = 135;
+  const cy = 135;
+  const innerRadius = 67;
   let cumulativeAngle = -90;
 
   const slices = entries.map(([cls, data]) => {
@@ -69,10 +86,12 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol 
       'Z',
     ].join(' ');
 
+    const displayValue = convertValue(data.value, nativeCurrency, dc, fxRate);
+
     return {
       cls,
       label: CLASS_LABELS[cls] || cls,
-      value: data.value,
+      value: displayValue,
       count: data.count,
       pct,
       d,
@@ -83,11 +102,11 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol 
   return (
     <div className="allocation-chart card">
       <h4 className="allocation-chart__title">
-        <PieChart size={14} />
+        <PieChart size={16} />
         Asset Allocation
       </h4>
       <div className="allocation-chart__content">
-        <svg viewBox="0 0 180 180" className="allocation-chart__svg">
+        <svg viewBox="0 0 270 270" className="allocation-chart__svg">
           {slices.map((s, i) => (
             <motion.path
               key={s.cls}
@@ -98,10 +117,10 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol 
               transition={{ delay: i * 0.08, duration: 0.3 }}
             />
           ))}
-          <text x={cx} y={cy - 4} textAnchor="middle" className="allocation-chart__center-label">
-            {formatAmount(total, sym)}
+          <text x={cx} y={cy - 6} textAnchor="middle" className="allocation-chart__center-label">
+            {formatAmount(displayTotal, dc)}
           </text>
-          <text x={cx} y={cy + 10} textAnchor="middle" className="allocation-chart__center-sub">
+          <text x={cx} y={cy + 14} textAnchor="middle" className="allocation-chart__center-sub">
             total
           </text>
         </svg>
@@ -112,7 +131,7 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol 
               <span className="allocation-chart__legend-label">{s.label}</span>
               <span className="allocation-chart__legend-pct mono">{(s.pct * 100).toFixed(1)}%</span>
               <span className="allocation-chart__legend-amt mono">
-                {formatAmount(s.value, sym)}
+                {formatAmount(s.value, dc)}
               </span>
             </div>
           ))}
