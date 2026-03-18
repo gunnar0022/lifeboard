@@ -58,11 +58,11 @@ async def seed_finance():
 
         # --- Budgets ---
         budgets = [
-            ("food", 80000),
-            ("transport", 15000),
-            ("entertainment", 30000),
-            ("shopping", 20000),
-            ("health", 10000),
+            ("Food & Dining", 80000),
+            ("Transportation", 15000),
+            ("Social & Going Out", 30000),
+            ("Shopping", 20000),
+            ("Health", 10000),
         ]
         for cat, limit in budgets:
             await db.execute(
@@ -73,11 +73,11 @@ async def seed_finance():
 
         # --- Recurring ---
         recurring = [
-            ("Apartment Rent", -95000, 1, "rent", "monthly", today.replace(day=28).isoformat(), 1),
-            ("Softbank Mobile", -8500, 1, "utilities", "monthly", today.replace(day=15).isoformat(), 1),
-            ("Netflix", -1490, 2, "entertainment", "monthly", today.replace(day=10).isoformat(), 1),
-            ("Spotify", -980, 2, "entertainment", "monthly", today.replace(day=5).isoformat(), 1),
-            ("Tokyo Gas", -4200, 1, "utilities", "monthly", today.replace(day=20).isoformat(), 0),
+            ("Apartment Rent", -95000, 1, "Housing", "monthly", today.replace(day=28).isoformat(), 1),
+            ("Softbank Mobile", -8500, 1, "Utilities", "monthly", today.replace(day=15).isoformat(), 1),
+            ("Netflix", -1490, 2, "Subscriptions", "monthly", today.replace(day=10).isoformat(), 1),
+            ("Spotify", -980, 2, "Subscriptions", "monthly", today.replace(day=5).isoformat(), 1),
+            ("Tokyo Gas", -4200, 1, "Utilities", "monthly", today.replace(day=20).isoformat(), 0),
         ]
         for name, amount, acc_id, cat, freq, due, autopay in recurring:
             await db.execute(
@@ -89,36 +89,36 @@ async def seed_finance():
         # --- Transactions (past 30 days) ---
         transactions = [
             # Income
-            (cycle_start.isoformat(), 380000, 1, "salary", "Monthly salary (net)"),
-            # Food
-            ((today - timedelta(days=1)).isoformat(), -1280, 1, "food", "Lawson lunch"),
-            ((today - timedelta(days=2)).isoformat(), -3500, 1, "food", "Yakiniku dinner with friends"),
-            ((today - timedelta(days=3)).isoformat(), -850, 1, "food", "FamilyMart onigiri & coffee"),
-            ((today - timedelta(days=5)).isoformat(), -2200, 1, "food", "Sushi takeout"),
-            ((today - timedelta(days=6)).isoformat(), -4500, 1, "food", "Weekly groceries — OK Store"),
-            ((today - timedelta(days=8)).isoformat(), -1100, 1, "food", "Starbucks"),
-            ((today - timedelta(days=10)).isoformat(), -950, 1, "food", "7-Eleven snacks"),
-            ((today - timedelta(days=12)).isoformat(), -5800, 1, "food", "Groceries — LIFE supermarket"),
-            ((today - timedelta(days=14)).isoformat(), -3200, 1, "food", "Ramen & gyoza"),
-            ((today - timedelta(days=18)).isoformat(), -6000, 1, "food", "Big weekly grocery run"),
-            # Transport
-            ((today - timedelta(days=1)).isoformat(), -500, 3, "transport", "Suica top-up"),
-            ((today - timedelta(days=7)).isoformat(), -2000, 3, "transport", "Suica top-up"),
-            ((today - timedelta(days=15)).isoformat(), -5000, 1, "transport", "Monthly commuter pass top-up"),
-            # Entertainment
-            ((today - timedelta(days=4)).isoformat(), -1800, 2, "entertainment", "Kindle manga"),
-            ((today - timedelta(days=9)).isoformat(), -2500, 1, "entertainment", "Movie ticket"),
-            ((today - timedelta(days=20)).isoformat(), -3000, 1, "entertainment", "Karaoke"),
+            (cycle_start.isoformat(), 380000, 1, "Income", "Monthly salary (net)"),
+            # Food & Dining
+            ((today - timedelta(days=1)).isoformat(), -1280, 1, "Food & Dining", "Lawson lunch"),
+            ((today - timedelta(days=2)).isoformat(), -3500, 1, "Food & Dining", "Yakiniku dinner with friends"),
+            ((today - timedelta(days=3)).isoformat(), -850, 1, "Food & Dining", "FamilyMart onigiri & coffee"),
+            ((today - timedelta(days=5)).isoformat(), -2200, 1, "Food & Dining", "Sushi takeout"),
+            ((today - timedelta(days=6)).isoformat(), -4500, 1, "Food & Dining", "Weekly groceries — OK Store"),
+            ((today - timedelta(days=8)).isoformat(), -1100, 1, "Food & Dining", "Starbucks"),
+            ((today - timedelta(days=10)).isoformat(), -950, 1, "Food & Dining", "7-Eleven snacks"),
+            ((today - timedelta(days=12)).isoformat(), -5800, 1, "Food & Dining", "Groceries — LIFE supermarket"),
+            ((today - timedelta(days=14)).isoformat(), -3200, 1, "Food & Dining", "Ramen & gyoza"),
+            ((today - timedelta(days=18)).isoformat(), -6000, 1, "Food & Dining", "Big weekly grocery run"),
+            # Transportation
+            ((today - timedelta(days=1)).isoformat(), -500, 3, "Transportation", "Suica top-up"),
+            ((today - timedelta(days=7)).isoformat(), -2000, 3, "Transportation", "Suica top-up"),
+            ((today - timedelta(days=15)).isoformat(), -5000, 1, "Transportation", "Monthly commuter pass top-up"),
+            # Social & Going Out
+            ((today - timedelta(days=4)).isoformat(), -1800, 2, "Social & Going Out", "Kindle manga"),
+            ((today - timedelta(days=9)).isoformat(), -2500, 1, "Social & Going Out", "Movie ticket"),
+            ((today - timedelta(days=20)).isoformat(), -3000, 1, "Social & Going Out", "Karaoke"),
             # Shopping
-            ((today - timedelta(days=3)).isoformat(), -6800, 2, "shopping", "Amazon — USB-C hub"),
-            ((today - timedelta(days=11)).isoformat(), -3500, 2, "shopping", "Uniqlo basics"),
-            # Rent & utilities
-            ((today - timedelta(days=2)).isoformat(), -95000, 1, "rent", "March rent"),
-            ((today - timedelta(days=5)).isoformat(), -8500, 1, "utilities", "Softbank mobile"),
-            ((today - timedelta(days=10)).isoformat(), -1490, 2, "entertainment", "Netflix"),
-            ((today - timedelta(days=5)).isoformat(), -980, 2, "entertainment", "Spotify"),
+            ((today - timedelta(days=3)).isoformat(), -6800, 2, "Shopping", "Amazon — USB-C hub"),
+            ((today - timedelta(days=11)).isoformat(), -3500, 2, "Shopping", "Uniqlo basics"),
+            # Housing & Utilities
+            ((today - timedelta(days=2)).isoformat(), -95000, 1, "Housing", "March rent"),
+            ((today - timedelta(days=5)).isoformat(), -8500, 1, "Utilities", "Softbank mobile"),
+            ((today - timedelta(days=10)).isoformat(), -1490, 2, "Subscriptions", "Netflix"),
+            ((today - timedelta(days=5)).isoformat(), -980, 2, "Subscriptions", "Spotify"),
             # Health
-            ((today - timedelta(days=13)).isoformat(), -2800, 1, "health", "Pharmacy — supplements"),
+            ((today - timedelta(days=13)).isoformat(), -2800, 1, "Health", "Pharmacy — supplements"),
         ]
         for dt, amt, acc_id, cat, desc in transactions:
             await db.execute(
@@ -169,11 +169,11 @@ async def seed_cycle_summaries():
         "Subscriptions": (3000, 5000),
     }
     base_budgets = {
-        "food": 80000,
-        "transport": 15000,
-        "entertainment": 30000,
-        "shopping": 20000,
-        "health": 10000,
+        "Food & Dining": 80000,
+        "Transportation": 15000,
+        "Social & Going Out": 30000,
+        "Shopping": 20000,
+        "Health": 10000,
     }
 
     try:

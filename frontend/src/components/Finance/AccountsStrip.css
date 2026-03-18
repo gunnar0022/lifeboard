@@ -103,6 +103,27 @@
   color: var(--text-primary);
 }
 
+.accounts-strip__total--combined {
+  padding-left: var(--space-lg);
+  border-left: 1px solid var(--border-light);
+}
+
+.accounts-strip__fx-toggle {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-finance);
+  background: color-mix(in srgb, var(--color-finance) 10%, transparent);
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.accounts-strip__fx-toggle:hover {
+  background: color-mix(in srgb, var(--color-finance) 20%, transparent);
+}
+
 /* Modal styles (shared) */
 .modal-overlay {
   position: fixed;

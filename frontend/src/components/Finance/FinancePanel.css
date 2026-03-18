@@ -96,6 +96,10 @@
   }
 }
 
+.finance-panel__section-break {
+  margin-top: var(--space-xl);
+}
+
 .finance-panel__loading {
   display: flex;
   flex-direction: column;

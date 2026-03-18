@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Landmark, Wallet, TrendingUp, Banknote, ArrowLeftRight, Plus, X } from 'lucide-react';
-import { apiPost } from '../../hooks/useApi';
+import { useApi, apiPost } from '../../hooks/useApi';
 import './AccountsStrip.css';
 
 const TYPE_ICONS = {
@@ -17,8 +17,46 @@ function formatBalance(amount, currency) {
   return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 }
 
+function CombinedTotal({ byCurrency, fxRate }) {
+  const [targetCurrency, setTargetCurrency] = useState('JPY');
+
+  if (!fxRate || !byCurrency || byCurrency.length < 2) return null;
+
+  const jpyGroup = byCurrency.find(g => g.currency === 'JPY');
+  const usdGroup = byCurrency.find(g => g.currency === 'USD');
+  if (!jpyGroup || !usdGroup) return null;
+
+  let combined;
+  if (targetCurrency === 'JPY') {
+    // Convert USD (stored in cents) to JPY
+    const usdInJpy = Math.round((usdGroup.total / 100) * fxRate.usd_to_jpy);
+    combined = jpyGroup.total + usdInJpy;
+  } else {
+    // Convert JPY to USD cents
+    const jpyInUsdCents = Math.round(jpyGroup.total * fxRate.jpy_to_usd * 100);
+    combined = usdGroup.total + jpyInUsdCents;
+  }
+
+  return (
+    <div className="accounts-strip__total accounts-strip__total--combined">
+      <span className="accounts-strip__total-label">Combined</span>
+      <span className="accounts-strip__total-value mono">
+        {formatBalance(combined, targetCurrency)}
+      </span>
+      <button
+        className="accounts-strip__fx-toggle"
+        onClick={() => setTargetCurrency(t => t === 'JPY' ? 'USD' : 'JPY')}
+        title={`1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})`}
+      >
+        {targetCurrency}
+      </button>
+    </div>
+  );
+}
+
 export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
   const [showAddForm, setShowAddForm] = useState(false);
+  const { data: fxRate } = useApi('/api/finance/exchange-rate');
 
   if (!overview) return null;
 
@@ -68,6 +106,7 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
             </span>
           </div>
         ))}
+        <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} />
       </div>
 
       {/* Add account modal */}

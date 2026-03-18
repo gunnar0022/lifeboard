@@ -172,7 +172,7 @@ export default function FinancePanel() {
       </motion.div>
 
       {/* Section D — Data entry & transaction list */}
-      <motion.div variants={fadeUp}>
+      <motion.div variants={fadeUp} className="finance-panel__section-break">
         <QuickAddForm
           mode="transaction"
           accounts={accounts || []}
@@ -183,19 +183,19 @@ export default function FinancePanel() {
       </motion.div>
 
       <motion.div variants={fadeUp}>
+        <RecurringManager
+          recurring={recurring || []}
+          currencySymbol={currencySymbol}
+          onRefresh={refetchAll}
+        />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
         <TransactionList
           transactions={transactions || []}
           transfers={transfers || []}
           currencySymbol={currencySymbol}
           currency={currency}
-        />
-      </motion.div>
-
-      <motion.div variants={fadeUp}>
-        <RecurringManager
-          recurring={recurring || []}
-          currencySymbol={currencySymbol}
-          onRefresh={refetchAll}
         />
       </motion.div>
     </motion.div>
