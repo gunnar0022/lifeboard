@@ -101,6 +101,7 @@ Write actions — Recurring & Budgets:
 - edit_recurring: data={{recurring_id, ...fields to update}}
 - deactivate_recurring: data={{recurring_id}}
 - set_budget: data={{category, monthly_limit (int)}}
+- set_interest_rate: data={{account_id (int), interest_rate (real — annual rate as decimal, e.g. 0.045 for 4.5%. Use null to clear.)}}. Interest is auto-calculated monthly on the 1st and logged as "Interest" income transactions.
 
 Read actions:
 - get_accounts_overview: data={{}}
@@ -131,7 +132,10 @@ def _format_accounts(accounts: list[dict]) -> str:
             bal_str = f"${bal / 100:,.2f}"
         else:
             bal_str = f"¥{bal:,}"
-        lines.append(f"  [{a['id']}] {a['name']} ({a['account_type']}, {a['currency']}) — Balance: {bal_str}")
+        rate_str = ""
+        if a.get("interest_rate"):
+            rate_str = f" | {a['interest_rate'] * 100:.1f}% APR"
+        lines.append(f"  [{a['id']}] {a['name']} ({a['account_type']}, {a['currency']}) — Balance: {bal_str}{rate_str}")
     return "\n".join(lines)
 
 

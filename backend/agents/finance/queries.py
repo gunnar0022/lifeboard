@@ -115,7 +115,7 @@ async def add_account(name: str, currency: str, account_type: str,
 
 
 async def edit_account(account_id: int, **fields) -> dict | None:
-    allowed = {"name", "currency", "account_type", "current_balance", "notes", "sort_order", "is_active"}
+    allowed = {"name", "currency", "account_type", "current_balance", "interest_rate", "notes", "sort_order", "is_active"}
     updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
     if not updates:
         return await get_account(account_id)
@@ -141,6 +141,32 @@ async def deactivate_account(account_id: int) -> bool:
         )
         await db.commit()
         return True
+    finally:
+        await db.close()
+
+
+async def set_interest_rate(account_id: int, interest_rate: float | None) -> dict | None:
+    """Set or clear the annual interest rate for an account (as decimal, e.g. 0.045 = 4.5%)."""
+    db = await get_db()
+    try:
+        await db.execute(
+            "UPDATE finance_accounts SET interest_rate = ? WHERE id = ?",
+            (interest_rate, account_id)
+        )
+        await db.commit()
+        return await get_account(account_id)
+    finally:
+        await db.close()
+
+
+async def get_interest_bearing_accounts() -> list[dict]:
+    """Get all active accounts with a non-null interest rate."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM finance_accounts WHERE is_active = 1 AND interest_rate IS NOT NULL ORDER BY id"
+        )
+        return [dict(r) for r in await cursor.fetchall()]
     finally:
         await db.close()
 

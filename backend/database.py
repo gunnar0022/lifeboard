@@ -37,6 +37,7 @@ async def _create_finance_tables(db: aiosqlite.Connection):
             account_type TEXT NOT NULL CHECK(account_type IN ('bank', 'wallet', 'investment', 'cash', 'transfer_service')),
             currency TEXT NOT NULL CHECK(currency IN ('JPY', 'USD')),
             current_balance INTEGER NOT NULL DEFAULT 0,
+            interest_rate REAL,
             is_active INTEGER NOT NULL DEFAULT 1,
             notes TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,

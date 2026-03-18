@@ -1,7 +1,7 @@
 """
-Finance agent -- cycle compression scheduler.
-Runs on the 24th of each month (LM-24: 3-day grace period after cycle boundary).
-Pipeline: aggregate -> generate insights -> store summary -> delete detail (LM-26).
+Finance agent -- background schedulers.
+- Cycle compression: 24th of each month (LM-24).
+- Interest calculation: 1st of each month (LM-32).
 """
 import os
 import asyncio
@@ -16,26 +16,31 @@ from backend.agents.finance import queries
 logger = logging.getLogger(__name__)
 
 _compression_task: asyncio.Task | None = None
+_interest_task: asyncio.Task | None = None
 
 
 async def start_scheduler():
-    """Start the finance compression scheduler."""
-    global _compression_task
+    """Start the finance compression and interest schedulers."""
+    global _compression_task, _interest_task
     _compression_task = asyncio.create_task(_monthly_compression_loop())
+    _interest_task = asyncio.create_task(_monthly_interest_loop())
     logger.info("Finance compression scheduler started")
+    logger.info("Finance interest scheduler started")
 
 
 async def stop_scheduler():
-    """Cancel the compression task."""
-    global _compression_task
-    if _compression_task and not _compression_task.done():
-        _compression_task.cancel()
-        try:
-            await _compression_task
-        except asyncio.CancelledError:
-            pass
+    """Cancel both scheduler tasks."""
+    global _compression_task, _interest_task
+    for task in (_compression_task, _interest_task):
+        if task and not task.done():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
     _compression_task = None
-    logger.info("Finance compression scheduler stopped")
+    _interest_task = None
+    logger.info("Finance schedulers stopped")
 
 
 async def _monthly_compression_loop():
@@ -74,6 +79,76 @@ async def _monthly_compression_loop():
         except Exception as e:
             logger.error(f"Finance compression loop error: {e}")
             await asyncio.sleep(3600)
+
+
+async def _monthly_interest_loop():
+    """
+    Run interest calculation on the 1st of each month at 2 AM (LM-32).
+    For each interest-bearing account, calculates monthly interest and logs
+    as an auto-generated "Interest" income transaction.
+    """
+    while True:
+        try:
+            config = get_config()
+            tz = ZoneInfo(config.get("timezone", "UTC"))
+            now = datetime.now(tz)
+
+            # Find next 1st at 2 AM
+            if now.day == 1 and now.hour < 2:
+                target = now.replace(hour=2, minute=0, second=0, microsecond=0)
+            else:
+                # Move to 1st of next month
+                if now.month == 12:
+                    target = now.replace(year=now.year + 1, month=1, day=1,
+                                         hour=2, minute=0, second=0, microsecond=0)
+                else:
+                    target = now.replace(month=now.month + 1, day=1,
+                                         hour=2, minute=0, second=0, microsecond=0)
+
+            wait_seconds = (target - now).total_seconds()
+            logger.info(f"Next interest calculation in {wait_seconds / 3600:.1f} hours (target: {target.date()})")
+            await asyncio.sleep(wait_seconds)
+
+            await run_interest_calculation()
+
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Interest calculation loop error: {e}")
+            await asyncio.sleep(3600)
+
+
+async def run_interest_calculation():
+    """
+    Calculate and log monthly interest for all interest-bearing accounts (LM-32).
+    Interest = current_balance x interest_rate / 12, rounded to nearest integer.
+    Skips if result would be 0. Logs as positive "Interest" transaction with is_auto=true.
+    """
+    accounts = await queries.get_interest_bearing_accounts()
+    if not accounts:
+        logger.info("No interest-bearing accounts, skipping interest calculation")
+        return
+
+    today_str = date.today().replace(day=1).isoformat()
+    credited = 0
+
+    for acc in accounts:
+        monthly_interest = round(acc["current_balance"] * acc["interest_rate"] / 12)
+        if monthly_interest == 0:
+            continue
+
+        await queries.log_transaction(
+            amount=monthly_interest,
+            account_id=acc["id"],
+            category="Interest",
+            description=f"Monthly interest \u2014 {acc['name']}",
+            date_str=today_str,
+            is_auto=True,
+        )
+        credited += 1
+        logger.info(f"Interest credited: {acc['name']} +{monthly_interest} ({acc['interest_rate'] * 100:.1f}% APR)")
+
+    logger.info(f"Interest calculation complete: {credited}/{len(accounts)} accounts credited")
 
 
 async def run_compression():

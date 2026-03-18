@@ -27,6 +27,7 @@ class AccountUpdate(BaseModel):
     currency: Optional[str] = None
     account_type: Optional[str] = None
     current_balance: Optional[int] = None
+    interest_rate: Optional[float] = None
     notes: Optional[str] = None
     sort_order: Optional[int] = None
 

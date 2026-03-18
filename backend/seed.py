@@ -44,17 +44,21 @@ async def seed_finance():
     try:
         # --- Accounts ---
         accounts = [
-            ("SMBC Checking", "bank", "JPY", 485000, 1),
-            ("Rakuten Card", "wallet", "JPY", -32000, 2),
-            ("Cash Wallet", "cash", "JPY", 15000, 3),
-            ("Wise USD", "transfer_service", "USD", 120000, 4),  # $1,200
+            # (name, type, currency, balance, sort, interest_rate)
+            ("SMBC Checking", "bank", "JPY", 485000, 1, None),
+            ("Rakuten Card", "wallet", "JPY", -32000, 2, None),
+            ("Cash Wallet", "cash", "JPY", 15000, 3, None),
+            ("Wise USD", "transfer_service", "USD", 120000, 4, 0.038),  # $1,200 @ 3.8% APR
+            ("US Savings", "bank", "USD", 550000, 5, 0.045),  # $5,500 @ 4.5% APR
         ]
-        for name, atype, curr, balance, sort in accounts:
+        for name, atype, curr, balance, sort, rate in accounts:
             await db.execute(
-                "INSERT INTO finance_accounts (name, account_type, currency, current_balance, sort_order) VALUES (?, ?, ?, ?, ?)",
-                [name, atype, curr, balance, sort],
+                """INSERT INTO finance_accounts
+                   (name, account_type, currency, current_balance, sort_order, interest_rate)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                [name, atype, curr, balance, sort, rate],
             )
-        print("  [OK] Finance accounts (4)")
+        print(f"  [OK] Finance accounts ({len(accounts)})")
 
         # --- Budgets ---
         budgets = [

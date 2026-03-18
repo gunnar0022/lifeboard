@@ -205,6 +205,16 @@ async def handle_get_file(data: dict) -> dict:
     )
 
 
+async def handle_set_interest_rate(data: dict) -> dict:
+    result = await queries.set_interest_rate(
+        account_id=data["account_id"],
+        interest_rate=data["interest_rate"],
+    )
+    if not result:
+        raise ValueError(f"Account {data['account_id']} not found")
+    return result
+
+
 async def handle_get_cycle_summaries(data: dict) -> list:
     return await queries.get_all_cycle_summaries()
 
@@ -279,6 +289,10 @@ ACTION_REGISTRY = {
     "set_budget": {
         "handler": handle_set_budget,
         "required": ["category", "monthly_limit"],
+    },
+    "set_interest_rate": {
+        "handler": handle_set_interest_rate,
+        "required": ["account_id", "interest_rate"],
     },
     "store_file": {
         "handler": handle_store_file,
