@@ -14,7 +14,7 @@ export function useApi(endpoint, options = {}) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`);
+      const res = await fetch(`${API_BASE}${endpoint}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);

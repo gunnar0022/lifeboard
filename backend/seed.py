@@ -22,7 +22,7 @@ async def seed_config():
         "secondary_currency": "USD",
         "pay_cycle_day": 21,
         "salary_is_net": True,
-        "active_agents": ["finance", "life_manager"],
+        "active_agents": ["finance", "life_manager", "health_body"],
         "quiet_hours": {
             "weekday": {"start": "08:00", "end": "16:00"},
             "weekend": None,
