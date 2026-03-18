@@ -1,3 +1,7 @@
+.quick-add-bar {
+  margin-bottom: var(--space-lg);
+}
+
 .quick-add-bar__form {
   display: flex;
   flex-direction: column;
