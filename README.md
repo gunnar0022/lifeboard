@@ -109,7 +109,7 @@ backend/
   main.py              # App entry, lifespan events, nudge aggregation, SPA serving
   database.py          # Schema definitions, init_db(), WAL mode, foreign keys
   config.py            # user_config.json loader with file-change detection
-  llm_client.py        # Anthropic API wrapper (Claude claude-sonnet-4-20250514)
+  llm_client.py        # Anthropic API wrapper (Claude claude-sonnet-4-5-20250514)
   action_executor.py   # Validate-execute-respond loop for agent actions
   seed.py              # Demo data generator (--clear --config flags)
   agents/
@@ -189,7 +189,7 @@ Schedulers start and stop cleanly with the FastAPI lifespan. Each uses `asyncio`
 | Frontend | React 18, Vite 6, Framer Motion, Recharts, Lucide Icons |
 | Backend | Python, FastAPI, uvicorn, aiosqlite |
 | Database | SQLite (WAL mode, foreign keys, raw SQL) |
-| AI | Anthropic Claude (claude-sonnet-4-20250514) via `anthropic` SDK |
+| AI | Anthropic Claude (claude-sonnet-4-5-20250514) via `anthropic` SDK |
 | Telegram | python-telegram-bot v21 (async) |
 | Market Data | yfinance, frankfurter.app (FX rates) |
 | Process Manager | PM2 (production) |

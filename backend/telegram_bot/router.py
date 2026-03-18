@@ -95,6 +95,7 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
             system_prompt=prompt,
             user_message=text,
             max_tokens=200,
+            model=llm_client.MODEL_FAST,
         )
 
         # Parse routes from response

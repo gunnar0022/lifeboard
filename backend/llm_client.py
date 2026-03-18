@@ -9,8 +9,10 @@ from anthropic import AsyncAnthropic
 
 logger = logging.getLogger(__name__)
 
-# Use Sonnet for cost efficiency (LM-13a)
-MODEL = "claude-sonnet-4-20250514"
+# Default model for agent processing
+MODEL = "claude-sonnet-4-5-20250514"
+# Lightweight model for classification tasks (routing)
+MODEL_FAST = "claude-haiku-4-5-20251001"
 
 _client: AsyncAnthropic | None = None
 
@@ -63,6 +65,7 @@ async def process_message(
     image_data: bytes = None,
     image_media_type: str = "image/jpeg",
     max_tokens: int = 2048,
+    model: str = None,
 ) -> dict:
     """
     Send a message to Claude and get a structured JSON action back.
@@ -103,7 +106,7 @@ async def process_message(
 
     try:
         response = await client.messages.create(
-            model=MODEL,
+            model=model or MODEL,
             max_tokens=max_tokens,
             system=system_prompt,
             messages=messages,
