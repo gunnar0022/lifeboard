@@ -23,6 +23,7 @@ async def init_db():
     try:
         await _create_finance_tables(db)
         await _create_life_manager_tables(db)
+        await _create_health_tables(db)
         await db.commit()
     finally:
         await db.close()
@@ -93,6 +94,93 @@ async def _create_finance_tables(db: aiosqlite.Connection):
             mime_type TEXT,
             file_size INTEGER,
             linked_transaction_id INTEGER REFERENCES finance_transactions(id),
+            description TEXT,
+            extracted_data TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+    """)
+
+
+async def _create_health_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS health_profile (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            height_cm REAL,
+            weight_g INTEGER,
+            age INTEGER,
+            activity_level TEXT CHECK(activity_level IN (
+                'sedentary', 'light', 'moderate', 'active', 'very_active'
+            )),
+            daily_calorie_goal INTEGER,
+            evening_checkin_time TEXT DEFAULT '21:00',
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_meals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            time TEXT,
+            description TEXT NOT NULL,
+            calories INTEGER NOT NULL DEFAULT 0,
+            protein_g INTEGER NOT NULL DEFAULT 0,
+            carbs_g INTEGER NOT NULL DEFAULT 0,
+            fat_g INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            time TEXT,
+            description TEXT NOT NULL,
+            duration_minutes INTEGER NOT NULL DEFAULT 0,
+            estimated_calories INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_daily_summary (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL UNIQUE,
+            total_calories INTEGER NOT NULL DEFAULT 0,
+            total_protein_g INTEGER NOT NULL DEFAULT 0,
+            total_carbs_g INTEGER NOT NULL DEFAULT 0,
+            total_fat_g INTEGER NOT NULL DEFAULT 0,
+            total_exercise_minutes INTEGER NOT NULL DEFAULT 0,
+            total_exercise_calories INTEGER NOT NULL DEFAULT 0,
+            mood INTEGER CHECK(mood BETWEEN 1 AND 5),
+            energy INTEGER CHECK(energy BETWEEN 1 AND 5),
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_measurements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            weight_g INTEGER,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL CHECK(category IN (
+                'checkup', 'vaccination', 'prescription', 'lab_result',
+                'imaging', 'dental', 'vision', 'other'
+            )),
+            date TEXT,
+            provider TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS health_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            file_path TEXT NOT NULL,
+            original_filename TEXT NOT NULL,
+            mime_type TEXT,
+            file_size INTEGER,
+            linked_document_id INTEGER REFERENCES health_documents(id),
             description TEXT,
             extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))

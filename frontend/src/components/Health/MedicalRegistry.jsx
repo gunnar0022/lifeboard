@@ -1,31 +1,33 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FileText, ChevronDown, ChevronRight, AlertCircle, Camera,
-  Home, Shield, Scale, Heart, Wallet, FolderOpen,
+  FileText, ChevronDown, ChevronRight, Camera,
+  Stethoscope, Syringe, Pill, FlaskConical, ScanLine, SmilePlus, Eye, FolderOpen,
   Search, ArrowUpDown, X,
 } from 'lucide-react';
-import './DocumentRegistry.css';
+import './MedicalRegistry.css';
 
 const CATEGORY_ICONS = {
-  housing: Home,
-  insurance: Shield,
-  legal: Scale,
-  medical: Heart,
-  financial: Wallet,
+  checkup: Stethoscope,
+  vaccination: Syringe,
+  prescription: Pill,
+  lab_result: FlaskConical,
+  imaging: ScanLine,
+  dental: SmilePlus,
+  vision: Eye,
   other: FolderOpen,
 };
 
-function getExpiryStatus(expiryDate) {
-  if (!expiryDate) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const exp = new Date(expiryDate + 'T00:00:00');
-  const diff = Math.floor((exp - today) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { text: 'Expired', className: 'expired' };
-  if (diff <= 30) return { text: `${diff}d`, className: 'expiring' };
-  return { text: exp.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), className: 'normal' };
-}
+const CATEGORY_LABELS = {
+  checkup: 'Checkup',
+  vaccination: 'Vaccination',
+  prescription: 'Prescription',
+  lab_result: 'Lab Result',
+  imaging: 'Imaging',
+  dental: 'Dental',
+  vision: 'Vision',
+  other: 'Other',
+};
 
 function parseExtractedData(file) {
   if (!file?.extracted_data) return null;
@@ -53,11 +55,11 @@ function ExtractedFields({ data }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="doc-item__fields">
+    <div className="med-item__fields">
       {entries.map(([key, value]) => (
-        <div key={key} className="doc-item__field">
-          <span className="doc-item__field-label">{formatFieldLabel(key)}</span>
-          <span className="doc-item__field-value">{String(value)}</span>
+        <div key={key} className="med-item__field">
+          <span className="med-item__field-label">{formatFieldLabel(key)}</span>
+          <span className="med-item__field-value">{String(value)}</span>
         </div>
       ))}
     </div>
@@ -65,47 +67,35 @@ function ExtractedFields({ data }) {
 }
 
 const SORT_OPTIONS = [
+  { key: 'date', label: 'Date' },
   { key: 'name', label: 'Name' },
-  { key: 'expiry', label: 'Expiry' },
   { key: 'newest', label: 'Newest' },
 ];
 
-const EXPIRY_FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'expiring', label: 'Expiring soon' },
-  { key: 'expired', label: 'Expired' },
-  { key: 'valid', label: 'Valid' },
-];
-
-export default function DocumentRegistry({ documents }) {
+export default function MedicalRegistry({ documents }) {
   const [expanded, setExpanded] = useState(true);
   const [expandedDoc, setExpandedDoc] = useState(null);
   const [viewingPhoto, setViewingPhoto] = useState(null);
 
-  // Search / filter / sort state
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [expiryFilter, setExpiryFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
 
-  // Extract unique categories
   const categories = useMemo(() => {
     const cats = new Set();
     for (const doc of documents) cats.add(doc.category || 'other');
     return ['all', ...Array.from(cats).sort()];
   }, [documents]);
 
-  // Filter + sort
   const filteredDocs = useMemo(() => {
     let result = [...documents];
 
-    // Text search
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(doc => {
         if (doc.name?.toLowerCase().includes(q)) return true;
+        if (doc.provider?.toLowerCase().includes(q)) return true;
         if (doc.notes?.toLowerCase().includes(q)) return true;
-        // Search extracted data values
         const files = doc.files || [];
         for (const f of files) {
           const data = parseExtractedData(f);
@@ -119,40 +109,23 @@ export default function DocumentRegistry({ documents }) {
       });
     }
 
-    // Category filter
     if (activeCategory !== 'all') {
       result = result.filter(doc => (doc.category || 'other') === activeCategory);
     }
 
-    // Expiry filter
-    if (expiryFilter !== 'all') {
-      result = result.filter(doc => {
-        const status = getExpiryStatus(doc.expiry_date);
-        if (expiryFilter === 'expired') return status?.className === 'expired';
-        if (expiryFilter === 'expiring') return status?.className === 'expiring';
-        if (expiryFilter === 'valid') return status?.className === 'normal';
-        return true;
-      });
-    }
-
-    // Sort
     result.sort((a, b) => {
-      if (sortBy === 'name') {
-        return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'date') {
+        const da = a.date || '0000-00-00';
+        const db = b.date || '0000-00-00';
+        return db.localeCompare(da); // newest date first
       }
-      if (sortBy === 'expiry') {
-        const ea = a.expiry_date || '9999-12-31';
-        const eb = b.expiry_date || '9999-12-31';
-        return ea.localeCompare(eb);
-      }
-      // newest → highest ID first
       return (b.id || 0) - (a.id || 0);
     });
 
     return result;
-  }, [documents, searchQuery, activeCategory, expiryFilter, sortBy]);
+  }, [documents, searchQuery, activeCategory, sortBy]);
 
-  // Group filtered docs by category
   const grouped = {};
   for (const doc of filteredDocs) {
     const cat = doc.category || 'other';
@@ -160,22 +133,22 @@ export default function DocumentRegistry({ documents }) {
     grouped[cat].push(doc);
   }
 
-  const isFiltering = searchQuery || activeCategory !== 'all' || expiryFilter !== 'all';
+  const isFiltering = searchQuery || activeCategory !== 'all';
   const cycleSortBy = () => {
     const idx = SORT_OPTIONS.findIndex(o => o.key === sortBy);
     setSortBy(SORT_OPTIONS[(idx + 1) % SORT_OPTIONS.length].key);
   };
 
   return (
-    <div className="doc-registry card">
+    <div className="med-registry card">
       <button
-        className="doc-registry__header"
+        className="med-registry__header"
         onClick={() => setExpanded(!expanded)}
       >
         <h3 className="chart-title">
           <FileText size={16} />
-          Documents
-          <span className="doc-registry__count">{documents.length}</span>
+          Medical Records
+          <span className="med-registry__count">{documents.length}</span>
         </h3>
         {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </button>
@@ -183,53 +156,42 @@ export default function DocumentRegistry({ documents }) {
       <AnimatePresence>
         {expanded && (
           <motion.div
-            className="doc-registry__body"
+            className="med-registry__body"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
-            {/* Toolbar */}
             {documents.length > 0 && (
-              <div className="doc-toolbar">
-                <div className="doc-toolbar__search">
+              <div className="med-toolbar">
+                <div className="med-toolbar__search">
                   <Search size={14} />
                   <input
                     type="text"
-                    placeholder="Search documents..."
+                    placeholder="Search records..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                   />
                   {searchQuery && (
-                    <button className="doc-toolbar__clear" onClick={() => setSearchQuery('')}>
+                    <button className="med-toolbar__clear" onClick={() => setSearchQuery('')}>
                       <X size={12} />
                     </button>
                   )}
                 </div>
 
-                <div className="doc-toolbar__filters">
-                  <div className="doc-toolbar__pills">
+                <div className="med-toolbar__filters">
+                  <div className="med-toolbar__pills">
                     {categories.map(cat => (
                       <button
                         key={cat}
-                        className={`doc-pill${activeCategory === cat ? ' doc-pill--active' : ''}`}
+                        className={`med-pill${activeCategory === cat ? ' med-pill--active' : ''}`}
                         onClick={() => setActiveCategory(cat)}
                       >
-                        {cat === 'all' ? 'All' : cat}
+                        {cat === 'all' ? 'All' : (CATEGORY_LABELS[cat] || cat)}
                       </button>
                     ))}
                   </div>
 
-                  <select
-                    className="doc-toolbar__select"
-                    value={expiryFilter}
-                    onChange={e => setExpiryFilter(e.target.value)}
-                  >
-                    {EXPIRY_FILTERS.map(f => (
-                      <option key={f.key} value={f.key}>{f.label}</option>
-                    ))}
-                  </select>
-
-                  <button className="doc-toolbar__sort" onClick={cycleSortBy} title={`Sort: ${sortBy}`}>
+                  <button className="med-toolbar__sort" onClick={cycleSortBy} title={`Sort: ${sortBy}`}>
                     <ArrowUpDown size={13} />
                     {SORT_OPTIONS.find(o => o.key === sortBy)?.label}
                   </button>
@@ -238,54 +200,57 @@ export default function DocumentRegistry({ documents }) {
             )}
 
             {documents.length === 0 ? (
-              <div className="doc-registry__empty">
+              <div className="med-registry__empty">
                 <FileText size={24} />
-                <p>No documents tracked yet</p>
+                <p>No medical records yet</p>
               </div>
             ) : filteredDocs.length === 0 ? (
-              <div className="doc-registry__empty">
+              <div className="med-registry__empty">
                 <Search size={20} />
-                <p>No documents match your filters</p>
+                <p>No records match your filters</p>
               </div>
             ) : (
               <>
                 {Object.entries(grouped).map(([category, docs]) => {
                   const Icon = CATEGORY_ICONS[category] || FolderOpen;
                   return (
-                    <div key={category} className="doc-group">
-                      <div className="doc-group__title">
+                    <div key={category} className="med-group">
+                      <div className="med-group__title">
                         <Icon size={14} />
-                        <span>{category}</span>
-                        <span className="doc-group__count">{docs.length}</span>
+                        <span>{CATEGORY_LABELS[category] || category}</span>
+                        <span className="med-group__count">{docs.length}</span>
                       </div>
                       {docs.map(doc => {
-                        const expiry = getExpiryStatus(doc.expiry_date);
                         const files = doc.files || [];
                         const photoFile = files.find(f => f.file_path && f.mime_type?.startsWith('image/'));
                         const extractedData = files.reduce((acc, f) => acc || parseExtractedData(f), null);
                         const isExpanded = expandedDoc === doc.id;
 
                         return (
-                          <div key={doc.id} className="doc-item">
+                          <div key={doc.id} className="med-item">
                             <button
-                              className="doc-item__row"
+                              className="med-item__row"
                               onClick={() => {
                                 setExpandedDoc(isExpanded ? null : doc.id);
                                 if (isExpanded) setViewingPhoto(null);
                               }}
                             >
-                              <span className="doc-item__name">
-                                {doc.name}
-                                {photoFile && (
-                                  <span className="doc-item__photo-badge" title="Has photo">
-                                    <Camera size={10} />
-                                  </span>
+                              <div className="med-item__name-col">
+                                <span className="med-item__name">
+                                  {doc.name}
+                                  {photoFile && (
+                                    <span className="med-item__photo-badge" title="Has photo">
+                                      <Camera size={10} />
+                                    </span>
+                                  )}
+                                </span>
+                                {doc.provider && (
+                                  <span className="med-item__provider">{doc.provider}</span>
                                 )}
-                              </span>
-                              {expiry && (
-                                <span className={`doc-item__expiry doc-item__expiry--${expiry.className}`}>
-                                  {expiry.className === 'expired' && <AlertCircle size={10} />}
-                                  {expiry.text}
+                              </div>
+                              {doc.date && (
+                                <span className="med-item__date mono">
+                                  {doc.date}
                                 </span>
                               )}
                             </button>
@@ -293,7 +258,7 @@ export default function DocumentRegistry({ documents }) {
                             <AnimatePresence>
                               {isExpanded && (
                                 <motion.div
-                                  className="doc-item__detail"
+                                  className="med-item__detail"
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: 'auto' }}
                                   exit={{ opacity: 0, height: 0 }}
@@ -301,12 +266,12 @@ export default function DocumentRegistry({ documents }) {
                                   {extractedData ? (
                                     <ExtractedFields data={extractedData} />
                                   ) : doc.notes ? (
-                                    <div className="doc-item__notes">{doc.notes}</div>
+                                    <div className="med-item__notes">{doc.notes}</div>
                                   ) : null}
 
                                   {photoFile && (
                                     <button
-                                      className="doc-item__view-photo"
+                                      className="med-item__view-photo"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setViewingPhoto(viewingPhoto === photoFile.id ? null : photoFile.id);
@@ -318,9 +283,9 @@ export default function DocumentRegistry({ documents }) {
                                   )}
 
                                   {viewingPhoto === photoFile?.id && (
-                                    <div className="doc-item__photo">
+                                    <div className="med-item__photo">
                                       <img
-                                        src={`/api/life/files/${photoFile.id}/view`}
+                                        src={`/api/health_body/files/${photoFile.id}/view`}
                                         alt={doc.name}
                                       />
                                     </div>
@@ -335,8 +300,8 @@ export default function DocumentRegistry({ documents }) {
                   );
                 })}
                 {isFiltering && (
-                  <div className="doc-registry__results-count">
-                    {filteredDocs.length} of {documents.length} documents
+                  <div className="med-registry__results-count">
+                    {filteredDocs.length} of {documents.length} records
                   </div>
                 )}
               </>

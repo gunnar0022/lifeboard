@@ -12,16 +12,8 @@ AGENTS_DIR = Path(__file__).parent
 ALL_AGENTS = [
     {"id": "finance", "module": "backend.agents.finance"},
     {"id": "life_manager", "module": "backend.agents.life_manager"},
+    {"id": "health_body", "module": "backend.agents.health_body"},
     # Placeholder agents (no module yet)
-    {
-        "id": "health_body",
-        "name": "Health & Body",
-        "accent_color": "#F59E0B",
-        "icon": "heart-pulse",
-        "enabled": False,
-        "description": "Exercise, nutrition, sleep, medical",
-        "v1": False,
-    },
     {
         "id": "investing",
         "name": "Investing",

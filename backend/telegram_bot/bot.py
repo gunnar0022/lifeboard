@@ -38,6 +38,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Hey {display_name}! Here's what I can do:\n\n"
         "*/f* or */finance* — Switch to Finance agent\n"
         "*/l* or */life* — Switch to Life Manager agent\n"
+        "*/h* or */health* — Switch to Health & Body agent\n"
         "*/status* — Quick summary from all agents\n"
         "*/help* — Show this message\n\n"
         f"Currently talking to: *{_active_agent.replace('_', ' ').title()}*",
@@ -64,6 +65,17 @@ async def cmd_life(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _active_agent = "life_manager"
     await update.message.reply_text(
         "📋 Life Manager active. Add tasks, track bills, or ask about upcoming events."
+    )
+
+
+async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Switch to Health & Body agent."""
+    if not _is_authorized(update):
+        return
+    global _active_agent
+    _active_agent = "health_body"
+    await update.message.reply_text(
+        "💪 Health & Body active. Log meals, exercise, mood, or send medical docs."
     )
 
 
@@ -107,8 +119,29 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception:
         life_status = "📋 *Life Manager*: No data yet"
 
+    # Health & Body status
+    try:
+        from backend.agents.health_body import queries as hq
+        from datetime import date as dt_date
+        profile = await hq.get_profile()
+        if profile:
+            today_str = dt_date.today().isoformat()
+            meals = await hq.get_meals_for_date(today_str)
+            today_cal = sum(m.get("calories", 0) for m in meals)
+            goal = profile.get("daily_calorie_goal", 0)
+            weight_kg = round(profile.get("weight_g", 0) / 1000, 1) if profile.get("weight_g") else "?"
+            health_status = (
+                f"💪 *Health & Body*\n"
+                f"  Today: {today_cal}/{goal} kcal ({len(meals)} meals)\n"
+                f"  Weight: {weight_kg}kg"
+            )
+        else:
+            health_status = "💪 *Health & Body*: Profile not set up"
+    except Exception:
+        health_status = "💪 *Health & Body*: No data yet"
+
     await update.message.reply_text(
-        f"📊 *LifeBoard Status*\n\n{finance_status}\n\n{life_status}",
+        f"📊 *LifeBoard Status*\n\n{finance_status}\n\n{life_status}\n\n{health_status}",
         parse_mode="Markdown",
     )
 
@@ -138,9 +171,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif _active_agent == "life_manager":
         from backend.agents.life_manager.telegram import process_message as lm_process
         await lm_process(update, text)
+    elif _active_agent == "health_body":
+        from backend.agents.health_body.telegram import process_message as hb_process
+        await hb_process(update, text)
     else:
         await update.message.reply_text(
-            "I'm not sure which agent to use. Try /f for Finance or /l for Life Manager."
+            "I'm not sure which agent to use. Try /f for Finance, /l for Life Manager, or /h for Health."
         )
 
 
@@ -157,9 +193,12 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif _active_agent == "life_manager":
         from backend.agents.life_manager.telegram import process_photo as lm_photo
         await lm_photo(update, caption)
+    elif _active_agent == "health_body":
+        from backend.agents.health_body.telegram import process_photo as hb_photo
+        await hb_photo(update, caption)
     else:
         await update.message.reply_text(
-            "Photo processing requires an active agent. Try /f for Finance or /l for Life Manager."
+            "Photo processing requires an active agent. Try /f for Finance, /l for Life Manager, or /h for Health."
         )
 
 
@@ -192,6 +231,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         from backend.agents.life_manager.telegram import process_message as lm_process
         fake = FakeUpdate(query, option_text)
         await lm_process(fake, option_text)
+    elif data.startswith("health:"):
+        option_text = data[len("health:"):]
+        from backend.agents.health_body.telegram import process_message as hb_process
+        fake = FakeUpdate(query, option_text)
+        await hb_process(fake, option_text)
 
 
 def _is_authorized(update: Update) -> bool:
@@ -225,6 +269,7 @@ async def start_bot():
     _bot_app.add_handler(CommandHandler("help", cmd_help))
     _bot_app.add_handler(CommandHandler(["f", "finance"], cmd_finance))
     _bot_app.add_handler(CommandHandler(["l", "life"], cmd_life))
+    _bot_app.add_handler(CommandHandler(["h", "health"], cmd_health))
     _bot_app.add_handler(CommandHandler("status", cmd_status))
     _bot_app.add_handler(
         MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
@@ -239,6 +284,7 @@ async def start_bot():
         BotCommand("help", "Show available commands"),
         BotCommand("f", "Switch to Finance agent"),
         BotCommand("l", "Switch to Life Manager agent"),
+        BotCommand("h", "Switch to Health & Body agent"),
         BotCommand("status", "Quick summary from all agents"),
     ])
 

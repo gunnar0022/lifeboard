@@ -216,6 +216,91 @@ async def seed_life_manager():
         await db.close()
 
 
+async def seed_health():
+    """Seed Health & Body agent data."""
+    import random
+    db = await get_db()
+    today = date.today()
+
+    try:
+        # Profile
+        await db.execute(
+            """INSERT OR REPLACE INTO health_profile
+               (id, height_cm, weight_g, age, activity_level, daily_calorie_goal, evening_checkin_time)
+               VALUES (1, 182, 81000, 30, 'moderate', 2200, '21:00')"""
+        )
+
+        # Measurements (weekly weigh-ins, last 4 weeks)
+        for i in range(4):
+            d = today - timedelta(days=i * 7)
+            w = 81000 - (i * 300)  # slight downward trend
+            await db.execute(
+                "INSERT INTO health_measurements (date, weight_g) VALUES (?, ?)",
+                [d.isoformat(), w],
+            )
+
+        # Recent meals (last 3 days — kept as individual entries)
+        meals = [
+            (today.isoformat(), "08:30", "Coffee and toast with egg", 350, 15, 30, 12),
+            (today.isoformat(), "12:30", "Katsu curry set at CoCo Ichibanya", 850, 35, 90, 30),
+            ((today - timedelta(days=1)).isoformat(), "08:00", "Yogurt and granola", 300, 12, 40, 8),
+            ((today - timedelta(days=1)).isoformat(), "12:00", "Convenience store bento", 700, 25, 80, 25),
+            ((today - timedelta(days=1)).isoformat(), "19:00", "Salmon sashimi and rice", 550, 35, 50, 15),
+            ((today - timedelta(days=2)).isoformat(), "09:00", "Onigiri and miso soup", 280, 8, 45, 4),
+            ((today - timedelta(days=2)).isoformat(), "13:00", "Ramen", 750, 25, 80, 30),
+            ((today - timedelta(days=2)).isoformat(), "19:30", "Yakitori and beer", 650, 30, 20, 25),
+        ]
+        for d, t, desc, cal, p, c, f in meals:
+            await db.execute(
+                "INSERT INTO health_meals (date, time, description, calories, protein_g, carbs_g, fat_g) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [d, t, desc, cal, p, c, f],
+            )
+
+        # Recent exercises
+        exercises = [
+            ((today - timedelta(days=1)).isoformat(), "07:00", "Morning jog in park", 30, 250),
+            ((today - timedelta(days=2)).isoformat(), "18:00", "Gym session - weights and stretching", 45, 300),
+        ]
+        for d, t, desc, dur, cal in exercises:
+            await db.execute(
+                "INSERT INTO health_exercises (date, time, description, duration_minutes, estimated_calories) VALUES (?, ?, ?, ?, ?)",
+                [d, t, desc, dur, cal],
+            )
+
+        # Daily summaries for older days (already compressed, days 4-30)
+        for i in range(4, 30):
+            d = (today - timedelta(days=i)).isoformat()
+            cal = random.randint(1800, 2600)
+            mood = random.randint(2, 5)
+            energy = random.randint(2, 5)
+            ex_min = random.choice([0, 0, 20, 30, 45, 60])
+            ex_cal = ex_min * 8
+            await db.execute(
+                """INSERT INTO health_daily_summary
+                   (date, total_calories, total_protein_g, total_carbs_g, total_fat_g,
+                    total_exercise_minutes, total_exercise_calories, mood, energy)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                [d, cal, random.randint(60, 120), random.randint(150, 300),
+                 random.randint(40, 100), ex_min, ex_cal, mood, energy],
+            )
+
+        # Medical documents
+        docs = [
+            ("Annual health checkup 2025", "checkup", (today - timedelta(days=90)).isoformat(), "Tanaka Clinic", "All results normal"),
+            ("Flu vaccination 2025", "vaccination", (today - timedelta(days=120)).isoformat(), "City Hospital", None),
+        ]
+        for name, cat, doc_date, provider, notes in docs:
+            await db.execute(
+                "INSERT INTO health_documents (name, category, date, provider, notes) VALUES (?, ?, ?, ?, ?)",
+                [name, cat, doc_date, provider, notes],
+            )
+
+        await db.commit()
+        print(f"  [OK] Health profile, {len(meals)} meals, {len(exercises)} exercises, 26 daily summaries, {len(docs)} medical docs")
+    finally:
+        await db.close()
+
+
 async def clear_all():
     """Clear all data from all tables."""
     db = await get_db()
@@ -225,11 +310,16 @@ async def clear_all():
             "finance_files", "finance_transactions", "finance_transfers",
             "finance_recurring", "finance_budgets", "finance_accounts",
             "life_files", "life_events", "life_tasks", "life_bills", "life_documents",
+            "health_files", "health_documents", "health_measurements",
+            "health_daily_summary", "health_exercises", "health_meals", "health_profile",
         ]
         for table in tables:
-            await db.execute(f"DELETE FROM {table}")
-            # Reset autoincrement counters
-            await db.execute(f"DELETE FROM sqlite_sequence WHERE name = ?", [table])
+            try:
+                await db.execute(f"DELETE FROM {table}")
+                # Reset autoincrement counters
+                await db.execute(f"DELETE FROM sqlite_sequence WHERE name = ?", [table])
+            except Exception:
+                pass  # Table may not exist yet
         await db.commit()
         await db.execute("PRAGMA foreign_keys=ON")
         print("  [OK] All tables cleared")
@@ -258,6 +348,9 @@ async def main():
 
     print("\nSeeding Life Manager data...")
     await seed_life_manager()
+
+    print("\nSeeding Health & Body data...")
+    await seed_health()
 
     print("\n" + "=" * 40)
     print("Done! Restart the backend to pick up changes.")

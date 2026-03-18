@@ -136,6 +136,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-card);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
   transition: box-shadow var(--duration-normal) ease, transform var(--duration-normal) ease;
 }
 

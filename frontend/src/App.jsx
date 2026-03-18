@@ -4,6 +4,7 @@ import TopBar from './components/Shell/TopBar';
 import HomePanel from './components/Shell/HomePanel';
 import FinancePanel from './components/Finance/FinancePanel';
 import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
+import HealthPanel from './components/Health/HealthPanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
 import { useApi } from './hooks/useApi';
 import './App.css';
@@ -38,6 +39,10 @@ export default function App() {
 
     if (activePanel === 'life_manager') {
       return <LifeManagerPanel key="life_manager" />;
+    }
+
+    if (activePanel === 'health_body') {
+      return <HealthPanel key="health_body" />;
     }
 
     // Placeholder agents
