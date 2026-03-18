@@ -1,0 +1,103 @@
+.portfolio-trend__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.portfolio-trend__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.portfolio-trend__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: var(--space-xs) 0 2px;
+}
+
+.portfolio-trend__gain {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.portfolio-trend__gain-label {
+  color: var(--text-tertiary);
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.portfolio-trend__ranges {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.portfolio-trend__range-btn {
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: calc(var(--radius-sm) - 2px);
+  transition: all 0.15s ease;
+}
+
+.portfolio-trend__range-btn:hover {
+  color: var(--text-primary);
+}
+
+.portfolio-trend__range-btn.active {
+  background: var(--bg-card);
+  color: var(--color-investing);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.portfolio-trend__svg {
+  width: 100%;
+  height: auto;
+}
+
+.portfolio-trend__tick {
+  font-size: 9px;
+  fill: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.portfolio-trend__date-label {
+  font-size: 9px;
+  fill: var(--text-tertiary);
+}
+
+.portfolio-trend__hover-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.portfolio-trend__hover-date {
+  font-size: 9px;
+  fill: var(--text-secondary);
+}
+
+.portfolio-trend__no-data {
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-xl) 0;
+  font-size: 0.875rem;
+}

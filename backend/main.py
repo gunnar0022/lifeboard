@@ -46,6 +46,7 @@ async def lifespan(app: FastAPI):
     active = config.get("active_agents", [])
     health_scheduler_running = False
     finance_scheduler_running = False
+    investing_scheduler_running = False
 
     if "health_body" in active:
         try:
@@ -63,6 +64,14 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Finance scheduler failed to start: {e}")
 
+    if "investing" in active:
+        try:
+            from backend.agents.investing.scheduler import start_scheduler as start_investing_scheduler
+            await start_investing_scheduler()
+            investing_scheduler_running = True
+        except Exception as e:
+            logger.error(f"Investing scheduler failed to start: {e}")
+
     yield
 
     # Shutdown schedulers
@@ -79,6 +88,13 @@ async def lifespan(app: FastAPI):
             await stop_finance_scheduler()
         except Exception as e:
             logger.error(f"Finance scheduler stop error: {e}")
+
+    if investing_scheduler_running:
+        try:
+            from backend.agents.investing.scheduler import stop_scheduler as stop_investing_scheduler
+            await stop_investing_scheduler()
+        except Exception as e:
+            logger.error(f"Investing scheduler stop error: {e}")
 
     logger.info("Shutting down Telegram bot...")
     await stop_bot()
@@ -154,6 +170,12 @@ async def get_nudges():
     except Exception as e:
         logger.error(f"Health nudge check failed: {e}")
         errors.append(f"health_body: {e}")
+    try:
+        from backend.agents.investing.nudges import check_nudges as investing_nudges
+        all_nudges.extend(await investing_nudges())
+    except Exception as e:
+        logger.error(f"Investing nudge check failed: {e}")
+        errors.append(f"investing: {e}")
     if errors:
         logger.error(f"Nudge errors: {errors}")
     # Sort: alert > warning > info

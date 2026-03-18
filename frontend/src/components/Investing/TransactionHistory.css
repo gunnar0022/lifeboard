@@ -1,0 +1,182 @@
+.tx-history__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-lg);
+}
+
+.tx-history__modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.tx-history__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.tx-history__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tx-history__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.tx-history__close {
+  padding: var(--space-xs);
+  border: none;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tx-history__close:hover {
+  color: var(--text-primary);
+}
+
+.tx-history__summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.tx-history__stat-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.tx-history__stat-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tx-history__stat-value.gain {
+  color: var(--color-success);
+}
+
+.tx-history__stat-value.loss {
+  color: var(--color-alert);
+}
+
+.tx-history__list-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--space-sm);
+}
+
+.tx-history__loading,
+.tx-history__empty {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+.tx-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tx-history__row {
+  display: grid;
+  grid-template-columns: 50px 90px 1fr 1fr 1fr;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+.tx-history__row:hover {
+  background: var(--bg-secondary);
+}
+
+.tx-history__badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.tx-history__badge.buy {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent);
+  color: var(--color-success);
+}
+
+.tx-history__badge.sell {
+  background: color-mix(in srgb, var(--color-alert) 15%, transparent);
+  color: var(--color-alert);
+}
+
+.tx-history__badge.dividend {
+  background: color-mix(in srgb, var(--color-investing) 15%, transparent);
+  color: var(--color-investing);
+}
+
+.tx-history__badge.split {
+  background: color-mix(in srgb, var(--text-tertiary) 15%, transparent);
+  color: var(--text-secondary);
+}
+
+.tx-history__date {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.tx-history__shares,
+.tx-history__price,
+.tx-history__total {
+  color: var(--text-primary);
+}
+
+@media (max-width: 500px) {
+  .tx-history__summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tx-history__row {
+    grid-template-columns: 50px 1fr 1fr;
+  }
+
+  .tx-history__shares,
+  .tx-history__price {
+    display: none;
+  }
+}

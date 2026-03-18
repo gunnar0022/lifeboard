@@ -5,6 +5,7 @@ import HomePanel from './components/Shell/HomePanel';
 import FinancePanel from './components/Finance/FinancePanel';
 import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
 import HealthPanel from './components/Health/HealthPanel';
+import InvestingPanel from './components/Investing/InvestingPanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
 import { useApi } from './hooks/useApi';
 import './App.css';
@@ -43,6 +44,10 @@ export default function App() {
 
     if (activePanel === 'health_body') {
       return <HealthPanel key="health_body" />;
+    }
+
+    if (activePanel === 'investing') {
+      return <InvestingPanel key="investing" />;
     }
 
     // Placeholder agents

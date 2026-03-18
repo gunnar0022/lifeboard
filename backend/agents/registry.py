@@ -13,16 +13,8 @@ ALL_AGENTS = [
     {"id": "finance", "module": "backend.agents.finance"},
     {"id": "life_manager", "module": "backend.agents.life_manager"},
     {"id": "health_body", "module": "backend.agents.health_body"},
+    {"id": "investing", "module": "backend.agents.investing"},
     # Placeholder agents (no module yet)
-    {
-        "id": "investing",
-        "name": "Investing",
-        "accent_color": "#8B5CF6",
-        "icon": "trending-up",
-        "enabled": False,
-        "description": "Portfolio, market tracking, strategy",
-        "v1": False,
-    },
     {
         "id": "career",
         "name": "Career",

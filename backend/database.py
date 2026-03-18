@@ -24,6 +24,7 @@ async def init_db():
         await _create_finance_tables(db)
         await _create_life_manager_tables(db)
         await _create_health_tables(db)
+        await _create_investing_tables(db)
         await db.commit()
     finally:
         await db.close()
@@ -267,5 +268,61 @@ async def _create_life_manager_tables(db: aiosqlite.Connection):
             description TEXT,
             extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+    """)
+
+
+async def _create_investing_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS investing_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            type TEXT NOT NULL CHECK(type IN ('brokerage', 'retirement', 'crypto')),
+            currency TEXT NOT NULL DEFAULT 'JPY',
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS investing_holdings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            symbol TEXT NOT NULL,
+            name TEXT NOT NULL,
+            asset_class TEXT NOT NULL CHECK(asset_class IN ('stock', 'etf', 'crypto', 'bond', 'other')),
+            currency TEXT NOT NULL DEFAULT 'JPY',
+            total_shares REAL NOT NULL DEFAULT 0,
+            avg_cost_per_share INTEGER NOT NULL DEFAULT 0,
+            current_price INTEGER NOT NULL DEFAULT 0,
+            last_price_update TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS investing_transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            holding_id INTEGER NOT NULL REFERENCES investing_holdings(id),
+            type TEXT NOT NULL CHECK(type IN ('buy', 'sell', 'dividend', 'split')),
+            shares REAL NOT NULL DEFAULT 0,
+            price_per_share INTEGER NOT NULL DEFAULT 0,
+            total_amount INTEGER NOT NULL DEFAULT 0,
+            currency TEXT NOT NULL DEFAULT 'JPY',
+            date TEXT NOT NULL,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS investing_portfolio_snapshots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL UNIQUE,
+            total_value INTEGER NOT NULL DEFAULT 0,
+            currency TEXT NOT NULL DEFAULT 'JPY',
+            breakdown TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS investing_holding_accounts (
+            holding_id INTEGER NOT NULL REFERENCES investing_holdings(id),
+            account_id INTEGER NOT NULL REFERENCES investing_accounts(id),
+            PRIMARY KEY (holding_id, account_id)
         );
     """)

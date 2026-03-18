@@ -17,6 +17,38 @@ function formatBalance(amount, currency) {
   return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 }
 
+function NetWorth({ byCurrency, fxRate, investingSnapshot }) {
+  if (!investingSnapshot || !investingSnapshot.total_value) return null;
+  if (!byCurrency || byCurrency.length === 0) return null;
+
+  // Calculate bank total in JPY
+  let bankTotalJpy = 0;
+  for (const g of byCurrency) {
+    if (g.currency === 'JPY') {
+      bankTotalJpy += g.total;
+    } else if (g.currency === 'USD' && fxRate) {
+      bankTotalJpy += Math.round((g.total / 100) * fxRate.usd_to_jpy);
+    }
+  }
+
+  // Investing snapshot total_value is already in smallest unit of its currency
+  let investTotalJpy = investingSnapshot.total_value;
+  if (investingSnapshot.currency === 'USD' && fxRate) {
+    investTotalJpy = Math.round((investingSnapshot.total_value / 100) * fxRate.usd_to_jpy);
+  }
+
+  const netWorth = bankTotalJpy + investTotalJpy;
+
+  return (
+    <div className="accounts-strip__total accounts-strip__total--net-worth">
+      <span className="accounts-strip__total-label">Net Worth</span>
+      <span className="accounts-strip__total-value accounts-strip__total-value--net mono">
+        {formatBalance(netWorth, 'JPY')}
+      </span>
+    </div>
+  );
+}
+
 function CombinedTotal({ byCurrency, fxRate }) {
   const [targetCurrency, setTargetCurrency] = useState('JPY');
 
@@ -57,6 +89,7 @@ function CombinedTotal({ byCurrency, fxRate }) {
 export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const { data: fxRate } = useApi('/api/finance/exchange-rate');
+  const { data: investingSnapshot } = useApi('/api/investing/latest-snapshot');
 
   if (!overview) return null;
 
@@ -107,6 +140,7 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
           </div>
         ))}
         <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} />
+        <NetWorth byCurrency={overview.by_currency} fxRate={fxRate} investingSnapshot={investingSnapshot} />
       </div>
 
       {/* Add account modal */}

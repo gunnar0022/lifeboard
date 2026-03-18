@@ -15,19 +15,21 @@ from backend import llm_client
 logger = logging.getLogger(__name__)
 
 # Valid agent IDs
-VALID_AGENTS = {"finance", "life_manager", "health_body"}
+VALID_AGENTS = {"finance", "life_manager", "health_body", "investing"}
 
 # Emoji prefixes for multi-agent consolidated replies
 AGENT_EMOJI = {
     "finance": "\U0001f4b0",       # money bag
     "life_manager": "\U0001f4cb",   # clipboard
     "health_body": "\U0001f4aa",    # flexed biceps
+    "investing": "\U0001f4c8",     # chart increasing
 }
 
 AGENT_LABELS = {
     "finance": "Finance",
     "life_manager": "Life Manager",
     "health_body": "Health & Body",
+    "investing": "Investing",
 }
 
 # --- In-memory state (resets on restart, fine per LM-14) ---
@@ -51,6 +53,7 @@ Agents:
 - finance: money, spending, transactions, budget, accounts, salary, receipts, payments, transfers, recurring payments, income, interest
 - life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands
 - health_body: food, meals, exercise, weight, mood, energy, medical, calories, gym, nutrition, sleep, health checkups
+- investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
 
 Rules:
 - Most messages go to ONE agent
@@ -293,9 +296,15 @@ async def _send_fallback_keyboard(update: Update, text: str):
                 f"{AGENT_EMOJI['life_manager']} Life Manager",
                 callback_data="router:life_manager",
             ),
+        ],
+        [
             InlineKeyboardButton(
                 f"{AGENT_EMOJI['health_body']} Health",
                 callback_data="router:health_body",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['investing']} Investing",
+                callback_data="router:investing",
             ),
         ]
     ]
@@ -327,9 +336,15 @@ async def _send_photo_fallback(update: Update):
                 f"{AGENT_EMOJI['life_manager']} Life Manager",
                 callback_data="router_photo:life_manager",
             ),
+        ],
+        [
             InlineKeyboardButton(
                 f"{AGENT_EMOJI['health_body']} Health",
                 callback_data="router_photo:health_body",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['investing']} Investing",
+                callback_data="router_photo:investing",
             ),
         ]
     ]
@@ -353,6 +368,9 @@ def _get_agent_handler(agent_id: str, method: str):
             return process_message if method == "process_message" else process_photo
         elif agent_id == "health_body":
             from backend.agents.health_body.telegram import process_message, process_photo
+            return process_message if method == "process_message" else process_photo
+        elif agent_id == "investing":
+            from backend.agents.investing.telegram import process_message, process_photo
             return process_message if method == "process_message" else process_photo
     except ImportError as e:
         logger.error(f"Failed to import {agent_id} handler: {e}")

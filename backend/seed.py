@@ -22,7 +22,7 @@ async def seed_config():
         "secondary_currency": "USD",
         "pay_cycle_day": 21,
         "salary_is_net": True,
-        "active_agents": ["finance", "life_manager", "health_body"],
+        "active_agents": ["finance", "life_manager", "health_body", "investing"],
         "quiet_hours": {
             "weekday": {"start": "08:00", "end": "16:00"},
             "weekend": None,
@@ -390,6 +390,116 @@ async def seed_health():
         await db.close()
 
 
+async def seed_investing():
+    """Seed Investing agent data."""
+    import random
+    db = await get_db()
+    today = date.today()
+
+    try:
+        # --- Accounts ---
+        accounts = [
+            # (name, type, currency)
+            ("SBI Securities", "brokerage", "JPY"),
+            ("Coinbase", "crypto", "USD"),
+        ]
+        for name, atype, curr in accounts:
+            await db.execute(
+                "INSERT INTO investing_accounts (name, type, currency) VALUES (?, ?, ?)",
+                [name, atype, curr],
+            )
+        print(f"  [OK] Investing accounts ({len(accounts)})")
+
+        # --- Holdings ---
+        # (symbol, name, asset_class, currency, total_shares, avg_cost, current_price)
+        holdings = [
+            ("7203.T", "Toyota Motor", "stock", "JPY", 100, 2850, 2920),
+            ("1306.T", "TOPIX ETF", "etf", "JPY", 50, 2400, 2480),
+            ("AAPL", "Apple Inc", "stock", "USD", 5, 17500, 19200),        # $175 -> $192
+            ("VOO", "Vanguard S&P 500", "etf", "USD", 3, 48000, 52100),   # $480 -> $521
+            ("BTC-USD", "Bitcoin", "crypto", "USD", 0.05, 4200000, 8400000),  # $42k -> $84k
+            ("8306.T", "MUFG", "stock", "JPY", 200, 1250, 1380),
+        ]
+        now_iso = today.isoformat() + "T18:00:00"
+        for symbol, name, cls, curr, shares, avg_cost, price in holdings:
+            await db.execute(
+                """INSERT INTO investing_holdings
+                   (symbol, name, asset_class, currency, total_shares,
+                    avg_cost_per_share, current_price, last_price_update)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                [symbol, name, cls, curr, shares, avg_cost, price, now_iso],
+            )
+        print(f"  [OK] Investing holdings ({len(holdings)})")
+
+        # --- Transactions ---
+        transactions = [
+            # (holding_id, type, shares, price_per_share, total_amount, currency, date, notes)
+            (1, "buy", 50, 2800, 140000, "JPY", (today - timedelta(days=150)).isoformat(), "Initial Toyota purchase"),
+            (1, "buy", 50, 2900, 145000, "JPY", (today - timedelta(days=60)).isoformat(), "Added more Toyota"),
+            (2, "buy", 50, 2400, 120000, "JPY", (today - timedelta(days=120)).isoformat(), "TOPIX ETF — lump sum"),
+            (3, "buy", 3, 16500, 49500, "USD", (today - timedelta(days=180)).isoformat(), "First Apple shares"),
+            (3, "buy", 2, 19000, 38000, "USD", (today - timedelta(days=30)).isoformat(), "Added more Apple"),
+            (4, "buy", 3, 48000, 144000, "USD", (today - timedelta(days=90)).isoformat(), "VOO S&P 500"),
+            (5, "buy", 0.05, 4200000, 210000, "USD", (today - timedelta(days=200)).isoformat(), "BTC DCA"),
+            (6, "buy", 200, 1250, 250000, "JPY", (today - timedelta(days=100)).isoformat(), "MUFG bank stock"),
+            (4, "dividend", 0, 0, 1250, "USD", (today - timedelta(days=15)).isoformat(), "Q1 2026 VOO dividend"),
+            (3, "dividend", 0, 0, 125, "USD", (today - timedelta(days=20)).isoformat(), "AAPL quarterly dividend"),
+        ]
+        for h_id, ttype, shares, pps, total, curr, dt, notes in transactions:
+            await db.execute(
+                """INSERT INTO investing_transactions
+                   (holding_id, type, shares, price_per_share, total_amount, currency, date, notes)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                [h_id, ttype, shares, pps, total, curr, dt, notes],
+            )
+        print(f"  [OK] Investing transactions ({len(transactions)})")
+
+        # --- Holding-Account links ---
+        # JPY holdings -> SBI (id=1), USD/crypto -> Coinbase (id=2)
+        links = [
+            (1, 1), (2, 1), (6, 1),  # Toyota, TOPIX, MUFG -> SBI
+            (3, 2), (4, 2), (5, 2),  # AAPL, VOO, BTC -> Coinbase
+        ]
+        for h_id, a_id in links:
+            await db.execute(
+                "INSERT INTO investing_holding_accounts (holding_id, account_id) VALUES (?, ?)",
+                [h_id, a_id],
+            )
+        print(f"  [OK] Investing account links ({len(links)})")
+
+        # --- Portfolio snapshots (90 days, LM-33) ---
+        # Base total in JPY: ~3.5M with gradual growth
+        base_value = 3200000
+        for i in range(90):
+            d = today - timedelta(days=90 - i)
+            # Gradual upward trend with daily noise
+            noise = random.randint(-25000, 30000)
+            trend = int(i * 4000)  # ~4k/day growth
+            total = base_value + trend + noise
+
+            # Breakdown by asset class (rough proportions)
+            stock_pct = 0.50 + random.uniform(-0.03, 0.03)
+            etf_pct = 0.28 + random.uniform(-0.02, 0.02)
+            crypto_pct = 1.0 - stock_pct - etf_pct
+            breakdown = {
+                "stock": int(total * stock_pct),
+                "etf": int(total * etf_pct),
+                "crypto": int(total * crypto_pct),
+            }
+
+            await db.execute(
+                """INSERT INTO investing_portfolio_snapshots
+                   (date, total_value, currency, breakdown)
+                   VALUES (?, ?, ?, ?)""",
+                [d.isoformat(), total, "JPY", json.dumps(breakdown)],
+            )
+        print(f"  [OK] Investing portfolio snapshots (90 days)")
+
+        await db.commit()
+    finally:
+        await db.close()
+
+
 async def clear_all():
     """Clear all data from all tables."""
     db = await get_db()
@@ -402,6 +512,8 @@ async def clear_all():
             "life_files", "life_events", "life_tasks", "life_bills", "life_documents",
             "health_files", "health_documents", "health_measurements",
             "health_daily_summary", "health_exercises", "health_meals", "health_profile",
+            "investing_holding_accounts", "investing_transactions",
+            "investing_portfolio_snapshots", "investing_holdings", "investing_accounts",
         ]
         for table in tables:
             try:
@@ -444,6 +556,9 @@ async def main():
 
     print("\nSeeding Health & Body data...")
     await seed_health()
+
+    print("\nSeeding Investing data...")
+    await seed_investing()
 
     print("\n" + "=" * 40)
     print("Done! Restart the backend to pick up changes.")

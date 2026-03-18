@@ -1,0 +1,79 @@
+.allocation-chart__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.allocation-chart__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.allocation-chart__svg {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.allocation-chart__center-label {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.allocation-chart__center-sub {
+  font-size: 8px;
+  fill: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.allocation-chart__legend {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.allocation-chart__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8rem;
+}
+
+.allocation-chart__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.allocation-chart__legend-label {
+  color: var(--text-primary);
+  font-weight: 500;
+  flex: 1;
+}
+
+.allocation-chart__legend-pct {
+  color: var(--text-secondary);
+  min-width: 44px;
+  text-align: right;
+}
+
+.allocation-chart__legend-amt {
+  color: var(--text-primary);
+  min-width: 90px;
+  text-align: right;
+  font-weight: 500;
+}

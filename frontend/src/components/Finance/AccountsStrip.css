@@ -108,6 +108,15 @@
   border-left: 1px solid var(--border-light);
 }
 
+.accounts-strip__total--net-worth {
+  padding-left: var(--space-lg);
+  border-left: 1px solid var(--border-light);
+}
+
+.accounts-strip__total-value--net {
+  color: var(--color-investing) !important;
+}
+
 .accounts-strip__fx-toggle {
   font-size: 0.6875rem;
   font-weight: 700;
