@@ -98,6 +98,22 @@ async def _create_finance_tables(db: aiosqlite.Connection):
             extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
+
+        CREATE TABLE IF NOT EXISTS finance_cycle_summaries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cycle_start TEXT NOT NULL,
+            cycle_end TEXT NOT NULL,
+            total_income INTEGER NOT NULL DEFAULT 0,
+            total_expenses INTEGER NOT NULL DEFAULT 0,
+            net INTEGER NOT NULL DEFAULT 0,
+            transfer_volume INTEGER NOT NULL DEFAULT 0,
+            transaction_count INTEGER NOT NULL DEFAULT 0,
+            category_breakdown TEXT NOT NULL DEFAULT '{}',
+            budget_snapshot TEXT NOT NULL DEFAULT '{}',
+            insights TEXT NOT NULL DEFAULT '[]',
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            UNIQUE(cycle_start, cycle_end)
+        );
     """)
 
 

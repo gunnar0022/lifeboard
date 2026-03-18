@@ -41,26 +41,44 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Telegram bot...")
     await start_bot()
 
-    # Start health scheduler if agent is active
-    health_scheduler_running = False
+    # Start schedulers for active agents
     config = get_config()
-    if "health_body" in config.get("active_agents", []):
+    active = config.get("active_agents", [])
+    health_scheduler_running = False
+    finance_scheduler_running = False
+
+    if "health_body" in active:
         try:
-            from backend.agents.health_body.scheduler import start_scheduler, stop_scheduler
-            await start_scheduler()
+            from backend.agents.health_body.scheduler import start_scheduler as start_health_scheduler
+            await start_health_scheduler()
             health_scheduler_running = True
         except Exception as e:
             logger.error(f"Health scheduler failed to start: {e}")
 
+    if "finance" in active:
+        try:
+            from backend.agents.finance.scheduler import start_scheduler as start_finance_scheduler
+            await start_finance_scheduler()
+            finance_scheduler_running = True
+        except Exception as e:
+            logger.error(f"Finance scheduler failed to start: {e}")
+
     yield
 
-    # Shutdown
+    # Shutdown schedulers
     if health_scheduler_running:
         try:
-            from backend.agents.health_body.scheduler import stop_scheduler
-            await stop_scheduler()
+            from backend.agents.health_body.scheduler import stop_scheduler as stop_health_scheduler
+            await stop_health_scheduler()
         except Exception as e:
             logger.error(f"Health scheduler stop error: {e}")
+
+    if finance_scheduler_running:
+        try:
+            from backend.agents.finance.scheduler import stop_scheduler as stop_finance_scheduler
+            await stop_finance_scheduler()
+        except Exception as e:
+            logger.error(f"Finance scheduler stop error: {e}")
 
     logger.info("Shutting down Telegram bot...")
     await stop_bot()

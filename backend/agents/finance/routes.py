@@ -297,6 +297,18 @@ async def list_categories():
     return await queries.get_categories()
 
 
+@router.get("/insights")
+async def insights_data():
+    """Aggregated data for the insights section — averages, trends, comparisons."""
+    return await queries.get_insights_section_data()
+
+
+@router.get("/cycle-summaries")
+async def list_cycle_summaries():
+    """All compressed cycle summaries."""
+    return await queries.get_all_cycle_summaries()
+
+
 # --- Health ---
 
 @router.get("/health")

@@ -106,10 +106,12 @@ Read actions:
 - get_accounts_overview: data={{}}
 - get_budget_status: data={{}}
 - get_spending_by_category: data={{num_cycles (int, default 1)}}
-- get_cycle_summary: data={{cycle_offset (int, default 0)}}
-- get_transactions: data={{account_id, category, date_from, date_to, search, limit (default 10)}}
+- get_cycle_summary: data={{cycle_offset (int, default 0)}}. NOTE: Older cycles (offset -2 and beyond) may be compressed — the response will have "compressed": true with aggregated totals but no individual transactions.
+- get_transactions: data={{account_id, category, date_from, date_to, search, limit (default 10)}}. NOTE: Transactions from compressed cycles are deleted; only current and previous cycle have individual records.
 - get_transfers: data={{account_id, date_from, date_to, limit (default 10)}}
 - get_recurring_list: data={{active_only (bool), autopay_only (bool)}}
+- get_cycle_summaries: data={{}} — returns all compressed historical cycle summaries with category breakdowns and insights.
+- compare_cycles: data={{cycle_offsets (list of ints, e.g. [0, -1])}} — compare spending across cycles. Works with both live and compressed data.
 
 Meta actions:
 - respond: Just reply with information, no DB write.

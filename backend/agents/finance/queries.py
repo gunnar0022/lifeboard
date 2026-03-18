@@ -3,6 +3,7 @@ Finance agent — SQL query functions.
 Raw SQL with aiosqlite (no ORM per LM-01).
 All amounts stored as integers (smallest currency unit per LM-06).
 """
+import json
 from datetime import date, datetime, timedelta
 from backend.database import get_db
 from backend.config import get_config
@@ -540,42 +541,61 @@ async def set_budget(category: str, monthly_limit: int) -> dict:
 # --- Aggregate queries ---
 
 async def get_cycle_summary(cycle_offset: int = 0) -> dict:
-    """Full overview of a pay cycle — income, expenses, net, top categories."""
+    """Full overview of a pay cycle — income, expenses, net, top categories.
+    Falls back to compressed cycle summary if transactions have been deleted."""
     cycle_start, cycle_end = _get_cycle_dates(offset=cycle_offset)
+    cs, ce = cycle_start.isoformat(), cycle_end.isoformat()
+
+    # Check if this cycle has been compressed
+    compressed = await get_cycle_summary_record(cs, ce)
+    if compressed:
+        by_category = [
+            {"category": cat, "total": amt}
+            for cat, amt in sorted(compressed["category_breakdown"].items(),
+                                    key=lambda x: x[1], reverse=True)
+        ]
+        return {
+            "cycle_start": cs,
+            "cycle_end": ce,
+            "income": compressed["total_income"],
+            "expenses": compressed["total_expenses"],
+            "net": compressed["net"],
+            "by_category": by_category,
+            "compressed": True,
+        }
+
+    # Live data
     db = await get_db()
     try:
-        # Income (positive amounts, exclude auto-generated transfer labels)
         cursor = await db.execute(
             """SELECT COALESCE(SUM(amount), 0)
                FROM finance_transactions
                WHERE date >= ? AND date <= ? AND amount > 0""",
-            (cycle_start.isoformat(), cycle_end.isoformat())
+            (cs, ce)
         )
         income = (await cursor.fetchone())[0]
 
-        # Expenses (negative amounts)
         cursor = await db.execute(
             """SELECT COALESCE(SUM(amount), 0)
                FROM finance_transactions
                WHERE date >= ? AND date <= ? AND amount < 0""",
-            (cycle_start.isoformat(), cycle_end.isoformat())
+            (cs, ce)
         )
-        expenses = (await cursor.fetchone())[0]  # Will be negative
+        expenses = (await cursor.fetchone())[0]
 
-        # Spending by category
         cursor = await db.execute(
             """SELECT category, SUM(ABS(amount)) as total
                FROM finance_transactions
                WHERE date >= ? AND date <= ? AND amount < 0
                GROUP BY category
                ORDER BY total DESC""",
-            (cycle_start.isoformat(), cycle_end.isoformat())
+            (cs, ce)
         )
         by_category = [dict(r) for r in await cursor.fetchall()]
 
         return {
-            "cycle_start": cycle_start.isoformat(),
-            "cycle_end": cycle_end.isoformat(),
+            "cycle_start": cs,
+            "cycle_end": ce,
             "income": income,
             "expenses": abs(expenses),
             "net": income + expenses,
@@ -634,10 +654,29 @@ async def get_budget_status() -> dict:
 
 
 async def get_spending_by_category(num_cycles: int = 1) -> list[dict]:
-    """Spending breakdown by category for the current or past N cycles."""
+    """Spending breakdown by category for the current or past N cycles.
+    Uses compressed summaries for older cycles."""
     results = []
     for offset in range(0, -num_cycles, -1):
         cycle_start, cycle_end = _get_cycle_dates(offset=offset)
+        cs, ce = cycle_start.isoformat(), cycle_end.isoformat()
+
+        # Check for compressed summary
+        compressed = await get_cycle_summary_record(cs, ce)
+        if compressed:
+            rows = [
+                {"category": cat, "total": amt, "count": 0}
+                for cat, amt in sorted(compressed["category_breakdown"].items(),
+                                        key=lambda x: x[1], reverse=True)
+            ]
+            results.append({
+                "cycle_start": cs,
+                "cycle_end": ce,
+                "categories": rows,
+            })
+            continue
+
+        # Live data
         db = await get_db()
         try:
             cursor = await db.execute(
@@ -646,12 +685,12 @@ async def get_spending_by_category(num_cycles: int = 1) -> list[dict]:
                    WHERE date >= ? AND date <= ? AND amount < 0
                    GROUP BY category
                    ORDER BY total DESC""",
-                (cycle_start.isoformat(), cycle_end.isoformat())
+                (cs, ce)
             )
             rows = [dict(r) for r in await cursor.fetchall()]
             results.append({
-                "cycle_start": cycle_start.isoformat(),
-                "cycle_end": cycle_end.isoformat(),
+                "cycle_start": cs,
+                "cycle_end": ce,
                 "categories": rows,
             })
         finally:
@@ -660,10 +699,26 @@ async def get_spending_by_category(num_cycles: int = 1) -> list[dict]:
 
 
 async def get_cycle_trend(num_cycles: int = 6) -> list[dict]:
-    """Income vs expenses for the last N pay cycles (for bar chart)."""
+    """Income vs expenses for the last N pay cycles (for bar chart).
+    Uses compressed summaries for older cycles."""
     trend = []
     for offset in range(0, -num_cycles, -1):
         cycle_start, cycle_end = _get_cycle_dates(offset=offset)
+        cs, ce = cycle_start.isoformat(), cycle_end.isoformat()
+
+        # Check for compressed summary first
+        compressed = await get_cycle_summary_record(cs, ce)
+        if compressed:
+            trend.append({
+                "cycle_start": cs,
+                "cycle_end": ce,
+                "label": cycle_start.strftime("%b %d"),
+                "income": compressed["total_income"],
+                "expenses": compressed["total_expenses"],
+            })
+            continue
+
+        # Live data
         db = await get_db()
         try:
             cursor = await db.execute(
@@ -672,12 +727,12 @@ async def get_cycle_trend(num_cycles: int = 6) -> list[dict]:
                      COALESCE(SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END), 0) as expenses
                    FROM finance_transactions
                    WHERE date >= ? AND date <= ?""",
-                (cycle_start.isoformat(), cycle_end.isoformat())
+                (cs, ce)
             )
             row = await cursor.fetchone()
             trend.append({
-                "cycle_start": cycle_start.isoformat(),
-                "cycle_end": cycle_end.isoformat(),
+                "cycle_start": cs,
+                "cycle_end": ce,
                 "label": cycle_start.strftime("%b %d"),
                 "income": row["income"],
                 "expenses": row["expenses"],
@@ -763,3 +818,291 @@ async def get_file(file_id: int = None, search: str = None) -> dict | None:
         return dict(row) if row else None
     finally:
         await db.close()
+
+
+# --- Cycle Summaries & Compression ---
+
+async def get_cycle_summary_record(cycle_start: str, cycle_end: str) -> dict | None:
+    """Get a compressed cycle summary if one exists."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM finance_cycle_summaries WHERE cycle_start = ? AND cycle_end = ?",
+            (cycle_start, cycle_end)
+        )
+        row = await cursor.fetchone()
+        if row:
+            d = dict(row)
+            d["category_breakdown"] = json.loads(d["category_breakdown"])
+            d["budget_snapshot"] = json.loads(d["budget_snapshot"])
+            d["insights"] = json.loads(d["insights"])
+            return d
+        return None
+    finally:
+        await db.close()
+
+
+async def get_all_cycle_summaries() -> list[dict]:
+    """Get all compressed cycle summaries, newest first."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT * FROM finance_cycle_summaries ORDER BY cycle_start DESC"
+        )
+        rows = await cursor.fetchall()
+        result = []
+        for row in rows:
+            d = dict(row)
+            d["category_breakdown"] = json.loads(d["category_breakdown"])
+            d["budget_snapshot"] = json.loads(d["budget_snapshot"])
+            d["insights"] = json.loads(d["insights"])
+            result.append(d)
+        return result
+    finally:
+        await db.close()
+
+
+async def store_cycle_summary(cycle_start: str, cycle_end: str,
+                               total_income: int, total_expenses: int,
+                               net: int, transfer_volume: int,
+                               transaction_count: int,
+                               category_breakdown: dict,
+                               budget_snapshot: dict,
+                               insights: list[str]) -> dict:
+    """Store a cycle summary (idempotent — won't duplicate)."""
+    db = await get_db()
+    try:
+        # Check if already exists (LM-24: safe to re-run)
+        cursor = await db.execute(
+            "SELECT id FROM finance_cycle_summaries WHERE cycle_start = ? AND cycle_end = ?",
+            (cycle_start, cycle_end)
+        )
+        if await cursor.fetchone():
+            return await get_cycle_summary_record(cycle_start, cycle_end)
+
+        cursor = await db.execute(
+            """INSERT INTO finance_cycle_summaries
+               (cycle_start, cycle_end, total_income, total_expenses, net,
+                transfer_volume, transaction_count, category_breakdown,
+                budget_snapshot, insights)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (cycle_start, cycle_end, total_income, total_expenses, net,
+             transfer_volume, transaction_count,
+             json.dumps(category_breakdown),
+             json.dumps(budget_snapshot),
+             json.dumps(insights))
+        )
+        await db.commit()
+        return await get_cycle_summary_record(cycle_start, cycle_end)
+    finally:
+        await db.close()
+
+
+async def aggregate_cycle_for_compression(cycle_start: str, cycle_end: str) -> dict:
+    """
+    Build full aggregation data for a cycle from live transactions.
+    Returns everything needed to store a summary + generate insights.
+    LM-26: This MUST be called BEFORE deleting transactions.
+    """
+    db = await get_db()
+    try:
+        # Income
+        cursor = await db.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM finance_transactions WHERE date >= ? AND date <= ? AND amount > 0",
+            (cycle_start, cycle_end)
+        )
+        total_income = (await cursor.fetchone())[0]
+
+        # Expenses
+        cursor = await db.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM finance_transactions WHERE date >= ? AND date <= ? AND amount < 0",
+            (cycle_start, cycle_end)
+        )
+        total_expenses = abs((await cursor.fetchone())[0])
+
+        # Transaction count
+        cursor = await db.execute(
+            "SELECT COUNT(*) FROM finance_transactions WHERE date >= ? AND date <= ?",
+            (cycle_start, cycle_end)
+        )
+        transaction_count = (await cursor.fetchone())[0]
+
+        # Category breakdown (expenses only)
+        cursor = await db.execute(
+            """SELECT category, SUM(ABS(amount)) as total
+               FROM finance_transactions
+               WHERE date >= ? AND date <= ? AND amount < 0
+               GROUP BY category ORDER BY total DESC""",
+            (cycle_start, cycle_end)
+        )
+        category_breakdown = {r["category"]: r["total"] for r in await cursor.fetchall()}
+
+        # Transfer volume
+        cursor = await db.execute(
+            "SELECT COALESCE(SUM(from_amount), 0) FROM finance_transfers WHERE date >= ? AND date <= ?",
+            (cycle_start, cycle_end)
+        )
+        transfer_volume = (await cursor.fetchone())[0]
+
+        # Budget snapshot (LM-25: capture current budgets at compression time)
+        cursor = await db.execute("SELECT category, monthly_limit FROM finance_budgets")
+        budget_snapshot = {r["category"]: r["monthly_limit"] for r in await cursor.fetchall()}
+
+        # Full transaction list for insight generation
+        cursor = await db.execute(
+            """SELECT t.date, t.amount, t.category, t.description, a.name as account_name
+               FROM finance_transactions t
+               JOIN finance_accounts a ON t.account_id = a.id
+               WHERE t.date >= ? AND t.date <= ?
+               ORDER BY t.date ASC""",
+            (cycle_start, cycle_end)
+        )
+        transactions = [dict(r) for r in await cursor.fetchall()]
+
+        return {
+            "cycle_start": cycle_start,
+            "cycle_end": cycle_end,
+            "total_income": total_income,
+            "total_expenses": total_expenses,
+            "net": total_income - total_expenses,
+            "transfer_volume": transfer_volume,
+            "transaction_count": transaction_count,
+            "category_breakdown": category_breakdown,
+            "budget_snapshot": budget_snapshot,
+            "transactions": transactions,  # For insight generation, not stored
+        }
+    finally:
+        await db.close()
+
+
+async def delete_cycle_transactions(cycle_start: str, cycle_end: str):
+    """
+    Delete all transactions and transfers for a compressed cycle.
+    Does NOT adjust account balances (those reflect cumulative history).
+    Called only AFTER summary is stored (LM-26).
+    """
+    db = await get_db()
+    try:
+        await db.execute("BEGIN")
+        await db.execute(
+            "DELETE FROM finance_transactions WHERE date >= ? AND date <= ?",
+            (cycle_start, cycle_end)
+        )
+        await db.execute(
+            "DELETE FROM finance_transfers WHERE date >= ? AND date <= ?",
+            (cycle_start, cycle_end)
+        )
+        await db.commit()
+    except Exception:
+        await db.execute("ROLLBACK")
+        raise
+    finally:
+        await db.close()
+
+
+async def get_historical_category_averages() -> dict:
+    """Calculate average spending per category across all completed cycle summaries."""
+    summaries = await get_all_cycle_summaries()
+    if not summaries:
+        return {}
+
+    totals = {}
+    for s in summaries:
+        for cat, amount in s["category_breakdown"].items():
+            totals[cat] = totals.get(cat, 0) + amount
+
+    count = len(summaries)
+    return {cat: round(total / count) for cat, total in totals.items()}
+
+
+async def get_category_trend(num_cycles: int = 6) -> dict:
+    """
+    Get per-category spending for the last N completed cycles.
+    Returns {category: [amount_cycle_1, amount_cycle_2, ...]} oldest first.
+    """
+    summaries = await get_all_cycle_summaries()
+    # Take last N, reverse to oldest-first
+    recent = summaries[:num_cycles]
+    recent.reverse()
+
+    all_cats = set()
+    for s in recent:
+        all_cats.update(s["category_breakdown"].keys())
+
+    trends = {}
+    for cat in sorted(all_cats):
+        trends[cat] = [s["category_breakdown"].get(cat, 0) for s in recent]
+
+    return trends
+
+
+async def get_insights_section_data() -> dict:
+    """
+    Aggregate data for the frontend insights section:
+    - Average spending pie chart data
+    - Per-category sparkline trends
+    - Current vs average comparison
+    - Latest cycle insights
+    """
+    summaries = await get_all_cycle_summaries()
+
+    if not summaries:
+        return {"has_data": False}
+
+    # Average spending per category
+    averages = await get_historical_category_averages()
+
+    # Category trends (last 6 cycles)
+    trends = await get_category_trend(6)
+
+    # Detect trending categories (3+ consecutive cycles same direction)
+    trending = {}
+    for cat, values in trends.items():
+        if len(values) >= 3:
+            last_3 = values[-3:]
+            if all(last_3[i] < last_3[i+1] for i in range(2)):
+                trending[cat] = "up"
+            elif all(last_3[i] > last_3[i+1] for i in range(2)):
+                trending[cat] = "down"
+            else:
+                trending[cat] = "flat"
+        else:
+            trending[cat] = "flat"
+
+    # Current cycle spending vs averages
+    current_summary = await get_cycle_summary(0)
+    cycle_info = get_cycle_day_info()
+    pace_factor = cycle_info["current_day"] / cycle_info["total_days"]
+
+    comparisons = []
+    for cat, avg in sorted(averages.items(), key=lambda x: x[1], reverse=True):
+        current_spent = 0
+        for by_cat in current_summary.get("by_category", []):
+            if by_cat["category"] == cat:
+                current_spent = by_cat["total"]
+                break
+        expected_at_pace = round(avg * pace_factor)
+        pct = round(current_spent / expected_at_pace * 100) if expected_at_pace > 0 else 0
+        comparisons.append({
+            "category": cat,
+            "current": current_spent,
+            "average": avg,
+            "expected_at_pace": expected_at_pace,
+            "percentage": pct,
+            "status": "under" if pct <= 100 else "over",
+        })
+
+    # Latest insights
+    latest_insights = summaries[0]["insights"] if summaries else []
+    latest_cycle_label = f"{summaries[0]['cycle_start']} to {summaries[0]['cycle_end']}" if summaries else ""
+
+    return {
+        "has_data": True,
+        "completed_cycles": len(summaries),
+        "averages": averages,
+        "trends": trends,
+        "trending": trending,
+        "comparisons": comparisons,
+        "latest_insights": latest_insights,
+        "latest_cycle_label": latest_cycle_label,
+    }

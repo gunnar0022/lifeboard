@@ -132,6 +132,91 @@ async def seed_finance():
         await db.close()
 
 
+async def seed_cycle_summaries():
+    """Seed 4 historical cycle summaries for the insights section."""
+    import random
+    db = await get_db()
+    today = date.today()
+
+    # Generate 4 past cycles (offset -2 through -5, since -1 is previous and kept live)
+    # Cycles run from pay_cycle_day(21) to pay_cycle_day-1(20) of next month
+    cycles = []
+    for months_back in range(2, 6):
+        # Calculate cycle start: 21st of (current_month - months_back)
+        month = today.month - months_back
+        year = today.year
+        while month <= 0:
+            month += 12
+            year -= 1
+        cs = date(year, month, 21)
+        # Cycle end: 20th of next month
+        end_month = cs.month + 1
+        end_year = cs.year
+        if end_month > 12:
+            end_month = 1
+            end_year += 1
+        ce = date(end_year, end_month, 20)
+        cycles.append((cs, ce))
+
+    base_categories = {
+        "Food & Dining": (35000, 55000),
+        "Housing": (95000, 95000),
+        "Transportation": (7000, 15000),
+        "Social & Going Out": (8000, 25000),
+        "Shopping": (5000, 20000),
+        "Utilities": (12000, 16000),
+        "Health": (2000, 8000),
+        "Subscriptions": (3000, 5000),
+    }
+    base_budgets = {
+        "food": 80000,
+        "transport": 15000,
+        "entertainment": 30000,
+        "shopping": 20000,
+        "health": 10000,
+    }
+
+    try:
+        for cs, ce in cycles:
+            cat_breakdown = {}
+            for cat, (lo, hi) in base_categories.items():
+                cat_breakdown[cat] = random.randint(lo, hi)
+
+            total_expenses = sum(cat_breakdown.values())
+            total_income = random.randint(370000, 400000)
+            transfer_vol = random.randint(10000, 50000)
+            tx_count = random.randint(30, 55)
+
+            # Generate simple insights
+            top_cat = max(cat_breakdown, key=cat_breakdown.get)
+            second_cat = sorted(cat_breakdown.items(), key=lambda x: x[1], reverse=True)[1][0]
+            insights = [
+                f"{top_cat} was the highest spending category at Y{cat_breakdown[top_cat]:,}, "
+                f"{'above' if cat_breakdown[top_cat] > 50000 else 'within'} typical range.",
+                f"Total expenses of Y{total_expenses:,} against Y{total_income:,} income "
+                f"left a {'surplus' if total_income > total_expenses else 'deficit'} of Y{abs(total_income - total_expenses):,}.",
+                f"{second_cat} spending of Y{cat_breakdown[second_cat]:,} was "
+                f"{'notably higher' if cat_breakdown[second_cat] > 15000 else 'relatively modest'} this cycle.",
+            ]
+
+            await db.execute(
+                """INSERT INTO finance_cycle_summaries
+                   (cycle_start, cycle_end, total_income, total_expenses, net,
+                    transfer_volume, transaction_count, category_breakdown,
+                    budget_snapshot, insights)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                [cs.isoformat(), ce.isoformat(), total_income, total_expenses,
+                 total_income - total_expenses, transfer_vol, tx_count,
+                 json.dumps(cat_breakdown), json.dumps(base_budgets),
+                 json.dumps(insights)]
+            )
+
+        await db.commit()
+        print(f"  [OK] Finance cycle summaries ({len(cycles)} historical cycles)")
+    finally:
+        await db.close()
+
+
 async def seed_life_manager():
     """Seed Life Manager agent data."""
     db = await get_db()
@@ -307,6 +392,7 @@ async def clear_all():
     try:
         await db.execute("PRAGMA foreign_keys=OFF")
         tables = [
+            "finance_cycle_summaries",
             "finance_files", "finance_transactions", "finance_transfers",
             "finance_recurring", "finance_budgets", "finance_accounts",
             "life_files", "life_events", "life_tasks", "life_bills", "life_documents",
@@ -345,6 +431,9 @@ async def main():
 
     print("\nSeeding Finance data...")
     await seed_finance()
+
+    print("\nSeeding Finance cycle summaries...")
+    await seed_cycle_summaries()
 
     print("\nSeeding Life Manager data...")
     await seed_life_manager()

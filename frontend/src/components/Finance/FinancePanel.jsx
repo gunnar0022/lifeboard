@@ -7,6 +7,7 @@ import CycleOverview from './CycleOverview';
 import SpendingChart from './SpendingChart';
 import CycleTrend from './CycleTrend';
 import BudgetBars from './BudgetBars';
+import InsightsSection from './InsightsSection';
 import TransactionList from './TransactionList';
 import QuickAddForm from './QuickAddForm';
 import RecurringManager from './RecurringManager';
@@ -163,6 +164,11 @@ export default function FinancePanel() {
           budgetStatus={budgetStatus}
           currencySymbol={currencySymbol}
         />
+      </motion.div>
+
+      {/* Section C.5 — Insights (historical trends & compressed cycle data) */}
+      <motion.div variants={fadeUp}>
+        <InsightsSection currencySymbol={currencySymbol} />
       </motion.div>
 
       {/* Section D — Data entry & transaction list */}

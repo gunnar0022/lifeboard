@@ -205,6 +205,19 @@ async def handle_get_file(data: dict) -> dict:
     )
 
 
+async def handle_get_cycle_summaries(data: dict) -> list:
+    return await queries.get_all_cycle_summaries()
+
+
+async def handle_compare_cycles(data: dict) -> list:
+    offsets = data.get("cycle_offsets", [0, -1])
+    results = []
+    for offset in offsets:
+        summary = await queries.get_cycle_summary(cycle_offset=offset)
+        results.append({"cycle_offset": offset, **summary})
+    return results
+
+
 # --- ACTION_REGISTRY (LM-13d) ---
 
 ACTION_REGISTRY = {
@@ -317,6 +330,17 @@ ACTION_REGISTRY = {
         "handler": handle_get_file,
         "required": [],
         "optional": ["file_id", "search"],
+        "is_read": True,
+    },
+    "get_cycle_summaries": {
+        "handler": handle_get_cycle_summaries,
+        "required": [],
+        "is_read": True,
+    },
+    "compare_cycles": {
+        "handler": handle_compare_cycles,
+        "required": [],
+        "optional": ["cycle_offsets"],
         "is_read": True,
     },
 }
