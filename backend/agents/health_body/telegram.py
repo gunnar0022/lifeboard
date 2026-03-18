@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 _conversation_history: list[dict] = []
 
 
-async def process_message(update: Update, text: str) -> str:
+async def process_message(update: Update, text: str, send_reply: bool = True) -> str:
     """Process a Health & Body agent message and return the reply text."""
     global _conversation_history
 
@@ -64,15 +64,16 @@ async def process_message(update: Update, text: str) -> str:
     if len(_conversation_history) > 10:
         _conversation_history = _conversation_history[-10:]
 
-    if keyboard:
-        await update.message.reply_text(reply_text, reply_markup=keyboard)
-    else:
-        await update.message.reply_text(reply_text)
+    if send_reply:
+        if keyboard:
+            await update.message.reply_text(reply_text, reply_markup=keyboard)
+        else:
+            await update.message.reply_text(reply_text)
 
     return reply_text
 
 
-async def process_photo(update: Update, caption: str = None) -> str:
+async def process_photo(update: Update, caption: str = None, send_reply: bool = True) -> str:
     """Process a photo sent to the Health & Body agent (medical documents, etc.)."""
     global _conversation_history
 
@@ -137,15 +138,16 @@ async def process_photo(update: Update, caption: str = None) -> str:
     if len(_conversation_history) > 10:
         _conversation_history = _conversation_history[-10:]
 
-    if action_data.get("action") == "clarify" and result.get("options"):
-        buttons = [
-            [InlineKeyboardButton(opt, callback_data=f"health:{opt}")]
-            for opt in result["options"]
-        ]
-        await update.message.reply_text(
-            reply_text, reply_markup=InlineKeyboardMarkup(buttons)
-        )
-    else:
-        await update.message.reply_text(reply_text)
+    if send_reply:
+        if action_data.get("action") == "clarify" and result.get("options"):
+            buttons = [
+                [InlineKeyboardButton(opt, callback_data=f"health:{opt}")]
+                for opt in result["options"]
+            ]
+            await update.message.reply_text(
+                reply_text, reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        else:
+            await update.message.reply_text(reply_text)
 
     return reply_text

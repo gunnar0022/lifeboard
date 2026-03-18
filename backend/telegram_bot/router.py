@@ -1,0 +1,386 @@
+"""
+Telegram message router — LLM-powered classification and multi-agent fan-out (LM-27).
+Every inbound message passes through the router to determine which agent(s) handle it.
+The router is a lightweight classification call, NOT a conversation (LM-27).
+"""
+import asyncio
+import json
+import logging
+import time
+
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
+from backend import llm_client
+
+logger = logging.getLogger(__name__)
+
+# Valid agent IDs
+VALID_AGENTS = {"finance", "life_manager", "health_body"}
+
+# Emoji prefixes for multi-agent consolidated replies
+AGENT_EMOJI = {
+    "finance": "\U0001f4b0",       # money bag
+    "life_manager": "\U0001f4cb",   # clipboard
+    "health_body": "\U0001f4aa",    # flexed biceps
+}
+
+AGENT_LABELS = {
+    "finance": "Finance",
+    "life_manager": "Life Manager",
+    "health_body": "Health & Body",
+}
+
+# --- In-memory state (resets on restart, fine per LM-14) ---
+
+# LM-31: Recent context buffer
+_recent_context: dict | None = None  # {"agent": str, "timestamp": float}
+
+# LM-30: Reply-to tracking — bot message_id -> source agent
+_reply_source_map: dict[int, str] = {}
+_REPLY_MAP_MAX = 50
+
+# Fallback: pending messages awaiting agent selection via keyboard
+_pending_fallback: dict[int, dict] = {}
+
+# --- Router system prompt (LM-27: under 300 tokens) ---
+
+_ROUTER_PROMPT = """\
+You route messages to LifeBoard agents. Return JSON only.
+
+Agents:
+- finance: money, spending, transactions, budget, accounts, salary, receipts, payments, transfers, recurring payments, income, interest
+- life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands
+- health_body: food, meals, exercise, weight, mood, energy, medical, calories, gym, nutrition, sleep, health checkups
+
+Rules:
+- Most messages go to ONE agent
+- Multi-agent only when message explicitly covers 2+ domains (e.g. "spent 1000 on ramen" = finance + health)
+- For ambiguous follow-ups, use the context hint about the last agent
+- If genuinely unclear, return empty routes
+
+Return: {"routes": [{"agent": "agent_id", "message": "relevant portion"}]}"""
+
+
+# --- Core routing functions ---
+
+async def route_message(text: str, reply_to_agent: str | None = None) -> list[dict]:
+    """
+    Classify a message and determine which agent(s) should handle it.
+
+    Returns list of {"agent": str, "message": str} dicts, or empty list for fallback.
+    """
+    # Build prompt with context signals
+    prompt = _ROUTER_PROMPT
+
+    context_lines = []
+    if reply_to_agent and reply_to_agent != "multi":
+        context_lines.append(
+            f"Context: User is replying to a message from {reply_to_agent}."
+        )
+    if _recent_context:
+        elapsed = time.time() - _recent_context["timestamp"]
+        if elapsed < 120:  # 2-minute window (LM-31)
+            context_lines.append(
+                f"Context: Last message was handled by {_recent_context['agent']} {int(elapsed)}s ago."
+            )
+
+    if context_lines:
+        prompt = prompt + "\n\n" + "\n".join(context_lines)
+
+    try:
+        result = await llm_client.process_message(
+            system_prompt=prompt,
+            user_message=text,
+            max_tokens=200,
+        )
+
+        # Parse routes from response
+        routes = result.get("routes", [])
+        if not isinstance(routes, list):
+            return []
+
+        # Validate agent IDs
+        valid_routes = []
+        for route in routes:
+            if (
+                isinstance(route, dict)
+                and route.get("agent") in VALID_AGENTS
+                and route.get("message")
+            ):
+                valid_routes.append(route)
+
+        return valid_routes
+
+    except Exception as e:
+        logger.error(f"Router LLM call failed: {e}")
+        return []
+
+
+async def dispatch_text(update: Update, text: str):
+    """
+    Main entry point for text messages. Routes through LLM and dispatches.
+    """
+    # LM-30: Check if this is a reply to a bot message
+    reply_to_agent = _get_reply_to_agent(update)
+
+    # Route through LLM
+    routes = await route_message(text, reply_to_agent=reply_to_agent)
+
+    if not routes:
+        # Fallback: show agent picker keyboard
+        await _send_fallback_keyboard(update, text)
+        return
+
+    if len(routes) == 1:
+        # Single agent — dispatch directly, agent sends its own reply
+        route = routes[0]
+        agent_id = route["agent"]
+        routed_text = route["message"]
+
+        handler = _get_agent_handler(agent_id, "process_message")
+        if not handler:
+            await update.message.reply_text("Something went wrong routing that message.")
+            return
+
+        reply_text = await handler(update, routed_text)
+
+        # Track context
+        _update_recent_context(agent_id)
+        # The agent sent the reply via update.message.reply_text, but we don't have
+        # the sent message_id easily. We'll track via _recent_context instead.
+
+    else:
+        # Multi-agent fan-out (LM-29: parallel with asyncio.gather)
+        await _dispatch_multi_agent(update, routes)
+
+
+async def dispatch_photo(update: Update, caption: str | None):
+    """
+    Entry point for photo messages. Routes based on caption or context.
+    """
+    if caption and caption.strip():
+        # Route based on caption
+        reply_to_agent = _get_reply_to_agent(update)
+        routes = await route_message(caption, reply_to_agent=reply_to_agent)
+
+        if routes:
+            # Photos go to single agent only (first route)
+            agent_id = routes[0]["agent"]
+            handler = _get_agent_handler(agent_id, "process_photo")
+            if handler:
+                await handler(update, caption)
+                _update_recent_context(agent_id)
+                return
+
+    # No caption or routing failed — try recent context
+    if _recent_context and (time.time() - _recent_context["timestamp"]) < 120:
+        agent_id = _recent_context["agent"]
+        handler = _get_agent_handler(agent_id, "process_photo")
+        if handler:
+            await handler(update, caption or "")
+            _update_recent_context(agent_id)
+            return
+
+    # Check reply-to context
+    reply_to_agent = _get_reply_to_agent(update)
+    if reply_to_agent and reply_to_agent in VALID_AGENTS:
+        handler = _get_agent_handler(reply_to_agent, "process_photo")
+        if handler:
+            await handler(update, caption or "")
+            _update_recent_context(reply_to_agent)
+            return
+
+    # No context at all — ask user
+    await _send_photo_fallback(update)
+
+
+async def handle_router_fallback(query, data: str):
+    """
+    Handle callbacks from the router's fallback keyboard.
+    data format: "router:{agent_id}" or "router_photo:{agent_id}"
+    """
+    if data.startswith("router_photo:"):
+        agent_id = data[len("router_photo:"):]
+        if agent_id in VALID_AGENTS:
+            _update_recent_context(agent_id)
+            await query.edit_message_text(
+                f"Got it — send the photo again and I'll route it to {AGENT_LABELS.get(agent_id, agent_id)}."
+            )
+        return
+
+    if data.startswith("router:"):
+        agent_id = data[len("router:"):]
+        if agent_id not in VALID_AGENTS:
+            return
+
+        # Look up the pending message
+        msg_id = query.message.message_id
+        pending = _pending_fallback.pop(msg_id, None)
+
+        if not pending or not pending.get("text"):
+            await query.edit_message_text("Sorry, I lost track of that message. Please resend it.")
+            return
+
+        original_text = pending["text"]
+
+        # Create a FakeUpdate so the agent can reply via edit_message_text
+        class FakeMessage:
+            def __init__(self, q, text):
+                self.text = text
+                self._query = q
+            async def reply_text(self, text, **kwargs):
+                await self._query.edit_message_text(text, **kwargs)
+
+        class FakeUpdate:
+            def __init__(self, q, text):
+                self.message = FakeMessage(q, text)
+
+        handler = _get_agent_handler(agent_id, "process_message")
+        if handler:
+            fake = FakeUpdate(query, original_text)
+            await handler(fake, original_text)
+            _update_recent_context(agent_id)
+
+
+# --- Multi-agent dispatch (LM-29) ---
+
+async def _dispatch_multi_agent(update: Update, routes: list[dict]):
+    """
+    Fan out to multiple agents in parallel, collect responses, send consolidated reply.
+    """
+    async def _call_agent(route: dict) -> tuple[str, str]:
+        agent_id = route["agent"]
+        routed_text = route["message"]
+        handler = _get_agent_handler(agent_id, "process_message")
+        if not handler:
+            return agent_id, "Failed to process."
+        try:
+            reply = await handler(update, routed_text, send_reply=False)
+            return agent_id, reply
+        except Exception as e:
+            logger.error(f"Multi-agent dispatch error ({agent_id}): {e}")
+            return agent_id, "Something went wrong processing that."
+
+    # LM-29: parallel fan-out
+    results = await asyncio.gather(*[_call_agent(r) for r in routes])
+
+    # Build consolidated reply with emoji prefixes
+    parts = []
+    for agent_id, reply in results:
+        emoji = AGENT_EMOJI.get(agent_id, "")
+        parts.append(f"{emoji} {reply}")
+
+    consolidated = "\n\n".join(parts)
+
+    sent_msg = await update.message.reply_text(consolidated)
+
+    # Track context — use "multi" for multi-agent replies
+    _update_recent_context(routes[0]["agent"])
+    _track_reply(sent_msg.message_id, "multi")
+
+
+# --- Fallback keyboards ---
+
+async def _send_fallback_keyboard(update: Update, text: str):
+    """Send an inline keyboard asking the user which agent should handle the message."""
+    buttons = [
+        [
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['finance']} Finance",
+                callback_data="router:finance",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['life_manager']} Life Manager",
+                callback_data="router:life_manager",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['health_body']} Health",
+                callback_data="router:health_body",
+            ),
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
+    sent = await update.message.reply_text(
+        "I'm not sure which agent should handle that. Which one?",
+        reply_markup=keyboard,
+    )
+
+    # Store the original text so we can dispatch after selection
+    _pending_fallback[sent.message_id] = {"text": text}
+
+    # Clean old entries (keep last 20)
+    if len(_pending_fallback) > 20:
+        oldest_keys = sorted(_pending_fallback.keys())[:-20]
+        for k in oldest_keys:
+            _pending_fallback.pop(k, None)
+
+
+async def _send_photo_fallback(update: Update):
+    """Ask user which agent should process a photo with no context."""
+    buttons = [
+        [
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['finance']} Finance",
+                callback_data="router_photo:finance",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['life_manager']} Life Manager",
+                callback_data="router_photo:life_manager",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['health_body']} Health",
+                callback_data="router_photo:health_body",
+            ),
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
+    await update.message.reply_text(
+        "Which agent should process this photo?",
+        reply_markup=keyboard,
+    )
+
+
+# --- Helper functions ---
+
+def _get_agent_handler(agent_id: str, method: str):
+    """Dynamically import and return an agent's handler function."""
+    try:
+        if agent_id == "finance":
+            from backend.agents.finance.telegram import process_message, process_photo
+            return process_message if method == "process_message" else process_photo
+        elif agent_id == "life_manager":
+            from backend.agents.life_manager.telegram import process_message, process_photo
+            return process_message if method == "process_message" else process_photo
+        elif agent_id == "health_body":
+            from backend.agents.health_body.telegram import process_message, process_photo
+            return process_message if method == "process_message" else process_photo
+    except ImportError as e:
+        logger.error(f"Failed to import {agent_id} handler: {e}")
+    return None
+
+
+def _update_recent_context(agent: str):
+    """Update the recent context buffer (LM-31)."""
+    global _recent_context
+    _recent_context = {"agent": agent, "timestamp": time.time()}
+
+
+def _track_reply(message_id: int, agent: str):
+    """Track which agent generated a bot reply (LM-30)."""
+    _reply_source_map[message_id] = agent
+    # Cap size
+    if len(_reply_source_map) > _REPLY_MAP_MAX:
+        oldest_keys = sorted(_reply_source_map.keys())[: len(_reply_source_map) - _REPLY_MAP_MAX]
+        for k in oldest_keys:
+            _reply_source_map.pop(k, None)
+
+
+def _get_reply_to_agent(update: Update) -> str | None:
+    """Check if the message is a reply to a tracked bot message (LM-30)."""
+    try:
+        reply_msg = update.message.reply_to_message
+        if reply_msg and reply_msg.message_id in _reply_source_map:
+            return _reply_source_map[reply_msg.message_id]
+    except AttributeError:
+        pass
+    return None

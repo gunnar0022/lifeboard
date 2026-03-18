@@ -62,6 +62,7 @@ async def process_message(
     conversation_history: list[dict] = None,
     image_data: bytes = None,
     image_media_type: str = "image/jpeg",
+    max_tokens: int = 2048,
 ) -> dict:
     """
     Send a message to Claude and get a structured JSON action back.
@@ -103,7 +104,7 @@ async def process_message(
     try:
         response = await client.messages.create(
             model=MODEL,
-            max_tokens=2048,
+            max_tokens=max_tokens,
             system=system_prompt,
             messages=messages,
         )
