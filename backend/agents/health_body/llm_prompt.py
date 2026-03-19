@@ -206,12 +206,19 @@ def _format_recent(recent: list[dict]) -> str:
         return "RECENT 3 DAYS: No data"
     lines = ["RECENT 3 DAYS:"]
     for day in recent:
-        meal_count = len(day.get("meals", []))
+        meals = day.get("meals", [])
+        exercises = day.get("exercises", [])
         cal = day.get("total_calories", 0)
         ex_min = day.get("total_exercise_minutes", 0)
         mood = day.get("mood")
         mood_str = f" | Mood:{mood}/5" if mood else ""
-        lines.append(f"  {day['date']} ({day['day_name']}): {cal} kcal ({meal_count} meals) | Exercise: {ex_min} min{mood_str}")
+        lines.append(f"  {day['date']} ({day['day_name']}): {cal} kcal ({len(meals)} meals) | Exercise: {ex_min} min{mood_str}")
+        for m in meals:
+            time_str = f" {m['time']}" if m.get("time") else ""
+            lines.append(f"    [meal:{m['id']}]{time_str} {m['description']} — {m['calories']} kcal")
+        for e in exercises:
+            time_str = f" {e['time']}" if e.get("time") else ""
+            lines.append(f"    [exercise:{e['id']}]{time_str} {e['description']} — {e['duration_minutes']} min")
     return "\n".join(lines)
 
 
