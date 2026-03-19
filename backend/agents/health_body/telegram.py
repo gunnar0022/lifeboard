@@ -31,6 +31,24 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
 
     logger.info(f"Health LLM action: {action_data.get('action')} | data keys: {list(action_data.get('data', {}).keys())}")
 
+    # Retry if LLM returned 'respond' when it should have returned an action
+    if action_data.get("action") == "respond":
+        result = await execute_action(action_data, ACTION_REGISTRY)
+        if result.get("_hallucinated"):
+            logger.info("Retrying with correction prompt...")
+            correction = (
+                f"CORRECTION: You returned 'respond' but your reply claims you performed an action. "
+                f"The 'respond' action does NOTHING to the database. You MUST return the actual action name "
+                f"(e.g., delete_meal, log_meal, edit_meal, etc.) with the correct data fields. "
+                f"The user said: \"{text}\". Try again with the correct action."
+            )
+            action_data = await llm_client.process_message(
+                system_prompt=system_prompt,
+                user_message=correction,
+                conversation_history=_conversation_history,
+            )
+            logger.info(f"Health LLM retry action: {action_data.get('action')} | data keys: {list(action_data.get('data', {}).keys())}")
+
     _conversation_history.append({"role": "user", "content": text})
 
     result = await execute_action(action_data, ACTION_REGISTRY)

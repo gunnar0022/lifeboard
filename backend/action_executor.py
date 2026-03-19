@@ -3,9 +3,16 @@ Shared action executor — validate → execute → respond loop (LM-04, LM-13d)
 Each agent defines an ACTION_REGISTRY mapping action names to handler functions.
 This module handles the common validation and execution flow.
 """
+import re
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Words in the LLM reply that suggest it thinks it performed an action
+_ACTION_CLAIM_PATTERN = re.compile(
+    r'\b(deleted|removed|logged|added|created|updated|edited|recorded|set|saved|stored)\b',
+    re.IGNORECASE,
+)
 
 
 async def execute_action(action_data: dict, action_registry: dict) -> dict:
@@ -31,10 +38,18 @@ async def execute_action(action_data: dict, action_registry: dict) -> dict:
 
     # Handle meta actions
     if action_name == "respond":
+        reply = action_data.get("reply", "")
+        # Detect hallucinated actions: LLM said "respond" but reply claims it did something
+        if _ACTION_CLAIM_PATTERN.search(reply):
+            logger.warning(
+                f"LLM returned 'respond' but reply claims action was taken: {reply[:100]}. "
+                f"Flagging as hallucinated — no DB operation occurred."
+            )
         return {
             "success": True,
             "result": None,
-            "reply": action_data.get("reply", ""),
+            "reply": reply,
+            "_hallucinated": bool(_ACTION_CLAIM_PATTERN.search(reply)),
         }
 
     if action_name == "clarify":

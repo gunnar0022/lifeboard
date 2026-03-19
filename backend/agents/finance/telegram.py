@@ -29,6 +29,22 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
         conversation_history=_conversation_history,
     )
 
+    # Retry if LLM returned 'respond' when it should have returned an action
+    if action_data.get("action") == "respond":
+        result = await execute_action(action_data, ACTION_REGISTRY)
+        if result.get("_hallucinated"):
+            logger.info("Finance: retrying with correction prompt...")
+            correction = (
+                f"CORRECTION: You returned 'respond' but your reply claims you performed an action. "
+                f"The 'respond' action does NOTHING to the database. Return the actual action name. "
+                f"The user said: \"{text}\". Try again with the correct action."
+            )
+            action_data = await llm_client.process_message(
+                system_prompt=system_prompt,
+                user_message=correction,
+                conversation_history=_conversation_history,
+            )
+
     # Update conversation history
     _conversation_history.append({"role": "user", "content": text})
 
