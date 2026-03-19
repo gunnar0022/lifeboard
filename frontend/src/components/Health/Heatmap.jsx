@@ -80,8 +80,11 @@ export default function Heatmap({ data }) {
     data.forEach(d => { dayMap[d.date] = d; });
 
     // Build grid: each column is a week, rows are Mon-Sun
-    const firstDate = new Date(data[0].date + 'T00:00:00');
-    const lastDate = new Date(data[data.length - 1].date + 'T00:00:00');
+    // Use T00:00:00 to avoid timezone shifts in date comparisons
+    const firstDateStr = data[0].date;
+    const lastDateStr = data[data.length - 1].date;
+    const firstDate = new Date(firstDateStr + 'T00:00:00');
+    const lastDate = new Date(lastDateStr + 'T00:00:00');
 
     // Align to Monday
     const startDay = firstDate.getDay(); // 0=Sun
@@ -94,11 +97,19 @@ export default function Heatmap({ data }) {
     let current = new Date(gridStart);
     let lastMonth = -1;
 
-    while (current <= lastDate) {
+    // Use string comparison to avoid timezone issues cutting off today
+    const toDateStr = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    while (toDateStr(current) <= lastDateStr) {
       const week = [];
       for (let row = 0; row < 7; row++) {
-        const dateStr = current.toISOString().split('T')[0];
-        const inRange = current >= firstDate && current <= lastDate;
+        const dateStr = toDateStr(current);
+        const inRange = dateStr >= firstDateStr && dateStr <= lastDateStr;
         week.push(inRange ? (dayMap[dateStr] || { date: dateStr, total_calories: 0 }) : null);
 
         // Track month labels
