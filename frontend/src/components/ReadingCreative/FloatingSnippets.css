@@ -18,9 +18,15 @@
 
 .floating-snippets__item {
   position: absolute;
-  max-width: 45%;
+  max-width: 42%;
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   pointer-events: none;
   font-family: Georgia, 'Times New Roman', serif;
+  transition: color 0.8s ease;
+}
+
+.floating-snippets__item--focus {
+  color: var(--text-primary);
+  font-weight: 500;
 }

@@ -20,7 +20,7 @@ const fadeUp = {
 export default function ReadingCreativePanel() {
   const { data: projects, loading } = useApi('/api/reading_creative/projects');
   const { data: books, refetch: refetchBooks } = useApi('/api/reading_creative/books');
-  const { data: snippets } = useApi('/api/reading_creative/snippets?count=8');
+  const { data: snippets } = useApi('/api/reading_creative/snippets?count=12');
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
 
   // Count total files across projects
