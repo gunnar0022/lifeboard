@@ -9,13 +9,16 @@ from backend.agents.investing import queries
 # --- Write action handlers ---
 
 async def handle_add_holding(data: dict) -> dict:
-    return await queries.add_holding(
+    result = await queries.add_holding(
         symbol=data["symbol"],
         name=data["name"],
         asset_class=data.get("asset_class", "stock"),
         currency=data.get("currency"),
         notes=data.get("notes"),
     )
+    # Immediately fetch current market price so the holding doesn't show as $0
+    await _refresh_price(result["id"])
+    return await queries.get_holding(result["id"]) or result
 
 
 async def handle_edit_holding(data: dict) -> dict:
@@ -29,7 +32,7 @@ async def handle_remove_holding(data: dict) -> bool:
 
 async def handle_record_transaction(data: dict) -> dict:
     """Record buy/sell/dividend/split and recalculate cost basis (LM-34)."""
-    return await queries.record_transaction(
+    result = await queries.record_transaction(
         holding_id=data["holding_id"],
         tx_type=data["type"],
         shares=data.get("shares", 0),
@@ -39,6 +42,19 @@ async def handle_record_transaction(data: dict) -> dict:
         date_str=data.get("date"),
         notes=data.get("notes"),
     )
+    # Fetch current price on buy so portfolio value is accurate immediately
+    if data.get("type") == "buy":
+        await _refresh_price(data["holding_id"])
+    return result
+
+
+async def _refresh_price(holding_id: int):
+    """Non-blocking price refresh — failures are silently ignored."""
+    try:
+        from backend.agents.investing.scheduler import refresh_single_holding_price
+        await refresh_single_holding_price(holding_id)
+    except Exception:
+        pass  # Non-critical — the daily scheduler will catch it
 
 
 async def handle_add_account(data: dict) -> dict:

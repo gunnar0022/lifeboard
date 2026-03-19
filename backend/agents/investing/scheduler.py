@@ -145,6 +145,49 @@ def _price_to_smallest_unit(price: float, currency: str) -> int:
         return round(price * 100)  # USD/etc: 1 unit = 1 cent
 
 
+async def refresh_single_holding_price(holding_id: int) -> int | None:
+    """
+    Fetch the current price for a single holding and update the DB.
+    Called immediately after adding a holding or recording a buy.
+    Returns the updated price (in smallest unit) or None on failure.
+    """
+    db_holding = None
+    try:
+        from backend.database import get_db
+        db = await get_db()
+        try:
+            cursor = await db.execute(
+                "SELECT symbol, currency FROM investing_holdings WHERE id = ?",
+                (holding_id,),
+            )
+            db_holding = await cursor.fetchone()
+        finally:
+            await db.close()
+
+        if not db_holding:
+            return None
+
+        symbol = db_holding["symbol"]
+        currency = db_holding["currency"]
+
+        prices = await asyncio.to_thread(_fetch_prices_sync, [symbol])
+        raw_price = prices.get(symbol)
+
+        if raw_price is None:
+            logger.warning(f"No price data for {symbol} during immediate refresh")
+            return None
+
+        price_int = _price_to_smallest_unit(raw_price, currency)
+        now_iso = datetime.now().isoformat()
+        await queries.update_holding_price(holding_id, price_int, now_iso)
+        logger.info(f"Immediate price refresh: {symbol} = {raw_price} ({currency})")
+        return price_int
+
+    except Exception as e:
+        logger.error(f"Immediate price refresh failed for holding {holding_id}: {e}")
+        return None
+
+
 async def run_price_refresh():
     """
     Fetch latest prices for all holdings, update DB, store portfolio snapshot.
