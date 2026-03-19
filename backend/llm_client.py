@@ -82,10 +82,10 @@ async def process_message(
     """
     client = _get_client()
 
-    # Build messages (cap at 5 for cost control per LM-13a)
+    # Build messages: 3 exchanges (6 messages) sliding window
     messages = []
     if conversation_history:
-        for msg in conversation_history[-5:]:
+        for msg in conversation_history[-6:]:
             messages.append(msg)
 
     # Build current message content
