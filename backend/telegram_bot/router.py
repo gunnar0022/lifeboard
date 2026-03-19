@@ -38,6 +38,11 @@ AGENT_LABELS = {
 # LM-31: Recent context buffer
 _recent_context: dict | None = None  # {"agent": str, "timestamp": float}
 
+# Router conversation history — 8 exchanges (16 messages) so the router
+# can see what the user has been doing and route follow-ups correctly.
+_router_history: list[dict] = []
+_ROUTER_HISTORY_MAX = 16  # 8 user + 8 assistant = 8 exchanges
+
 # LM-30: Reply-to tracking — bot message_id -> source agent
 _reply_source_map: dict[int, str] = {}
 _REPLY_MAP_MAX = 50
@@ -99,6 +104,8 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
             user_message=text,
             max_tokens=200,
             model=llm_client.MODEL_FAST,
+            conversation_history=_router_history,
+            max_history=16,
         )
 
         # Parse routes from response
@@ -116,6 +123,13 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
                 and route.get("message")
             ):
                 valid_routes.append(route)
+
+        # Record this exchange in router history
+        _router_history.append({"role": "user", "content": text})
+        routed_to = ", ".join(r["agent"] for r in valid_routes) if valid_routes else "none"
+        _router_history.append({"role": "assistant", "content": f'{{"routes": [{routed_to}]}}'})
+        if len(_router_history) > _ROUTER_HISTORY_MAX:
+            _router_history[:] = _router_history[-_ROUTER_HISTORY_MAX:]
 
         return valid_routes
 

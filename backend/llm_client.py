@@ -66,6 +66,7 @@ async def process_message(
     image_media_type: str = "image/jpeg",
     max_tokens: int = 2048,
     model: str = None,
+    max_history: int = 6,
 ) -> dict:
     """
     Send a message to Claude and get a structured JSON action back.
@@ -73,19 +74,20 @@ async def process_message(
     Args:
         system_prompt: Agent-specific system prompt with state context (LM-13b, LM-13e).
         user_message: The user's natural language message.
-        conversation_history: Last 5 messages for context (LM-13a).
+        conversation_history: Recent messages for context.
         image_data: Optional image bytes (receipt, document).
         image_media_type: MIME type of the image.
+        max_history: Max conversation history messages to include (default 6 = 3 exchanges).
 
     Returns:
         Parsed JSON action dict from Claude's response.
     """
     client = _get_client()
 
-    # Build messages: 3 exchanges (6 messages) sliding window
+    # Build messages with sliding window
     messages = []
     if conversation_history:
-        for msg in conversation_history[-6:]:
+        for msg in conversation_history[-max_history:]:
             messages.append(msg)
 
     # Build current message content
