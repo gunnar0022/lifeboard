@@ -11,19 +11,19 @@ export default function FloatingSnippets({ snippets }) {
       ...s,
       x: 3 + (i % 4) * 22 + Math.random() * 10,
       y: 8 + Math.floor(i / 4) * 28 + Math.random() * 15,
-      size: 0.72 + Math.random() * 0.25,
+      size: 1.1 + Math.random() * 0.25,
       drift: 6 + Math.random() * 12,
       duration: 25 + Math.random() * 20,
       delay: Math.random() * -10,
     }));
   }, [snippets]);
 
-  // Cycle focus every 4 seconds
+  // Cycle focus every 6 seconds
   useEffect(() => {
     if (positioned.length === 0) return;
     const interval = setInterval(() => {
       setFocusIndex(prev => (prev + 1) % positioned.length);
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [positioned.length]);
 
