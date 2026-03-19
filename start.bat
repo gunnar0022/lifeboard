@@ -45,10 +45,10 @@ echo.
 
 :: ── Start backend ──
 echo [3/4] Starting backend on port 8000...
-start "LifeBoard Backend" /min cmd /c "cd /d %~dp0 && python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload 2>&1"
+start "LifeBoard Backend" /min cmd /c "cd /d %~dp0 && python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 2>&1"
 
-:: Give backend a moment to boot
-timeout /t 2 /nobreak >nul
+:: Give backend time to initialize (DB + Telegram + schedulers)
+timeout /t 5 /nobreak >nul
 
 :: ── Start frontend ──
 echo [4/4] Starting frontend on port 5173...
