@@ -34,7 +34,7 @@ The LLM is the parser, not the database. Claude never stores state — it reads 
 
 ## Agents
 
-LifeBoard is built around **four specialized agents**, each owning its own domain, database tables, and Telegram integration. Three more are planned as placeholders.
+LifeBoard is built around **four specialized agents** and a **headless consultation agent**, each owning its own domain, database tables, and Telegram integration. Three more are planned as placeholders.
 
 ### Finance Agent
 
@@ -64,16 +64,17 @@ Dashboard panel: 14-day scrollable timeline with color-coded dots, bill tracker,
 
 ### Health & Body Agent
 
-Nutrition, exercise, mood tracking, body measurements, and medical record management.
+Nutrition, exercise, mood tracking, body measurements, medical records, and health concern tracking.
 
 - **Meals** — logged with full macros (calories, protein, carbs, fat) parsed by Claude from natural descriptions
 - **Exercise** — workouts with duration and estimated calorie burn
 - **Daily summaries** — automatic end-of-day aggregation of meals, exercise, mood (1-5), and energy (1-5)
 - **Body measurements** — weight tracking with a 90-day heatmap visualization
 - **Medical records** — checkups, vaccinations, prescriptions, lab results, imaging, dental, and vision records
+- **Health concerns** — trackable health issues (injuries, symptoms, conditions) created during Fleet visits and updated via casual Telegram messages between visits. Each concern has a full log history showing both user updates and Fleet visit notes. Resolved concerns retain their summary for 90 days before logs are compressed.
 - **Evening check-in** — scheduled Telegram prompt asking about your day's mood and energy
 
-Dashboard panel: calorie/macro breakdown, exercise log, mood/energy trends, weight heatmap, medical document registry.
+Dashboard panel: calorie/macro breakdown, exercise log, mood/energy trends, weight heatmap, health concerns tracker with expandable log history, medical document registry.
 
 ### Investing Agent
 
@@ -87,6 +88,20 @@ Portfolio tracking across stocks, ETFs, and crypto with multi-currency support.
 - **Projection calculator** — frontend compound-interest simulator with adjustable parameters
 
 Dashboard panel: portfolio value trend chart (with crosshair hover), asset allocation donut, expandable holdings table grouped by asset class, future projection calculator. USD/JPY currency toggle converts all values on the page.
+
+### Dr. Fleet — Consultation Agent
+
+A headless personal health consultant that conducts clinic-style visits via Telegram. Fleet has no dashboard panel and no sidebar entry — it exists purely as a focused conversational system within Telegram, powered by Claude Opus.
+
+- **Clinic visits** — say "I want to see the doctor" or "can I talk to Fleet" in Telegram to start a session. Fleet greets you with awareness of your health history, active concerns, and past visits.
+- **Session lock** — while a visit is active, all Telegram messages go directly to Fleet. No routing, no other agents. The visit is a focused conversation.
+- **Medical briefing** — each session starts with an automated assembly of your health profile, weight history, active concerns with full log histories, resolved concerns, medical record counts, and last visit summary. Fleet references this naturally during conversation.
+- **Record retrieval** — mid-conversation, Fleet can look up specific medical records when relevant, injecting results into the conversation context without breaking the flow.
+- **Three-way handshake** — when you signal you're done, Fleet presents a brief action checklist (new concerns, updates, resolutions). You confirm before anything is written to the database. No writes happen during the conversation itself.
+- **Actions** — after confirmation, Fleet creates new concerns, adds visit notes to existing ones, resolves concerns with summaries, reactivates old ones, and updates your health profile — all in a single batch.
+- **Disclaimers** — Fleet includes appropriate caveats when discussing anything potentially serious, and recommends seeing a real doctor when warranted.
+
+Fleet is the only part of the system that uses Claude Opus. All other agents, the router, and supporting calls use Haiku or Sonnet.
 
 ### Planned Agents
 
@@ -118,6 +133,7 @@ backend/
     life_manager/      # config, actions, routes, queries, telegram, llm_prompt, nudges
     health_body/       # config, actions, routes, queries, telegram, llm_prompt, nudges, scheduler
     investing/         # config, actions, routes, queries, telegram, llm_prompt, nudges, scheduler
+    fleet/             # config, queries, llm_prompt, telegram, scheduler (headless — no routes/dashboard)
   telegram_bot/
     bot.py             # Bot lifecycle, command handlers, authorization
     router.py          # LLM-powered message classification and multi-agent dispatch
@@ -127,7 +143,7 @@ backend/
 
 **Database** is a single SQLite file (`data/lifeboard.db`) with WAL journaling and foreign key enforcement. All currency amounts are stored as integers in the smallest unit (1 for JPY, 100 for USD) to avoid floating-point errors. Every query is raw SQL via `aiosqlite` — no ORM.
 
-**Lifespan events** handle startup and shutdown of the Telegram bot, background schedulers (finance cycle compression, health evening check-ins, investing price refresh), and database initialization.
+**Lifespan events** handle startup and shutdown of the Telegram bot, background schedulers (finance cycle compression, health evening check-ins, investing price refresh, Fleet concern compression), orphaned Fleet session recovery, and database initialization.
 
 **Nudges** are proactive alerts aggregated from all agents on each API request. Each agent defines a `check_nudges()` function that returns alerts (budget exceeded), warnings (bill due in 3 days), or info items (document expiring soon). The frontend displays these as dismissible banners in the top bar.
 
@@ -141,7 +157,7 @@ frontend/src/
     Shell/             # Sidebar, TopBar, HomePanel, PulseCard
     Finance/           # AccountsStrip, CycleOverview, SpendingChart, BudgetDonut, ...
     LifeManager/       # Timeline, TaskBoard, BillTracker, DocumentRegistry, ...
-    Health/            # CalorieBar, ExerciseLog, WeightHeatmap, MedicalRegistry, ...
+    Health/            # CalorieBar, ExerciseLog, WeightHeatmap, ConcernsTracker, MedicalRegistry, ...
     Investing/         # PortfolioTrend, AllocationChart, HoldingsTable, ProjectionCalc, ...
     Shared/            # PlaceholderPanel for upcoming agents
 ```
@@ -166,6 +182,8 @@ Each agent implements `process_message()` and `process_photo()` handlers. These 
 
 **Context hints** give the router a 2-minute memory window — if you just talked to Finance, a follow-up "add another one" routes back to Finance without needing explicit context.
 
+**Fleet sessions** are a special case. When the router detects a request to see the doctor, it starts a Fleet visit instead of routing to a standard agent. While a visit is active, the router is bypassed entirely — all messages go directly to Fleet's Opus conversation handler until the session ends.
+
 ### Background Schedulers
 
 Three agents run background tasks:
@@ -177,6 +195,8 @@ Three agents run background tasks:
 | Health & Body | Daily (configurable) | Send evening check-in prompt via Telegram |
 | Health & Body | Daily (2 AM) | Compress yesterday's meals/exercises into daily summary |
 | Investing | Daily (6 PM) | Refresh holding prices via yfinance, store portfolio snapshot |
+| Fleet | Daily (4 AM) | Compress resolved concern logs older than 90 days |
+| Fleet | On startup | Recover orphaned sessions (close visits interrupted by restart) |
 
 Schedulers start and stop cleanly with the FastAPI lifespan. Each uses `asyncio` background tasks with timezone-aware scheduling.
 
@@ -189,7 +209,7 @@ Schedulers start and stop cleanly with the FastAPI lifespan. Each uses `asyncio`
 | Frontend | React 18, Vite 6, Framer Motion, Recharts, Lucide Icons |
 | Backend | Python, FastAPI, uvicorn, aiosqlite |
 | Database | SQLite (WAL mode, foreign keys, raw SQL) |
-| AI | Anthropic Claude (claude-sonnet-4-5-20250514) via `anthropic` SDK |
+| AI | Anthropic Claude — Opus (Fleet visits), Sonnet 4.5 (agents), Haiku 4.5 (routing) |
 | Telegram | python-telegram-bot v21 (async) |
 | Market Data | yfinance, frankfurter.app (FX rates) |
 | Process Manager | PM2 (production) |
@@ -292,8 +312,9 @@ lifeboard/
 │   │   ├── registry.py         # Agent auto-discovery
 │   │   ├── finance/            # Budget, accounts, transactions, transfers
 │   │   ├── life_manager/       # Calendar, bills, tasks, documents
-│   │   ├── health_body/        # Nutrition, exercise, mood, medical
-│   │   └── investing/          # Portfolio, holdings, snapshots
+│   │   ├── health_body/        # Nutrition, exercise, mood, medical, concerns
+│   │   ├── investing/          # Portfolio, holdings, snapshots
+│   │   └── fleet/              # Dr. Fleet consultation agent (headless)
 │   └── telegram_bot/
 │       ├── bot.py              # Bot lifecycle and handlers
 │       └── router.py           # LLM message classifier + multi-agent dispatch
