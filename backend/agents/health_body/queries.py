@@ -3,8 +3,17 @@ Health & Body agent — SQL query functions.
 Raw SQL with aiosqlite (no ORM per LM-01).
 Weight stored in grams (81kg = 81000) per LM-06.
 """
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from backend.database import get_db
+from backend.config import get_config
+
+
+def _today() -> date:
+    """Get today's date in the user's configured timezone."""
+    cfg = get_config()
+    tz = ZoneInfo(cfg.get("timezone", "UTC"))
+    return datetime.now(tz).date()
 
 
 # ──────────────────────── Profile ────────────────────────
@@ -27,7 +36,7 @@ async def upsert_profile(**fields) -> dict:
                         "daily_calorie_goal", "evening_checkin_time"}
             updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
             if updates:
-                updates["updated_at"] = date.today().isoformat()
+                updates["updated_at"] = _today().isoformat()
                 set_clause = ", ".join(f"{k} = ?" for k in updates)
                 params = list(updates.values()) + [1]
                 await db.execute(
@@ -111,7 +120,7 @@ async def add_meal(
     fat_g: int = 0,
 ) -> dict:
     if not meal_date:
-        meal_date = date.today().isoformat()
+        meal_date = _today().isoformat()
     db = await get_db()
     try:
         cursor = await db.execute(
@@ -207,7 +216,7 @@ async def add_exercise(
     estimated_calories: int = 0,
 ) -> dict:
     if not exercise_date:
-        exercise_date = date.today().isoformat()
+        exercise_date = _today().isoformat()
     db = await get_db()
     try:
         cursor = await db.execute(
@@ -304,7 +313,7 @@ async def upsert_daily_summary(date_str: str, **fields) -> dict:
 
 async def set_mood_energy(date_str: str = None, mood: int = None, energy: int = None) -> dict:
     if not date_str:
-        date_str = date.today().isoformat()
+        date_str = _today().isoformat()
     updates = {}
     if mood is not None:
         updates["mood"] = mood
@@ -332,7 +341,7 @@ async def add_measurement(
     notes: str = None,
 ) -> dict:
     if not measurement_date:
-        measurement_date = date.today().isoformat()
+        measurement_date = _today().isoformat()
     db = await get_db()
     try:
         cursor = await db.execute(
@@ -514,7 +523,7 @@ async def get_files_for_document(doc_id: int) -> list[dict]:
 
 async def get_heatmap_data(days: int = 90) -> list[dict]:
     """Return per-day data for the heatmap grid."""
-    today = date.today()
+    today = _today()
     start = today - timedelta(days=days - 1)
     start_str = start.isoformat()
     today_str = today.isoformat()
@@ -584,7 +593,7 @@ async def get_heatmap_data(days: int = 90) -> list[dict]:
 
 async def get_recent_detail(days: int = 3) -> list[dict]:
     """Return individual meals and exercises for the last N days."""
-    today = date.today()
+    today = _today()
     result = []
     for i in range(days):
         d = today - timedelta(days=i)
@@ -611,7 +620,7 @@ async def get_recent_detail(days: int = 3) -> list[dict]:
 
 async def get_pulse() -> dict:
     """Return key metrics for the Home panel pulse card."""
-    today_str = date.today().isoformat()
+    today_str = _today().isoformat()
     profile = await get_profile()
     goal = (profile or {}).get("daily_calorie_goal", 0)
 
@@ -637,7 +646,7 @@ async def get_pulse() -> dict:
 
 async def get_uncompressed_dates(older_than_days: int = 3) -> list[str]:
     """Find dates with individual meal/exercise rows older than N days."""
-    cutoff = (date.today() - timedelta(days=older_than_days)).isoformat()
+    cutoff = (_today() - timedelta(days=older_than_days)).isoformat()
     db = await get_db()
     try:
         meal_dates = await db.execute_fetchall(

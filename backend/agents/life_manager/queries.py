@@ -4,9 +4,17 @@ Raw SQL with aiosqlite (no ORM per LM-01).
 All amounts stored as integers (smallest currency unit per LM-06).
 """
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from backend.database import get_db
 from backend.config import get_config
 from dateutil.relativedelta import relativedelta
+
+
+def _today() -> date:
+    """Get today's date in the user's configured timezone."""
+    config = get_config()
+    tz = ZoneInfo(config.get("timezone", "UTC"))
+    return datetime.now(tz).date()
 
 
 # ──────────────────────── Events ────────────────────────
@@ -245,7 +253,7 @@ async def get_bills(
             sql += " AND category = ?"
             params.append(category)
         if upcoming_days is not None:
-            cutoff = (date.today() + timedelta(days=upcoming_days)).isoformat()
+            cutoff = (_today() + timedelta(days=upcoming_days)).isoformat()
             sql += " AND next_due <= ?"
             params.append(cutoff)
         sql += " ORDER BY next_due ASC LIMIT ?"
@@ -277,7 +285,7 @@ async def add_bill(
     notes: str = None,
 ) -> dict:
     # Set next_due to due_date initially
-    next_due = due_date or date.today().isoformat()
+    next_due = due_date or _today().isoformat()
     due = due_date or next_due
     db = await get_db()
     try:
@@ -375,7 +383,7 @@ async def get_documents(
             sql += " AND category = ?"
             params.append(category)
         if expiring_within_days is not None:
-            cutoff = (date.today() + timedelta(days=expiring_within_days)).isoformat()
+            cutoff = (_today() + timedelta(days=expiring_within_days)).isoformat()
             sql += " AND expiry_date IS NOT NULL AND expiry_date <= ?"
             params.append(cutoff)
         if search:
@@ -520,7 +528,7 @@ async def get_files_for_document(doc_id: int) -> list[dict]:
 
 async def get_today_items() -> dict:
     """Get all items for today: events, tasks due, bills due."""
-    today_str = date.today().isoformat()
+    today_str = _today().isoformat()
     events = await get_events(date_from=today_str, date_to=today_str)
     tasks = await get_tasks(is_completed=False)
     tasks_due_today = [t for t in tasks if t.get("due_date") == today_str]
@@ -535,8 +543,8 @@ async def get_today_items() -> dict:
 
 async def get_upcoming(days_ahead: int = 7) -> dict:
     """Get all upcoming items within N days."""
-    today_str = date.today().isoformat()
-    cutoff = (date.today() + timedelta(days=days_ahead)).isoformat()
+    today_str = _today().isoformat()
+    cutoff = (_today() + timedelta(days=days_ahead)).isoformat()
     events = await get_events(date_from=today_str, date_to=cutoff)
     tasks = await get_tasks(is_completed=False)
     tasks_due = [t for t in tasks if t.get("due_date") and t["due_date"] <= cutoff]
@@ -551,7 +559,7 @@ async def get_upcoming(days_ahead: int = 7) -> dict:
 
 async def get_overdue() -> dict:
     """Get all overdue items."""
-    today_str = date.today().isoformat()
+    today_str = _today().isoformat()
     # Overdue events (past date, not completed)
     db = await get_db()
     try:
@@ -580,7 +588,7 @@ async def get_overdue() -> dict:
 
 async def get_timeline(days: int = 14) -> list[dict]:
     """Get timeline data for the next N days (for the dashboard timeline strip)."""
-    today = date.today()
+    today = _today()
     timeline = []
     for i in range(days):
         d = today + timedelta(days=i)
@@ -623,7 +631,7 @@ async def get_timeline(days: int = 14) -> list[dict]:
 
 async def get_bill_calendar() -> list[dict]:
     """Get bill due dates for a month-view calendar."""
-    today = date.today()
+    today = _today()
     # Show current month
     month_start = today.replace(day=1)
     if today.month == 12:
@@ -650,7 +658,7 @@ async def get_bill_calendar() -> list[dict]:
 
 async def get_pulse() -> dict:
     """Return key metrics for the Home panel pulse card."""
-    today_str = date.today().isoformat()
+    today_str = _today().isoformat()
 
     # Tasks due today
     tasks = await get_tasks(is_completed=False)

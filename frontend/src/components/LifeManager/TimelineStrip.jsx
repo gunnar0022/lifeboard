@@ -68,22 +68,37 @@ export default function TimelineStrip({ timeline }) {
   const [selectedDay, setSelectedDay] = useState(null);
   const [viewMode, setViewMode] = useState('strip'); // 'strip' or 'month'
 
-  // Build 8-week grid (56 days), extending beyond the 14-day timeline data
+  // Build 8-week grid (56 days), aligned to Monday start
   const weeksGrid = useMemo(() => {
     if (!timeline || timeline.length === 0) return [];
 
-    const firstDate = new Date(timeline[0].date + 'T00:00:00');
+    const todayDate = new Date(timeline[0].date + 'T00:00:00');
     const dayMap = {};
     for (const d of timeline) {
       dayMap[d.date] = d;
     }
 
+    // Rewind to previous Monday so grid columns align with Mon-Sun header
+    const todayDow = todayDate.getDay(); // 0=Sun
+    const mondayOffset = todayDow === 0 ? 6 : todayDow - 1;
+    const gridStart = new Date(todayDate);
+    gridStart.setDate(gridStart.getDate() - mondayOffset);
+
+    const toDateStr = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
     const weeks = [];
+    // 8 full weeks from grid start
+    const totalDays = 56 + mondayOffset; // extra days to fill 8 full weeks
     let currentWeek = [];
-    for (let i = 0; i < 56; i++) {
-      const d = new Date(firstDate);
+    for (let i = 0; i < totalDays; i++) {
+      const d = new Date(gridStart);
       d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = toDateStr(d);
       const existing = dayMap[dateStr];
       const dayData = existing || {
         date: dateStr,
@@ -99,14 +114,16 @@ export default function TimelineStrip({ timeline }) {
 
       dayData.is_month_start = d.getDate() === 1;
       dayData.month_label = d.toLocaleDateString('en-US', { month: 'short' });
+      dayData.is_before_today = d < todayDate;
 
       currentWeek.push(dayData);
       if (currentWeek.length === 7) {
         weeks.push(currentWeek);
         currentWeek = [];
+        if (weeks.length >= 8) break;
       }
     }
-    if (currentWeek.length > 0) weeks.push(currentWeek);
+    if (currentWeek.length > 0 && weeks.length < 8) weeks.push(currentWeek);
     return weeks;
   }, [timeline]);
 
