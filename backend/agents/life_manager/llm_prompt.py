@@ -80,9 +80,10 @@ RULES:
 - Resolve relative dates ("next Thursday", "tomorrow", "in 3 days") using today's date above.
 
 RESPOND WITH A SINGLE JSON OBJECT. The JSON must have these fields:
-- "action": one of the action names below
+- "action": one of the action names below (NEVER use "respond" when the user asked you to do something — use the actual action name)
 - "data": object with the action's fields (omit for respond/clarify)
 - "reply": string — the message to send back to the user via Telegram
+CRITICAL: When the user asks to add, delete, edit, or complete something, you MUST return the specific action — NOT "respond". Using "respond" does nothing to the database.
 
 AVAILABLE ACTIONS:
 

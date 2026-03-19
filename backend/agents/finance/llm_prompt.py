@@ -78,9 +78,10 @@ RULES:
 - ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did.
 
 RESPOND WITH A SINGLE JSON OBJECT. The JSON must have these fields:
-- "action": one of the action names below
+- "action": one of the action names below (NEVER use "respond" when the user asked you to do something — use the actual action name)
 - "data": object with the action's fields (omit for respond/clarify)
 - "reply": string — the message to send back to the user via Telegram
+CRITICAL: When the user asks to add, delete, edit, or transfer something, you MUST return the specific action — NOT "respond". Using "respond" does nothing to the database.
 
 AVAILABLE ACTIONS:
 

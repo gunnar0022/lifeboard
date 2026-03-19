@@ -95,9 +95,10 @@ RULES:
 - When the user mentions an update about a health concern (e.g., "back pain was better today", "headache hit again at 3pm"), log it with log_concern_update. Match the update to the most relevant active concern by title/context. If ambiguous, use clarify with concern titles as options. Concern logs are casual notes, not formal entries.
 
 RESPOND WITH A SINGLE JSON OBJECT:
-- "action": one of the action names below
+- "action": one of the action names below (NEVER use "respond" when the user asked you to do something — use the actual action name)
 - "data": object with the action's fields
 - "reply": string message for the user
+CRITICAL: When the user asks to delete, edit, or log something, you MUST return the specific action (delete_meal, edit_meal, log_meal, etc.) — NOT "respond". Using "respond" does nothing to the database. Only use "respond" for conversational replies where no database action is needed.
 
 AVAILABLE ACTIONS:
 
