@@ -14,6 +14,7 @@ ALL_AGENTS = [
     {"id": "life_manager", "module": "backend.agents.life_manager"},
     {"id": "health_body", "module": "backend.agents.health_body"},
     {"id": "investing", "module": "backend.agents.investing"},
+    {"id": "reading_creative", "module": "backend.agents.reading_creative"},
     # Placeholder agents (no module yet)
     {
         "id": "career",
@@ -31,15 +32,6 @@ ALL_AGENTS = [
         "icon": "folder-kanban",
         "enabled": False,
         "description": "Active projects, milestones, task tracking",
-        "v1": False,
-    },
-    {
-        "id": "reading_creative",
-        "name": "Reading & Creative",
-        "accent_color": "#14B8A6",
-        "icon": "book-open",
-        "enabled": False,
-        "description": "Reading list, research notes, creative references",
         "v1": False,
     },
 ]

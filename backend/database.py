@@ -26,6 +26,7 @@ async def init_db():
         await _create_health_tables(db)
         await _create_investing_tables(db)
         await _create_fleet_tables(db)
+        await _create_reading_creative_tables(db)
         await db.commit()
     finally:
         await db.close()
@@ -357,5 +358,39 @@ async def _create_fleet_tables(db: aiosqlite.Connection):
             conversation_history TEXT NOT NULL DEFAULT '[]',
             actions_taken TEXT,
             summary TEXT
+        );
+    """)
+
+
+async def _create_reading_creative_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS creative_projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            slug TEXT NOT NULL UNIQUE,
+            description TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS creative_file_index (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id INTEGER NOT NULL REFERENCES creative_projects(id) ON DELETE CASCADE,
+            file_path TEXT NOT NULL UNIQUE,
+            file_name TEXT NOT NULL,
+            is_directory INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS reading_books (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            author TEXT,
+            status TEXT NOT NULL CHECK(status IN ('to_read', 'reading', 'finished')),
+            recommended_by TEXT,
+            reflection TEXT,
+            date_finished TEXT,
+            date_added TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            sort_order INTEGER NOT NULL DEFAULT 0
         );
     """)

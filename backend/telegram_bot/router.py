@@ -15,7 +15,7 @@ from backend import llm_client
 logger = logging.getLogger(__name__)
 
 # Valid agent IDs (fleet is session-based, not in this set)
-VALID_AGENTS = {"finance", "life_manager", "health_body", "investing"}
+VALID_AGENTS = {"finance", "life_manager", "health_body", "investing", "reading_creative"}
 FLEET_AGENT = "fleet"
 
 # Emoji prefixes for multi-agent consolidated replies
@@ -24,6 +24,7 @@ AGENT_EMOJI = {
     "life_manager": "\U0001f4cb",   # clipboard
     "health_body": "\U0001f4aa",    # flexed biceps
     "investing": "\U0001f4c8",     # chart increasing
+    "reading_creative": "\U0001fab6",  # feather
 }
 
 AGENT_LABELS = {
@@ -31,6 +32,7 @@ AGENT_LABELS = {
     "life_manager": "Life Manager",
     "health_body": "Health & Body",
     "investing": "Investing",
+    "reading_creative": "Reading & Creative",
 }
 
 # --- In-memory state (resets on restart, fine per LM-14) ---
@@ -60,6 +62,7 @@ Agents:
 - life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands (NOT workouts or exercise — those go to health_body)
 - health_body: food, meals, exercise, workouts, sports, gym, weight, mood, energy, medical, calories, nutrition, sleep, health checkups, health concern updates (e.g. "back pain was better today"). Any physical activity (volleyball, running, etc.) goes here, not life_manager
 - investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
+- reading_creative: creative ideas, worldbuilding, story ideas, writing, books, reading list, finished reading, book recommendations
 - fleet: ONLY for explicit requests to see a doctor, talk to Fleet, start a medical consultation/clinic visit
 
 Rules:
@@ -348,7 +351,13 @@ async def _send_fallback_keyboard(update: Update, text: str):
                 f"{AGENT_EMOJI['investing']} Investing",
                 callback_data="router:investing",
             ),
-        ]
+        ],
+        [
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['reading_creative']} Creative",
+                callback_data="router:reading_creative",
+            ),
+        ],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     sent = await update.message.reply_text(
@@ -388,7 +397,13 @@ async def _send_photo_fallback(update: Update):
                 f"{AGENT_EMOJI['investing']} Investing",
                 callback_data="router_photo:investing",
             ),
-        ]
+        ],
+        [
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['reading_creative']} Creative",
+                callback_data="router_photo:reading_creative",
+            ),
+        ],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
@@ -413,6 +428,9 @@ def _get_agent_handler(agent_id: str, method: str):
             return process_message if method == "process_message" else process_photo
         elif agent_id == "investing":
             from backend.agents.investing.telegram import process_message, process_photo
+            return process_message if method == "process_message" else process_photo
+        elif agent_id == "reading_creative":
+            from backend.agents.reading_creative.telegram import process_message, process_photo
             return process_message if method == "process_message" else process_photo
     except ImportError as e:
         logger.error(f"Failed to import {agent_id} handler: {e}")

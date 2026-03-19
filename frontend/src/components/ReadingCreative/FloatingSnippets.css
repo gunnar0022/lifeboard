@@ -1,0 +1,26 @@
+.floating-snippets {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: color-mix(in srgb, #B07CD8 6%, var(--bg-primary));
+  border: 1px solid color-mix(in srgb, #B07CD8 15%, var(--border-subtle));
+}
+
+.floating-snippets__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.floating-snippets__item {
+  position: absolute;
+  max-width: 45%;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  pointer-events: none;
+  font-family: Georgia, 'Times New Roman', serif;
+}

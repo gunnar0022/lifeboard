@@ -193,6 +193,12 @@ async def get_nudges():
     except Exception as e:
         logger.error(f"Investing nudge check failed: {e}")
         errors.append(f"investing: {e}")
+    try:
+        from backend.agents.reading_creative.nudges import check_nudges as creative_nudges
+        all_nudges.extend(await creative_nudges())
+    except Exception as e:
+        logger.error(f"Reading & Creative nudge check failed: {e}")
+        errors.append(f"reading_creative: {e}")
     if errors:
         logger.error(f"Nudge errors: {errors}")
     # Sort: alert > warning > info

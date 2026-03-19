@@ -610,6 +610,129 @@ async def seed_fleet():
         await db.close()
 
 
+async def seed_reading_creative():
+    """Seed Reading & Creative data — projects, files, books."""
+    import shutil
+    from pathlib import Path
+
+    db = await get_db()
+    creative_root = Path(__file__).parent.parent / "data" / "creative"
+
+    # Clean any existing creative folders
+    if creative_root.exists():
+        shutil.rmtree(creative_root)
+    creative_root.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # --- Projects ---
+        projects = [
+            ("Post-Apoc World", "post-apoc-world", "Post-apocalyptic worldbuilding with a magic system based on symbols"),
+            ("Living City", "living-city", "A city that grows and changes like a living organism"),
+        ]
+        for name, slug, desc in projects:
+            await db.execute(
+                "INSERT INTO creative_projects (name, slug, description) VALUES (?, ?, ?)",
+                [name, slug, desc],
+            )
+            # Create folders
+            (creative_root / slug).mkdir(parents=True, exist_ok=True)
+            (creative_root / slug / "_ideas").mkdir(exist_ok=True)
+
+        print(f"  [OK] Creative projects ({len(projects)})")
+
+        # --- Sample files ---
+        # Post-Apoc World
+        (creative_root / "post-apoc-world" / "magic").mkdir(exist_ok=True)
+        (creative_root / "post-apoc-world" / "magic" / "symbols.md").write_text(
+            "# Symbol System\n\n"
+            "The magic system is based on combining elemental symbols carved into stone or bone.\n\n"
+            "## Base Symbols\n\n"
+            "- **Bind** — connection, joining, sealing\n"
+            "- **Release** — opening, freeing, dispersing\n"
+            "- **Flow** — movement, direction, current\n"
+            "- **Hold** — stasis, preservation, containment\n\n"
+            "## Elemental Modifiers\n\n"
+            "Each base symbol can be modified with an elemental suffix:\n"
+            "- Air, Water, Fire, Earth\n\n"
+            "Combinations create specific effects. For example, Bind + Air could create a vacuum seal.\n",
+            encoding="utf-8",
+        )
+        (creative_root / "post-apoc-world" / "factions.md").write_text(
+            "# Factions\n\n"
+            "## The Mountain Cities\n\n"
+            "Isolated settlements in the high ranges. They've preserved the most knowledge of the old symbol system. "
+            "Their economy runs on preserved food and clean water, both maintained through symbol magic.\n\n"
+            "## The Lowland Traders\n\n"
+            "Nomadic groups that move between settlements. They carry news, goods, and — most importantly — "
+            "new symbol combinations discovered in ruins.\n",
+            encoding="utf-8",
+        )
+        (creative_root / "post-apoc-world" / "_ideas" / "2026-03-15_vacuum-preservation.md").write_text(
+            "What if the bind symbol combined with air creates a vacuum? "
+            "That could be how they preserve food in the mountain cities.\n",
+            encoding="utf-8",
+        )
+
+        # Living City
+        (creative_root / "living-city" / "districts.md").write_text(
+            "# Districts\n\n"
+            "The city is divided into districts that function like organs in a body.\n\n"
+            "## The Market Heart\n\n"
+            "The central bazaar. It pulses with activity during the day and contracts at night. "
+            "The buildings themselves shift slightly to accommodate the flow of people.\n\n"
+            "## The Guild Quarter\n\n"
+            "Where the trade halls are. Each guild has its own building that reflects its craft — "
+            "the blacksmiths' hall is warm and always slightly glowing.\n",
+            encoding="utf-8",
+        )
+        (creative_root / "living-city" / "_ideas" / "2026-03-18_guild-izakaya.md").write_text(
+            "What if the guild halls double as evening social spaces, like izakayas but tied to your trade.\n",
+            encoding="utf-8",
+        )
+
+        # Index files
+        file_entries = [
+            (1, "post-apoc-world/_ideas", "_ideas", 1),
+            (1, "post-apoc-world/magic", "magic", 1),
+            (1, "post-apoc-world/magic/symbols.md", "symbols.md", 0),
+            (1, "post-apoc-world/factions.md", "factions.md", 0),
+            (1, "post-apoc-world/_ideas/2026-03-15_vacuum-preservation.md", "2026-03-15_vacuum-preservation.md", 0),
+            (2, "living-city/_ideas", "_ideas", 1),
+            (2, "living-city/districts.md", "districts.md", 0),
+            (2, "living-city/_ideas/2026-03-18_guild-izakaya.md", "2026-03-18_guild-izakaya.md", 0),
+        ]
+        for pid, fpath, fname, is_dir in file_entries:
+            await db.execute(
+                "INSERT OR IGNORE INTO creative_file_index (project_id, file_path, file_name, is_directory) VALUES (?, ?, ?, ?)",
+                [pid, fpath, fname, is_dir],
+            )
+        print(f"  [OK] Creative files ({len(file_entries)})")
+
+        # --- Books ---
+        books = [
+            ("A Wizard of Earthsea", "Ursula K. Le Guin", "finished", None,
+             "The prose is so restrained it forces you to fill in the emotional weight yourself.",
+             "2026-02-20"),
+            ("The Tombs of Atuan", "Ursula K. Le Guin", "finished", None,
+             "Tenar's choice to leave wasn't about Ged — it was about refusing to be defined by the institution that raised her.",
+             "2026-03-10"),
+            ("The Left Hand of Darkness", "Ursula K. Le Guin", "reading", "Jake", None, None),
+            ("The Dispossessed", "Ursula K. Le Guin", "to_read", "Jake", None, None),
+            ("Piranesi", "Susanna Clarke", "to_read", None, None, None),
+            ("The Name of the Wind", "Patrick Rothfuss", "to_read", "Online rec", None, None),
+        ]
+        for title, author, status, rec, reflection, date_fin in books:
+            await db.execute(
+                "INSERT INTO reading_books (title, author, status, recommended_by, reflection, date_finished) VALUES (?, ?, ?, ?, ?, ?)",
+                [title, author, status, rec, reflection, date_fin],
+            )
+        print(f"  [OK] Reading books ({len(books)})")
+
+        await db.commit()
+    finally:
+        await db.close()
+
+
 async def clear_all():
     """Clear all data from all tables."""
     db = await get_db()
@@ -625,6 +748,7 @@ async def clear_all():
             "investing_holding_accounts", "investing_transactions",
             "investing_portfolio_snapshots", "investing_holdings", "investing_accounts",
             "fleet_concern_logs", "fleet_visits", "fleet_concerns",
+            "creative_file_index", "creative_projects", "reading_books",
         ]
         for table in tables:
             try:
@@ -673,6 +797,9 @@ async def main():
 
     print("\nSeeding Fleet (Dr. Fleet) data...")
     await seed_fleet()
+
+    print("\nSeeding Reading & Creative data...")
+    await seed_reading_creative()
 
     print("\n" + "=" * 40)
     print("Done! Restart the backend to pick up changes.")

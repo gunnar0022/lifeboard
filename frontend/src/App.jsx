@@ -6,6 +6,7 @@ import FinancePanel from './components/Finance/FinancePanel';
 import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
 import HealthPanel from './components/Health/HealthPanel';
 import InvestingPanel from './components/Investing/InvestingPanel';
+import ReadingCreativePanel from './components/ReadingCreative/ReadingCreativePanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
 import { useApi } from './hooks/useApi';
 import './App.css';
@@ -48,6 +49,10 @@ export default function App() {
 
     if (activePanel === 'investing') {
       return <InvestingPanel key="investing" />;
+    }
+
+    if (activePanel === 'reading_creative') {
+      return <ReadingCreativePanel key="reading_creative" />;
     }
 
     // Placeholder agents
