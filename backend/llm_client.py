@@ -10,7 +10,7 @@ from anthropic import AsyncAnthropic
 logger = logging.getLogger(__name__)
 
 # Default model for agent processing
-MODEL = "claude-sonnet-4-5-20250514"
+MODEL = "claude-sonnet-4-5-20250929"
 # Lightweight model for classification tasks (routing)
 MODEL_FAST = "claude-haiku-4-5-20251001"
 

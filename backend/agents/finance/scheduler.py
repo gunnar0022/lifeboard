@@ -261,7 +261,7 @@ Be concrete -- reference specific categories and numbers. Use {symbol} for curre
 Keep each insight to 1-2 sentences. Return as a JSON array of strings."""
 
         response = await client.messages.create(
-            model="claude-sonnet-4-5-20250514",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
