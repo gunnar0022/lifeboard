@@ -526,13 +526,37 @@ async def get_heatmap_data(days: int = 90) -> list[dict]:
     summaries = await get_daily_summaries(start_str, today_str)
     summary_map = {s["date"]: s for s in summaries}
 
-    # For recent days (last 3), compute from individual entries if no summary
+    # Recent days: always compute from individual entries (meals/exercises
+    # are still in raw tables) and merge mood/energy from daily_summary.
+    # Older days: use compressed daily_summary if available.
+    # This prevents mood-only summary rows from masking actual meal/exercise data.
+    recent_cutoff = 3
+
     result = []
     for i in range(days):
         d = start + timedelta(days=i)
         d_str = d.isoformat()
+        days_ago = (today - d).days
 
-        if d_str in summary_map:
+        if days_ago <= recent_cutoff:
+            # Recent: compute from raw entries, merge mood/energy from summary
+            meals = await get_meals_for_date(d_str)
+            exercises = await get_exercises_for_date(d_str)
+            total_cal = sum(m.get("calories", 0) for m in meals)
+            total_ex_min = sum(e.get("duration_minutes", 0) for e in exercises)
+            total_ex_cal = sum(e.get("estimated_calories", 0) for e in exercises)
+            summary = summary_map.get(d_str) or await get_daily_summary(d_str)
+            result.append({
+                "date": d_str,
+                "total_calories": total_cal,
+                "total_exercise_minutes": total_ex_min,
+                "total_exercise_calories": total_ex_cal,
+                "mood": (summary or {}).get("mood"),
+                "energy": (summary or {}).get("energy"),
+                "calorie_goal": calorie_goal,
+            })
+        elif d_str in summary_map:
+            # Older: use compressed summary
             s = summary_map[d_str]
             result.append({
                 "date": d_str,
@@ -541,24 +565,6 @@ async def get_heatmap_data(days: int = 90) -> list[dict]:
                 "total_exercise_calories": s["total_exercise_calories"],
                 "mood": s.get("mood"),
                 "energy": s.get("energy"),
-                "calorie_goal": calorie_goal,
-            })
-        elif (today - d).days <= 3:
-            # Compute on-the-fly from individual entries
-            meals = await get_meals_for_date(d_str)
-            exercises = await get_exercises_for_date(d_str)
-            total_cal = sum(m.get("calories", 0) for m in meals)
-            total_ex_min = sum(e.get("duration_minutes", 0) for e in exercises)
-            total_ex_cal = sum(e.get("estimated_calories", 0) for e in exercises)
-            # Check if mood/energy was set
-            summary = await get_daily_summary(d_str)
-            result.append({
-                "date": d_str,
-                "total_calories": total_cal,
-                "total_exercise_minutes": total_ex_min,
-                "total_exercise_calories": total_ex_cal,
-                "mood": (summary or {}).get("mood"),
-                "energy": (summary or {}).get("energy"),
                 "calorie_goal": calorie_goal,
             })
         else:
