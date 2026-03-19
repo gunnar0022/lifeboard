@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Feather } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
@@ -20,11 +20,8 @@ const fadeUp = {
 export default function ReadingCreativePanel() {
   const { data: projects, loading } = useApi('/api/reading_creative/projects');
   const { data: books, refetch: refetchBooks } = useApi('/api/reading_creative/books');
-  const { data: snippets } = useApi('/api/reading_creative/snippets?count=12');
+  const { data: snippets } = useApi('/api/reading_creative/snippets?count=40');
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-
-  // Count total files across projects
-  const fileCount = projects ? projects.reduce((sum, p) => sum, 0) : 0;
 
   if (workspaceOpen) {
     return <CreativeWorkspace onBack={() => setWorkspaceOpen(false)} />;
@@ -48,42 +45,44 @@ export default function ReadingCreativePanel() {
   }
 
   return (
-    <motion.div
-      className="rc-panel"
-      variants={stagger}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div variants={fadeUp} className="rc-panel__header">
-        <div className="rc-panel__title-group">
-          <span className="rc-panel__icon"><Feather size={24} /></span>
-          <h2 className="rc-panel__title">Reading & Creative</h2>
-        </div>
-      </motion.div>
+    <div className="rc-panel">
+      {/* Background layer: floating text everywhere */}
+      <FloatingSnippets snippets={snippets || []} />
 
-      <motion.div variants={fadeUp}>
-        <FloatingSnippets snippets={snippets || []} />
-      </motion.div>
-
-      <motion.div variants={fadeUp}>
-        <button
-          className="rc-panel__workspace-btn card"
-          onClick={() => setWorkspaceOpen(true)}
-        >
-          <div className="rc-panel__workspace-info">
-            <Feather size={20} />
-            <div>
-              <strong>Open Workspace</strong>
-              <span>{projects?.length || 0} projects</span>
-            </div>
+      {/* Foreground content: centered column */}
+      <motion.div
+        className="rc-panel__content"
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={fadeUp} className="rc-panel__header">
+          <div className="rc-panel__title-group">
+            <span className="rc-panel__icon"><Feather size={24} /></span>
+            <h2 className="rc-panel__title">Reading & Creative</h2>
           </div>
-          <span className="rc-panel__workspace-arrow">&rarr;</span>
-        </button>
-      </motion.div>
+        </motion.div>
 
-      <motion.div variants={fadeUp}>
-        <ReadingLog books={books || []} onRefresh={refetchBooks} />
+        <motion.div variants={fadeUp}>
+          <button
+            className="rc-panel__workspace-btn card"
+            onClick={() => setWorkspaceOpen(true)}
+          >
+            <div className="rc-panel__workspace-info">
+              <Feather size={20} />
+              <div>
+                <strong>Open Workspace</strong>
+                <span>{projects?.length || 0} projects</span>
+              </div>
+            </div>
+            <span className="rc-panel__workspace-arrow">&rarr;</span>
+          </button>
+        </motion.div>
+
+        <motion.div variants={fadeUp}>
+          <ReadingLog books={books || []} onRefresh={refetchBooks} />
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,3 +1,10 @@
+/* Frosted glass over floating text background */
+.reading-log.card {
+  background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .reading-log__header {
   width: 100%;
   display: flex;

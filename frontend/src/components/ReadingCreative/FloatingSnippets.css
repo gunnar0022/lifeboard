@@ -1,9 +1,10 @@
+/* Full background layer — fills entire rc-panel */
 .floating-snippets {
-  position: relative;
-  height: 200px;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
-  background: color-mix(in srgb, #B07CD8 6%, var(--bg-primary));
-  border: 1px solid color-mix(in srgb, #B07CD8 15%, var(--border-subtle));
+  pointer-events: none;
 }
 
 .floating-snippets__empty {
@@ -14,16 +15,16 @@
   font-size: 0.85rem;
   color: var(--text-tertiary);
   font-style: italic;
+  opacity: 0.5;
 }
 
 .floating-snippets__item {
   position: absolute;
-  max-width: 42%;
+  max-width: 30%;
   line-height: 1.5;
   color: var(--text-tertiary);
-  pointer-events: none;
   font-family: Georgia, 'Times New Roman', serif;
-  transition: color 0.8s ease;
+  transition: color 1s ease;
 }
 
 .floating-snippets__item--focus {
