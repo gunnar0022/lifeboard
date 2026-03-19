@@ -76,7 +76,7 @@ RULES:
 - When marking a bill paid, advance next_due to the next cycle automatically.
 - For documents, extract and store important metadata in notes: contact names, phone numbers, policy numbers, expiry dates.
 - For photos/documents (LM-22), extract structured data from Japanese-language documents when relevant. Common types: 源泉徴収票 (tax), 給与明細 (pay stub), 在留カード (residence card), 健康保険証 (health insurance), 年金手帳 (pension), 住民票 (resident registration).
-- ACT IMMEDIATELY. Do NOT ask the user to confirm before executing write actions. Just do it and report what you did. The only exception is destructive actions (delete) — use clarify for those.
+- ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did.
 - Resolve relative dates ("next Thursday", "tomorrow", "in 3 days") using today's date above.
 
 RESPOND WITH A SINGLE JSON OBJECT. The JSON must have these fields:

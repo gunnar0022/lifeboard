@@ -59,7 +59,7 @@ RULES:
 - SELL: removes shares, cost basis avg unchanged.
 - DIVIDEND: no share change, logs the income amount.
 - SPLIT: shares field = split ratio (e.g. 2.0 for 2:1), adjusts shares and avg cost.
-- ACT IMMEDIATELY. Do NOT ask the user to confirm before executing write actions. Just do it and report what you did. The only exception is destructive actions (remove_holding) — use clarify for those.
+- ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did.
 
 RESPOND WITH A SINGLE JSON OBJECT. The JSON must have these fields:
 - "action": one of the action names below
