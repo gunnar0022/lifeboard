@@ -38,10 +38,10 @@ AGENT_LABELS = {
 # LM-31: Recent context buffer
 _recent_context: dict | None = None  # {"agent": str, "timestamp": float}
 
-# Router conversation history — 8 exchanges (16 messages) so the router
-# can see what the user has been doing and route follow-ups correctly.
+# Router conversation history — compact summaries of recent routing decisions.
+# Stores abbreviated user message + which agent handled it, not full content.
 _router_history: list[dict] = []
-_ROUTER_HISTORY_MAX = 16  # 8 user + 8 assistant = 8 exchanges
+_ROUTER_HISTORY_MAX = 16  # 8 exchanges
 
 # LM-30: Reply-to tracking — bot message_id -> source agent
 _reply_source_map: dict[int, str] = {}
@@ -65,11 +65,13 @@ Agents:
 Rules:
 - Most messages go to ONE agent
 - Multi-agent only when message explicitly covers 2+ domains (e.g. "spent 1000 on ramen" = finance + health)
-- For ambiguous follow-ups, use the context hint about the last agent
+- For ambiguous follow-ups, use conversation history to determine intent and agent
 - If genuinely unclear, return empty routes
 - "fleet" is special: only use for explicit doctor/Fleet visit requests, NOT for casual health updates
 
-Return: {"routes": [{"agent": "agent_id", "message": "relevant portion"}]}"""
+For the "message" field: write a brief, context-aware summary that the receiving agent can act on. Include any relevant details from conversation history. For example, if the user previously logged a meal and now says "delete that", the message should be "Delete the [meal name] that was just logged" — not just "delete that".
+
+Return: {"routes": [{"agent": "agent_id", "message": "context-enriched instruction for the agent"}]}"""
 
 
 # --- Core routing functions ---
@@ -124,7 +126,8 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
             ):
                 valid_routes.append(route)
 
-        # Record this exchange in router history
+        # Record exchange in router history — full user text so the router
+        # can write context-aware summaries for follow-up messages
         _router_history.append({"role": "user", "content": text})
         routed_to = ", ".join(r["agent"] for r in valid_routes) if valid_routes else "none"
         _router_history.append({"role": "assistant", "content": f'{{"routes": [{routed_to}]}}'})
