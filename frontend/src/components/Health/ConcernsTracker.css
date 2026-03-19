@@ -1,0 +1,209 @@
+/* --- Concerns Tracker --- */
+
+.concerns-tracker__header {
+  margin-bottom: var(--space-md);
+}
+
+.concerns-tracker__count {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-health-body);
+  background: color-mix(in srgb, var(--color-health-body) 12%, transparent);
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin-left: 8px;
+}
+
+.concerns-tracker__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* --- Concern Item --- */
+
+.concern-item {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.concern-item__header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.concern-item__header:hover {
+  background: var(--bg-hover);
+}
+
+.concern-item__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.concern-item__icon--active {
+  color: var(--color-health-body);
+  flex-shrink: 0;
+}
+
+.concern-item__icon--resolved {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.concern-item__title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.concern-item__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.concern-item__stat {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.concern-item__dates {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+/* --- Detail Section --- */
+
+.concern-item__detail {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  overflow: hidden;
+}
+
+.concern-item__description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-health-body);
+}
+
+.concern-item__resolution {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: var(--space-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-success);
+}
+
+.concern-item__compressed {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: var(--space-xs);
+}
+
+.concern-item__empty-logs {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* --- Logs --- */
+
+.concern-item__logs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.concern-log {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xs);
+  border-left: 2px solid var(--border-subtle);
+}
+
+.concern-log--fleet {
+  border-left-color: var(--color-health-body);
+}
+
+.concern-log__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.concern-log__source {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-tertiary);
+}
+
+.concern-log__date {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+
+.concern-log__content {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* --- Resolved Toggle --- */
+
+.concerns-tracker__resolved-section {
+  margin-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-sm);
+}
+
+.concerns-tracker__resolved-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  padding: var(--space-xs) 0;
+  transition: color 0.15s;
+}
+
+.concerns-tracker__resolved-toggle:hover {
+  color: var(--text-secondary);
+}

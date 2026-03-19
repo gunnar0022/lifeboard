@@ -47,6 +47,7 @@ async def lifespan(app: FastAPI):
     health_scheduler_running = False
     finance_scheduler_running = False
     investing_scheduler_running = False
+    fleet_scheduler_running = False
 
     if "health_body" in active:
         try:
@@ -72,6 +73,15 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Investing scheduler failed to start: {e}")
 
+    # Fleet scheduler (compression + orphaned session recovery) — always runs if health is active
+    if "health_body" in active:
+        try:
+            from backend.agents.fleet.scheduler import start_scheduler as start_fleet_scheduler
+            await start_fleet_scheduler()
+            fleet_scheduler_running = True
+        except Exception as e:
+            logger.error(f"Fleet scheduler failed to start: {e}")
+
     yield
 
     # Shutdown schedulers
@@ -95,6 +105,13 @@ async def lifespan(app: FastAPI):
             await stop_investing_scheduler()
         except Exception as e:
             logger.error(f"Investing scheduler stop error: {e}")
+
+    if fleet_scheduler_running:
+        try:
+            from backend.agents.fleet.scheduler import stop_scheduler as stop_fleet_scheduler
+            await stop_fleet_scheduler()
+        except Exception as e:
+            logger.error(f"Fleet scheduler stop error: {e}")
 
     logger.info("Shutting down Telegram bot...")
     await stop_bot()

@@ -43,6 +43,14 @@ async def build_system_prompt() -> str:
     docs = await queries.get_health_documents(limit=10)
     docs_str = _format_documents(docs)
 
+    # Active health concerns
+    try:
+        from backend.agents.fleet.queries import get_active_concerns
+        active_concerns = await get_active_concerns()
+        concerns_str = _format_active_concerns(active_concerns)
+    except Exception:
+        concerns_str = "ACTIVE CONCERNS: None"
+
     # Onboarding
     onboarding_note = ""
     if not profile:
@@ -71,6 +79,8 @@ TODAY: {day_name}, {date_str}
 
 {docs_str}
 
+{concerns_str}
+
 RULES:
 - When the user reports food ("Had katsu curry for lunch", "ate a convenience store bento"), estimate calories, protein (g), carbs (g), and fat (g). Use reasonable estimates for Japanese food portions. Log silently with log_meal — NO confirmation step needed.
 - When the user reports exercise ("Jogged 30 minutes", "gym for an hour"), estimate calorie burn using their profile (weight, activity level). Log with log_exercise. NEVER mention the specific calorie burn number in your reply — just acknowledge the exercise naturally.
@@ -82,6 +92,7 @@ RULES:
 - Resolve relative dates ("yesterday", "this morning") using today's date above.
 - If the user asks about nutrition on a day older than 3 days, daily totals will be available but individual meals won't. Just present whatever data exists without explaining the difference.
 - For multi-part messages (meal + exercise + mood in one message), use multi_action to log everything at once.
+- When the user mentions an update about a health concern (e.g., "back pain was better today", "headache hit again at 3pm"), log it with log_concern_update. Match the update to the most relevant active concern by title/context. If ambiguous, use clarify with concern titles as options. Concern logs are casual notes, not formal entries.
 
 RESPOND WITH A SINGLE JSON OBJECT:
 - "action": one of the action names below
@@ -115,9 +126,13 @@ Write actions — Medical Documents:
 - delete_health_document: data={{document_id (int)}}
 - store_health_file: data={{file_context (str), link_to_document_id (int, optional), extracted_data (JSON string, optional)}}
 
+Write actions — Health Concerns:
+- log_concern_update: data={{content (str), concern_id (int, optional — omit if only one active concern)}}
+
 Read actions:
 - get_profile: data={{}}
 - get_today_nutrition: data={{}}
+- get_active_concerns: data={{}}
 - get_recent_detail: data={{days (int, default 3)}}
 - get_heatmap_data: data={{days (int, default 90)}}
 - get_measurements: data={{limit (int, default 30)}}
@@ -214,4 +229,14 @@ def _format_documents(docs: list[dict]) -> str:
         provider_str = f" — {d['provider']}" if d.get("provider") else ""
         date_str = f" ({d['date']})" if d.get("date") else ""
         lines.append(f"  [{d['id']}] {d['name']} ({d['category']}){date_str}{provider_str}")
+    return "\n".join(lines)
+
+
+def _format_active_concerns(concerns: list[dict]) -> str:
+    if not concerns:
+        return "ACTIVE CONCERNS: None"
+    lines = [f"ACTIVE CONCERNS ({len(concerns)}):"]
+    for c in concerns:
+        log_count = len(c.get("logs", []))
+        lines.append(f"  [#{c['id']}] {c['title']} ({log_count} logs)")
     return "\n".join(lines)

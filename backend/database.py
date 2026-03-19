@@ -25,6 +25,7 @@ async def init_db():
         await _create_life_manager_tables(db)
         await _create_health_tables(db)
         await _create_investing_tables(db)
+        await _create_fleet_tables(db)
         await db.commit()
     finally:
         await db.close()
@@ -324,5 +325,37 @@ async def _create_investing_tables(db: aiosqlite.Connection):
             holding_id INTEGER NOT NULL REFERENCES investing_holdings(id),
             account_id INTEGER NOT NULL REFERENCES investing_accounts(id),
             PRIMARY KEY (holding_id, account_id)
+        );
+    """)
+
+
+async def _create_fleet_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS fleet_concerns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'resolved')),
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            resolved_at TEXT,
+            resolution_summary TEXT,
+            compressed_at TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS fleet_concern_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            concern_id INTEGER NOT NULL REFERENCES fleet_concerns(id),
+            source TEXT NOT NULL CHECK(source IN ('user_log', 'fleet_visit')),
+            content TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS fleet_visits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            started_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            ended_at TEXT,
+            conversation_history TEXT NOT NULL DEFAULT '[]',
+            actions_taken TEXT,
+            summary TEXT
         );
     """)

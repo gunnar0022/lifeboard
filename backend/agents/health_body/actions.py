@@ -1,6 +1,7 @@
 """
 Health & Body agent — ACTION_REGISTRY.
 Maps action names to handler functions and required field schemas.
+LM-40: Health agent has write access to fleet_concern_logs for user_log entries.
 """
 from backend.agents.health_body import queries
 
@@ -111,6 +112,36 @@ async def handle_store_health_file(data: dict) -> dict:
         description=data.get("file_context", ""),
         extracted_data=data.get("extracted_data"),
     )
+
+
+# --- Concern log handler (LM-40: Health writes user_log entries) ---
+
+async def handle_log_concern_update(data: dict) -> dict:
+    from backend.agents.fleet.queries import add_concern_log, get_active_concerns
+    concern_id = data.get("concern_id")
+    content = data["content"]
+
+    # If no concern_id provided, try to find active concerns
+    if not concern_id:
+        active = await get_active_concerns()
+        if len(active) == 1:
+            concern_id = active[0]["id"]
+        elif not active:
+            return {"error": "No active concerns to log against"}
+        else:
+            # Return concern options for clarify action
+            return {
+                "needs_clarify": True,
+                "concerns": [{"id": c["id"], "title": c["title"]} for c in active],
+            }
+
+    result = await add_concern_log(concern_id, "user_log", content)
+    return result
+
+
+async def handle_get_active_concerns(data: dict) -> list:
+    from backend.agents.fleet.queries import get_active_concerns
+    return await get_active_concerns()
 
 
 # --- Read action handlers ---
@@ -283,6 +314,20 @@ ACTION_REGISTRY = {
         "handler": handle_get_health_file,
         "required": [],
         "optional": ["file_id", "search", "linked_document_id"],
+        "is_read": True,
+    },
+
+    # Write — Concern logs (LM-40)
+    "log_concern_update": {
+        "handler": handle_log_concern_update,
+        "required": ["content"],
+        "optional": ["concern_id"],
+    },
+
+    # Read — Active concerns
+    "get_active_concerns": {
+        "handler": handle_get_active_concerns,
+        "required": [],
         "is_read": True,
     },
 }

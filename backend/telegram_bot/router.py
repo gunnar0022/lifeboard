@@ -14,8 +14,9 @@ from backend import llm_client
 
 logger = logging.getLogger(__name__)
 
-# Valid agent IDs
+# Valid agent IDs (fleet is session-based, not in this set)
 VALID_AGENTS = {"finance", "life_manager", "health_body", "investing"}
+FLEET_AGENT = "fleet"
 
 # Emoji prefixes for multi-agent consolidated replies
 AGENT_EMOJI = {
@@ -52,14 +53,16 @@ You route messages to LifeBoard agents. Return JSON only.
 Agents:
 - finance: money, spending, transactions, budget, accounts, salary, receipts, payments, transfers, recurring payments, income, interest
 - life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands
-- health_body: food, meals, exercise, weight, mood, energy, medical, calories, gym, nutrition, sleep, health checkups
+- health_body: food, meals, exercise, weight, mood, energy, medical, calories, gym, nutrition, sleep, health checkups, health concern updates (e.g. "back pain was better today")
 - investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
+- fleet: ONLY for explicit requests to see a doctor, talk to Fleet, start a medical consultation/clinic visit
 
 Rules:
 - Most messages go to ONE agent
 - Multi-agent only when message explicitly covers 2+ domains (e.g. "spent 1000 on ramen" = finance + health)
 - For ambiguous follow-ups, use the context hint about the last agent
 - If genuinely unclear, return empty routes
+- "fleet" is special: only use for explicit doctor/Fleet visit requests, NOT for casual health updates
 
 Return: {"routes": [{"agent": "agent_id", "message": "relevant portion"}]}"""
 
@@ -103,12 +106,13 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
         if not isinstance(routes, list):
             return []
 
-        # Validate agent IDs
+        # Validate agent IDs (fleet is also valid for routing)
+        all_valid = VALID_AGENTS | {FLEET_AGENT}
         valid_routes = []
         for route in routes:
             if (
                 isinstance(route, dict)
-                and route.get("agent") in VALID_AGENTS
+                and route.get("agent") in all_valid
                 and route.get("message")
             ):
                 valid_routes.append(route)
@@ -123,7 +127,14 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
 async def dispatch_text(update: Update, text: str):
     """
     Main entry point for text messages. Routes through LLM and dispatches.
+    LM-37: Fleet session lock — when active, ALL messages bypass router.
     """
+    # LM-37: Check Fleet session lock first
+    from backend.agents.fleet.telegram import is_session_active, handle_message as fleet_handle
+    if is_session_active():
+        await fleet_handle(update, text)
+        return
+
     # LM-30: Check if this is a reply to a bot message
     reply_to_agent = _get_reply_to_agent(update)
 
@@ -136,11 +147,17 @@ async def dispatch_text(update: Update, text: str):
         return
 
     if len(routes) == 1:
-        # Single agent — dispatch directly, agent sends its own reply
         route = routes[0]
         agent_id = route["agent"]
         routed_text = route["message"]
 
+        # Fleet session start request
+        if agent_id == FLEET_AGENT:
+            from backend.agents.fleet.telegram import start_session
+            await start_session(update)
+            return
+
+        # Single agent — dispatch directly, agent sends its own reply
         handler = _get_agent_handler(agent_id, "process_message")
         if not handler:
             await update.message.reply_text("Something went wrong routing that message.")
@@ -150,8 +167,6 @@ async def dispatch_text(update: Update, text: str):
 
         # Track context
         _update_recent_context(agent_id)
-        # The agent sent the reply via update.message.reply_text, but we don't have
-        # the sent message_id easily. We'll track via _recent_context instead.
 
     else:
         # Multi-agent fan-out (LM-29: parallel with asyncio.gather)
@@ -161,7 +176,16 @@ async def dispatch_text(update: Update, text: str):
 async def dispatch_photo(update: Update, caption: str | None):
     """
     Entry point for photo messages. Routes based on caption or context.
+    LM-37: Fleet session lock — photos during a Fleet visit get a message.
     """
+    from backend.agents.fleet.telegram import is_session_active
+    if is_session_active():
+        await update.message.reply_text(
+            "I can't process photos during a Fleet visit. "
+            "End the visit first, then send the photo."
+        )
+        return
+
     if caption and caption.strip():
         # Route based on caption
         reply_to_agent = _get_reply_to_agent(update)

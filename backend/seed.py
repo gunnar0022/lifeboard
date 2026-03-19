@@ -501,6 +501,115 @@ async def seed_investing():
         await db.close()
 
 
+async def seed_fleet():
+    """Seed Dr. Fleet data — concerns, logs, and a past visit."""
+    db = await get_db()
+    today = date.today()
+
+    try:
+        # --- Active Concerns ---
+        # Concern 1: Recurring lower back pain (active, with logs)
+        await db.execute(
+            """INSERT INTO fleet_concerns (title, description, status, created_at)
+               VALUES (?, ?, 'active', ?)""",
+            [
+                "Recurring lower back pain after volleyball",
+                "Patient reports recurring lower back pain that started approximately 3 weeks ago. "
+                "Pain is worst the day after volleyball matches, localized to the L4-L5 region. "
+                "No radiating pain to legs. Aggravated by prolonged sitting and bending forward. "
+                "Likely muscular strain related to explosive jumping movements. Patient has moderate "
+                "activity level and plays volleyball 2x per week.",
+                (today - timedelta(days=21)).isoformat(),
+            ],
+        )
+
+        # Concern 2: Persistent headaches (active, with logs)
+        await db.execute(
+            """INSERT INTO fleet_concerns (title, description, status, created_at)
+               VALUES (?, ?, 'active', ?)""",
+            [
+                "Persistent afternoon headaches",
+                "Patient reports headaches occurring 3-4 times per week, typically starting around "
+                "2-3 PM. Describes them as a dull pressure behind the eyes and temples. No visual "
+                "disturbances or nausea. Possibly related to screen time (8+ hours daily for work). "
+                "Patient mentioned not drinking enough water during work hours. Recommended tracking "
+                "hydration and taking regular screen breaks.",
+                (today - timedelta(days=14)).isoformat(),
+            ],
+        )
+
+        print(f"  [OK] Fleet concerns (2 active)")
+
+        # --- Concern Logs ---
+        logs = [
+            # Back pain logs
+            (1, "user_log", "Back was pretty stiff this morning after yesterday's game",
+             (today - timedelta(days=18)).isoformat()),
+            (1, "fleet_visit", "Discussed stretching routine. Recommended cat-cow and child's pose "
+             "before and after volleyball. Consider reducing jump serves temporarily.",
+             (today - timedelta(days=14)).isoformat()),
+            (1, "user_log", "Tried the stretches before volleyball today, back felt a bit better during the game",
+             (today - timedelta(days=10)).isoformat()),
+            (1, "user_log", "Back pain was mild today, just some tightness in the morning",
+             (today - timedelta(days=5)).isoformat()),
+            (1, "user_log", "Good day, barely noticed the back",
+             (today - timedelta(days=2)).isoformat()),
+
+            # Headache logs
+            (2, "user_log", "Headache hit around 3pm again, pretty bad today",
+             (today - timedelta(days=12)).isoformat()),
+            (2, "user_log", "Tried drinking more water, headache was lighter today",
+             (today - timedelta(days=8)).isoformat()),
+            (2, "fleet_visit", "Patient reports some improvement with hydration. Still occurring 2-3x "
+             "per week. Suggested 20-20-20 rule for screen breaks and tracking caffeine intake.",
+             (today - timedelta(days=7)).isoformat()),
+            (2, "user_log", "No headache today! Took screen breaks every hour",
+             (today - timedelta(days=3)).isoformat()),
+        ]
+
+        for concern_id, source, content, created_at in logs:
+            await db.execute(
+                """INSERT INTO fleet_concern_logs (concern_id, source, content, created_at)
+                   VALUES (?, ?, ?, ?)""",
+                [concern_id, source, content, created_at],
+            )
+        print(f"  [OK] Fleet concern logs ({len(logs)})")
+
+        # --- Resolved Concern ---
+        await db.execute(
+            """INSERT INTO fleet_concerns (title, description, status, created_at, resolved_at, resolution_summary)
+               VALUES (?, ?, 'resolved', ?, ?, ?)""",
+            [
+                "Left ankle soreness from trail run",
+                "Patient rolled left ankle mildly during a trail run. Minor swelling, no bruising. "
+                "Full range of motion but discomfort on uneven surfaces. Likely a mild Grade I sprain.",
+                (today - timedelta(days=45)).isoformat(),
+                (today - timedelta(days=20)).isoformat(),
+                "Ankle fully recovered. Swelling resolved within a week, discomfort gone by day 14. "
+                "Patient resumed normal running without issues. No ongoing concerns.",
+            ],
+        )
+        print(f"  [OK] Fleet resolved concerns (1)")
+
+        # --- Past Visit ---
+        await db.execute(
+            """INSERT INTO fleet_visits (started_at, ended_at, conversation_history, actions_taken, summary)
+               VALUES (?, ?, '[]', ?, ?)""",
+            [
+                (today - timedelta(days=7)).isoformat() + "T14:00:00",
+                (today - timedelta(days=7)).isoformat() + "T14:25:00",
+                '[{"type": "add_log", "concern_id": 1}, {"type": "add_log", "concern_id": 2}]',
+                "Follow-up on back pain and headaches. Back improving with stretches. "
+                "Headaches partially responding to hydration. Added screen break recommendation.",
+            ],
+        )
+        print(f"  [OK] Fleet visits (1)")
+
+        await db.commit()
+    finally:
+        await db.close()
+
+
 async def clear_all():
     """Clear all data from all tables."""
     db = await get_db()
@@ -515,6 +624,7 @@ async def clear_all():
             "health_daily_summary", "health_exercises", "health_meals", "health_profile",
             "investing_holding_accounts", "investing_transactions",
             "investing_portfolio_snapshots", "investing_holdings", "investing_accounts",
+            "fleet_concern_logs", "fleet_visits", "fleet_concerns",
         ]
         for table in tables:
             try:
@@ -560,6 +670,9 @@ async def main():
 
     print("\nSeeding Investing data...")
     await seed_investing()
+
+    print("\nSeeding Fleet (Dr. Fleet) data...")
+    await seed_fleet()
 
     print("\n" + "=" * 40)
     print("Done! Restart the backend to pick up changes.")

@@ -7,6 +7,7 @@ import Heatmap from './Heatmap';
 import RecentDetail from './RecentDetail';
 import WeightTrend from './WeightTrend';
 import MedicalRegistry from './MedicalRegistry';
+import ConcernsTracker from './ConcernsTracker';
 import './HealthPanel.css';
 
 const stagger = {
@@ -25,6 +26,7 @@ export default function HealthPanel() {
   const { data: recent, refetch: refetchRecent } = useApi('/api/health_body/recent');
   const { data: measurements, refetch: refetchMeasurements } = useApi('/api/health_body/measurements');
   const { data: documents, refetch: refetchDocs } = useApi('/api/health_body/documents');
+  const { data: concerns } = useApi('/api/health_body/concerns');
 
   const refetchAll = useCallback(() => {
     refetchProfile();
@@ -110,6 +112,12 @@ export default function HealthPanel() {
       {measurements && measurements.length > 0 && (
         <motion.div variants={fadeUp}>
           <WeightTrend measurements={measurements} />
+        </motion.div>
+      )}
+
+      {concerns && (concerns.active?.length > 0 || concerns.resolved?.length > 0) && (
+        <motion.div variants={fadeUp}>
+          <ConcernsTracker concerns={concerns} />
         </motion.div>
       )}
 

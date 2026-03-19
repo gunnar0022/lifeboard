@@ -312,3 +312,12 @@ async def view_file(file_id: int):
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="File not found on disk")
     return FileResponse(str(full_path), media_type=f.get("mime_type", "application/octet-stream"))
+
+
+# --- Health Concerns (Fleet data, displayed in Health panel per LM-40) ---
+
+@router.get("/concerns")
+async def get_concerns():
+    """Get health concerns for the dashboard."""
+    from backend.agents.fleet.queries import get_concerns_for_dashboard
+    return await get_concerns_for_dashboard()
