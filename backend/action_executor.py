@@ -8,9 +8,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Words in the LLM reply that suggest it thinks it performed an action
+# Patterns that suggest the LLM thinks it performed an action.
+# Must be affirmative claims like "I've deleted..." or "Done! Logged..."
+# NOT matches for "I don't see" or "no X found" or "couldn't delete".
 _ACTION_CLAIM_PATTERN = re.compile(
-    r'\b(deleted|removed|logged|added|created|updated|edited|recorded|set|saved|stored)\b',
+    r"(?:I've |I have |Done|Got it|All set|Successfully |✅|Alright,? )"
+    r".*\b(deleted|removed|logged|added|created|updated|edited|recorded|saved|stored)\b",
     re.IGNORECASE,
 )
 
