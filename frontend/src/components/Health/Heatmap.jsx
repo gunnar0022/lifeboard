@@ -6,13 +6,21 @@ const CELL_GAP = 3;
 const DAY_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
 
 function getColor(day) {
-  if (!day || day.total_calories === 0) {
+  if (!day) {
+    return { bg: 'var(--bg-skeleton)', text: 'var(--text-tertiary)' };
+  }
+
+  const cal = day.total_calories || 0;
+  const exMin = day.total_exercise_minutes || 0;
+  const hasMood = day.mood != null;
+  const hasAnyData = cal > 0 || exMin > 0 || hasMood;
+
+  // No data at all — skeleton
+  if (!hasAnyData) {
     return { bg: 'var(--bg-skeleton)', text: 'var(--text-tertiary)' };
   }
 
   const goal = day.calorie_goal || 2000;
-  const ratio = day.total_calories / goal;
-  const exMin = day.total_exercise_minutes || 0;
 
   // Saturation based on exercise intensity
   let sat;
@@ -20,6 +28,17 @@ function getColor(day) {
   else if (exMin < 30) sat = 40;
   else if (exMin <= 60) sat = 65;
   else sat = 90;
+
+  // If only mood/exercise data (no calories), use a neutral warm tone
+  if (cal === 0) {
+    const hue = exMin > 0 ? 142 : 200; // green if exercised, blue-gray if mood only
+    return {
+      bg: `hsl(${hue}, ${sat}%, 55%)`,
+      text: 'rgba(255,255,255,0.85)',
+    };
+  }
+
+  const ratio = cal / goal;
 
   // Hue based on calorie adherence
   let hue, lightness;
