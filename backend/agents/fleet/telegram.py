@@ -20,7 +20,7 @@ from backend import llm_client
 logger = logging.getLogger(__name__)
 
 # LM-38: Fleet uses Opus
-MODEL_OPUS = "claude-opus-4-0-20250514"
+MODEL_OPUS = "claude-opus-4-20250514"
 
 # LM-37: Global session lock
 _fleet_session = {
