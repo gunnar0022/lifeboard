@@ -1,7 +1,7 @@
 .rc-panel {
   position: relative;
   min-height: 600px;
-  overflow: hidden;
+  padding-bottom: 250px;  /* extra space below reading log for snippets */
 }
 
 /* Foreground content: centered narrow column above the floating text */

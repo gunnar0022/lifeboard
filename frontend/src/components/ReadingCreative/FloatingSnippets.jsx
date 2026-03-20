@@ -11,16 +11,16 @@ import './FloatingSnippets.css';
 
 const REPEL_STRENGTH = 0.8;
 const REPEL_RADIUS = 120;       // px — beyond this, no force
-const DRAG = 0.97;              // velocity damping per frame
-const MAX_SPEED = 0.4;          // px per frame cap
+const MAX_SPEED = 0.6;          // px per frame cap
+const INIT_SPEED = 0.35;        // initial random velocity range
 const CYCLE_MS = 6000;          // lifecycle tick interval
-const VISIBLE_TARGET = 22;      // how many on screen at once
+const VISIBLE_TARGET = 33;      // how many on screen at once (1.5x from 22)
 const FADE_DURATION = 1500;     // ms for fade in/out
 
 // Dead zones as fractions of container size
-// Title area: top center
 const DEAD_ZONES = [
-  { x: 0.18, y: 0, w: 0.64, h: 0.09 },  // title bar area
+  { x: 0.18, y: 0, w: 0.64, h: 0.07 },    // title bar area
+  { x: 0.30, y: 0.42, w: 0.40, h: 0.18 },  // under reading log — centered 40% of card
 ];
 
 function estimateBox(snippet, containerW, containerH) {
@@ -88,8 +88,8 @@ export default function FloatingSnippets({ snippets }) {
       text: s.text.length > 100 ? s.text.slice(0, 100) + '...' : s.text,
       size: 0.82 + Math.random() * 0.3,
       x: 0, y: 0,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
+      vx: (Math.random() - 0.5) * INIT_SPEED * 2,
+      vy: (Math.random() - 0.5) * INIT_SPEED * 2,
       opacity: 0,
       phase: 'waiting', // waiting | fading_in | floating | bolded | fading_out
       phaseStart: 0,
@@ -164,8 +164,8 @@ export default function FloatingSnippets({ snippets }) {
           const pos = spawnPosition(newP.text, newP.size, particles, cw, ch);
           newP.x = pos.x;
           newP.y = pos.y;
-          newP.vx = (Math.random() - 0.5) * 0.2;
-          newP.vy = (Math.random() - 0.5) * 0.2;
+          newP.vx = (Math.random() - 0.5) * INIT_SPEED * 2;
+          newP.vy = (Math.random() - 0.5) * INIT_SPEED * 2;
           newP.opacity = 0;
           newP.phase = 'fading_in';
           newP.phaseStart = now;
@@ -195,16 +195,12 @@ export default function FloatingSnippets({ snippets }) {
           }
         }
 
-        // Clamp speed
+        // Clamp speed (no drag — frictionless space)
         const speed = Math.sqrt(a.vx * a.vx + a.vy * a.vy);
         if (speed > MAX_SPEED) {
           a.vx = (a.vx / speed) * MAX_SPEED;
           a.vy = (a.vy / speed) * MAX_SPEED;
         }
-
-        // Apply drag
-        a.vx *= DRAG;
-        a.vy *= DRAG;
 
         // Move
         a.x += a.vx;
