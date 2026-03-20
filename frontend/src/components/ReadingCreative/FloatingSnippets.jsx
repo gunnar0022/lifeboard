@@ -62,8 +62,17 @@ function spawnPosition(text, size, placed, cw, ch) {
     }
     if (!overlaps) return { x: px, y: py };
   }
-  // Fallback
-  return { x: Math.random() * (cw - box.w), y: Math.random() * (ch - box.h) };
+  // Fallback: place in corners/edges guaranteed outside dead zones
+  const safeSpots = [
+    { x: 0, y: 0 },
+    { x: cw - box.w, y: 0 },
+    { x: 0, y: ch - box.h },
+    { x: cw - box.w, y: ch - box.h },
+    { x: 0, y: ch * 0.3 },
+    { x: cw - box.w, y: ch * 0.6 },
+  ];
+  const safe = safeSpots.find(s => !isInDeadZone(s.x, s.y, box.w, box.h, cw, ch));
+  return safe || { x: 0, y: ch - box.h };
 }
 
 export default function FloatingSnippets({ snippets }) {
@@ -212,20 +221,36 @@ export default function FloatingSnippets({ snippets }) {
         if (a.x + aBox.w > cw) { a.x = cw - aBox.w; a.vx = -Math.abs(a.vx) * 0.5; }
         if (a.y + aBox.h > ch) { a.y = ch - aBox.h; a.vy = -Math.abs(a.vy) * 0.5; }
 
-        // Dead zone bounce — invert perpendicular momentum
+        // Dead zone bounce — eject toward nearest edge with minimum velocity
         const dz = isInDeadZone(a.x, a.y, aBox.w, aBox.h, cw, ch);
         if (dz) {
-          const dzCx = (dz.x + dz.w / 2) * cw;
-          const dzCy = (dz.y + dz.h / 2) * ch;
+          const dzLeft = dz.x * cw;
+          const dzTop = dz.y * ch;
+          const dzRight = (dz.x + dz.w) * cw;
+          const dzBottom = (dz.y + dz.h) * ch;
           const aCx = a.x + aBox.w / 2;
           const aCy = a.y + aBox.h / 2;
-          // Push away from dead zone center
-          if (Math.abs(aCx - dzCx) > Math.abs(aCy - dzCy)) {
-            a.vx = -a.vx;
-            a.x += a.vx * 3;
+
+          // Find nearest edge to eject through
+          const distLeft = Math.abs(aCx - dzLeft);
+          const distRight = Math.abs(aCx - dzRight);
+          const distTop = Math.abs(aCy - dzTop);
+          const distBottom = Math.abs(aCy - dzBottom);
+          const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+          const minSpeed = 0.3;
+
+          if (minDist === distLeft) {
+            a.x = dzLeft - aBox.w - 2;
+            a.vx = -(Math.abs(a.vx) || minSpeed);
+          } else if (minDist === distRight) {
+            a.x = dzRight + 2;
+            a.vx = Math.abs(a.vx) || minSpeed;
+          } else if (minDist === distTop) {
+            a.y = dzTop - aBox.h - 2;
+            a.vy = -(Math.abs(a.vy) || minSpeed);
           } else {
-            a.vy = -a.vy;
-            a.y += a.vy * 3;
+            a.y = dzBottom + 2;
+            a.vy = Math.abs(a.vy) || minSpeed;
           }
         }
 
