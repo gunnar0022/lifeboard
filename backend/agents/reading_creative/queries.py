@@ -454,6 +454,10 @@ async def sync_filesystem() -> dict:
                 ideas_dir.mkdir(exist_ok=True)
                 added += 1
 
+        # Ensure _ideas/ exists for ALL projects on disk
+        for slug in disk_slugs:
+            (CREATIVE_ROOT / slug / "_ideas").mkdir(exist_ok=True)
+
         # Remove DB entries for deleted folders
         for slug, pid in list(db_projects.items()):
             if slug not in disk_slugs:
