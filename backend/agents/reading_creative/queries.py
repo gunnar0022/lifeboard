@@ -554,58 +554,68 @@ async def delete_book(book_id: int) -> bool:
 # --- Snippets ---
 
 async def get_snippets(count: int = 8) -> list[dict]:
-    """Get random text snippets from authored .md files (not _ideas/)."""
+    """Get random text snippets from authored .md files (not _ideas/).
+
+    Extracts ALL paragraphs from all files into a pool, then samples.
+    Also splits long paragraphs into sentence-level fragments to maximize
+    the number of available snippets.
+    """
     _ensure_creative_root()
     projects = await get_projects()
     if not projects:
         return []
 
-    # Collect all .md files across projects, excluding _ideas/
-    all_files = []
+    # Build a pool of all text fragments across all projects
+    pool = []
     for p in projects:
         project_dir = CREATIVE_ROOT / p["slug"]
         if not project_dir.exists():
             continue
         for root, dirs, files in os.walk(project_dir):
-            # Skip _ideas directories
             if "_ideas" in Path(root).parts:
                 continue
             for f in files:
-                if f.endswith(".md"):
-                    all_files.append((Path(root) / f, p["name"]))
+                if not f.endswith(".md"):
+                    continue
+                try:
+                    content = (Path(root) / f).read_text(encoding="utf-8").strip()
+                    if not content:
+                        continue
+                    paragraphs = [para.strip() for para in content.split("\n\n") if para.strip()]
+                    for para in paragraphs:
+                        # Skip pure headings
+                        if para.startswith("#") and len(para) < 50:
+                            continue
+                        # Strip leading markdown heading markers for display
+                        display = para.lstrip("#").strip()
+                        if not display:
+                            continue
+                        # Split long paragraphs into sentences for more fragments
+                        words = display.split()
+                        if len(words) > 30:
+                            # Split into ~20-word chunks
+                            for i in range(0, len(words), 18):
+                                chunk = " ".join(words[i:i + 22])
+                                if len(chunk.split()) >= 5:
+                                    pool.append({
+                                        "text": chunk + ("..." if i + 22 < len(words) else ""),
+                                        "source_file": f,
+                                        "project_name": p["name"],
+                                    })
+                        else:
+                            pool.append({
+                                "text": display,
+                                "source_file": f,
+                                "project_name": p["name"],
+                            })
+                except Exception:
+                    continue
 
-    if not all_files:
+    if not pool:
         return []
 
-    snippets = []
-    random.shuffle(all_files)
-
-    for file_path, project_name in all_files[:count * 3]:  # oversample then trim
-        try:
-            content = file_path.read_text(encoding="utf-8").strip()
-            if not content:
-                continue
-            # Split into paragraphs, pick a random non-empty one
-            paragraphs = [p.strip() for p in content.split("\n\n") if p.strip()]
-            # Filter out headings-only paragraphs
-            paragraphs = [p for p in paragraphs if not p.startswith("#") or len(p) > 50]
-            if not paragraphs:
-                continue
-            para = random.choice(paragraphs)
-            # Truncate to ~50 words
-            words = para.split()
-            if len(words) > 50:
-                para = " ".join(words[:50]) + "..."
-            snippets.append({
-                "text": para,
-                "source_file": file_path.name,
-                "project_name": project_name,
-            })
-        except Exception:
-            continue
-
-        if len(snippets) >= count:
-            break
+    random.shuffle(pool)
+    snippets = pool[:count]
 
     return snippets[:count]
 
