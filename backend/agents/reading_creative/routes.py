@@ -86,6 +86,8 @@ async def get_pulse():
 
 @router.get("/projects")
 async def list_projects():
+    """List all projects, syncing with filesystem first to pick up manually added folders."""
+    await queries.sync_filesystem()
     return await queries.get_projects()
 
 @router.post("/projects")
@@ -167,6 +169,11 @@ async def reindex_files():
     for p in projects:
         total += await queries.reindex_project(p["id"])
     return {"ok": True, "indexed": total}
+
+@router.post("/sync")
+async def sync_filesystem():
+    """Sync filesystem with database — discovers new folders, removes deleted ones, reindexes all."""
+    return await queries.sync_filesystem()
 
 
 # --- Snippets ---

@@ -416,6 +416,64 @@ async def search_files(query: str) -> list[dict]:
         await db.close()
 
 
+async def sync_filesystem() -> dict:
+    """Discover projects from disk and reconcile with the database.
+
+    - Folders in data/creative/ that aren't in the DB get registered as new projects.
+    - Projects in the DB whose folders no longer exist get removed.
+    - All discovered projects get their file index rebuilt.
+    """
+    _ensure_creative_root()
+    db = await get_db()
+    try:
+        # Get existing projects from DB
+        cursor = await db.execute("SELECT id, slug FROM creative_projects")
+        db_projects = {r["slug"]: r["id"] for r in await cursor.fetchall()}
+
+        # Get folders on disk
+        disk_slugs = set()
+        for entry in CREATIVE_ROOT.iterdir():
+            if entry.is_dir() and not entry.name.startswith("."):
+                disk_slugs.add(entry.name)
+
+        added = 0
+        removed = 0
+
+        # Register new folders as projects
+        for slug in disk_slugs:
+            if slug not in db_projects:
+                # Generate a display name from the slug
+                name = slug.replace("-", " ").title()
+                cursor = await db.execute(
+                    "INSERT INTO creative_projects (name, slug) VALUES (?, ?)",
+                    (name, slug),
+                )
+                db_projects[slug] = cursor.lastrowid
+                # Create _ideas/ if missing
+                ideas_dir = CREATIVE_ROOT / slug / "_ideas"
+                ideas_dir.mkdir(exist_ok=True)
+                added += 1
+
+        # Remove DB entries for deleted folders
+        for slug, pid in list(db_projects.items()):
+            if slug not in disk_slugs:
+                await db.execute("DELETE FROM creative_file_index WHERE project_id = ?", (pid,))
+                await db.execute("DELETE FROM creative_projects WHERE id = ?", (pid,))
+                del db_projects[slug]
+                removed += 1
+
+        await db.commit()
+    finally:
+        await db.close()
+
+    # Reindex all projects
+    indexed = 0
+    for slug, pid in db_projects.items():
+        indexed += await reindex_project(pid)
+
+    return {"added": added, "removed": removed, "indexed": indexed}
+
+
 async def reindex_project(project_id: int) -> int:
     """Rebuild file index for a project by walking the filesystem."""
     project = await get_project(project_id)

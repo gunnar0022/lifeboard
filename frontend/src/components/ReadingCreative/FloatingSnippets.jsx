@@ -14,7 +14,7 @@ const REPEL_RADIUS = 120;       // px — beyond this, no force
 const MAX_SPEED = 0.6;          // px per frame cap
 const INIT_SPEED = 0.35;        // initial random velocity range
 const CYCLE_MS = 6000;          // lifecycle tick interval
-const VISIBLE_TARGET = 33;      // how many on screen at once (1.5x from 22)
+const VISIBLE_TARGET = 25;      // how many on screen at once
 const FADE_DURATION = 1500;     // ms for fade in/out
 
 // Dead zones as fractions of container size
