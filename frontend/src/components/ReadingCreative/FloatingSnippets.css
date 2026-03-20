@@ -20,11 +20,14 @@
 
 .floating-snippets__item {
   position: absolute;
+  top: 0;
+  left: 0;
   max-width: 30%;
   line-height: 1.5;
   color: var(--text-tertiary);
   font-family: Georgia, 'Times New Roman', serif;
-  transition: color 1s ease;
+  will-change: transform, opacity;
+  transition: color 0.6s ease, font-weight 0.6s ease;
 }
 
 .floating-snippets__item--focus {
