@@ -9,8 +9,9 @@ import './FloatingSnippets.css';
  * - requestAnimationFrame loop, no CSS animations
  */
 
-const REPEL_STRENGTH = 0.015;    // force per frame at zero distance
-const REPEL_RADIUS = 150;       // px — beyond this, no force
+const REPEL_STRENGTH = 0.015;    // force per frame at zero distance (linear zone)
+const REPEL_LINEAR = 150;       // px — linear falloff zone (strong, close range)
+const REPEL_OUTER = 350;        // px — inverse-square zone extends to here
 const MAX_SPEED = 0.6;          // px per frame cap
 const INIT_SPEED = 0.35;        // initial random velocity range
 const CYCLE_MS = 6000;          // lifecycle tick interval
@@ -187,14 +188,23 @@ export default function FloatingSnippets({ snippets }) {
         const a = particles[i];
         const aBox = estimateBox(a, cw, ch);
 
-        // Repulsion from other particles (linear falloff — stronger at close range)
+        // Repulsion: linear within 150px, inverse-square from 150-350px
         for (let j = i + 1; j < particles.length; j++) {
           const b = particles[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          if (dist < REPEL_RADIUS) {
-            const force = REPEL_STRENGTH * (1 - dist / REPEL_RADIUS);
+          let force = 0;
+          if (dist < REPEL_LINEAR) {
+            // Strong linear zone: full strength at 0, tapers to threshold at 150px
+            force = REPEL_STRENGTH * (1 - dist / REPEL_LINEAR);
+          } else if (dist < REPEL_OUTER) {
+            // Gentle inverse-square zone: picks up where linear left off
+            const d = dist - REPEL_LINEAR; // 0 at boundary, up to 200
+            const range = REPEL_OUTER - REPEL_LINEAR;
+            force = (REPEL_STRENGTH * 0.15) * (range * range) / ((d + range * 0.3) * (d + range * 0.3));
+          }
+          if (force > 0) {
             const fx = (dx / dist) * force;
             const fy = (dy / dist) * force;
             a.vx += fx;
