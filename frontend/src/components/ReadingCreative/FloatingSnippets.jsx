@@ -9,8 +9,8 @@ import './FloatingSnippets.css';
  * - requestAnimationFrame loop, no CSS animations
  */
 
-const REPEL_STRENGTH = 0.8;
-const REPEL_RADIUS = 120;       // px — beyond this, no force
+const REPEL_STRENGTH = 0.015;    // force per frame at zero distance
+const REPEL_RADIUS = 150;       // px — beyond this, no force
 const MAX_SPEED = 0.6;          // px per frame cap
 const INIT_SPEED = 0.35;        // initial random velocity range
 const CYCLE_MS = 6000;          // lifecycle tick interval
@@ -187,14 +187,14 @@ export default function FloatingSnippets({ snippets }) {
         const a = particles[i];
         const aBox = estimateBox(a, cw, ch);
 
-        // Repulsion from other particles
+        // Repulsion from other particles (linear falloff — stronger at close range)
         for (let j = i + 1; j < particles.length; j++) {
           const b = particles[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
           if (dist < REPEL_RADIUS) {
-            const force = REPEL_STRENGTH / (dist * dist) * 0.5;
+            const force = REPEL_STRENGTH * (1 - dist / REPEL_RADIUS);
             const fx = (dx / dist) * force;
             const fy = (dy / dist) * force;
             a.vx += fx;
