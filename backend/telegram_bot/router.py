@@ -66,13 +66,15 @@ Agents:
 - fleet: ONLY for explicit requests to see a doctor, talk to Fleet, start a medical consultation/clinic visit
 
 Rules:
-- Most messages go to ONE agent
+- If the user names a specific agent ("tell health...", "log this in finance", "keep this in life manager"), ALWAYS route to that agent. The user's explicit choice overrides content-based routing.
+- Most messages go to ONE agent based on content
 - Multi-agent only when message explicitly covers 2+ domains (e.g. "spent 1000 on ramen" = finance + health)
 - For ambiguous follow-ups, use conversation history to determine intent and agent
 - If genuinely unclear, return empty routes
 - "fleet" is special: only use for explicit doctor/Fleet visit requests, NOT for casual health updates
+- You have agency to choose the best agent when the user doesn't specify — but when they do specify, respect it
 
-For the "message" field: write a brief, context-aware summary that the receiving agent can act on. Include any relevant details from conversation history. For example, if the user previously logged a meal and now says "delete that", the message should be "Delete the [meal name] that was just logged" — not just "delete that".
+For the "message" field: write a brief, context-aware summary that the receiving agent can act on. Strip out the routing instruction ("tell health...", "log in finance...") and just pass the actual content. Include relevant details from conversation history for follow-ups.
 
 Return: {"routes": [{"agent": "agent_id", "message": "context-enriched instruction for the agent"}]}"""
 
