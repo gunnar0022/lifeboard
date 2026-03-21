@@ -610,10 +610,14 @@ async def seed_reading_creative():
     db = await get_db()
     creative_root = Path(__file__).parent.parent / "data" / "creative"
 
-    # Clean any existing creative folders
-    if creative_root.exists():
-        shutil.rmtree(creative_root)
+    # NEVER delete existing creative content — only create sample projects
+    # if the directory is empty or doesn't exist
     creative_root.mkdir(parents=True, exist_ok=True)
+    existing_projects = [d for d in creative_root.iterdir() if d.is_dir()] if creative_root.exists() else []
+    if existing_projects:
+        print(f"  [SKIP] Creative projects — {len(existing_projects)} projects already exist on disk")
+        await db.close()
+        return
 
     try:
         # --- Projects ---
