@@ -151,20 +151,34 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Something went wrong processing that photo.")
 
 
-async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle photos sent as documents (uncompressed images)."""
+async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle documents — PDFs, images sent as files, etc."""
     if not _is_authorized(update):
         return
 
     doc = update.message.document
-    if not doc.mime_type or not doc.mime_type.startswith("image/"):
-        return  # Not an image document
+    if not doc or not doc.mime_type:
+        return
 
-    logger.info(f"Document-photo received: {doc.file_name} ({doc.mime_type})")
-    await update.message.reply_text(
-        "I received your image, but please send it as a photo (not a file) so I can process it. "
-        "On Telegram, uncheck 'Send as file' when attaching."
-    )
+    caption = update.message.caption or ""
+    logger.info(f"Document received: {doc.file_name} ({doc.mime_type}, {doc.file_size} bytes)")
+
+    try:
+        if doc.mime_type.startswith("image/"):
+            # Image sent as document — save and route like a photo
+            from backend.telegram_bot.router import dispatch_photo
+            await dispatch_photo(update, caption)
+        elif doc.mime_type == "application/pdf":
+            # PDF — save to disk and route to appropriate agent
+            from backend.telegram_bot.router import dispatch_document
+            await dispatch_document(update, caption)
+        else:
+            await update.message.reply_text(
+                f"I received {doc.file_name} but I can only process images and PDFs right now."
+            )
+    except Exception as e:
+        logger.error(f"Document handler error: {e}", exc_info=True)
+        await update.message.reply_text("Something went wrong processing that document.")
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -247,7 +261,7 @@ async def start_bot():
         MessageHandler(filters.PHOTO, handle_photo)
     )
     _bot_app.add_handler(
-        MessageHandler(filters.Document.ALL, handle_document_photo)
+        MessageHandler(filters.Document.ALL, handle_document)
     )
     _bot_app.add_handler(CallbackQueryHandler(handle_callback))
 

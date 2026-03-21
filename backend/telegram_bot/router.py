@@ -245,6 +245,69 @@ async def dispatch_photo(update: Update, caption: str | None):
     await _send_photo_fallback(update)
 
 
+async def dispatch_document(update: Update, caption: str | None):
+    """
+    Handle document uploads (PDFs, etc). Save to disk and route to an agent.
+    """
+    from backend.agents.fleet.telegram import is_session_active
+    if is_session_active():
+        await update.message.reply_text(
+            "I can't process documents during a Fleet visit. "
+            "End the visit first, then send the document."
+        )
+        return
+
+    import logging
+    from pathlib import Path
+    from datetime import datetime
+
+    doc = update.message.document
+    file = await doc.get_file()
+    file_data = await file.download_as_bytearray()
+
+    # Determine which agent handles this based on caption or context
+    agent_id = None
+    if caption and caption.strip():
+        routes = await route_message(caption)
+        if routes:
+            agent_id = routes[0]["agent"]
+
+    if not agent_id:
+        # Default: health for medical docs, finance for receipts
+        if _recent_context and (time.time() - _recent_context["timestamp"]) < 120:
+            agent_id = _recent_context["agent"]
+        else:
+            agent_id = "health_body"  # Most common PDF use case
+
+    # Save file to disk under the agent's folder
+    now = datetime.now()
+    file_dir = Path(__file__).parent.parent.parent / "data" / "files" / agent_id / now.strftime("%Y-%m")
+    file_dir.mkdir(parents=True, exist_ok=True)
+
+    ext = Path(doc.file_name).suffix if doc.file_name else ".pdf"
+    filename = f"{now.strftime('%Y%m%d_%H%M%S')}_{file.file_unique_id}{ext}"
+    file_path = file_dir / filename
+
+    with open(file_path, "wb") as f:
+        f.write(file_data)
+
+    logger.info(f"Document saved: {file_path} ({len(file_data)} bytes), routing to {agent_id}")
+
+    # Route to agent's process_message with file context
+    handler = _get_agent_handler(agent_id, "process_message")
+    if handler:
+        file_context = (
+            f"{caption or 'Document uploaded'}\n\n"
+            f"[Document saved: {filename}, type: {doc.mime_type}, "
+            f"size: {len(file_data)} bytes, "
+            f"path: {agent_id}/{now.strftime('%Y-%m')}/{filename}]"
+        )
+        await handler(update, file_context)
+        _update_recent_context(agent_id)
+    else:
+        await update.message.reply_text(f"Saved {filename} but couldn't route it to an agent.")
+
+
 async def handle_router_fallback(query, data: str):
     """
     Handle callbacks from the router's fallback keyboard.
