@@ -297,8 +297,14 @@ async def dispatch_document(update: Update, caption: str | None):
     file_dir = Path(__file__).parent.parent.parent / "data" / "files" / agent_id / now.strftime("%Y-%m")
     file_dir.mkdir(parents=True, exist_ok=True)
 
-    ext = Path(doc.file_name).suffix if doc.file_name else ".pdf"
-    filename = f"{now.strftime('%Y%m%d_%H%M%S')}_{file.file_unique_id}{ext}"
+    # Use original filename with timestamp suffix for deduplication
+    if doc.file_name:
+        stem = Path(doc.file_name).stem
+        ext = Path(doc.file_name).suffix
+    else:
+        stem = "document"
+        ext = ".pdf"
+    filename = f"{stem}_{now.strftime('%Y%m%d_%H%M%S')}{ext}"
     file_path = file_dir / filename
 
     with open(file_path, "wb") as f:

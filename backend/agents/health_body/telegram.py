@@ -102,7 +102,7 @@ async def process_photo(update: Update, caption: str = None, send_reply: bool = 
     now = datetime.now()
     file_dir = Path(__file__).parent.parent.parent.parent / "data" / "files" / "health_body" / now.strftime("%Y-%m")
     file_dir.mkdir(parents=True, exist_ok=True)
-    filename = f"{now.strftime('%Y%m%d_%H%M%S')}_{file.file_unique_id}.jpg"
+    filename = f"health_photo_{now.strftime('%Y%m%d_%H%M%S')}.jpg"
     file_path = file_dir / filename
     with open(file_path, "wb") as f:
         f.write(image_data)
