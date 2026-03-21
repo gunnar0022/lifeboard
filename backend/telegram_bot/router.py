@@ -293,16 +293,25 @@ async def dispatch_document(update: Update, caption: str | None):
 
     logger.info(f"Document saved: {file_path} ({len(file_data)} bytes), routing to {agent_id}")
 
-    # Route to agent's process_message with file context
-    handler = _get_agent_handler(agent_id, "process_message")
-    if handler:
+    rel_path = f"{agent_id}/{now.strftime('%Y-%m')}/{filename}"
+
+    # Use process_message with explicit file metadata so the LLM creates
+    # a document record AND links the file in one multi_action
+    msg_handler = _get_agent_handler(agent_id, "process_message")
+
+    if msg_handler:
+        # For agents without process_photo, use process_message and then
+        # manually create the document + file link via the agent's actions
         file_context = (
             f"{caption or 'Document uploaded'}\n\n"
             f"[Document saved: {filename}, type: {doc.mime_type}, "
-            f"size: {len(file_data)} bytes, "
-            f"path: {agent_id}/{now.strftime('%Y-%m')}/{filename}]"
+            f"size: {len(file_data)} bytes, path: {rel_path}]\n"
+            f"IMPORTANT: Use add_document (or add_health_document) to create a record, "
+            f"then use store_file (or store_health_file) with file_path=\"{rel_path}\", "
+            f"original_filename=\"{doc.file_name or filename}\", mime_type=\"{doc.mime_type}\", "
+            f"file_size={len(file_data)} to link the file. Use multi_action for both."
         )
-        await handler(update, file_context)
+        await msg_handler(update, file_context)
         _update_recent_context(agent_id)
     else:
         await update.message.reply_text(f"Saved {filename} but couldn't route it to an agent.")
