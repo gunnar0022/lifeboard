@@ -257,7 +257,6 @@ async def dispatch_document(update: Update, caption: str | None):
         )
         return
 
-    import logging
     from pathlib import Path
     from datetime import datetime
 
@@ -266,18 +265,30 @@ async def dispatch_document(update: Update, caption: str | None):
     file_data = await file.download_as_bytearray()
 
     # Determine which agent handles this based on caption or context
+    # First check for explicit agent mentions in caption
     agent_id = None
     if caption and caption.strip():
-        routes = await route_message(caption)
-        if routes:
-            agent_id = routes[0]["agent"]
+        caption_lower = caption.lower()
+        # Explicit agent mentions override routing
+        if any(w in caption_lower for w in ["life manager", "life_manager", "calendar", "task", "bill", "document", "contract", "lease"]):
+            agent_id = "life_manager"
+        elif any(w in caption_lower for w in ["finance", "receipt", "expense", "transaction"]):
+            agent_id = "finance"
+        elif any(w in caption_lower for w in ["health", "medical", "checkup", "prescription", "lab"]):
+            agent_id = "health_body"
+        elif any(w in caption_lower for w in ["invest", "stock", "portfolio", "brokerage"]):
+            agent_id = "investing"
+        else:
+            # Fall back to LLM routing
+            routes = await route_message(caption)
+            if routes:
+                agent_id = routes[0]["agent"]
 
     if not agent_id:
-        # Default: health for medical docs, finance for receipts
         if _recent_context and (time.time() - _recent_context["timestamp"]) < 120:
             agent_id = _recent_context["agent"]
         else:
-            agent_id = "health_body"  # Most common PDF use case
+            agent_id = "life_manager"  # Default: documents are most commonly life manager
 
     # Save file to disk under the agent's folder
     now = datetime.now()
