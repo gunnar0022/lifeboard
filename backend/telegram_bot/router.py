@@ -200,8 +200,7 @@ async def dispatch_text(update: Update, text: str):
 
 async def dispatch_photo(update: Update, caption: str | None):
     """
-    Entry point for photo messages. Routes based on caption or context.
-    LM-37: Fleet session lock — photos during a Fleet visit get a message.
+    Entry point for photo messages. All photos go through the unified document classifier.
     """
     from backend.agents.fleet.telegram import is_session_active
     if is_session_active():
@@ -211,45 +210,12 @@ async def dispatch_photo(update: Update, caption: str | None):
         )
         return
 
-    if caption and caption.strip():
-        # Route based on caption
-        reply_to_agent = _get_reply_to_agent(update)
-        routes = await route_message(caption, reply_to_agent=reply_to_agent)
-
-        if routes:
-            # Photos go to single agent only (first route)
-            agent_id = routes[0]["agent"]
-            handler = _get_agent_handler(agent_id, "process_photo")
-            if handler:
-                await handler(update, caption)
-                _update_recent_context(agent_id)
-                return
-
-    # No caption or routing failed — try recent context
-    if _recent_context and (time.time() - _recent_context["timestamp"]) < 120:
-        agent_id = _recent_context["agent"]
-        handler = _get_agent_handler(agent_id, "process_photo")
-        if handler:
-            await handler(update, caption or "")
-            _update_recent_context(agent_id)
-            return
-
-    # Check reply-to context
-    reply_to_agent = _get_reply_to_agent(update)
-    if reply_to_agent and reply_to_agent in VALID_AGENTS:
-        handler = _get_agent_handler(reply_to_agent, "process_photo")
-        if handler:
-            await handler(update, caption or "")
-            _update_recent_context(reply_to_agent)
-            return
-
-    # No context at all — ask user
-    await _send_photo_fallback(update)
+    await _classify_and_store_file(update, caption, source="photo")
 
 
 async def dispatch_document(update: Update, caption: str | None):
     """
-    Handle document uploads (PDFs, etc). Save to disk and route to an agent.
+    Entry point for document uploads (PDFs, etc). All docs go through the unified classifier.
     """
     from backend.agents.fleet.telegram import is_session_active
     if is_session_active():
@@ -259,81 +225,91 @@ async def dispatch_document(update: Update, caption: str | None):
         )
         return
 
+    await _classify_and_store_file(update, caption, source="document")
+
+
+async def _classify_and_store_file(update: Update, caption: str | None, source: str):
+    """
+    Unified file handler: saves file to disk, runs Haiku classifier, stores in
+    unified documents table. Works for both photos and document uploads.
+    """
     from pathlib import Path
     from datetime import datetime
+    from backend.documents import classify_document, store_document
 
-    doc = update.message.document
-    file = await doc.get_file()
-    file_data = await file.download_as_bytearray()
-
-    # Determine which agent handles this based on caption or context
-    # First check for explicit agent mentions in caption
-    agent_id = None
-    if caption and caption.strip():
-        caption_lower = caption.lower()
-        # Explicit agent mentions override routing
-        if any(w in caption_lower for w in ["life manager", "life_manager", "calendar", "task", "bill", "document", "contract", "lease"]):
-            agent_id = "life_manager"
-        elif any(w in caption_lower for w in ["finance", "receipt", "expense", "transaction"]):
-            agent_id = "finance"
-        elif any(w in caption_lower for w in ["health", "medical", "checkup", "prescription", "lab"]):
-            agent_id = "health_body"
-        elif any(w in caption_lower for w in ["invest", "stock", "portfolio", "brokerage"]):
-            agent_id = "investing"
-        else:
-            # Fall back to LLM routing
-            routes = await route_message(caption)
-            if routes:
-                agent_id = routes[0]["agent"]
-
-    if not agent_id:
-        if _recent_context and (time.time() - _recent_context["timestamp"]) < 120:
-            agent_id = _recent_context["agent"]
-        else:
-            agent_id = "life_manager"  # Default: documents are most commonly life manager
-
-    # Save file to disk under the agent's folder
     now = datetime.now()
-    file_dir = Path(__file__).parent.parent.parent / "data" / "files" / agent_id / now.strftime("%Y-%m")
+
+    # Download the file
+    if source == "photo":
+        photo = update.message.photo[-1]
+        tg_file = await photo.get_file()
+        file_data = await tg_file.download_as_bytearray()
+        original_filename = f"photo_{now.strftime('%Y%m%d_%H%M%S')}.jpg"
+        mime_type = "image/jpeg"
+    else:
+        doc = update.message.document
+        tg_file = await doc.get_file()
+        file_data = await tg_file.download_as_bytearray()
+        original_filename = doc.file_name or f"document_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
+        mime_type = doc.mime_type or "application/octet-stream"
+
+    # Save to disk in a general documents folder
+    file_dir = Path(__file__).parent.parent.parent / "data" / "files" / "documents" / now.strftime("%Y-%m")
     file_dir.mkdir(parents=True, exist_ok=True)
 
-    # Use original filename with timestamp suffix for deduplication
-    if doc.file_name:
-        stem = Path(doc.file_name).stem
-        ext = Path(doc.file_name).suffix
-    else:
-        stem = "document"
-        ext = ".pdf"
+    stem = Path(original_filename).stem
+    ext = Path(original_filename).suffix or (".jpg" if source == "photo" else ".pdf")
     filename = f"{stem}_{now.strftime('%Y%m%d_%H%M%S')}{ext}"
     file_path = file_dir / filename
 
     with open(file_path, "wb") as f:
         f.write(file_data)
 
-    logger.info(f"Document saved: {file_path} ({len(file_data)} bytes), routing to {agent_id}")
+    rel_path = f"documents/{now.strftime('%Y-%m')}/{filename}"
+    logger.info(f"File saved: {file_path} ({len(file_data)} bytes)")
 
-    rel_path = f"{agent_id}/{now.strftime('%Y-%m')}/{filename}"
+    # Classify using Haiku
+    await update.message.reply_text("Classifying your document...")
 
-    # Use process_message with explicit file metadata so the LLM creates
-    # a document record AND links the file in one multi_action
-    msg_handler = _get_agent_handler(agent_id, "process_message")
+    classification = await classify_document(
+        file_path=rel_path,
+        original_filename=original_filename,
+        mime_type=mime_type,
+        file_size=len(file_data),
+        user_caption=caption or "",
+        image_data=bytes(file_data) if mime_type.startswith("image/") else None,
+    )
 
-    if msg_handler:
-        # For agents without process_photo, use process_message and then
-        # manually create the document + file link via the agent's actions
-        file_context = (
-            f"{caption or 'Document uploaded'}\n\n"
-            f"[Document saved: {filename}, type: {doc.mime_type}, "
-            f"size: {len(file_data)} bytes, path: {rel_path}]\n"
-            f"IMPORTANT: Use add_document (or add_health_document) to create a record, "
-            f"then use store_file (or store_health_file) with file_path=\"{rel_path}\", "
-            f"original_filename=\"{doc.file_name or filename}\", mime_type=\"{doc.mime_type}\", "
-            f"file_size={len(file_data)} to link the file. Use multi_action for both."
-        )
-        await msg_handler(update, file_context)
-        _update_recent_context(agent_id)
-    else:
-        await update.message.reply_text(f"Saved {filename} but couldn't route it to an agent.")
+    # Store in unified documents table
+    doc_record = await store_document(
+        title=classification["title"],
+        summary=classification["summary"],
+        tags=classification["tags"],
+        category=classification["category"],
+        file_path=rel_path,
+        original_filename=original_filename,
+        mime_type=mime_type,
+        file_size=len(file_data),
+        date=classification.get("date"),
+        provider=classification.get("provider"),
+    )
+
+    # Build response
+    tags_str = ", ".join(classification["tags"])
+    cat_emoji = {"finance": "\U0001f4b0", "health": "\U0001f4aa", "investing": "\U0001f4c8", "life": "\U0001f4cb"}.get(classification["category"], "\U0001f4c4")
+
+    reply = (
+        f"{cat_emoji} *{classification['title']}*\n"
+        f"Category: {classification['category']} | Tags: {tags_str}\n\n"
+        f"{classification['summary']}"
+    )
+
+    try:
+        await update.message.reply_text(reply, parse_mode="Markdown")
+    except Exception:
+        await update.message.reply_text(reply)
+
+    _update_recent_context("life_manager")
 
 
 async def handle_router_fallback(query, data: str):

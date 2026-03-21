@@ -6,7 +6,6 @@ import ProfileCard from './ProfileCard';
 import Heatmap from './Heatmap';
 import RecentDetail from './RecentDetail';
 import WeightTrend from './WeightTrend';
-import MedicalRegistry from './MedicalRegistry';
 import ConcernsTracker from './ConcernsTracker';
 import './HealthPanel.css';
 
@@ -25,16 +24,7 @@ export default function HealthPanel() {
   const { data: heatmap, refetch: refetchHeatmap } = useApi('/api/health_body/heatmap?days=90');
   const { data: recent, refetch: refetchRecent } = useApi('/api/health_body/recent');
   const { data: measurements, refetch: refetchMeasurements } = useApi('/api/health_body/measurements');
-  const { data: documents, refetch: refetchDocs } = useApi('/api/health_body/documents');
   const { data: concerns } = useApi('/api/health_body/concerns');
-
-  const refetchAll = useCallback(() => {
-    refetchProfile();
-    refetchHeatmap();
-    refetchRecent();
-    refetchMeasurements();
-    refetchDocs();
-  }, [refetchProfile, refetchHeatmap, refetchRecent, refetchMeasurements, refetchDocs]);
 
   const hasProfile = profile && profile.id;
 
@@ -69,13 +59,13 @@ export default function HealthPanel() {
             <span className="health-panel__icon"><HeartPulse size={24} /></span>
             <h2 className="health-panel__title">Health & Body</h2>
           </div>
-          <p className="health-panel__subtitle">Exercise, nutrition, mood, medical records</p>
+          <p className="health-panel__subtitle">Exercise, nutrition, mood tracking</p>
         </div>
         <div className="health-panel__empty">
           <div className="health-panel__empty-icon"><HeartPulse size={40} /></div>
           <h3>No health profile yet</h3>
           <p>
-            Message the Telegram bot with <code>/h</code> to set up your profile.
+            Message the Telegram bot to set up your profile.
             Tell it your height, weight, age, and activity level to get started.
           </p>
         </div>
@@ -120,10 +110,6 @@ export default function HealthPanel() {
           <ConcernsTracker concerns={concerns} />
         </motion.div>
       )}
-
-      <motion.div variants={fadeUp}>
-        <MedicalRegistry documents={documents || []} onRefresh={refetchDocs} />
-      </motion.div>
     </motion.div>
   );
 }

@@ -238,84 +238,59 @@ async def remove_bill(bill_id: int):
     return {"success": True}
 
 
-# ──────────────────────── Documents ────────────────────────
+# ──────────────────────── Unified Documents ────────────────────────
 
 @router.get("/documents")
 async def list_documents(
+    query: Optional[str] = None,
+    tag: Optional[str] = None,
     category: Optional[str] = None,
-    expiring_within_days: Optional[int] = None,
-    search: Optional[str] = None,
     limit: int = 50,
 ):
-    docs = await queries.get_documents(
-        category=category, expiring_within_days=expiring_within_days,
-        search=search, limit=limit,
-    )
-    # Enrich with linked file info
-    for doc in docs:
-        files = await queries.get_files_for_document(doc["id"])
-        doc["files"] = files
-    return docs
+    """Search/list all documents from the unified documents table."""
+    from backend.documents import search_documents
+    tags = [tag] if tag else None
+    return await search_documents(query=query, tags=tags, category=category, limit=limit)
+
+
+@router.get("/documents/tags")
+async def list_tags():
+    """Get all tags currently in use."""
+    from backend.documents import get_all_tags_in_use
+    return await get_all_tags_in_use()
 
 
 @router.get("/documents/{doc_id}")
 async def get_document(doc_id: int):
-    doc = await queries.get_document(doc_id)
+    from backend.documents import get_document as get_doc
+    doc = await get_doc(doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     return doc
 
 
-@router.get("/documents/{doc_id}/files")
-async def get_document_files(doc_id: int):
-    return await queries.get_files_for_document(doc_id)
-
-
-class DocumentCreate(BaseModel):
-    name: str
-    category: str = "other"
-    expiry_date: Optional[str] = None
-    notes: Optional[str] = None
-
-@router.post("/documents")
-async def create_document(body: DocumentCreate):
-    return await queries.add_document(
-        name=body.name, category=body.category,
-        expiry_date=body.expiry_date, notes=body.notes,
-    )
-
-
-class DocumentUpdate(BaseModel):
-    name: Optional[str] = None
-    category: Optional[str] = None
-    expiry_date: Optional[str] = None
-    notes: Optional[str] = None
-
-@router.put("/documents/{doc_id}")
-async def update_document(doc_id: int, body: DocumentUpdate):
-    return await queries.edit_document(doc_id, **body.model_dump(exclude_none=True))
-
-
 @router.delete("/documents/{doc_id}")
 async def remove_document(doc_id: int):
-    await queries.delete_document(doc_id)
+    from backend.documents import delete_document
+    if not await delete_document(doc_id):
+        raise HTTPException(status_code=404, detail="Document not found")
     return {"success": True}
 
 
-# ──────────────────────── Files ────────────────────────
-
-@router.get("/files/{file_id}/view")
-async def view_file(file_id: int):
-    """Serve a stored file (photo/document) for viewing."""
-    file_info = await queries.get_file(file_id=file_id)
-    if not file_info or not file_info.get("file_path"):
-        raise HTTPException(status_code=404, detail="File not found")
-    full_path = DATA_DIR / file_info["file_path"]
+@router.get("/documents/{doc_id}/view")
+async def view_document_file(doc_id: int):
+    """Serve a document's file for viewing (PDF opens in new tab, images inline)."""
+    from backend.documents import get_document as get_doc
+    doc = await get_doc(doc_id)
+    if not doc or not doc.get("file_path"):
+        raise HTTPException(status_code=404, detail="File not found or no file attached")
+    full_path = DATA_DIR / doc["file_path"]
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="File missing from disk")
     return FileResponse(
-        full_path,
-        media_type=file_info.get("mime_type", "application/octet-stream"),
+        str(full_path),
+        media_type=doc.get("mime_type", "application/octet-stream"),
+        filename=doc.get("original_filename"),
     )
 
 

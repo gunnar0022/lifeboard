@@ -79,41 +79,6 @@ async def handle_update_profile(data: dict) -> dict:
     return await queries.upsert_profile(**data)
 
 
-# --- Medical Document handlers ---
-
-async def handle_add_health_document(data: dict) -> dict:
-    return await queries.add_health_document(
-        name=data["name"],
-        category=data.get("category", "other"),
-        doc_date=data.get("date"),
-        provider=data.get("provider"),
-        notes=data.get("notes"),
-    )
-
-
-async def handle_edit_health_document(data: dict) -> dict:
-    doc_id = data.pop("document_id")
-    return await queries.edit_health_document(doc_id, **data)
-
-
-async def handle_delete_health_document(data: dict) -> bool:
-    return await queries.delete_health_document(data["document_id"])
-
-
-# --- File handlers ---
-
-async def handle_store_health_file(data: dict) -> dict:
-    return await queries.store_health_file(
-        file_path=data.get("file_path", ""),
-        original_filename=data.get("original_filename", ""),
-        mime_type=data.get("mime_type"),
-        file_size=data.get("file_size"),
-        linked_document_id=data.get("link_to_document_id"),
-        description=data.get("file_context", ""),
-        extracted_data=data.get("extracted_data"),
-    )
-
-
 # --- Concern log handler (LM-40: Health writes user_log entries) ---
 
 async def handle_log_concern_update(data: dict) -> dict:
@@ -180,20 +145,6 @@ async def handle_get_measurements(data: dict) -> list:
     return await queries.get_measurements(limit=data.get("limit", 30))
 
 
-async def handle_get_health_documents(data: dict) -> list:
-    return await queries.get_health_documents(
-        category=data.get("category"),
-        search=data.get("search"),
-    )
-
-
-async def handle_get_health_file(data: dict) -> dict:
-    return await queries.get_health_file(
-        file_id=data.get("file_id"),
-        search=data.get("search"),
-        linked_document_id=data.get("linked_document_id"),
-    )
-
 
 # --- ACTION_REGISTRY ---
 
@@ -252,29 +203,6 @@ ACTION_REGISTRY = {
                       "daily_calorie_goal", "evening_checkin_time"],
     },
 
-    # Write — Medical Documents
-    "add_health_document": {
-        "handler": handle_add_health_document,
-        "required": ["name"],
-        "optional": ["category", "date", "provider", "notes"],
-    },
-    "edit_health_document": {
-        "handler": handle_edit_health_document,
-        "required": ["document_id"],
-        "optional": ["name", "category", "date", "provider", "notes"],
-    },
-    "delete_health_document": {
-        "handler": handle_delete_health_document,
-        "required": ["document_id"],
-    },
-
-    # Write — Files
-    "store_health_file": {
-        "handler": handle_store_health_file,
-        "required": ["file_context"],
-        "optional": ["link_to_document_id", "extracted_data"],
-    },
-
     # Read actions
     "get_profile": {
         "handler": handle_get_profile,
@@ -304,19 +232,6 @@ ACTION_REGISTRY = {
         "optional": ["limit"],
         "is_read": True,
     },
-    "get_health_documents": {
-        "handler": handle_get_health_documents,
-        "required": [],
-        "optional": ["category", "search"],
-        "is_read": True,
-    },
-    "get_health_file": {
-        "handler": handle_get_health_file,
-        "required": [],
-        "optional": ["file_id", "search", "linked_document_id"],
-        "is_read": True,
-    },
-
     # Write — Concern logs (LM-40)
     "log_concern_update": {
         "handler": handle_log_concern_update,

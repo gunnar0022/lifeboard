@@ -85,42 +85,6 @@ async def handle_delete_bill(data: dict) -> bool:
     return await queries.delete_bill(data["bill_id"])
 
 
-# --- Document handlers ---
-
-async def handle_add_document(data: dict) -> dict:
-    return await queries.add_document(
-        name=data["name"],
-        category=data.get("category", "other"),
-        expiry_date=data.get("expiry_date"),
-        notes=data.get("notes"),
-    )
-
-
-async def handle_edit_document(data: dict) -> dict:
-    doc_id = data.pop("document_id")
-    return await queries.edit_document(doc_id, **data)
-
-
-async def handle_delete_document(data: dict) -> bool:
-    return await queries.delete_document(data["document_id"])
-
-
-# --- File handlers ---
-
-async def handle_store_file(data: dict) -> dict:
-    return await queries.store_file(
-        file_path=data.get("file_path", ""),
-        original_filename=data.get("original_filename", ""),
-        mime_type=data.get("mime_type"),
-        file_size=data.get("file_size"),
-        linked_document_id=data.get("link_to_document_id"),
-        linked_bill_id=data.get("link_to_bill_id"),
-        linked_task_id=data.get("link_to_task_id"),
-        description=data.get("file_context", ""),
-        extracted_data=data.get("extracted_data"),
-    )
-
-
 # --- Read action handlers ---
 
 async def handle_get_today(data: dict) -> dict:
@@ -161,22 +125,6 @@ async def handle_get_events(data: dict) -> list:
         date_to=data.get("date_to"),
         category=data.get("category"),
         search=data.get("search"),
-    )
-
-
-async def handle_get_documents(data: dict) -> list:
-    return await queries.get_documents(
-        category=data.get("category"),
-        expiring_within_days=data.get("expiring_within_days"),
-        search=data.get("search"),
-    )
-
-
-async def handle_get_file(data: dict) -> dict:
-    return await queries.get_file(
-        file_id=data.get("file_id"),
-        search=data.get("search"),
-        linked_document_id=data.get("linked_document_id"),
     )
 
 
@@ -243,29 +191,6 @@ ACTION_REGISTRY = {
         "required": ["bill_id"],
     },
 
-    # Write — Documents
-    "add_document": {
-        "handler": handle_add_document,
-        "required": ["name"],
-        "optional": ["category", "expiry_date", "notes"],
-    },
-    "edit_document": {
-        "handler": handle_edit_document,
-        "required": ["document_id"],
-        "optional": ["name", "category", "expiry_date", "notes"],
-    },
-    "delete_document": {
-        "handler": handle_delete_document,
-        "required": ["document_id"],
-    },
-
-    # Write — Files
-    "store_file": {
-        "handler": handle_store_file,
-        "required": ["file_context"],
-        "optional": ["link_to_document_id", "link_to_bill_id", "link_to_task_id", "extracted_data"],
-    },
-
     # Read actions
     "get_today": {
         "handler": handle_get_today,
@@ -299,18 +224,6 @@ ACTION_REGISTRY = {
         "handler": handle_get_events,
         "required": [],
         "optional": ["date_from", "date_to", "category", "search"],
-        "is_read": True,
-    },
-    "get_documents": {
-        "handler": handle_get_documents,
-        "required": [],
-        "optional": ["category", "expiring_within_days", "search"],
-        "is_read": True,
-    },
-    "get_file": {
-        "handler": handle_get_file,
-        "required": [],
-        "optional": ["file_id", "search", "linked_document_id"],
         "is_read": True,
     },
 }

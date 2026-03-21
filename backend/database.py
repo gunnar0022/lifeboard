@@ -27,6 +27,7 @@ async def init_db():
         await _create_investing_tables(db)
         await _create_fleet_tables(db)
         await _create_reading_creative_tables(db)
+        await _create_documents_table(db)
         await db.commit()
     finally:
         await db.close()
@@ -88,18 +89,6 @@ async def _create_finance_tables(db: aiosqlite.Connection):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             category TEXT NOT NULL UNIQUE,
             monthly_limit INTEGER NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS finance_files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_path TEXT NOT NULL,
-            original_filename TEXT NOT NULL,
-            mime_type TEXT,
-            file_size INTEGER,
-            linked_transaction_id INTEGER REFERENCES finance_transactions(id),
-            description TEXT,
-            extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 
@@ -181,30 +170,6 @@ async def _create_health_tables(db: aiosqlite.Connection):
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 
-        CREATE TABLE IF NOT EXISTS health_documents (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL CHECK(category IN (
-                'checkup', 'vaccination', 'prescription', 'lab_result',
-                'imaging', 'dental', 'vision', 'other'
-            )),
-            date TEXT,
-            provider TEXT,
-            notes TEXT,
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS health_files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_path TEXT NOT NULL,
-            original_filename TEXT NOT NULL,
-            mime_type TEXT,
-            file_size INTEGER,
-            linked_document_id INTEGER REFERENCES health_documents(id),
-            description TEXT,
-            extracted_data TEXT,
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-        );
     """)
 
 
@@ -249,28 +214,6 @@ async def _create_life_manager_tables(db: aiosqlite.Connection):
             completed_at TEXT
         );
 
-        CREATE TABLE IF NOT EXISTS life_documents (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL CHECK(category IN ('housing', 'insurance', 'legal', 'medical', 'financial', 'other')),
-            expiry_date TEXT,
-            notes TEXT,
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-        );
-
-        CREATE TABLE IF NOT EXISTS life_files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_path TEXT NOT NULL,
-            original_filename TEXT NOT NULL,
-            mime_type TEXT,
-            file_size INTEGER,
-            linked_document_id INTEGER REFERENCES life_documents(id),
-            linked_bill_id INTEGER REFERENCES life_bills(id),
-            linked_task_id INTEGER REFERENCES life_tasks(id),
-            description TEXT,
-            extracted_data TEXT,
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-        );
     """)
 
 
@@ -392,5 +335,26 @@ async def _create_reading_creative_tables(db: aiosqlite.Connection):
             date_finished TEXT,
             date_added TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
             sort_order INTEGER NOT NULL DEFAULT 0
+        );
+    """)
+
+
+async def _create_documents_table(db: aiosqlite.Connection):
+    """Unified document storage — replaces health_files, health_documents, life_files, life_documents, finance_files."""
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            summary TEXT,
+            tags TEXT NOT NULL DEFAULT '[]',
+            category TEXT NOT NULL CHECK(category IN ('finance', 'health', 'investing', 'life')),
+            file_path TEXT,
+            original_filename TEXT,
+            mime_type TEXT,
+            file_size INTEGER,
+            date TEXT,
+            provider TEXT,
+            extracted_data TEXT,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
     """)

@@ -4,7 +4,7 @@ import { useApi } from '../../hooks/useApi';
 import TimelineStrip from './TimelineStrip';
 import BillsTracker from './BillsTracker';
 import TaskBoard from './TaskBoard';
-import DocumentRegistry from './DocumentRegistry';
+import DocumentSearch from './DocumentSearch';
 import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
 
@@ -12,20 +12,18 @@ export default function LifeManagerPanel() {
   const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline');
   const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50');
   const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills');
-  const { data: documents, refetch: refetchDocs } = useApi('/api/life/documents');
   const { data: config } = useApi('/api/config');
 
   const refetchAll = useCallback(() => {
     refetchTimeline();
     refetchTasks();
     refetchBills();
-    refetchDocs();
-  }, [refetchTimeline, refetchTasks, refetchBills, refetchDocs]);
+  }, [refetchTimeline, refetchTasks, refetchBills]);
 
   const currencySymbol = config?.currency_symbol || '$';
 
-  const hasData = (tasks && tasks.length > 0) || (bills && bills.length > 0) || (documents && documents.length > 0);
-  const isLoading = tasksLoading || billsLoading || (!tasks && !bills && !documents);
+  const hasData = (tasks && tasks.length > 0) || (bills && bills.length > 0);
+  const isLoading = tasksLoading || billsLoading || (!tasks && !bills);
 
   if (isLoading) {
     return (
@@ -113,9 +111,7 @@ export default function LifeManagerPanel() {
         onSuccess={refetchAll}
       />
 
-      <DocumentRegistry
-        documents={documents || []}
-      />
+      <DocumentSearch />
     </div>
   );
 }

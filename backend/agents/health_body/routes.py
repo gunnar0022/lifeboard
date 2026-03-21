@@ -70,22 +70,6 @@ class MeasurementCreate(BaseModel):
     notes: Optional[str] = None
 
 
-class DocumentCreate(BaseModel):
-    name: str
-    category: str = "other"
-    date: Optional[str] = None
-    provider: Optional[str] = None
-    notes: Optional[str] = None
-
-
-class DocumentUpdate(BaseModel):
-    name: Optional[str] = None
-    category: Optional[str] = None
-    date: Optional[str] = None
-    provider: Optional[str] = None
-    notes: Optional[str] = None
-
-
 # --- Pulse ---
 
 @router.get("/pulse")
@@ -260,58 +244,6 @@ async def get_heatmap(days: int = 90):
 @router.get("/recent")
 async def get_recent(days: int = 3):
     return await queries.get_recent_detail(days=days)
-
-
-# --- Medical Documents ---
-
-@router.get("/documents")
-async def get_documents(category: str = None, search: str = None):
-    return await queries.get_health_documents(category=category, search=search)
-
-
-@router.post("/documents")
-async def add_document(body: DocumentCreate):
-    return await queries.add_health_document(
-        name=body.name,
-        category=body.category,
-        doc_date=body.date,
-        provider=body.provider,
-        notes=body.notes,
-    )
-
-
-@router.put("/documents/{doc_id}")
-async def edit_document(doc_id: int, body: DocumentUpdate):
-    existing = await queries.get_health_document(doc_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Document not found")
-    fields = body.model_dump(exclude_none=True)
-    return await queries.edit_health_document(doc_id, **fields)
-
-
-@router.delete("/documents/{doc_id}")
-async def delete_document(doc_id: int):
-    existing = await queries.get_health_document(doc_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Document not found")
-    await queries.delete_health_document(doc_id)
-    return {"ok": True}
-
-
-@router.get("/documents/{doc_id}/files")
-async def get_document_files(doc_id: int):
-    return await queries.get_files_for_document(doc_id)
-
-
-@router.get("/files/{file_id}/view")
-async def view_file(file_id: int):
-    f = await queries.get_health_file(file_id=file_id)
-    if not f:
-        raise HTTPException(status_code=404, detail="File not found")
-    full_path = PROJECT_ROOT / "data" / "files" / f["file_path"]
-    if not full_path.exists():
-        raise HTTPException(status_code=404, detail="File not found on disk")
-    return FileResponse(str(full_path), media_type=f.get("mime_type", "application/octet-stream"))
 
 
 # --- Health Concerns (Fleet data, displayed in Health panel per LM-40) ---

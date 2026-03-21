@@ -284,21 +284,24 @@ async def seed_life_manager():
             )
         print(f"  [OK] Life Manager events ({len(events)})")
 
-        # --- Documents ---
-        documents = [
-            ("Apartment Lease", "housing", (today + timedelta(days=180)).isoformat(), "2-year lease with Oakhouse. Renewal in September."),
-            ("National Health Insurance Card", "insurance", (today + timedelta(days=270)).isoformat(), "NHI card — renewal around December."),
-            ("Residence Card (Zairyu)", "legal", (today + timedelta(days=720)).isoformat(), "Zairyu card valid through 2028."),
-            ("Employment Contract", "legal", None, "Current employment contract with TechCo Japan."),
-            ("Renter's Insurance Policy", "insurance", (today + timedelta(days=300)).isoformat(), "JA Kyosai policy — fire + liability."),
-            ("Passport", "legal", (today + timedelta(days=1000)).isoformat(), "Swedish passport — valid until 2029."),
+        # --- Documents (unified table) ---
+        import json as _json
+        unified_docs = [
+            ("Apartment Lease", "2-year lease with Oakhouse Co. Monthly rent 85,000 JPY. Renewal in September 2026.", '["lease", "contract"]', "life", None, "Oakhouse Co."),
+            ("National Health Insurance Card", "NHI card issued by Shinjuku Ward. Card number NHI-2025-xxxxx. Renewal around December.", '["insurance", "id-document"]', "life", None, "Shinjuku Ward Office"),
+            ("Residence Card (Zairyu)", "Zairyu card valid through 2028. Residence status: Engineer/Specialist in Humanities.", '["visa", "id-document", "legal"]', "life", None, "Immigration Bureau"),
+            ("Employment Contract", "Full-time employment contract with TechCo Japan. Start date January 2024. Annual salary review in April.", '["employment", "contract"]', "life", None, "TechCo Japan"),
+            ("Renter's Insurance Policy", "JA Kyosai fire and liability insurance. Policy covers up to 10M JPY in damages.", '["insurance"]', "life", None, "JA Kyosai"),
+            ("Passport", "Swedish passport valid until 2029. Passport number SE-xxxxxxxx.", '["id-document", "legal"]', "life", None, "Swedish Embassy"),
+            ("Annual Health Checkup 2025", "Routine annual checkup. All blood work within normal ranges. BMI 24.5. Blood pressure 118/76. Cholesterol slightly elevated but within acceptable limits.", '["checkup", "medical"]', "health", (today - timedelta(days=90)).isoformat(), "Tanaka Clinic"),
+            ("Flu Vaccination 2025", "Influenza vaccination, standard quadrivalent. No adverse reactions.", '["vaccination", "medical"]', "health", (today - timedelta(days=120)).isoformat(), "City Hospital"),
         ]
-        for name, cat, expiry, notes in documents:
+        for title, summary, tags, cat, doc_date, provider in unified_docs:
             await db.execute(
-                "INSERT INTO life_documents (name, category, expiry_date, notes) VALUES (?, ?, ?, ?)",
-                [name, cat, expiry, notes],
+                "INSERT INTO documents (title, summary, tags, category, date, provider) VALUES (?, ?, ?, ?, ?, ?)",
+                [title, summary, tags, cat, doc_date, provider],
             )
-        print(f"  [OK] Life Manager documents ({len(documents)})")
+        print(f"  [OK] Documents ({len(unified_docs)})")
 
         await db.commit()
     finally:
@@ -373,19 +376,8 @@ async def seed_health():
                  random.randint(40, 100), ex_min, ex_cal, mood, energy],
             )
 
-        # Medical documents
-        docs = [
-            ("Annual health checkup 2025", "checkup", (today - timedelta(days=90)).isoformat(), "Tanaka Clinic", "All results normal"),
-            ("Flu vaccination 2025", "vaccination", (today - timedelta(days=120)).isoformat(), "City Hospital", None),
-        ]
-        for name, cat, doc_date, provider, notes in docs:
-            await db.execute(
-                "INSERT INTO health_documents (name, category, date, provider, notes) VALUES (?, ?, ?, ?, ?)",
-                [name, cat, doc_date, provider, notes],
-            )
-
         await db.commit()
-        print(f"  [OK] Health profile, {len(meals)} meals, {len(exercises)} exercises, 26 daily summaries, {len(docs)} medical docs")
+        print(f"  [OK] Health profile, {len(meals)} meals, {len(exercises)} exercises, 26 daily summaries")
     finally:
         await db.close()
 
@@ -740,15 +732,19 @@ async def clear_all():
         await db.execute("PRAGMA foreign_keys=OFF")
         tables = [
             "finance_cycle_summaries",
-            "finance_files", "finance_transactions", "finance_transfers",
+            "finance_transactions", "finance_transfers",
             "finance_recurring", "finance_budgets", "finance_accounts",
-            "life_files", "life_events", "life_tasks", "life_bills", "life_documents",
-            "health_files", "health_documents", "health_measurements",
+            "life_events", "life_tasks", "life_bills",
+            "health_measurements",
             "health_daily_summary", "health_exercises", "health_meals", "health_profile",
             "investing_holding_accounts", "investing_transactions",
             "investing_portfolio_snapshots", "investing_holdings", "investing_accounts",
             "fleet_concern_logs", "fleet_visits", "fleet_concerns",
             "creative_file_index", "creative_projects", "reading_books",
+            "documents",
+            # Legacy tables (drop if they exist from old schema)
+            "finance_files", "life_files", "life_documents",
+            "health_files", "health_documents",
         ]
         for table in tables:
             try:

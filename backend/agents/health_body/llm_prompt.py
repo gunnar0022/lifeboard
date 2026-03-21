@@ -39,9 +39,13 @@ async def build_system_prompt() -> str:
     latest = await queries.get_latest_measurement()
     weight_str = _format_latest_weight(latest)
 
-    # Medical documents count
-    docs = await queries.get_health_documents(limit=10)
-    docs_str = _format_documents(docs)
+    # Medical documents count (from unified documents table)
+    try:
+        from backend.documents import get_medical_summary
+        med_summary = await get_medical_summary()
+        docs_str = f"MEDICAL RECORDS: {med_summary['total']} documents on file"
+    except Exception:
+        docs_str = "MEDICAL RECORDS: None"
 
     # Active health concerns
     try:
@@ -86,7 +90,7 @@ RULES:
 - When the user reports exercise ("Jogged 30 minutes", "gym for an hour"), estimate calorie burn using their profile (weight, activity level). Log with log_exercise. NEVER mention the specific calorie burn number in your reply — just acknowledge the exercise naturally.
 - For mood/energy, use 1-5 scales (1=very low, 5=excellent). Use set_mood_energy.
 - Weight is stored in grams internally. Convert from user input: "81kg" = 81000, "81.5kg" = 81500, "180lbs" = ~81600. When user mentions a weigh-in, use log_measurement (which also updates profile weight).
-- For medical documents/photos, extract structured data. Common Japanese document types: 健康診断 (checkup), 予防接種 (vaccination), 処方箋 (prescription), 血液検査 (lab result), レントゲン (imaging), 歯科 (dental), 眼科 (vision).
+- Medical documents and photos are handled by a separate classifier system. Do NOT try to store files — just respond conversationally if the user mentions documents.
 - For evening check-in responses, parse everything from one natural message: mood, energy, exercise, any meals.
 - ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did. If the user says "remove that meal" or "delete the last exercise", identify the item from context and execute the delete action directly.
 - Resolve relative dates ("yesterday", "this morning") using today's date above.
@@ -121,12 +125,6 @@ Write actions — Measurements:
 Write actions — Profile:
 - update_profile: data={{height_cm (float), weight_g (int), age (int), activity_level (sedentary/light/moderate/active/very_active), daily_calorie_goal (int), evening_checkin_time (HH:MM)}}
 
-Write actions — Medical Documents:
-- add_health_document: data={{name (str), category (checkup/vaccination/prescription/lab_result/imaging/dental/vision/other), date (ISO, optional), provider (str, optional), notes (optional)}}
-- edit_health_document: data={{document_id (int), ...fields to update}}
-- delete_health_document: data={{document_id (int)}}
-- store_health_file: data={{file_context (str), link_to_document_id (int, optional), extracted_data (JSON string, optional)}}
-
 Write actions — Health Concerns:
 - log_concern_update: data={{content (str), concern_id (int, optional — omit if only one active concern)}}
 
@@ -137,9 +135,6 @@ Read actions:
 - get_recent_detail: data={{days (int, default 3)}}
 - get_heatmap_data: data={{days (int, default 90)}}
 - get_measurements: data={{limit (int, default 30)}}
-- get_health_documents: data={{category, search}}
-- get_health_file: data={{file_id, search, linked_document_id}}
-
 Meta actions:
 - respond: Just reply, no DB write.
 - clarify: data={{options (list of strings)}} — Inline keyboard buttons.
@@ -228,16 +223,6 @@ def _format_latest_weight(latest: dict | None) -> str:
     kg = round(latest["weight_g"] / 1000, 1)
     return f"LATEST WEIGHT: {kg}kg on {latest['date']}"
 
-
-def _format_documents(docs: list[dict]) -> str:
-    if not docs:
-        return "MEDICAL RECORDS: None"
-    lines = [f"MEDICAL RECORDS ({len(docs)}):"]
-    for d in docs:
-        provider_str = f" — {d['provider']}" if d.get("provider") else ""
-        date_str = f" ({d['date']})" if d.get("date") else ""
-        lines.append(f"  [{d['id']}] {d['name']} ({d['category']}){date_str}{provider_str}")
-    return "\n".join(lines)
 
 
 def _format_active_concerns(concerns: list[dict]) -> str:

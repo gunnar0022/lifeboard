@@ -99,6 +99,11 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
 
 
 async def process_photo(update: Update, caption: str = None, send_reply: bool = True) -> str:
+    """Photos now go through the unified document classifier. Redirect."""
+    return await process_message(update, caption or "Photo received", send_reply)
+
+
+async def _process_photo_legacy(update: Update, caption: str = None, send_reply: bool = True) -> str:
     """Process a photo sent to the Life Manager agent (documents, receipts, etc.)."""
     global _conversation_history
 

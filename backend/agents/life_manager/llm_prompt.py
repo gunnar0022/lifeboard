@@ -74,8 +74,7 @@ RULES:
 - For tasks, infer priority from urgency cues. "I need to..." with deadline = high. Casual mentions = medium. "Eventually..." = low.
 - For bills, amounts are stored as integers in smallest currency unit (¥1 = 1). Convert from user input.
 - When marking a bill paid, advance next_due to the next cycle automatically.
-- For documents, extract and store important metadata in notes: contact names, phone numbers, policy numbers, expiry dates.
-- For photos/documents (LM-22), extract structured data from Japanese-language documents when relevant. Common types: 源泉徴収票 (tax), 給与明細 (pay stub), 在留カード (residence card), 健康保険証 (health insurance), 年金手帳 (pension), 住民票 (resident registration).
+- Documents and photos are handled by a separate classifier system. Do NOT try to store files or documents — just respond conversationally if the user mentions documents.
 - ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did.
 - Resolve relative dates ("next Thursday", "tomorrow", "in 3 days") using today's date above.
 
@@ -105,12 +104,6 @@ Write actions — Bills:
 - mark_bill_paid: data={{bill_id}}
 - delete_bill: data={{bill_id}}
 
-Write actions — Documents:
-- add_document: data={{name, category (housing/insurance/legal/medical/financial/other), expiry_date (ISO, optional), notes (optional)}}
-- edit_document: data={{document_id, ...fields to update}}
-- delete_document: data={{document_id}}
-- store_file: data={{file_context (str), link_to_document_id (optional), link_to_bill_id (optional), link_to_task_id (optional), extracted_data (optional JSON string)}}
-
 Read actions:
 - get_today: data={{}} — Everything happening today
 - get_upcoming: data={{days_ahead (int, default 7)}} — Items due in next N days
@@ -118,9 +111,6 @@ Read actions:
 - get_tasks: data={{priority, category, is_completed, search, limit (default 10)}}
 - get_bills: data={{is_paid, category, upcoming_days}}
 - get_events: data={{date_from, date_to, category, search}}
-- get_documents: data={{category, expiring_within_days, search}}
-- get_file: data={{file_id, search, linked_document_id}} — Retrieve a stored file
-
 Meta actions:
 - respond: Just reply with information, no DB write.
 - clarify: data={{options (list of strings)}} — Ask for clarification. Options become inline keyboard buttons.

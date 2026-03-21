@@ -309,11 +309,10 @@ async def get_health_briefing() -> dict:
         )
         weights = [dict(r) for r in await weight_cursor.fetchall()]
 
-        # Medical records summary (count by category)
-        records_cursor = await db.execute(
-            "SELECT category, COUNT(*) as cnt FROM health_documents GROUP BY category"
-        )
-        records_summary = {r["category"]: r["cnt"] for r in await records_cursor.fetchall()}
+        # Medical records summary from unified documents table (health category)
+        from backend.documents import get_medical_summary
+        records_summary_data = await get_medical_summary()
+        records_summary = records_summary_data.get("by_tag", {})
 
         # Active concerns with full logs
         active_cursor = await db.execute(
@@ -354,36 +353,10 @@ async def get_health_briefing() -> dict:
 
 
 async def search_medical_records(query: str) -> list[dict]:
-    """Search health_documents and health_files for Fleet's mid-conversation retrieval (LM-42)."""
-    db = await get_db()
-    try:
-        search_pattern = f"%{query}%"
-        cursor = await db.execute(
-            """SELECT d.*, GROUP_CONCAT(f.id) as file_ids
-               FROM health_documents d
-               LEFT JOIN health_files f ON f.linked_document_id = d.id
-               WHERE d.name LIKE ? OR d.category LIKE ? OR d.provider LIKE ? OR d.notes LIKE ?
-               GROUP BY d.id
-               ORDER BY d.date DESC
-               LIMIT 10""",
-            (search_pattern, search_pattern, search_pattern, search_pattern),
-        )
-        results = [dict(r) for r in await cursor.fetchall()]
-
-        # Also search in extracted_data of files
-        file_cursor = await db.execute(
-            """SELECT f.*, d.name as doc_name, d.category as doc_category
-               FROM health_files f
-               LEFT JOIN health_documents d ON f.linked_document_id = d.id
-               WHERE f.extracted_data LIKE ? OR f.description LIKE ?
-               LIMIT 10""",
-            (search_pattern, search_pattern),
-        )
-        file_results = [dict(r) for r in await file_cursor.fetchall()]
-
-        return {"documents": results, "files": file_results}
-    finally:
-        await db.close()
+    """Search unified documents table for health records (LM-42)."""
+    from backend.documents import search_medical_records as search_docs
+    docs = await search_docs(query)
+    return {"documents": docs, "files": []}
 
 
 # --- Dashboard API queries ---
