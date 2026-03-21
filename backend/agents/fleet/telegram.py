@@ -60,6 +60,9 @@ async def start_session(update: Update) -> str:
     _fleet_session["conversation_history"] = []
     _fleet_session["system_prompt"] = system_prompt
 
+    # Send waiting room message while Opus prepares
+    await update.message.reply_text("Dr. Fleet will be with you shortly...")
+
     # Get Fleet's opening message via Opus
     config = get_config()
     user_name = config.get("display_name", config.get("user_name", "there"))
