@@ -10,9 +10,9 @@ AGENTS_DIR = Path(__file__).parent
 
 # All known agents including placeholders
 ALL_AGENTS = [
-    {"id": "finance", "module": "backend.agents.finance"},
     {"id": "life_manager", "module": "backend.agents.life_manager"},
     {"id": "health_body", "module": "backend.agents.health_body"},
+    {"id": "finance", "module": "backend.agents.finance"},
     {"id": "investing", "module": "backend.agents.investing"},
     {"id": "reading_creative", "module": "backend.agents.reading_creative"},
     # Placeholder agents (no module yet)

@@ -101,9 +101,17 @@ async def get_pulse():
         budget_pct = budget_status["percentage"] if budget_status["total_budget"] > 0 else 0
         prefix = "¥" if primary_currency == "JPY" else "$"
 
+        # On an empty cycle (e.g. payday), show total balance instead of ¥0 net
+        if net_remaining == 0 and cycle["income"] == 0:
+            net_label = "Balance"
+            net_value = f"{prefix}{primary_total:,}"
+        else:
+            net_label = "Net remaining"
+            net_value = f"{prefix}{net_remaining:,}"
+
         return {
             "metrics": [
-                {"label": "Net remaining", "value": f"{prefix}{net_remaining:,}"},
+                {"label": net_label, "value": net_value},
                 {"label": "Budget usage", "value": f"{budget_pct}%"},
                 {"label": "Days to payday", "value": str(cycle_info["days_to_payday"])},
             ]
