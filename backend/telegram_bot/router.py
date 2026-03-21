@@ -118,16 +118,19 @@ async def route_message(text: str, reply_to_agent: str | None = None) -> list[di
         if not isinstance(routes, list):
             return []
 
-        # Validate agent IDs (fleet is also valid for routing)
+        # Validate agent IDs and deduplicate (one route per agent max)
         all_valid = VALID_AGENTS | {FLEET_AGENT}
         valid_routes = []
+        seen_agents = set()
         for route in routes:
             if (
                 isinstance(route, dict)
                 and route.get("agent") in all_valid
                 and route.get("message")
+                and route["agent"] not in seen_agents
             ):
                 valid_routes.append(route)
+                seen_agents.add(route["agent"])
 
         # Record exchange in router history — full user text so the router
         # can write context-aware summaries for follow-up messages
