@@ -492,8 +492,19 @@ export default function CreativeWorkspace({ onBack }) {
 
       <div className="workspace__main">
         {/* Sidebar */}
-        <div className="workspace__sidebar" onContextMenu={handleEmptyContextMenu}>
-          <div className="workspace__tree" key={`${activeProject}-${treeKey}`}>
+        <div className="workspace__sidebar">
+          <div
+            className="workspace__tree"
+            key={`${activeProject}-${treeKey}`}
+            onContextMenu={handleEmptyContextMenu}
+            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('workspace__tree--drop-target'); }}
+            onDragLeave={(e) => { e.currentTarget.classList.remove('workspace__tree--drop-target'); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove('workspace__tree--drop-target');
+              if (dragItem) handleDrop({ path: activeProject, name: activeProject, type: 'dir' });
+            }}
+          >
             {!activeProject ? (
               <div className="workspace__tree-empty">Select or create a project</div>
             ) : (

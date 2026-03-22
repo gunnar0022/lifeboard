@@ -191,6 +191,13 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--space-xs) 0;
+  min-height: 100px;
+}
+
+.workspace__tree--drop-target {
+  background: color-mix(in srgb, #B07CD8 8%, transparent);
+  outline: 1.5px dashed #B07CD8;
+  outline-offset: -2px;
 }
 
 .workspace__tree-empty {
