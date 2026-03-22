@@ -189,9 +189,9 @@ async def _create_life_manager_tables(db: aiosqlite.Connection):
             reminder_offset INTEGER,
             reminder_sent INTEGER NOT NULL DEFAULT 0,
             google_updated_at TEXT,
-            local_updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
-            sync_status TEXT NOT NULL DEFAULT 'synced' CHECK(sync_status IN ('synced', 'pending_push', 'pending_delete')),
-            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+            local_updated_at TEXT,
+            sync_status TEXT NOT NULL DEFAULT 'synced',
+            created_at TEXT
         );
 
         CREATE TABLE IF NOT EXISTS life_bills (
