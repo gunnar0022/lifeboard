@@ -242,7 +242,13 @@ async def google_callback(code: str):
     """Handle OAuth callback from Google."""
     from backend.google_calendar import exchange_code, start_sync_scheduler
     from fastapi.responses import RedirectResponse
-    exchange_code(code)
+    import asyncio
+    try:
+        await asyncio.to_thread(exchange_code, code)
+        logger.info("Google OAuth token exchange successful")
+    except Exception as e:
+        logger.error(f"Google OAuth token exchange failed: {e}", exc_info=True)
+        return {"error": f"Token exchange failed: {str(e)}"}
     # Start sync now that we're connected
     try:
         await start_sync_scheduler()
