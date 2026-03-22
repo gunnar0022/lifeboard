@@ -2,31 +2,46 @@
   margin-bottom: var(--space-lg);
 }
 
-.accounts-strip__blur-toggle {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-xs);
+/* Per-account eye button */
+.account-card__eye {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 3px;
+  border-radius: var(--radius-xs);
+  opacity: 0.4;
+  transition: all 0.15s;
 }
 
-.accounts-strip__blur-btn {
+.account-card:hover .account-card__eye {
+  opacity: 1;
+}
+
+.account-card__eye:hover {
+  color: var(--color-finance);
+}
+
+/* Totals row eye button */
+.accounts-strip__totals-eye {
   display: flex;
   align-items: center;
-  gap: 4px;
   background: none;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--text-tertiary);
-  padding: 4px 8px;
-  font-size: 0.7rem;
+  padding: 4px 6px;
   transition: all 0.15s;
 }
 
-.accounts-strip__blur-btn:hover {
+.accounts-strip__totals-eye:hover {
   color: var(--color-finance);
   border-color: var(--color-finance);
 }
-
 
 .accounts-strip__cards {
   display: flex;
@@ -37,6 +52,7 @@
 }
 
 .account-card {
+  position: relative;
   flex-shrink: 0;
   min-width: 180px;
   padding: var(--space-md) !important;

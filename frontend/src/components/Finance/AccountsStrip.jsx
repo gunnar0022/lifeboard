@@ -106,27 +106,32 @@ function CombinedTotal({ byCurrency, fxRate, blurred }) {
 
 export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [blurred, setBlurred] = useState(true);
+  const [hiddenAccounts, setHiddenAccounts] = useState(() => {
+    // Default: all accounts hidden
+    const set = new Set();
+    overview?.accounts?.forEach(a => set.add(a.id));
+    return set;
+  });
+  const [totalsHidden, setTotalsHidden] = useState(true);
   const { data: fxRate } = useApi('/api/finance/exchange-rate');
   const { data: investingSnapshot } = useApi('/api/investing/latest-snapshot');
+
+  const toggleAccount = (id) => {
+    setHiddenAccounts(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   if (!overview) return null;
 
   return (
     <div className="accounts-strip">
-      <div className="accounts-strip__blur-toggle">
-        <button
-          className="accounts-strip__blur-btn"
-          onClick={() => setBlurred(b => !b)}
-          title={blurred ? 'Show balances' : 'Hide balances'}
-        >
-          {blurred ? <EyeOff size={16} /> : <Eye size={16} />}
-        </button>
-      </div>
-
       <div className="accounts-strip__cards">
         {overview.accounts?.map((acc, i) => {
           const Icon = TYPE_ICONS[acc.account_type] || Landmark;
+          const isHidden = hiddenAccounts.has(acc.id);
           return (
             <motion.div
               key={acc.id}
@@ -141,10 +146,16 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
               <div className="account-card__info">
                 <span className="account-card__name">{acc.name}</span>
                 <span className="account-card__balance mono">
-                  {formatBalance(acc.current_balance, acc.currency, blurred)}
+                  {formatBalance(acc.current_balance, acc.currency, isHidden)}
                 </span>
               </div>
-              <span className="account-card__type">{acc.account_type}</span>
+              <button
+                className="account-card__eye"
+                onClick={() => toggleAccount(acc.id)}
+                title={isHidden ? 'Show' : 'Hide'}
+              >
+                {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
+              </button>
             </motion.div>
           );
         })}
@@ -160,16 +171,23 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
 
       {/* Currency totals */}
       <div className="accounts-strip__totals">
+        <button
+          className="accounts-strip__totals-eye"
+          onClick={() => setTotalsHidden(h => !h)}
+          title={totalsHidden ? 'Show totals' : 'Hide totals'}
+        >
+          {totalsHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
         {overview.by_currency?.map((group) => (
           <div key={group.currency} className="accounts-strip__total">
             <span className="accounts-strip__total-label">Total {group.currency}</span>
             <span className="accounts-strip__total-value mono">
-              {formatBalance(group.total, group.currency, blurred)}
+              {formatBalance(group.total, group.currency, totalsHidden)}
             </span>
           </div>
         ))}
-        <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} blurred={blurred} />
-        <NetWorth byCurrency={overview.by_currency} fxRate={fxRate} investingSnapshot={investingSnapshot} blurred={blurred} />
+        <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} blurred={totalsHidden} />
+        <NetWorth byCurrency={overview.by_currency} fxRate={fxRate} investingSnapshot={investingSnapshot} blurred={totalsHidden} />
       </div>
 
       {/* Add account modal */}
