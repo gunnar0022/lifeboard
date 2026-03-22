@@ -122,7 +122,7 @@ function FileTreeNode({ entry, depth, onFileClick, activeProject, onContextMenu,
         style={{ paddingLeft: 12 + depth * 16 }}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        draggable={depth > 0}
+        draggable
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -553,6 +553,18 @@ export default function CreativeWorkspace({ onBack }) {
                 )}
               </>
             )}
+            {/* Empty space filler — catches right-click and drops for project root */}
+            <div
+              className="workspace__tree-spacer"
+              onContextMenu={handleEmptyContextMenu}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('workspace__tree--drop-target'); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove('workspace__tree--drop-target'); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('workspace__tree--drop-target');
+                if (dragItem && activeProject) handleDrop({ path: activeProject, name: activeProject, type: 'dir' });
+              }}
+            />
           </div>
 
           <div className="workspace__sidebar-actions">
