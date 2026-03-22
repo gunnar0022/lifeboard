@@ -191,9 +191,8 @@ function formatEventTime(item) {
   return '';
 }
 
-function DayPopup({ day, onClose, onEventUpdated }) {
+function DayPopup({ day, onClose, onEditEvent }) {
   const [expandedItem, setExpandedItem] = useState(null);
-  const [editingEvent, setEditingEvent] = useState(null);
 
   if (!day) return null;
   const items = day.items || [];
@@ -206,13 +205,7 @@ function DayPopup({ day, onClose, onEventUpdated }) {
   const hasContent = items.length > 0 || holidays.length > 0;
 
   return (
-    <motion.div
-      className="day-popup"
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.15 }}
-    >
+    <div className="day-popup">
       <div className="day-popup__header">
         <span className="day-popup__date">{formatted}</span>
         <button className="day-popup__close" onClick={onClose}>
@@ -284,7 +277,7 @@ function DayPopup({ day, onClose, onEventUpdated }) {
                       )}
                       <button
                         className="day-popup__edit-btn"
-                        onClick={(e) => { e.stopPropagation(); setEditingEvent(item); }}
+                        onClick={(e) => { e.stopPropagation(); if (onEditEvent) onEditEvent(item); }}
                       >
                         <Pencil size={12} /> Edit
                       </button>
@@ -297,16 +290,7 @@ function DayPopup({ day, onClose, onEventUpdated }) {
         </div>
       )}
 
-      <AnimatePresence>
-        {editingEvent && (
-          <EventEditModal
-            event={editingEvent}
-            onClose={() => setEditingEvent(null)}
-            onSave={() => { setEditingEvent(null); if (onEventUpdated) onEventUpdated(); }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
@@ -314,6 +298,7 @@ export default function TimelineStrip({ timeline, onRefresh }) {
   const scrollRef = useRef(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [viewMode, setViewMode] = useState('strip'); // 'strip' or 'month'
+  const [editingEvent, setEditingEvent] = useState(null);
 
   // Build 8-week grid (56 days), aligned to Monday start
   const weeksGrid = useMemo(() => {
@@ -482,11 +467,18 @@ export default function TimelineStrip({ timeline, onRefresh }) {
       )}
 
       {/* Day detail popup */}
-      <AnimatePresence>
-        {selectedDay && (
-          <DayPopup day={selectedDay} onClose={() => setSelectedDay(null)} onEventUpdated={onRefresh} />
-        )}
-      </AnimatePresence>
+      {selectedDay && (
+        <DayPopup day={selectedDay} onClose={() => setSelectedDay(null)} onEditEvent={setEditingEvent} />
+      )}
+
+      {/* Edit modal — rendered at top level to avoid stacking context issues */}
+      {editingEvent && (
+        <EventEditModal
+          event={editingEvent}
+          onClose={() => setEditingEvent(null)}
+          onSave={() => { setEditingEvent(null); if (onRefresh) onRefresh(); }}
+        />
+      )}
     </div>
   );
 }
