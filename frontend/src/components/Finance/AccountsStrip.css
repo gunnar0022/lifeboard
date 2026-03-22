@@ -2,6 +2,32 @@
   margin-bottom: var(--space-lg);
 }
 
+.accounts-strip__blur-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-xs);
+}
+
+.accounts-strip__blur-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  transition: all 0.15s;
+}
+
+.accounts-strip__blur-btn:hover {
+  color: var(--color-finance);
+  border-color: var(--color-finance);
+}
+
+
 .accounts-strip__cards {
   display: flex;
   gap: var(--space-md);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Wallet, TrendingUp, Banknote, ArrowLeftRight, Plus, X } from 'lucide-react';
+import { Landmark, Wallet, TrendingUp, Banknote, ArrowLeftRight, Plus, X, Eye, EyeOff } from 'lucide-react';
 import { useApi, apiPost } from '../../hooks/useApi';
 import './AccountsStrip.css';
 
@@ -12,12 +12,13 @@ const TYPE_ICONS = {
   transfer_service: ArrowLeftRight,
 };
 
-function formatBalance(amount, currency) {
+function formatBalance(amount, currency, blurred) {
+  if (blurred) return '••••••';
   if (currency === 'JPY') return `¥${amount.toLocaleString()}`;
   return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 }
 
-function NetWorth({ byCurrency, fxRate, investingSnapshot }) {
+function NetWorth({ byCurrency, fxRate, investingSnapshot, blurred }) {
   const [targetCurrency, setTargetCurrency] = useState('JPY');
 
   if (!investingSnapshot || !investingSnapshot.total_value) return null;
@@ -53,7 +54,7 @@ function NetWorth({ byCurrency, fxRate, investingSnapshot }) {
     <div className="accounts-strip__total accounts-strip__total--net-worth">
       <span className="accounts-strip__total-label">Net Worth</span>
       <span className="accounts-strip__total-value accounts-strip__total-value--net mono">
-        {formatBalance(netWorth, targetCurrency)}
+        {formatBalance(netWorth, targetCurrency, blurred)}
       </span>
       <button
         className="accounts-strip__fx-toggle accounts-strip__fx-toggle--net"
@@ -66,7 +67,7 @@ function NetWorth({ byCurrency, fxRate, investingSnapshot }) {
   );
 }
 
-function CombinedTotal({ byCurrency, fxRate }) {
+function CombinedTotal({ byCurrency, fxRate, blurred }) {
   const [targetCurrency, setTargetCurrency] = useState('JPY');
 
   if (!fxRate || !byCurrency || byCurrency.length < 2) return null;
@@ -90,7 +91,7 @@ function CombinedTotal({ byCurrency, fxRate }) {
     <div className="accounts-strip__total accounts-strip__total--combined">
       <span className="accounts-strip__total-label">Combined</span>
       <span className="accounts-strip__total-value mono">
-        {formatBalance(combined, targetCurrency)}
+        {formatBalance(combined, targetCurrency, blurred)}
       </span>
       <button
         className="accounts-strip__fx-toggle"
@@ -105,6 +106,7 @@ function CombinedTotal({ byCurrency, fxRate }) {
 
 export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [blurred, setBlurred] = useState(true);
   const { data: fxRate } = useApi('/api/finance/exchange-rate');
   const { data: investingSnapshot } = useApi('/api/investing/latest-snapshot');
 
@@ -112,6 +114,16 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
 
   return (
     <div className="accounts-strip">
+      <div className="accounts-strip__blur-toggle">
+        <button
+          className="accounts-strip__blur-btn"
+          onClick={() => setBlurred(b => !b)}
+          title={blurred ? 'Show balances' : 'Hide balances'}
+        >
+          {blurred ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+
       <div className="accounts-strip__cards">
         {overview.accounts?.map((acc, i) => {
           const Icon = TYPE_ICONS[acc.account_type] || Landmark;
@@ -129,7 +141,7 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
               <div className="account-card__info">
                 <span className="account-card__name">{acc.name}</span>
                 <span className="account-card__balance mono">
-                  {formatBalance(acc.current_balance, acc.currency)}
+                  {formatBalance(acc.current_balance, acc.currency, blurred)}
                 </span>
               </div>
               <span className="account-card__type">{acc.account_type}</span>
@@ -152,12 +164,12 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
           <div key={group.currency} className="accounts-strip__total">
             <span className="accounts-strip__total-label">Total {group.currency}</span>
             <span className="accounts-strip__total-value mono">
-              {formatBalance(group.total, group.currency)}
+              {formatBalance(group.total, group.currency, blurred)}
             </span>
           </div>
         ))}
-        <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} />
-        <NetWorth byCurrency={overview.by_currency} fxRate={fxRate} investingSnapshot={investingSnapshot} />
+        <CombinedTotal byCurrency={overview.by_currency} fxRate={fxRate} blurred={blurred} />
+        <NetWorth byCurrency={overview.by_currency} fxRate={fxRate} investingSnapshot={investingSnapshot} blurred={blurred} />
       </div>
 
       {/* Add account modal */}
