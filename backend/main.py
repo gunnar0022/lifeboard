@@ -82,6 +82,20 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Fleet scheduler failed to start: {e}")
 
+    # Google Calendar sync + reminder scheduler
+    google_cal_running = False
+    if "life_manager" in active:
+        try:
+            from backend.google_calendar import start_sync_scheduler, is_connected
+            if is_connected():
+                await start_sync_scheduler()
+                google_cal_running = True
+                logger.info("Google Calendar sync started")
+            else:
+                logger.info("Google Calendar not connected — visit /api/google/auth to connect")
+        except Exception as e:
+            logger.error(f"Google Calendar scheduler failed: {e}")
+
     yield
 
     # Shutdown schedulers
@@ -112,6 +126,13 @@ async def lifespan(app: FastAPI):
             await stop_fleet_scheduler()
         except Exception as e:
             logger.error(f"Fleet scheduler stop error: {e}")
+
+    if google_cal_running:
+        try:
+            from backend.google_calendar import stop_sync_scheduler
+            await stop_sync_scheduler()
+        except Exception as e:
+            logger.error(f"Google Calendar scheduler stop error: {e}")
 
     logger.info("Shutting down Telegram bot...")
     await stop_bot()
@@ -205,6 +226,61 @@ async def get_nudges():
     severity_order = {"alert": 0, "warning": 1, "info": 2}
     all_nudges.sort(key=lambda n: severity_order.get(n.get("severity", "info"), 3))
     return all_nudges
+
+
+# --- Google Calendar OAuth ---
+
+@app.get("/api/google/auth")
+async def google_auth():
+    """Redirect to Google OAuth consent screen."""
+    from backend.google_calendar import get_auth_url
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(get_auth_url())
+
+@app.get("/api/google/callback")
+async def google_callback(code: str):
+    """Handle OAuth callback from Google."""
+    from backend.google_calendar import exchange_code, start_sync_scheduler
+    from fastapi.responses import RedirectResponse
+    exchange_code(code)
+    # Start sync now that we're connected
+    try:
+        await start_sync_scheduler()
+    except Exception as e:
+        logger.error(f"Failed to start sync after auth: {e}")
+    return RedirectResponse("/")
+
+@app.get("/api/google/status")
+async def google_status():
+    """Check if Google Calendar is connected."""
+    from backend.google_calendar import is_connected
+    return {"connected": is_connected()}
+
+@app.post("/api/google/sync")
+async def google_sync():
+    """Manually trigger a Google Calendar sync."""
+    from backend.google_calendar import sync_calendar
+    await sync_calendar()
+    return {"ok": True}
+
+
+# --- Event enrichment (set reminders from dashboard) ---
+
+from pydantic import BaseModel
+from typing import Optional
+
+class ReminderUpdate(BaseModel):
+    reminder_offset: Optional[int] = None
+
+@app.put("/api/events/{event_id}/reminder")
+async def update_event_reminder(event_id: int, body: ReminderUpdate):
+    """Set or clear a reminder for an event."""
+    from backend.agents.life_manager.queries import set_event_reminder as _set_reminder
+    result = await _set_reminder(event_id, body.reminder_offset)
+    if not result:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Event not found")
+    return result
 
 
 # --- Unified Document API (shell-level, spans all agents) ---

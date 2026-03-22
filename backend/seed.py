@@ -268,21 +268,7 @@ async def seed_life_manager():
             )
         print(f"  [OK] Life Manager bills ({len(bills)})")
 
-        # --- Events ---
-        events = [
-            ("Dentist checkup", (today + timedelta(days=5)).isoformat(), "14:00", "appointment", "Dr. Tanaka — routine cleaning"),
-            ("Team dinner", (today + timedelta(days=2)).isoformat(), "19:00", "social", "Izakaya in Shibuya"),
-            ("Package delivery", (today + timedelta(days=1)).isoformat(), "10:00", "reminder", "Amazon — electronics order"),
-            ("Lease renewal deadline", (today + timedelta(days=14)).isoformat(), None, "deadline", "Current lease expires end of month"),
-            ("Mom's birthday", (today + timedelta(days=10)).isoformat(), None, "reminder", "Don't forget the gift!"),
-            ("Apartment inspection", (today + timedelta(days=21)).isoformat(), "11:00", "appointment", "Annual fire safety check"),
-        ]
-        for title, dt, time, cat, desc in events:
-            await db.execute(
-                "INSERT INTO life_events (title, date, time, category, description) VALUES (?, ?, ?, ?, ?)",
-                [title, dt, time, cat, desc],
-            )
-        print(f"  [OK] Life Manager events ({len(events)})")
+        # Events: no seed data — events come from Google Calendar sync
 
         # --- Documents (unified table) ---
         import json as _json

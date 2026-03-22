@@ -7,17 +7,17 @@ from backend.agents.life_manager import queries
 from backend import llm_client
 
 
-# --- Event handlers ---
+# --- Event handlers (Google Calendar integrated) ---
 
 async def handle_add_event(data: dict) -> dict:
     return await queries.add_event(
         title=data["title"],
-        event_date=data["date"],
-        time=data.get("time"),
-        category=data.get("category", "reminder"),
+        start_time=data["start_time"],
+        end_time=data.get("end_time"),
+        all_day=data.get("all_day", False),
+        location=data.get("location"),
         description=data.get("description"),
-        is_recurring=data.get("is_recurring", False),
-        recurring_rule=data.get("recurring_rule"),
+        reminder_offset=data.get("reminder_offset"),
     )
 
 
@@ -30,8 +30,11 @@ async def handle_delete_event(data: dict) -> bool:
     return await queries.delete_event(data["event_id"])
 
 
-async def handle_complete_event(data: dict) -> dict:
-    return await queries.complete_event(data["event_id"])
+async def handle_set_reminder(data: dict) -> dict:
+    return await queries.set_event_reminder(
+        event_id=data["event_id"],
+        reminder_offset=data.get("reminder_offset"),
+    )
 
 
 # --- Task handlers ---
@@ -131,24 +134,25 @@ async def handle_get_events(data: dict) -> list:
 # --- ACTION_REGISTRY (LM-13d) ---
 
 ACTION_REGISTRY = {
-    # Write — Events
+    # Write — Events (syncs with Google Calendar)
     "add_event": {
         "handler": handle_add_event,
-        "required": ["title", "date"],
-        "optional": ["time", "category", "description", "is_recurring", "recurring_rule"],
+        "required": ["title", "start_time"],
+        "optional": ["end_time", "all_day", "location", "description", "reminder_offset"],
     },
     "edit_event": {
         "handler": handle_edit_event,
         "required": ["event_id"],
-        "optional": ["title", "date", "time", "category", "description"],
+        "optional": ["title", "start_time", "end_time", "all_day", "location", "description", "reminder_offset"],
     },
     "delete_event": {
         "handler": handle_delete_event,
         "required": ["event_id"],
     },
-    "complete_event": {
-        "handler": handle_complete_event,
+    "set_reminder": {
+        "handler": handle_set_reminder,
         "required": ["event_id"],
+        "optional": ["reminder_offset"],
     },
 
     # Write — Tasks

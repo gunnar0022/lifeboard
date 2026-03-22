@@ -133,7 +133,7 @@ export default function TimelineStrip({ timeline }) {
     setSelectedDay(selectedDay?.date === day.date ? null : day);
   };
 
-  const hasActivity = (day) => day.events > 0 || day.tasks > 0 || day.bills > 0 || day.has_overdue;
+  const hasActivity = (day) => day.events > 0 || day.tasks > 0 || day.bills > 0 || day.has_overdue || (day.holidays && day.holidays.length > 0);
 
   return (
     <div className="timeline-strip card">
@@ -160,7 +160,7 @@ export default function TimelineStrip({ timeline }) {
           {timeline.map((day, i) => (
             <motion.button
               key={day.date}
-              className={`timeline-day${day.is_today ? ' timeline-day--today' : ''}${day.has_overdue ? ' timeline-day--overdue' : ''}${selectedDay?.date === day.date ? ' timeline-day--selected' : ''}`}
+              className={`timeline-day${day.is_today ? ' timeline-day--today' : ''}${day.has_overdue ? ' timeline-day--overdue' : ''}${selectedDay?.date === day.date ? ' timeline-day--selected' : ''}${day.holidays?.length > 0 ? ' timeline-day--holiday' : ''}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03, duration: 0.3 }}
@@ -190,6 +190,9 @@ export default function TimelineStrip({ timeline }) {
                   </span>
                 )}
               </div>
+              {day.holidays?.length > 0 && (
+                <span className="timeline-day__holiday">{day.holidays[0]}</span>
+              )}
             </motion.button>
           ))}
         </div>

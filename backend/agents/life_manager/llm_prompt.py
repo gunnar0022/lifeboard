@@ -76,11 +76,11 @@ CRITICAL: When the user asks to add, delete, edit, or complete something, you MU
 
 AVAILABLE ACTIONS:
 
-Write actions — Events:
-- add_event: data={{title, date (ISO), time (HH:MM, optional), category (appointment/deadline/reminder/social/errand), description (optional), is_recurring (bool), recurring_rule (optional)}}
-- edit_event: data={{event_id, ...fields to update}}
-- delete_event: data={{event_id}}
-- complete_event: data={{event_id}}
+Write actions — Events (syncs with Google Calendar):
+- add_event: data={{title (str), start_time (ISO datetime, e.g. "2026-03-25T14:00:00"), end_time (ISO, optional), all_day (bool, default false — use true for birthdays/holidays), location (str, optional), description (str, optional), reminder_offset (int minutes, optional — positive=before event, negative=after event start, e.g. 60=1hr before, -720=12hrs after)}}
+- edit_event: data={{event_id (int), ...fields to update}}
+- delete_event: data={{event_id (int)}}
+- set_reminder: data={{event_id (int), reminder_offset (int minutes or null to clear)}}
 
 Write actions — Tasks:
 - add_task: data={{title, priority (high/medium/low, default medium), due_date (ISO, optional), category (errand/admin/home/communication/other)}}
@@ -100,7 +100,7 @@ Read actions:
 - get_overdue: data={{}} — All overdue items
 - get_tasks: data={{priority, category, is_completed, search, limit (default 10)}}
 - get_bills: data={{is_paid, category, upcoming_days}}
-- get_events: data={{date_from, date_to, category, search}}
+- get_events: data={{date_from, date_to, search}}
 Meta actions:
 - respond: Just reply with information, no DB write.
 - clarify: data={{options (list of strings)}} — Ask for clarification. Options become inline keyboard buttons.

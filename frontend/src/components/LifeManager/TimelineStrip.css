@@ -69,6 +69,21 @@
   border-color: var(--color-alert);
 }
 
+.timeline-day--holiday {
+  background: color-mix(in srgb, var(--color-life-manager) 8%, var(--bg-secondary));
+}
+
+.timeline-day__holiday {
+  font-size: 0.55rem;
+  color: var(--color-life-manager);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
 .timeline-day--selected {
   border-color: var(--text-primary);
   background: var(--bg-hover);

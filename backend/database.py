@@ -177,15 +177,20 @@ async def _create_life_manager_tables(db: aiosqlite.Connection):
     await db.executescript("""
         CREATE TABLE IF NOT EXISTS life_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            google_event_id TEXT UNIQUE,
             title TEXT NOT NULL,
-            date TEXT NOT NULL,
-            time TEXT,
-            category TEXT NOT NULL CHECK(category IN ('appointment', 'deadline', 'reminder', 'social', 'errand')),
+            start_time TEXT NOT NULL,
+            end_time TEXT,
+            all_day INTEGER NOT NULL DEFAULT 0,
+            location TEXT,
             description TEXT,
-            is_recurring INTEGER NOT NULL DEFAULT 0,
-            recurring_rule TEXT,
-            is_completed INTEGER NOT NULL DEFAULT 0,
-            completed_at TEXT,
+            source_calendar TEXT DEFAULT 'personal',
+            is_holiday INTEGER NOT NULL DEFAULT 0,
+            reminder_offset INTEGER,
+            reminder_sent INTEGER NOT NULL DEFAULT 0,
+            google_updated_at TEXT,
+            local_updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            sync_status TEXT NOT NULL DEFAULT 'synced' CHECK(sync_status IN ('synced', 'pending_push', 'pending_delete')),
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 

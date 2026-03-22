@@ -17,35 +17,31 @@ def _today() -> date:
     return datetime.now(tz).date()
 
 
-# ──────────────────────── Events ────────────────────────
+# ──────────────────────── Events (Google Calendar integrated) ────────────────────────
 
 async def get_events(
     date_from: str = None,
     date_to: str = None,
-    category: str = None,
     search: str = None,
-    include_completed: bool = False,
+    include_holidays: bool = True,
     limit: int = 50,
 ) -> list[dict]:
     db = await get_db()
     try:
-        sql = "SELECT * FROM life_events WHERE 1=1"
+        sql = "SELECT * FROM life_events WHERE sync_status != 'pending_delete'"
         params = []
-        if not include_completed:
-            sql += " AND is_completed = 0"
         if date_from:
-            sql += " AND date >= ?"
+            sql += " AND start_time >= ?"
             params.append(date_from)
         if date_to:
-            sql += " AND date <= ?"
+            sql += " AND start_time <= ?"
             params.append(date_to)
-        if category:
-            sql += " AND category = ?"
-            params.append(category)
+        if not include_holidays:
+            sql += " AND is_holiday = 0"
         if search:
-            sql += " AND (title LIKE ? OR description LIKE ?)"
-            params.extend([f"%{search}%", f"%{search}%"])
-        sql += " ORDER BY date ASC, time ASC LIMIT ?"
+            sql += " AND (title LIKE ? OR description LIKE ? OR location LIKE ?)"
+            params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+        sql += " ORDER BY start_time ASC LIMIT ?"
         params.append(limit)
         rows = await db.execute_fetchall(sql, params)
         return [dict(r) for r in rows]
@@ -66,20 +62,24 @@ async def get_event(event_id: int) -> dict | None:
 
 async def add_event(
     title: str,
-    event_date: str,
-    time: str = None,
-    category: str = "reminder",
+    start_time: str,
+    end_time: str = None,
+    all_day: bool = False,
+    location: str = None,
     description: str = None,
-    is_recurring: bool = False,
-    recurring_rule: str = None,
+    reminder_offset: int = None,
 ) -> dict:
+    """Create an event locally with pending_push status for next Google sync."""
     db = await get_db()
     try:
+        now = datetime.now().isoformat()
         cursor = await db.execute(
-            """INSERT INTO life_events (title, date, time, category, description,
-               is_recurring, recurring_rule) VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            [title, event_date, time, category, description,
-             1 if is_recurring else 0, recurring_rule],
+            """INSERT INTO life_events
+               (title, start_time, end_time, all_day, location, description,
+                reminder_offset, local_updated_at, sync_status)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending_push')""",
+            [title, start_time, end_time, 1 if all_day else 0,
+             location, description, reminder_offset, now],
         )
         await db.commit()
         return await get_event(cursor.lastrowid)
@@ -90,11 +90,16 @@ async def add_event(
 async def edit_event(event_id: int, **fields) -> dict:
     db = await get_db()
     try:
-        allowed = {"title", "date", "time", "category", "description",
-                    "is_recurring", "recurring_rule"}
-        updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+        allowed = {"title", "start_time", "end_time", "all_day", "location",
+                    "description", "reminder_offset"}
+        updates = {k: v for k, v in fields.items() if k in allowed}
         if not updates:
             return await get_event(event_id)
+        updates["local_updated_at"] = datetime.now().isoformat()
+        updates["sync_status"] = "pending_push"
+        # Reset reminder if offset changed
+        if "reminder_offset" in updates:
+            updates["reminder_sent"] = 0
         set_clause = ", ".join(f"{k} = ?" for k in updates)
         params = list(updates.values()) + [event_id]
         await db.execute(f"UPDATE life_events SET {set_clause} WHERE id = ?", params)
@@ -104,26 +109,38 @@ async def edit_event(event_id: int, **fields) -> dict:
         await db.close()
 
 
-async def complete_event(event_id: int) -> dict:
+async def delete_event(event_id: int) -> bool:
+    """Mark for deletion — actual Google delete happens during sync."""
     db = await get_db()
     try:
-        now = datetime.now().isoformat()
-        await db.execute(
-            "UPDATE life_events SET is_completed = 1, completed_at = ? WHERE id = ?",
-            [now, event_id],
-        )
+        event = await get_event(event_id)
+        if not event:
+            return False
+        if event.get("google_event_id"):
+            # Has a Google counterpart — mark for sync deletion
+            await db.execute(
+                "UPDATE life_events SET sync_status = 'pending_delete' WHERE id = ?",
+                [event_id],
+            )
+        else:
+            # Local only — just delete
+            await db.execute("DELETE FROM life_events WHERE id = ?", [event_id])
         await db.commit()
-        return await get_event(event_id)
+        return True
     finally:
         await db.close()
 
 
-async def delete_event(event_id: int) -> bool:
+async def set_event_reminder(event_id: int, reminder_offset: int | None) -> dict:
+    """Set or clear a reminder for an event."""
     db = await get_db()
     try:
-        await db.execute("DELETE FROM life_events WHERE id = ?", [event_id])
+        await db.execute(
+            "UPDATE life_events SET reminder_offset = ?, reminder_sent = 0 WHERE id = ?",
+            [reminder_offset, event_id],
+        )
         await db.commit()
-        return True
+        return await get_event(event_id)
     finally:
         await db.close()
 
@@ -402,17 +419,10 @@ async def get_upcoming(days_ahead: int = 7) -> dict:
 
 
 async def get_overdue() -> dict:
-    """Get all overdue items."""
+    """Get all overdue items (tasks and bills only — events don't have 'overdue' state)."""
     today_str = _today().isoformat()
-    # Overdue events (past date, not completed)
     db = await get_db()
     try:
-        event_rows = await db.execute_fetchall(
-            "SELECT * FROM life_events WHERE date < ? AND is_completed = 0 ORDER BY date ASC",
-            [today_str],
-        )
-        events = [dict(r) for r in event_rows]
-
         task_rows = await db.execute_fetchall(
             "SELECT * FROM life_tasks WHERE due_date < ? AND is_completed = 0 ORDER BY due_date ASC",
             [today_str],
@@ -427,23 +437,30 @@ async def get_overdue() -> dict:
     finally:
         await db.close()
 
-    return {"events": events, "tasks": tasks, "bills": bills}
+    return {"tasks": tasks, "bills": bills}
 
 
 async def get_timeline(days: int = 14) -> list[dict]:
     """Get timeline data for the next N days (for the dashboard timeline strip)."""
     today = _today()
+    all_tasks = await get_tasks(is_completed=False)
     timeline = []
     for i in range(days):
         d = today + timedelta(days=i)
         d_str = d.isoformat()
 
-        events = await get_events(date_from=d_str, date_to=d_str)
-        tasks = await get_tasks(is_completed=False)
-        day_tasks = [t for t in tasks if t.get("due_date") == d_str]
-
+        # Events: match by date prefix (start_time may be full ISO datetime)
         db = await get_db()
         try:
+            event_rows = await db.execute_fetchall(
+                """SELECT * FROM life_events
+                   WHERE substr(start_time, 1, 10) = ?
+                   AND sync_status != 'pending_delete'
+                   ORDER BY start_time""",
+                [d_str],
+            )
+            day_events = [dict(r) for r in event_rows]
+
             bill_rows = await db.execute_fetchall(
                 "SELECT * FROM life_bills WHERE next_due = ? AND is_paid = 0",
                 [d_str],
@@ -452,22 +469,29 @@ async def get_timeline(days: int = 14) -> list[dict]:
         finally:
             await db.close()
 
+        day_tasks = [t for t in all_tasks if t.get("due_date") == d_str]
+
         # Check for overdue items on this day (only for today)
         has_overdue = False
         if i == 0:
             overdue = await get_overdue()
-            has_overdue = bool(overdue["events"] or overdue["tasks"] or overdue["bills"])
+            has_overdue = bool(overdue["tasks"] or overdue["bills"])
+
+        # Separate holidays from personal events
+        personal_events = [e for e in day_events if not e.get("is_holiday")]
+        holidays = [e for e in day_events if e.get("is_holiday")]
 
         timeline.append({
             "date": d_str,
             "day_name": d.strftime("%a"),
             "day_num": d.day,
             "is_today": i == 0,
-            "events": len(events),
+            "events": len(personal_events),
+            "holidays": [h["title"] for h in holidays],
             "tasks": len(day_tasks),
             "bills": len(day_bills),
             "has_overdue": has_overdue,
-            "items": events + day_tasks + day_bills,
+            "items": personal_events + day_tasks + day_bills,
         })
 
     return timeline
@@ -514,7 +538,7 @@ async def get_pulse() -> dict:
 
     # Overdue items
     overdue = await get_overdue()
-    overdue_count = len(overdue["events"]) + len(overdue["tasks"]) + len(overdue["bills"])
+    overdue_count = len(overdue["tasks"]) + len(overdue["bills"])
 
     return {
         "tasks_due_today": tasks_due_today,
