@@ -161,3 +161,56 @@
   border-radius: var(--radius-xs);
 }
 .doc-item__delete-btn:hover { color: var(--color-error, #ef4444); background: color-mix(in srgb, #ef4444 8%, transparent); }
+
+.doc-item__edit-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border: 1px solid var(--border-subtle); background: none;
+  cursor: pointer; color: var(--text-tertiary); font-size: 0.75rem;
+  border-radius: var(--radius-sm); transition: all 0.15s;
+}
+.doc-item__edit-btn:hover { color: var(--color-life-manager); border-color: var(--color-life-manager); }
+
+/* Document Edit Modal */
+.doc-edit-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+}
+.doc-edit-modal {
+  background: var(--bg-primary); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+  width: 440px; max-width: 90vw; max-height: 85vh; overflow-y: auto;
+}
+.doc-edit-modal__header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-subtle);
+}
+.doc-edit-modal__header h3 { font-size: 1rem; font-weight: 600; }
+.doc-edit-modal__header button { background: none; border: none; cursor: pointer; color: var(--text-tertiary); }
+.doc-edit-modal__form {
+  padding: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-md);
+}
+.doc-edit-modal__form label { display: flex; flex-direction: column; gap: 4px; }
+.doc-edit-modal__form label > span { font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); }
+.doc-edit-modal__form input,
+.doc-edit-modal__form textarea,
+.doc-edit-modal__form select {
+  padding: 8px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  background: var(--bg-secondary); color: var(--text-primary); font-size: 0.85rem; font-family: inherit;
+}
+.doc-edit-modal__form textarea { resize: vertical; }
+.doc-edit-modal__form input:focus,
+.doc-edit-modal__form textarea:focus,
+.doc-edit-modal__form select:focus { outline: none; border-color: var(--color-life-manager); }
+.doc-edit-modal__row { display: flex; gap: var(--space-md); }
+.doc-edit-modal__row > label { flex: 1; }
+.doc-edit-modal__actions { display: flex; justify-content: flex-end; gap: var(--space-sm); margin-top: var(--space-sm); }
+.doc-edit-modal__cancel {
+  padding: 8px 16px; background: none; border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm); cursor: pointer; color: var(--text-secondary); font-size: 0.85rem;
+}
+.doc-edit-modal__save {
+  display: flex; align-items: center; gap: 6px; padding: 8px 20px;
+  background: var(--color-life-manager); color: white; border: none;
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; font-weight: 500;
+}
+.doc-edit-modal__save:disabled { opacity: 0.6; cursor: default; }

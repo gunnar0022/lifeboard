@@ -2,9 +2,87 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, FileText, ChevronDown, ChevronRight, ExternalLink, X, AlertCircle,
-  Tag,
+  Tag, Pencil, Save,
 } from 'lucide-react';
 import './DocumentSearch.css';
+
+function DocEditModal({ doc, onClose, onSave }) {
+  const [form, setForm] = useState({
+    title: doc.title || '',
+    summary: doc.summary || '',
+    category: doc.category || 'life',
+    provider: doc.provider || '',
+    date: doc.date || '',
+    tags: (doc.tags || []).join(', '),
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    const body = {
+      title: form.title,
+      summary: form.summary,
+      category: form.category,
+      provider: form.provider || null,
+      date: form.date || null,
+      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+    };
+    try {
+      const res = await fetch(`/api/documents/${doc.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) { onSave(); onClose(); }
+    } catch { /* ignore */ }
+    setSaving(false);
+  };
+
+  return (
+    <div className="doc-edit-overlay" onClick={onClose}>
+      <div className="doc-edit-modal" onClick={e => e.stopPropagation()}>
+        <div className="doc-edit-modal__header">
+          <h3>Edit Document</h3>
+          <button onClick={onClose}><X size={16} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="doc-edit-modal__form">
+          <label><span>Title</span>
+            <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+          </label>
+          <label><span>Summary</span>
+            <textarea value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} rows={4} />
+          </label>
+          <div className="doc-edit-modal__row">
+            <label><span>Category</span>
+              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+                <option value="life">Life</option>
+                <option value="finance">Finance</option>
+                <option value="health">Health</option>
+                <option value="investing">Investing</option>
+              </select>
+            </label>
+            <label><span>Date</span>
+              <input type="date" value={form.date || ''} onChange={e => setForm({ ...form, date: e.target.value })} />
+            </label>
+          </div>
+          <label><span>Provider</span>
+            <input value={form.provider} onChange={e => setForm({ ...form, provider: e.target.value })} placeholder="Organization, clinic, company..." />
+          </label>
+          <label><span>Tags (comma-separated)</span>
+            <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} placeholder="contract, legal, insurance..." />
+          </label>
+          <div className="doc-edit-modal__actions">
+            <button type="button" className="doc-edit-modal__cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="doc-edit-modal__save" disabled={saving}>
+              <Save size={14} /> {saving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 const CATEGORY_LABELS = {
   finance: 'Finance',
@@ -26,6 +104,7 @@ export default function DocumentSearch() {
   const [documents, setDocuments] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [expandedDoc, setExpandedDoc] = useState(null);
+  const [editingDoc, setEditingDoc] = useState(null);
   const [searching, setSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -204,6 +283,9 @@ export default function DocumentSearch() {
                                 <AlertCircle size={12} /> No file attached
                               </span>
                             )}
+                            <button className="doc-item__edit-btn" onClick={() => setEditingDoc(doc)}>
+                              <Pencil size={13} /> Edit
+                            </button>
                             <button className="doc-item__delete-btn" onClick={() => handleDelete(doc.id)}>
                               <X size={13} /> Delete
                             </button>
@@ -218,6 +300,14 @@ export default function DocumentSearch() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {editingDoc && (
+        <DocEditModal
+          doc={editingDoc}
+          onClose={() => setEditingDoc(null)}
+          onSave={() => { setEditingDoc(null); performSearch(); }}
+        />
+      )}
     </div>
   );
 }

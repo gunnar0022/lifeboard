@@ -415,13 +415,10 @@ async def _dispatch_multi_agent(update: Update, routes: list[dict]):
 # --- Document retrieval ---
 
 async def _handle_document_query(update: Update, query_text: str):
-    """Search documents and use Haiku to extract the answer from summaries."""
-    from backend.documents import search_documents
+    """Handle document queries: read, edit, and delete."""
+    from backend.documents import search_documents, update_document, delete_document, VALID_TAGS
     from backend import llm_client
 
-    # Fetch all documents — the collection is small enough to send all
-    # summaries to Haiku. Keyword search often fails because the router
-    # sends a full sentence, not keywords.
     docs = await search_documents(limit=50)
 
     if not docs:
@@ -431,30 +428,59 @@ async def _handle_document_query(update: Update, query_text: str):
         _update_recent_context("documents")
         return
 
-    # Build context from document summaries
+    # Build context with IDs so the LLM can reference specific documents
     doc_context = "\n\n".join(
-        f"[{d['title']}] (tags: {', '.join(d.get('tags', []))})\n{d.get('summary', 'No summary')}"
+        f"[ID:{d['id']}] {d['title']} (tags: {', '.join(d.get('tags', []))}, category: {d.get('category', '?')})\n"
+        f"Summary: {d.get('summary', 'No summary')}\n"
+        f"Provider: {d.get('provider', 'N/A')} | Date: {d.get('date', 'N/A')}"
         for d in docs
     )
 
-    # Ask Haiku to answer the user's question from the document summaries
     try:
         result = await llm_client.process_message(
             system_prompt=(
-                "You are a document lookup assistant. The user is asking about information "
-                "from their stored documents. Below are summaries of matching documents. "
-                "Answer the user's question directly from these summaries. If the information "
-                "isn't in any summary, say so and suggest they check the original document. "
-                "Be concise and direct. Return JSON: {\"action\": \"respond\", \"reply\": \"your answer\"}"
+                "You are a document management assistant. You can READ, EDIT, and DELETE documents.\n\n"
+                "STORED DOCUMENTS:\n" + doc_context + "\n\n"
+                "Return a JSON object with one of these actions:\n"
+                "1. ANSWER a question: {\"action\": \"respond\", \"reply\": \"your answer\"}\n"
+                "2. DELETE a document: {\"action\": \"delete_document\", \"doc_id\": N, \"reply\": \"Deleted [title]\"}\n"
+                "3. EDIT document metadata: {\"action\": \"edit_document\", \"doc_id\": N, \"updates\": {\"title\": \"...\", \"summary\": \"...\", \"tags\": [\"...\"], \"category\": \"...\", \"provider\": \"...\", \"date\": \"...\"}, \"reply\": \"Updated [title]\"}\n\n"
+                f"Valid tags: {sorted(VALID_TAGS)}\n"
+                "Valid categories: finance, health, investing, life\n\n"
+                "ACT IMMEDIATELY. Do not ask for confirmation. If the user says delete, delete. "
+                "If they say update/change/fix, edit. Only include fields that are being changed in updates.\n"
+                "For questions, answer directly from the summaries."
             ),
-            user_message=f"Question: {query_text}\n\nDocuments found:\n{doc_context}",
+            user_message=query_text,
             max_tokens=500,
             model=llm_client.MODEL_FAST,
         )
-        reply = result.get("reply", "I found some documents but couldn't extract the answer.")
+
+        action = result.get("action", "respond")
+
+        if action == "delete_document":
+            doc_id = result.get("doc_id")
+            if doc_id:
+                success = await delete_document(doc_id)
+                reply = result.get("reply", "Document deleted.") if success else "Couldn't find that document to delete."
+            else:
+                reply = "I couldn't determine which document to delete."
+
+        elif action == "edit_document":
+            doc_id = result.get("doc_id")
+            updates = result.get("updates", {})
+            if doc_id and updates:
+                updated = await update_document(doc_id, **updates)
+                reply = result.get("reply", "Document updated.") if updated else "Couldn't find that document to update."
+            else:
+                reply = "I couldn't determine what to update."
+
+        else:
+            reply = result.get("reply", "I found documents but couldn't extract the answer.")
+
     except Exception as e:
         logger.error(f"Document query failed: {e}")
-        reply = "Something went wrong looking that up."
+        reply = "Something went wrong processing that."
 
     await update.message.reply_text(reply)
     _update_recent_context("documents")

@@ -311,6 +311,23 @@ async def get_document_detail(doc_id: int):
         raise HTTPException(404, "Document not found")
     return doc
 
+class DocumentUpdate(BaseModel):
+    title: Optional[str] = None
+    summary: Optional[str] = None
+    tags: Optional[list] = None
+    category: Optional[str] = None
+    provider: Optional[str] = None
+    date: Optional[str] = None
+
+@app.put("/api/documents/{doc_id}")
+async def update_document_entry(doc_id: int, body: DocumentUpdate):
+    from backend.documents import update_document
+    result = await update_document(doc_id, **body.model_dump(exclude_none=True))
+    if not result:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Document not found")
+    return result
+
 @app.delete("/api/documents/{doc_id}")
 async def delete_document_entry(doc_id: int):
     from backend.documents import delete_document
