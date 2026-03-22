@@ -2,7 +2,7 @@ import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar, CheckCircle2, Receipt, AlertCircle, X,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, MapPin, Clock, Star,
 } from 'lucide-react';
 import './TimelineStrip.css';
 
@@ -16,13 +16,32 @@ function getItemType(item) {
   return 'event';
 }
 
+function formatEventTime(item) {
+  if (!item.start_time) return '';
+  if (item.all_day) return 'All day';
+  const t = item.start_time;
+  if (t.includes('T')) {
+    const time = t.split('T')[1]?.slice(0, 5);
+    if (item.end_time && item.end_time.includes('T')) {
+      return `${time} - ${item.end_time.split('T')[1]?.slice(0, 5)}`;
+    }
+    return time;
+  }
+  return '';
+}
+
 function DayPopup({ day, onClose }) {
+  const [expandedItem, setExpandedItem] = useState(null);
+
   if (!day) return null;
   const items = day.items || [];
+  const holidays = day.holidays || [];
   const dateObj = new Date(day.date + 'T00:00:00');
   const formatted = dateObj.toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric',
   });
+
+  const hasContent = items.length > 0 || holidays.length > 0;
 
   return (
     <motion.div
@@ -39,21 +58,66 @@ function DayPopup({ day, onClose }) {
         </button>
       </div>
 
-      {items.length === 0 ? (
+      {holidays.length > 0 && (
+        <div className="day-popup__holidays">
+          {holidays.map((h, i) => (
+            <div key={i} className="day-popup__holiday">
+              <Star size={11} /> {h}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!hasContent ? (
         <div className="day-popup__empty">Nothing scheduled</div>
       ) : (
         <div className="day-popup__items">
           {items.map((item, i) => {
             const type = getItemType(item);
+            const isExpanded = expandedItem === i;
+            const timeStr = type === 'event' ? formatEventTime(item) : '';
+
             return (
-              <div key={i} className={`day-popup__item day-popup__item--${type}`}>
-                <span className="day-popup__item-icon">
-                  {type === 'event' && <Calendar size={12} />}
-                  {type === 'task' && <CheckCircle2 size={12} />}
-                  {type === 'bill' && <Receipt size={12} />}
-                </span>
-                <span className="day-popup__item-title">{formatItemTitle(item)}</span>
-                <span className="day-popup__item-type">{type}</span>
+              <div key={i}>
+                <button
+                  className={`day-popup__item day-popup__item--${type}`}
+                  onClick={() => setExpandedItem(isExpanded ? null : i)}
+                >
+                  <span className="day-popup__item-icon">
+                    {type === 'event' && <Calendar size={12} />}
+                    {type === 'task' && <CheckCircle2 size={12} />}
+                    {type === 'bill' && <Receipt size={12} />}
+                  </span>
+                  <span className="day-popup__item-title">{formatItemTitle(item)}</span>
+                  {timeStr && <span className="day-popup__item-time mono">{timeStr}</span>}
+                </button>
+
+                <AnimatePresence>
+                  {isExpanded && type === 'event' && (
+                    <motion.div
+                      className="day-popup__detail"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                    >
+                      {item.location && (
+                        <div className="day-popup__detail-row">
+                          <MapPin size={11} /> {item.location}
+                        </div>
+                      )}
+                      {item.description && (
+                        <div className="day-popup__detail-row day-popup__detail-desc">
+                          {item.description}
+                        </div>
+                      )}
+                      {item.source_calendar && item.source_calendar !== 'personal' && (
+                        <div className="day-popup__detail-row day-popup__detail-cal">
+                          Calendar: {item.source_calendar}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
