@@ -238,61 +238,7 @@ async def remove_bill(bill_id: int):
     return {"success": True}
 
 
-# ──────────────────────── Unified Documents ────────────────────────
-
-@router.get("/documents")
-async def list_documents(
-    query: Optional[str] = None,
-    tag: Optional[str] = None,
-    category: Optional[str] = None,
-    limit: int = 50,
-):
-    """Search/list all documents from the unified documents table."""
-    from backend.documents import search_documents
-    tags = [tag] if tag else None
-    return await search_documents(query=query, tags=tags, category=category, limit=limit)
-
-
-@router.get("/documents/tags")
-async def list_tags():
-    """Get all tags currently in use."""
-    from backend.documents import get_all_tags_in_use
-    return await get_all_tags_in_use()
-
-
-@router.get("/documents/{doc_id}")
-async def get_document(doc_id: int):
-    from backend.documents import get_document as get_doc
-    doc = await get_doc(doc_id)
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return doc
-
-
-@router.delete("/documents/{doc_id}")
-async def remove_document(doc_id: int):
-    from backend.documents import delete_document
-    if not await delete_document(doc_id):
-        raise HTTPException(status_code=404, detail="Document not found")
-    return {"success": True}
-
-
-@router.get("/documents/{doc_id}/view")
-async def view_document_file(doc_id: int):
-    """Serve a document's file for viewing (PDF opens in new tab, images inline)."""
-    from backend.documents import get_document as get_doc
-    doc = await get_doc(doc_id)
-    if not doc or not doc.get("file_path"):
-        raise HTTPException(status_code=404, detail="File not found or no file attached")
-    full_path = DATA_DIR / doc["file_path"]
-    if not full_path.exists():
-        raise HTTPException(status_code=404, detail="File missing from disk")
-    return FileResponse(
-        str(full_path),
-        media_type=doc.get("mime_type", "application/octet-stream"),
-        filename=doc.get("original_filename"),
-    )
-
+# (Documents moved to shell-level /api/documents/ routes in main.py)
 
 # ──────────────────────── Overdue & Today ────────────────────────
 

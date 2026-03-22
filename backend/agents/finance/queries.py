@@ -806,45 +806,7 @@ async def get_categories() -> list[str]:
         await db.close()
 
 
-# --- Files ---
-
-async def store_file(file_path: str, original_filename: str, mime_type: str = None,
-                     file_size: int = None, linked_transaction_id: int = None,
-                     description: str = None, extracted_data: str = None) -> dict:
-    db = await get_db()
-    try:
-        cursor = await db.execute(
-            """INSERT INTO finance_files
-               (file_path, original_filename, mime_type, file_size, linked_transaction_id, description, extracted_data)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (file_path, original_filename, mime_type, file_size,
-             linked_transaction_id, description, extracted_data)
-        )
-        await db.commit()
-        file_id = cursor.lastrowid
-        cursor = await db.execute("SELECT * FROM finance_files WHERE id = ?", (file_id,))
-        return dict(await cursor.fetchone())
-    finally:
-        await db.close()
-
-
-async def get_file(file_id: int = None, search: str = None) -> dict | None:
-    db = await get_db()
-    try:
-        if file_id:
-            cursor = await db.execute("SELECT * FROM finance_files WHERE id = ?", (file_id,))
-        elif search:
-            cursor = await db.execute(
-                "SELECT * FROM finance_files WHERE description LIKE ? OR original_filename LIKE ? ORDER BY id DESC LIMIT 1",
-                (f"%{search}%", f"%{search}%")
-            )
-        else:
-            return None
-        row = await cursor.fetchone()
-        return dict(row) if row else None
-    finally:
-        await db.close()
-
+# (Files removed — now in unified backend/documents.py)
 
 # --- Cycle Summaries & Compression ---
 

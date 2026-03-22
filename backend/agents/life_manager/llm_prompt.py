@@ -18,7 +18,6 @@ async def build_system_prompt() -> str:
     upcoming = await queries.get_upcoming(days_ahead=3)
     tasks = await queries.get_tasks(is_completed=False, limit=10)
     bills = await queries.get_bills(limit=10)
-    documents = await queries.get_documents(limit=10)
 
     # Format state context
     today_str = _format_today(today_items)
@@ -26,21 +25,13 @@ async def build_system_prompt() -> str:
     upcoming_str = _format_upcoming(upcoming)
     tasks_str = _format_tasks(tasks)
     bills_str = _format_bills(bills)
-    docs_str = _format_documents(documents)
+    docs_str = ""
 
     # Date context (LM-18)
     day_name = today.strftime("%A")
     date_str = today.strftime("%B %d, %Y")
 
-    # Document expiry check
     nearest_expiry = ""
-    for doc in documents:
-        if doc.get("expiry_date"):
-            exp = date.fromisoformat(doc["expiry_date"])
-            days_left = (exp - today).days
-            if 0 <= days_left <= 30:
-                nearest_expiry = f"ALERT: {doc['name']} expires in {days_left} days ({doc['expiry_date']})"
-                break
 
     # Currency for bill amounts
     primary_currency = config.get("primary_currency", "JPY")
@@ -48,11 +39,10 @@ async def build_system_prompt() -> str:
 
     # Empty state detection for onboarding (LM-23)
     onboarding_note = ""
-    if not documents and not bills and not tasks:
+    if not bills and not tasks:
         onboarding_note = """
-IMPORTANT: The user has NO documents, bills, or tasks tracked yet. Start an onboarding conversation:
-"No documents tracked yet. Want to walk through your important docs? Let's start with housing — do you have a lease?"
-Guide them through adding their first document, bill, or task.
+IMPORTANT: The user has NO bills or tasks tracked yet. Start an onboarding conversation.
+Guide them through adding their first bill or task.
 """
 
     return f"""You are the Life Manager agent for LifeBoard, a personal life administration tool. You help a single user manage their daily life — events, tasks, bills, and important documents — through natural conversation.
@@ -190,11 +180,3 @@ def _format_bills(bills: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def _format_documents(documents: list[dict]) -> str:
-    if not documents:
-        return "Documents: None tracked"
-    lines = [f"Documents ({len(documents)}):"]
-    for d in documents:
-        expiry = f" — expires {d['expiry_date']}" if d.get("expiry_date") else ""
-        lines.append(f"  [{d['id']}] {d['name']} ({d['category']}){expiry}")
-    return "\n".join(lines)

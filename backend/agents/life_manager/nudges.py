@@ -73,27 +73,6 @@ async def check_nudges() -> list[dict]:
                     "agent": "life_manager",
                 })
 
-        # Document expiry nudges
-        documents = await queries.get_documents(expiring_within_days=30)
-        for doc in documents:
-            if not doc.get("expiry_date"):
-                continue
-            exp = date.fromisoformat(doc["expiry_date"])
-            days_until = (exp - today).days
-
-            if days_until < 0:
-                nudges.append({
-                    "text": f"{doc['name']} expired {abs(days_until)} day{'s' if abs(days_until) > 1 else ''} ago",
-                    "severity": "alert",
-                    "agent": "life_manager",
-                })
-            elif days_until <= 30:
-                nudges.append({
-                    "text": f"{doc['name']} expires in {days_until} day{'s' if days_until > 1 else ''}",
-                    "severity": "info",
-                    "agent": "life_manager",
-                })
-
     except Exception as e:
         logger.error(f"Life Manager nudge check error: {e}")
 

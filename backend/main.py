@@ -207,6 +207,49 @@ async def get_nudges():
     return all_nudges
 
 
+# --- Unified Document API (shell-level, spans all agents) ---
+
+@app.get("/api/documents")
+async def list_documents(query: str = None, tag: str = None, category: str = None, limit: int = 50):
+    from backend.documents import search_documents
+    tags = [tag] if tag else None
+    return await search_documents(query=query, tags=tags, category=category, limit=limit)
+
+@app.get("/api/documents/tags")
+async def list_document_tags():
+    from backend.documents import get_all_tags_in_use
+    return await get_all_tags_in_use()
+
+@app.get("/api/documents/{doc_id}")
+async def get_document_detail(doc_id: int):
+    from backend.documents import get_document
+    doc = await get_document(doc_id)
+    if not doc:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Document not found")
+    return doc
+
+@app.delete("/api/documents/{doc_id}")
+async def delete_document_entry(doc_id: int):
+    from backend.documents import delete_document
+    if not await delete_document(doc_id):
+        from fastapi import HTTPException
+        raise HTTPException(404, "Document not found")
+    return {"ok": True}
+
+@app.get("/api/documents/{doc_id}/view")
+async def view_document_file(doc_id: int):
+    from backend.documents import get_document
+    doc = await get_document(doc_id)
+    if not doc or not doc.get("file_path"):
+        from fastapi import HTTPException
+        raise HTTPException(404, "File not found")
+    full_path = PROJECT_ROOT / "data" / "files" / doc["file_path"]
+    if not full_path.exists():
+        from fastapi import HTTPException
+        raise HTTPException(404, "File missing from disk")
+    return FileResponse(str(full_path), media_type=doc.get("mime_type", "application/octet-stream"), filename=doc.get("original_filename"))
+
 
 # --- Serve built frontend (production) ---
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"

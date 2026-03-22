@@ -138,17 +138,6 @@ async def handle_set_budget(data: dict) -> dict:
     )
 
 
-async def handle_store_file(data: dict) -> dict:
-    return await queries.store_file(
-        file_path=data.get("file_path", ""),
-        original_filename=data.get("original_filename", ""),
-        mime_type=data.get("mime_type"),
-        file_size=data.get("file_size"),
-        linked_transaction_id=data.get("link_to_transaction_id"),
-        description=data.get("file_context", ""),
-    )
-
-
 # --- Read action handlers ---
 
 async def handle_get_accounts_overview(data: dict) -> dict:
@@ -195,13 +184,6 @@ async def handle_get_recurring_list(data: dict) -> list:
     return await queries.get_recurring(
         active_only=data.get("active_only", True),
         autopay_only=data.get("autopay_only"),
-    )
-
-
-async def handle_get_file(data: dict) -> dict:
-    return await queries.get_file(
-        file_id=data.get("file_id"),
-        search=data.get("search"),
     )
 
 
@@ -294,11 +276,6 @@ ACTION_REGISTRY = {
         "handler": handle_set_interest_rate,
         "required": ["account_id", "interest_rate"],
     },
-    "store_file": {
-        "handler": handle_store_file,
-        "required": ["file_context"],
-        "optional": ["link_to_transaction_id"],
-    },
     # Read actions
     "get_accounts_overview": {
         "handler": handle_get_accounts_overview,
@@ -338,12 +315,6 @@ ACTION_REGISTRY = {
         "handler": handle_get_recurring_list,
         "required": [],
         "optional": ["active_only", "autopay_only"],
-        "is_read": True,
-    },
-    "get_file": {
-        "handler": handle_get_file,
-        "required": [],
-        "optional": ["file_id", "search"],
         "is_read": True,
     },
     "get_cycle_summaries": {

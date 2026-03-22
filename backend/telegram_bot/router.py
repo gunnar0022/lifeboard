@@ -445,43 +445,6 @@ async def _send_fallback_keyboard(update: Update, text: str):
             _pending_fallback.pop(k, None)
 
 
-async def _send_photo_fallback(update: Update):
-    """Ask user which agent should process a photo with no context."""
-    buttons = [
-        [
-            InlineKeyboardButton(
-                f"{AGENT_EMOJI['finance']} Finance",
-                callback_data="router_photo:finance",
-            ),
-            InlineKeyboardButton(
-                f"{AGENT_EMOJI['life_manager']} Life Manager",
-                callback_data="router_photo:life_manager",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                f"{AGENT_EMOJI['health_body']} Health",
-                callback_data="router_photo:health_body",
-            ),
-            InlineKeyboardButton(
-                f"{AGENT_EMOJI['investing']} Investing",
-                callback_data="router_photo:investing",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                f"{AGENT_EMOJI['reading_creative']} Creative",
-                callback_data="router_photo:reading_creative",
-            ),
-        ],
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text(
-        "Which agent should process this photo?",
-        reply_markup=keyboard,
-    )
-
-
 # --- Helper functions ---
 
 def _get_agent_handler(agent_id: str, method: str):

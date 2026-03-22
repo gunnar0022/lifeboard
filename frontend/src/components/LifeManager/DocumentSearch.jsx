@@ -31,7 +31,7 @@ export default function DocumentSearch() {
 
   // Load available tags on mount
   useEffect(() => {
-    fetch('/api/life/documents/tags')
+    fetch('/api/documents/tags')
       .then(r => r.json())
       .then(setAvailableTags)
       .catch(() => {});
@@ -57,7 +57,7 @@ export default function DocumentSearch() {
     if (query.trim()) params.set('query', query.trim());
     if (activeTag) params.set('tag', activeTag);
     try {
-      const res = await fetch(`/api/life/documents?${params}`);
+      const res = await fetch(`/api/documents?${params}`);
       if (res.ok) setDocuments(await res.json());
     } catch { /* ignore */ }
     setSearching(false);
@@ -68,7 +68,7 @@ export default function DocumentSearch() {
     setSearching(true);
     setHasSearched(true);
     try {
-      const res = await fetch('/api/life/documents');
+      const res = await fetch('/api/documents');
       if (res.ok) setDocuments(await res.json());
     } catch { /* ignore */ }
     setSearching(false);
@@ -76,12 +76,12 @@ export default function DocumentSearch() {
 
   const handleDelete = async (docId) => {
     if (!confirm('Delete this document permanently?')) return;
-    await fetch(`/api/life/documents/${docId}`, { method: 'DELETE' });
+    await fetch(`/api/documents/${docId}`, { method: 'DELETE' });
     setDocuments(prev => prev.filter(d => d.id !== docId));
   };
 
   const viewFile = (doc) => {
-    window.open(`/api/life/documents/${doc.id}/view`, '_blank');
+    window.open(`/api/documents/${doc.id}/view`, '_blank');
   };
 
   return (

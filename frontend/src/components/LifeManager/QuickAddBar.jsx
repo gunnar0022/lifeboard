@@ -8,7 +8,6 @@ const TYPES = [
   { value: 'task', label: 'Task' },
   { value: 'event', label: 'Event' },
   { value: 'bill', label: 'Bill' },
-  { value: 'document', label: 'Document' },
 ];
 
 export default function QuickAddBar({ currencySymbol, onSuccess }) {
@@ -43,11 +42,6 @@ export default function QuickAddBar({ currencySymbol, onSuccess }) {
           name: title.trim(),
           amount: amountInt,
           due_date: date || undefined,
-        });
-      } else if (type === 'document') {
-        await apiPost('/api/life/documents', {
-          name: title.trim(),
-          expiry_date: date || undefined,
         });
       }
 
@@ -84,7 +78,7 @@ export default function QuickAddBar({ currencySymbol, onSuccess }) {
         <div className="quick-add-bar__inputs">
           <input
             type="text"
-            placeholder={type === 'bill' ? 'Bill name...' : type === 'document' ? 'Document name...' : `${type === 'task' ? 'Task' : 'Event'} description...`}
+            placeholder={type === 'bill' ? 'Bill name...' : `${type === 'task' ? 'Task' : 'Event'} description...`}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="quick-add-bar__input"
