@@ -251,7 +251,7 @@ async def _execute_visit_actions(update: Update, action_data: dict):
     # End the visit
     await queries.end_visit(visit_id, executed, summary)
 
-    # Send closing message
+    # Send closing message from Fleet
     await update.message.reply_text(closing)
 
     # Clear session lock
@@ -259,6 +259,9 @@ async def _execute_visit_actions(update: Update, action_data: dict):
     _fleet_session["visit_id"] = None
     _fleet_session["conversation_history"] = []
     _fleet_session["system_prompt"] = None
+
+    # Confirm session ended (automated, not from Fleet)
+    await update.message.reply_text("--- Dr. Fleet has left the session. You're back to normal routing. ---")
 
     logger.info(f"Fleet visit #{visit_id} ended. Actions: {len(executed)}")
 
