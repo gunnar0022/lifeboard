@@ -419,12 +419,14 @@ async def _handle_document_query(update: Update, query_text: str):
     from backend.documents import search_documents
     from backend import llm_client
 
-    docs = await search_documents(query=query_text, limit=10)
+    # Fetch all documents — the collection is small enough to send all
+    # summaries to Haiku. Keyword search often fails because the router
+    # sends a full sentence, not keywords.
+    docs = await search_documents(limit=50)
 
     if not docs:
         await update.message.reply_text(
-            "I couldn't find any documents matching that query. "
-            "Try uploading the document first via photo or PDF."
+            "No documents stored yet. Upload a document via photo or PDF first."
         )
         _update_recent_context("documents")
         return
