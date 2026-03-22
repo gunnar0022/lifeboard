@@ -65,10 +65,19 @@ class BookUpdate(BaseModel):
 async def get_pulse():
     try:
         pulse = await queries.get_pulse()
+        titles = pulse.get("books_reading_titles", [])
+        count = pulse["books_reading"]
+        if count == 1:
+            reading_value = titles[0]
+        elif count > 1:
+            reading_value = f"({count}) books"
+        else:
+            reading_value = "None"
+
         return {
             "metrics": [
                 {"label": "Projects", "value": str(pulse["projects"])},
-                {"label": "Reading", "value": f"{pulse['books_reading']} now / {pulse['books_to_read']} queued"},
+                {"label": "In Progress", "value": reading_value},
                 {"label": "Finished", "value": str(pulse["books_finished"])},
             ]
         }

@@ -729,7 +729,7 @@ async def get_pulse() -> dict:
     books = await get_books()
 
     to_read = len([b for b in books if b["status"] == "to_read"])
-    reading = len([b for b in books if b["status"] == "reading"])
+    reading_books = [b for b in books if b["status"] == "reading"]
     finished = len([b for b in books if b["status"] == "finished"])
 
     # Count total files
@@ -743,7 +743,8 @@ async def get_pulse() -> dict:
     return {
         "projects": len(projects),
         "files": file_count,
-        "books_reading": reading,
+        "books_reading": len(reading_books),
+        "books_reading_titles": [b["title"] for b in reading_books],
         "books_to_read": to_read,
         "books_finished": finished,
     }
