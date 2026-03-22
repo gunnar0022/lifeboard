@@ -67,37 +67,34 @@ async def get_event(event_id: int):
 
 class EventCreate(BaseModel):
     title: str
-    date: str
-    time: Optional[str] = None
-    category: str = "reminder"
+    start_time: str
+    end_time: Optional[str] = None
+    all_day: bool = False
+    location: Optional[str] = None
     description: Optional[str] = None
-    is_recurring: bool = False
-    recurring_rule: Optional[str] = None
+    reminder_offset: Optional[int] = None
 
 @router.post("/events")
 async def create_event(body: EventCreate):
     return await queries.add_event(
-        title=body.title, event_date=body.date, time=body.time,
-        category=body.category, description=body.description,
-        is_recurring=body.is_recurring, recurring_rule=body.recurring_rule,
+        title=body.title, start_time=body.start_time, end_time=body.end_time,
+        all_day=body.all_day, location=body.location,
+        description=body.description, reminder_offset=body.reminder_offset,
     )
 
 
 class EventUpdate(BaseModel):
     title: Optional[str] = None
-    date: Optional[str] = None
-    time: Optional[str] = None
-    category: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    all_day: Optional[bool] = None
+    location: Optional[str] = None
     description: Optional[str] = None
+    reminder_offset: Optional[int] = None
 
 @router.put("/events/{event_id}")
 async def update_event(event_id: int, body: EventUpdate):
     return await queries.edit_event(event_id, **body.model_dump(exclude_none=True))
-
-
-@router.post("/events/{event_id}/complete")
-async def complete_event(event_id: int):
-    return await queries.complete_event(event_id)
 
 
 @router.delete("/events/{event_id}")

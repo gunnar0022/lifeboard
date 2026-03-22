@@ -90,7 +90,7 @@ export default function LifeManagerPanel() {
       </div>
 
       {/* Section A — Timeline */}
-      <TimelineStrip timeline={timeline || []} />
+      <TimelineStrip timeline={timeline || []} onRefresh={refetchAll} />
 
       {/* Section B — Bills & Tasks (2-column grid) */}
       <div className="life-panel__grid">

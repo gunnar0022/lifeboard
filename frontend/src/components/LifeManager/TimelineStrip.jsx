@@ -2,9 +2,170 @@ import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar, CheckCircle2, Receipt, AlertCircle, X,
-  ChevronDown, ChevronUp, MapPin, Clock, Star,
+  ChevronDown, ChevronUp, MapPin, Clock, Star, Pencil, Bell, Save,
 } from 'lucide-react';
 import './TimelineStrip.css';
+
+const REMINDER_OPTIONS = [
+  { label: 'None', value: null },
+  { label: '15 min before', value: 15 },
+  { label: '30 min before', value: 30 },
+  { label: '1 hour before', value: 60 },
+  { label: '2 hours before', value: 120 },
+  { label: '1 day before', value: 1440 },
+  { label: '12 hours after', value: -720 },
+  { label: '1 day after', value: -1440 },
+];
+
+function EventEditModal({ event, onClose, onSave }) {
+  const [form, setForm] = useState({
+    title: event.title || '',
+    start_time: event.start_time || '',
+    end_time: event.end_time || '',
+    all_day: event.all_day || false,
+    location: event.location || '',
+    description: event.description || '',
+    reminder_offset: event.reminder_offset,
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const body = { ...form };
+      if (!body.end_time) delete body.end_time;
+      if (!body.location) delete body.location;
+      if (!body.description) delete body.description;
+
+      const res = await fetch(`/api/life/events/${event.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        onSave();
+        onClose();
+      }
+    } catch { /* ignore */ }
+    setSaving(false);
+  };
+
+  // Format datetime-local value for input
+  const toInputValue = (iso) => {
+    if (!iso) return '';
+    return iso.slice(0, 16); // "2026-03-25T14:00"
+  };
+
+  return (
+    <div className="event-modal__overlay" onClick={onClose}>
+      <motion.div
+        className="event-modal"
+        onClick={e => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+      >
+        <div className="event-modal__header">
+          <h3>Edit Event</h3>
+          <button onClick={onClose}><X size={16} /></button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="event-modal__form">
+          <label>
+            <span>Title</span>
+            <input
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value })}
+              required
+            />
+          </label>
+
+          <div className="event-modal__row">
+            <label className="event-modal__check">
+              <input
+                type="checkbox"
+                checked={form.all_day}
+                onChange={e => setForm({ ...form, all_day: e.target.checked })}
+              />
+              All day
+            </label>
+          </div>
+
+          {!form.all_day ? (
+            <div className="event-modal__row">
+              <label>
+                <span>Start</span>
+                <input
+                  type="datetime-local"
+                  value={toInputValue(form.start_time)}
+                  onChange={e => setForm({ ...form, start_time: e.target.value + ':00' })}
+                  required
+                />
+              </label>
+              <label>
+                <span>End</span>
+                <input
+                  type="datetime-local"
+                  value={toInputValue(form.end_time)}
+                  onChange={e => setForm({ ...form, end_time: e.target.value + ':00' })}
+                />
+              </label>
+            </div>
+          ) : (
+            <label>
+              <span>Date</span>
+              <input
+                type="date"
+                value={form.start_time?.slice(0, 10) || ''}
+                onChange={e => setForm({ ...form, start_time: e.target.value })}
+                required
+              />
+            </label>
+          )}
+
+          <label>
+            <span>Location</span>
+            <input
+              value={form.location}
+              onChange={e => setForm({ ...form, location: e.target.value })}
+              placeholder="Optional"
+            />
+          </label>
+
+          <label>
+            <span>Description</span>
+            <textarea
+              value={form.description}
+              onChange={e => setForm({ ...form, description: e.target.value })}
+              rows={3}
+              placeholder="Notes, details..."
+            />
+          </label>
+
+          <label>
+            <span><Bell size={12} /> Reminder</span>
+            <select
+              value={form.reminder_offset ?? 'none'}
+              onChange={e => setForm({ ...form, reminder_offset: e.target.value === 'none' ? null : Number(e.target.value) })}
+            >
+              {REMINDER_OPTIONS.map(opt => (
+                <option key={opt.label} value={opt.value ?? 'none'}>{opt.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <div className="event-modal__actions">
+            <button type="button" className="event-modal__cancel" onClick={onClose}>Cancel</button>
+            <button type="submit" className="event-modal__save" disabled={saving}>
+              <Save size={14} /> {saving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
 
 function formatItemTitle(item) {
   return item.title || item.name || item.description || 'Untitled';
@@ -30,8 +191,9 @@ function formatEventTime(item) {
   return '';
 }
 
-function DayPopup({ day, onClose }) {
+function DayPopup({ day, onClose, onEventUpdated }) {
   const [expandedItem, setExpandedItem] = useState(null);
+  const [editingEvent, setEditingEvent] = useState(null);
 
   if (!day) return null;
   const items = day.items || [];
@@ -115,6 +277,17 @@ function DayPopup({ day, onClose }) {
                           Calendar: {item.source_calendar}
                         </div>
                       )}
+                      {item.reminder_offset != null && (
+                        <div className="day-popup__detail-row">
+                          <Bell size={11} /> Reminder: {REMINDER_OPTIONS.find(o => o.value === item.reminder_offset)?.label || `${item.reminder_offset} min`}
+                        </div>
+                      )}
+                      <button
+                        className="day-popup__edit-btn"
+                        onClick={(e) => { e.stopPropagation(); setEditingEvent(item); }}
+                      >
+                        <Pencil size={12} /> Edit
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -123,11 +296,21 @@ function DayPopup({ day, onClose }) {
           })}
         </div>
       )}
+
+      <AnimatePresence>
+        {editingEvent && (
+          <EventEditModal
+            event={editingEvent}
+            onClose={() => setEditingEvent(null)}
+            onSave={() => { setEditingEvent(null); if (onEventUpdated) onEventUpdated(); }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
-export default function TimelineStrip({ timeline }) {
+export default function TimelineStrip({ timeline, onRefresh }) {
   const scrollRef = useRef(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [viewMode, setViewMode] = useState('strip'); // 'strip' or 'month'
@@ -301,7 +484,7 @@ export default function TimelineStrip({ timeline }) {
       {/* Day detail popup */}
       <AnimatePresence>
         {selectedDay && (
-          <DayPopup day={selectedDay} onClose={() => setSelectedDay(null)} />
+          <DayPopup day={selectedDay} onClose={() => setSelectedDay(null)} onEventUpdated={onRefresh} />
         )}
       </AnimatePresence>
     </div>
