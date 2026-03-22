@@ -42,11 +42,16 @@ def _get_client_config() -> dict:
     }
 
 
+# Store the flow object between auth and callback (PKCE requires same instance)
+_pending_flow: Flow | None = None
+
+
 def get_auth_url() -> str:
     """Generate the OAuth authorization URL."""
-    flow = Flow.from_client_config(_get_client_config(), scopes=SCOPES)
-    flow.redirect_uri = "http://localhost:8000/api/google/callback"
-    auth_url, _ = flow.authorization_url(
+    global _pending_flow
+    _pending_flow = Flow.from_client_config(_get_client_config(), scopes=SCOPES)
+    _pending_flow.redirect_uri = "http://localhost:8000/api/google/callback"
+    auth_url, _ = _pending_flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
         prompt="consent",
@@ -56,11 +61,15 @@ def get_auth_url() -> str:
 
 def exchange_code(code: str) -> dict:
     """Exchange the OAuth callback code for tokens."""
-    flow = Flow.from_client_config(_get_client_config(), scopes=SCOPES)
-    flow.redirect_uri = "http://localhost:8000/api/google/callback"
-    flow.fetch_token(code=code)
+    global _pending_flow
+    if not _pending_flow:
+        # Fallback: create new flow without PKCE (shouldn't happen normally)
+        _pending_flow = Flow.from_client_config(_get_client_config(), scopes=SCOPES)
+        _pending_flow.redirect_uri = "http://localhost:8000/api/google/callback"
+    _pending_flow.fetch_token(code=code)
 
-    creds = flow.credentials
+    creds = _pending_flow.credentials
+    _pending_flow = None  # Clear after use
     token_data = {
         "token": creds.token,
         "refresh_token": creds.refresh_token,
