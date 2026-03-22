@@ -637,6 +637,18 @@ async def clear_all():
         await db.close()
 
 
+async def _has_data(table: str) -> bool:
+    """Check if a table already has data."""
+    db = await get_db()
+    try:
+        row = await (await db.execute(f"SELECT COUNT(*) as cnt FROM {table}")).fetchone()
+        return row["cnt"] > 0
+    except Exception:
+        return False
+    finally:
+        await db.close()
+
+
 async def main():
     import sys
     print("LifeBoard Seed Script")
@@ -653,23 +665,46 @@ async def main():
         print("\nSeeding user config...")
         await seed_config()
 
-    print("\nSeeding Finance data...")
-    await seed_finance()
+    # Seed functions only run if their tables are empty
+    # This prevents destroying user data on subsequent runs
+    if not await _has_data("finance_accounts"):
+        print("\nSeeding Finance data...")
+        await seed_finance()
+        print("\nSeeding Finance cycle summaries...")
+        await seed_cycle_summaries()
+    else:
+        print("\n[SKIP] Finance — data already exists")
 
-    print("\nSeeding Finance cycle summaries...")
-    await seed_cycle_summaries()
+    if not await _has_data("life_tasks"):
+        print("\nSeeding Life Manager data...")
+        await seed_life_manager()
+    else:
+        print("[SKIP] Life Manager — data already exists")
 
-    print("\nSeeding Life Manager data...")
-    await seed_life_manager()
+    if not await _has_data("health_profile"):
+        print("\nSeeding Health & Body data...")
+        await seed_health()
+    else:
+        print("[SKIP] Health & Body — data already exists")
 
-    print("\nSeeding Health & Body data...")
-    await seed_health()
+    if not await _has_data("investing_accounts"):
+        print("\nSeeding Investing data...")
+        await seed_investing()
+    else:
+        print("[SKIP] Investing — data already exists")
 
-    print("\nSeeding Investing data...")
-    await seed_investing()
+    if not await _has_data("fleet_concerns"):
+        print("\nSeeding Fleet (Dr. Fleet) data...")
+        await seed_fleet()
+    else:
+        print("[SKIP] Fleet — data already exists")
 
-    print("\nSeeding Fleet (Dr. Fleet) data...")
-    await seed_fleet()
+    if not await _has_data("documents"):
+        print("\nSeeding Documents...")
+        # Re-run the document seeding from life_manager seed
+        # (documents are seeded as part of seed_life_manager, check if they exist)
+    else:
+        print("[SKIP] Documents — data already exists")
 
     # Reading & Creative: no seed function — creative files live on disk
     # and are discovered by sync_filesystem(). Books can be added via Telegram.

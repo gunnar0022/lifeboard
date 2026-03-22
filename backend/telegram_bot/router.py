@@ -15,8 +15,9 @@ from backend import llm_client
 logger = logging.getLogger(__name__)
 
 # Valid agent IDs (fleet is session-based, not in this set)
-VALID_AGENTS = {"finance", "life_manager", "health_body", "investing", "reading_creative"}
+VALID_AGENTS = {"finance", "life_manager", "health_body", "investing", "reading_creative", "documents"}
 FLEET_AGENT = "fleet"
+DOCUMENTS_AGENT = "documents"
 
 # Emoji prefixes for multi-agent consolidated replies
 AGENT_EMOJI = {
@@ -25,6 +26,7 @@ AGENT_EMOJI = {
     "health_body": "\U0001f4aa",    # flexed biceps
     "investing": "\U0001f4c8",     # chart increasing
     "reading_creative": "\U0001fab6",  # feather
+    "documents": "\U0001f4c4",     # page facing up
 }
 
 AGENT_LABELS = {
@@ -33,6 +35,7 @@ AGENT_LABELS = {
     "health_body": "Health & Body",
     "investing": "Investing",
     "reading_creative": "Reading & Creative",
+    "documents": "Documents",
 }
 
 # --- In-memory state (resets on restart, fine per LM-14) ---
@@ -63,6 +66,7 @@ Agents:
 - health_body: food, meals, exercise, workouts, sports, gym, weight, mood, energy, medical, calories, nutrition, sleep, health checkups, health concern updates (e.g. "back pain was better today"). Any physical activity (volleyball, running, etc.) goes here, not life_manager
 - investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
 - reading_creative: creative ideas, worldbuilding, story ideas, writing, books, reading list, finished reading, book recommendations
+- documents: looking up info from uploaded documents/PDFs, "what's my ID number", "what does my contract say", finding details in stored files. Use when the user asks about information that would be IN a document they've uploaded.
 - fleet: ONLY for explicit requests to see a doctor, talk to Fleet, start a medical consultation/clinic visit
 
 Rules:
@@ -180,6 +184,11 @@ async def dispatch_text(update: Update, text: str):
         if agent_id == FLEET_AGENT:
             from backend.agents.fleet.telegram import start_session
             await start_session(update)
+            return
+
+        # Document retrieval request
+        if agent_id == DOCUMENTS_AGENT:
+            await _handle_document_query(update, routed_text)
             return
 
         # Single agent — dispatch directly, agent sends its own reply
@@ -353,6 +362,12 @@ async def handle_router_fallback(query, data: str):
             def __init__(self, q, text):
                 self.message = FakeMessage(q, text)
 
+        # Documents agent uses its own handler
+        if agent_id == DOCUMENTS_AGENT:
+            fake = FakeUpdate(query, original_text)
+            await _handle_document_query(fake, original_text)
+            return
+
         handler = _get_agent_handler(agent_id, "process_message")
         if handler:
             fake = FakeUpdate(query, original_text)
@@ -397,6 +412,52 @@ async def _dispatch_multi_agent(update: Update, routes: list[dict]):
     _track_reply(sent_msg.message_id, "multi")
 
 
+# --- Document retrieval ---
+
+async def _handle_document_query(update: Update, query_text: str):
+    """Search documents and use Haiku to extract the answer from summaries."""
+    from backend.documents import search_documents
+    from backend import llm_client
+
+    docs = await search_documents(query=query_text, limit=10)
+
+    if not docs:
+        await update.message.reply_text(
+            "I couldn't find any documents matching that query. "
+            "Try uploading the document first via photo or PDF."
+        )
+        _update_recent_context("documents")
+        return
+
+    # Build context from document summaries
+    doc_context = "\n\n".join(
+        f"[{d['title']}] (tags: {', '.join(d.get('tags', []))})\n{d.get('summary', 'No summary')}"
+        for d in docs
+    )
+
+    # Ask Haiku to answer the user's question from the document summaries
+    try:
+        result = await llm_client.process_message(
+            system_prompt=(
+                "You are a document lookup assistant. The user is asking about information "
+                "from their stored documents. Below are summaries of matching documents. "
+                "Answer the user's question directly from these summaries. If the information "
+                "isn't in any summary, say so and suggest they check the original document. "
+                "Be concise and direct. Return JSON: {\"action\": \"respond\", \"reply\": \"your answer\"}"
+            ),
+            user_message=f"Question: {query_text}\n\nDocuments found:\n{doc_context}",
+            max_tokens=500,
+            model=llm_client.MODEL_FAST,
+        )
+        reply = result.get("reply", "I found some documents but couldn't extract the answer.")
+    except Exception as e:
+        logger.error(f"Document query failed: {e}")
+        reply = "Something went wrong looking that up."
+
+    await update.message.reply_text(reply)
+    _update_recent_context("documents")
+
+
 # --- Fallback keyboards ---
 
 async def _send_fallback_keyboard(update: Update, text: str):
@@ -426,6 +487,10 @@ async def _send_fallback_keyboard(update: Update, text: str):
             InlineKeyboardButton(
                 f"{AGENT_EMOJI['reading_creative']} Creative",
                 callback_data="router:reading_creative",
+            ),
+            InlineKeyboardButton(
+                f"{AGENT_EMOJI['documents']} Documents",
+                callback_data="router:documents",
             ),
         ],
     ]
