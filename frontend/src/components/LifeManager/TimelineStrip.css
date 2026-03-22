@@ -2,6 +2,12 @@
   margin-bottom: var(--space-lg);
 }
 
+/* Disable the card hover transform — the translateY(-2px) causes
+   the popup and its contents to thrash when crossing hover boundaries */
+.timeline-strip.card:hover {
+  transform: none;
+}
+
 .timeline-strip__header {
   display: flex;
   justify-content: space-between;
