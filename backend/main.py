@@ -327,11 +327,15 @@ async def view_document_file(doc_id: int):
     return FileResponse(str(full_path), media_type=doc.get("mime_type", "application/octet-stream"), filename=doc.get("original_filename"))
 
 
-# --- Serve built frontend (production) ---
+# --- Serve built frontend (production) --- (MUST be last — catch-all route)
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 
-if FRONTEND_DIST.exists():
-    # Serve static assets (JS, CSS, images)
+
+def _register_spa_routes():
+    """Register SPA routes at the very end so they don't catch API routes."""
+    if not FRONTEND_DIST.exists():
+        return
+
     app.mount(
         "/assets",
         StaticFiles(directory=str(FRONTEND_DIST / "assets")),
@@ -355,3 +359,6 @@ if DATA_FILES.exists():
         StaticFiles(directory=str(DATA_FILES)),
         name="uploaded_files",
     )
+
+# Register SPA catch-all LAST so it doesn't intercept API routes
+_register_spa_routes()
