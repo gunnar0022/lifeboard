@@ -171,6 +171,36 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_backup(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Trigger a manual backup."""
+    if not _is_authorized(update):
+        return
+
+    await update.message.reply_text("\U0001f4be Running backup...")
+    try:
+        import asyncio
+        from backend.backup import backup_all_manual
+        result = await asyncio.to_thread(backup_all_manual)
+        creative = result.get("creative")
+        full = result.get("full")
+        parts = []
+        if creative:
+            from pathlib import Path
+            size = round(Path(creative).stat().st_size / 1024, 1)
+            parts.append(f"\U0001fab6 Creative: {Path(creative).name} ({size} KB)")
+        if full:
+            from pathlib import Path
+            size = round(Path(full).stat().st_size / 1024, 1)
+            parts.append(f"\U0001f4c4 Full: {Path(full).name} ({size} KB)")
+        await update.message.reply_text(
+            "\U00002705 *Backup complete*\n\n" + "\n".join(parts),
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        logger.error(f"Manual backup failed: {e}")
+        await update.message.reply_text(f"Backup failed: {e}")
+
+
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command."""
     if not _is_authorized(update):
@@ -315,6 +345,7 @@ async def start_bot():
     _bot_app.add_handler(CommandHandler("start", cmd_start))
     _bot_app.add_handler(CommandHandler("help", cmd_help))
     _bot_app.add_handler(CommandHandler("status", cmd_status))
+    _bot_app.add_handler(CommandHandler("backup", cmd_backup))
     _bot_app.add_handler(
         MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
     )
@@ -330,6 +361,7 @@ async def start_bot():
     await _bot_app.bot.set_my_commands([
         BotCommand("help", "What can LifeBoard do?"),
         BotCommand("status", "Daily briefing from all agents"),
+        BotCommand("backup", "Create a manual backup"),
     ])
 
     # Initialize and start polling

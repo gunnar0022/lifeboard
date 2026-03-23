@@ -27,6 +27,9 @@ data/
 *.db
 *.sqlite3
 
+# Backups (local only)
+backups/
+
 # User config (contains personal settings)
 user_config.json
 

@@ -96,6 +96,15 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Google Calendar scheduler failed: {e}")
 
+    # Backup scheduler
+    backup_running = False
+    try:
+        from backend.backup import start_backup_scheduler
+        await start_backup_scheduler()
+        backup_running = True
+    except Exception as e:
+        logger.error(f"Backup scheduler failed to start: {e}")
+
     yield
 
     # Shutdown schedulers
@@ -133,6 +142,13 @@ async def lifespan(app: FastAPI):
             await stop_sync_scheduler()
         except Exception as e:
             logger.error(f"Google Calendar scheduler stop error: {e}")
+
+    if backup_running:
+        try:
+            from backend.backup import stop_backup_scheduler
+            await stop_backup_scheduler()
+        except Exception as e:
+            logger.error(f"Backup scheduler stop error: {e}")
 
     logger.info("Shutting down Telegram bot...")
     await stop_bot()
@@ -268,6 +284,23 @@ async def google_sync():
     from backend.google_calendar import sync_calendar
     await sync_calendar()
     return {"ok": True}
+
+
+# --- Backup API ---
+
+@app.post("/api/backup")
+async def manual_backup():
+    """Trigger a manual backup of everything."""
+    import asyncio
+    from backend.backup import backup_all_manual
+    result = await asyncio.to_thread(backup_all_manual)
+    return result
+
+@app.get("/api/backups")
+async def list_all_backups():
+    """List all available backups."""
+    from backend.backup import list_backups
+    return list_backups()
 
 
 # --- Event enrichment (set reminders from dashboard) ---
