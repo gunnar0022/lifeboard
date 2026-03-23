@@ -153,7 +153,14 @@ Return ONLY the JSON object."""
 
         # Validate and sanitize
         title = result.get("title", original_filename)
-        summary = result.get("summary", "")
+        raw_summary = result.get("summary", "")
+        # Summary might come back as a list of extracted fields — convert to string
+        if isinstance(raw_summary, list):
+            summary = "\n".join(f"• {item}" for item in raw_summary if item)
+        elif isinstance(raw_summary, dict):
+            summary = "\n".join(f"• {k}: {v}" for k, v in raw_summary.items() if v)
+        else:
+            summary = str(raw_summary) if raw_summary else ""
         tags = [t for t in result.get("tags", []) if t in VALID_TAGS] or ["other"]
         category = result.get("category", "life")
         if category not in VALID_CATEGORIES:

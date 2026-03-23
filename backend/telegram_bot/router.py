@@ -326,15 +326,6 @@ async def handle_router_fallback(query, data: str):
     Handle callbacks from the router's fallback keyboard.
     data format: "router:{agent_id}" or "router_photo:{agent_id}"
     """
-    if data.startswith("router_photo:"):
-        agent_id = data[len("router_photo:"):]
-        if agent_id in VALID_AGENTS:
-            _update_recent_context(agent_id)
-            await query.edit_message_text(
-                f"Got it — send the photo again and I'll route it to {AGENT_LABELS.get(agent_id, agent_id)}."
-            )
-        return
-
     if data.startswith("router:"):
         agent_id = data[len("router:"):]
         if agent_id not in VALID_AGENTS:
@@ -540,24 +531,25 @@ async def _send_fallback_keyboard(update: Update, text: str):
 
 # --- Helper functions ---
 
-def _get_agent_handler(agent_id: str, method: str):
-    """Dynamically import and return an agent's handler function."""
+def _get_agent_handler(agent_id: str, method: str = "process_message"):
+    """Dynamically import and return an agent's process_message handler.
+    Photos/documents now go through the unified classifier — agents only handle text."""
     try:
         if agent_id == "finance":
-            from backend.agents.finance.telegram import process_message, process_photo
-            return process_message if method == "process_message" else process_photo
+            from backend.agents.finance.telegram import process_message
+            return process_message
         elif agent_id == "life_manager":
-            from backend.agents.life_manager.telegram import process_message, process_photo
-            return process_message if method == "process_message" else process_photo
+            from backend.agents.life_manager.telegram import process_message
+            return process_message
         elif agent_id == "health_body":
-            from backend.agents.health_body.telegram import process_message, process_photo
-            return process_message if method == "process_message" else process_photo
+            from backend.agents.health_body.telegram import process_message
+            return process_message
         elif agent_id == "investing":
-            from backend.agents.investing.telegram import process_message, process_photo
-            return process_message if method == "process_message" else process_photo
+            from backend.agents.investing.telegram import process_message
+            return process_message
         elif agent_id == "reading_creative":
-            from backend.agents.reading_creative.telegram import process_message, process_photo
-            return process_message if method == "process_message" else process_photo
+            from backend.agents.reading_creative.telegram import process_message
+            return process_message
     except ImportError as e:
         logger.error(f"Failed to import {agent_id} handler: {e}")
     return None
