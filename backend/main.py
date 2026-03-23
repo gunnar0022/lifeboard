@@ -172,6 +172,83 @@ for router in get_agent_routers():
     app.include_router(router)
 
 
+# --- Setup Wizard API ---
+
+@app.get("/api/setup/status")
+async def setup_status():
+    from backend.setup import get_setup_status
+    return get_setup_status()
+
+@app.post("/api/setup/env")
+async def setup_env(body: dict):
+    from backend.setup import save_env
+    save_env(body)
+    return {"ok": True}
+
+@app.post("/api/setup/config")
+async def setup_config(body: dict):
+    from backend.setup import save_config
+    save_config(body)
+    return {"ok": True}
+
+@app.post("/api/setup/test-anthropic")
+async def setup_test_anthropic(body: dict):
+    from backend.setup import test_anthropic_key
+    return await test_anthropic_key(body.get("api_key", ""))
+
+@app.post("/api/setup/test-telegram")
+async def setup_test_telegram(body: dict):
+    from backend.setup import test_telegram_token
+    return await test_telegram_token(body.get("token", ""))
+
+@app.post("/api/setup/health-profile")
+async def setup_health_profile(body: dict):
+    """Save health profile from the wizard."""
+    from backend.agents.health_body.queries import upsert_profile
+    await upsert_profile(**body)
+    return {"ok": True}
+
+@app.post("/api/setup/add-holding")
+async def setup_add_holding(body: dict):
+    """Add an investment holding from the wizard."""
+    from backend.agents.investing.queries import add_holding, record_transaction
+    holding = await add_holding(
+        symbol=body["symbol"],
+        name=body.get("name", body["symbol"]),
+        asset_class=body.get("asset_class", "stock"),
+        currency=body.get("currency", "USD"),
+    )
+    if body.get("shares") and body.get("price"):
+        price_int = int(float(body["price"]) * (100 if body.get("currency", "USD") != "JPY" else 1))
+        await record_transaction(
+            holding_id=holding["id"],
+            tx_type="buy",
+            shares=float(body["shares"]),
+            price_per_share=price_int,
+            total_amount=int(float(body["shares"]) * price_int),
+            currency=body.get("currency", "USD"),
+        )
+    return {"ok": True}
+
+@app.post("/api/setup/add-book")
+async def setup_add_book(body: dict):
+    """Add a book from the wizard."""
+    from backend.agents.reading_creative.queries import add_book
+    await add_book(
+        title=body["title"],
+        author=body.get("author"),
+        status=body.get("status", "reading"),
+    )
+    return {"ok": True}
+
+@app.post("/api/setup/complete")
+async def setup_complete():
+    """Mark setup as complete."""
+    from backend.setup import save_config
+    save_config({"setup_complete": True})
+    return {"ok": True}
+
+
 # --- Shell-level API routes ---
 
 

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/Shell/Sidebar';
 import TopBar from './components/Shell/TopBar';
 import HomePanel from './components/Shell/HomePanel';
+import SetupWizard from './components/Setup/SetupWizard';
 import FinancePanel from './components/Finance/FinancePanel';
 import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
 import HealthPanel from './components/Health/HealthPanel';
@@ -16,9 +17,19 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const [setupComplete, setSetupComplete] = useState(null); // null = loading, true/false
+
   const { data: agents, loading: agentsLoading } = useApi('/api/agents');
   const { data: config, loading: configLoading } = useApi('/api/config');
   const { data: nudges } = useApi('/api/nudges');
+
+  // Check setup status on load
+  useEffect(() => {
+    fetch('/api/setup/status')
+      .then(r => r.json())
+      .then(data => setSetupComplete(data.setup_complete))
+      .catch(() => setSetupComplete(false));
+  }, []);
 
   const handleNavigate = (panelId) => {
     setActivePanel(panelId);
@@ -65,6 +76,20 @@ export default function App() {
 
     return null;
   };
+
+  // Show wizard if setup isn't complete
+  if (setupComplete === null) {
+    return (
+      <div className="app-loading">
+        <div className="app-loading__spinner" />
+        <p>Loading LifeBoard...</p>
+      </div>
+    );
+  }
+
+  if (setupComplete === false) {
+    return <SetupWizard onComplete={() => window.location.reload()} />;
+  }
 
   if (agentsLoading || configLoading) {
     return (
