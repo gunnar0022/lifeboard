@@ -87,23 +87,23 @@
 /* Warm dark — not aggressive black, just a comfortable evening palette */
 [data-theme="dark"] {
   --bg-primary: #1C1C1E;
-  --bg-secondary: #232326;
-  --bg-tertiary: #2C2C30;
-  --bg-card: #252528;
-  --bg-sidebar: #1E1E20;
-  --bg-topbar: #1E1E20;
-  --bg-hover: #2F2F34;
-  --bg-skeleton: #2C2C30;
+  --bg-secondary: #2A2A2E;
+  --bg-tertiary: #343438;
+  --bg-card: #2E2E32;
+  --bg-sidebar: #26262A;
+  --bg-topbar: #26262A;
+  --bg-hover: #38383E;
+  --bg-skeleton: #343438;
 
-  --text-primary: #E8E6E3;
-  --text-secondary: #A0A0A6;
-  --text-tertiary: #6E6E76;
-  --text-muted: #6E6E76;
+  --text-primary: #EAE8E5;
+  --text-secondary: #A8A8AE;
+  --text-tertiary: #78787F;
+  --text-muted: #78787F;
   --text-inverse: #1A1A1A;
 
-  --border-light: #38383C;
-  --border-subtle: #38383C;
-  --border-medium: #48484E;
+  --border-light: #40404A;
+  --border-subtle: #40404A;
+  --border-medium: #50505A;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
