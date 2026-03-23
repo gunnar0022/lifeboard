@@ -220,6 +220,7 @@ function DayPopup({ day, onClose, onEditEvent }) {
               <Star size={11} />
               <span>{typeof h === 'string' ? h : h.title}</span>
               {h.country && <span className="day-popup__holiday-flag">{h.country === 'jp' ? '🇯🇵' : h.country === 'us' ? '🇺🇸' : ''}</span>}
+              {h.type === 'public' && <span className="day-popup__holiday-type day-popup__holiday-type--public">public</span>}
               {h.type === 'observance' && <span className="day-popup__holiday-type">obs</span>}
             </div>
           ))}
@@ -370,6 +371,15 @@ export default function TimelineStrip({ timeline, onRefresh }) {
 
   const hasActivity = (day) => day.events > 0 || day.tasks > 0 || day.bills > 0 || day.has_overdue || (day.holidays && day.holidays.length > 0);
 
+  const getHolidayClass = (holidays) => {
+    if (!holidays || holidays.length === 0) return '';
+    const countries = new Set(holidays.map(h => typeof h === 'string' ? 'other' : h.country));
+    if (countries.has('jp') && countries.has('us')) return ' timeline-grid__cell--holiday-both';
+    if (countries.has('jp')) return ' timeline-grid__cell--holiday-jp';
+    if (countries.has('us')) return ' timeline-grid__cell--holiday-us';
+    return ' timeline-grid__cell--holiday';
+  };
+
   return (
     <div className="timeline-strip card">
       <div className="timeline-strip__header">
@@ -449,7 +459,7 @@ export default function TimelineStrip({ timeline, onRefresh }) {
                 {week.map(day => (
                   <button
                     key={day.date}
-                    className={`timeline-grid__cell${day.is_today ? ' timeline-grid__cell--today' : ''}${hasActivity(day) ? ' timeline-grid__cell--has-items' : ''}${selectedDay?.date === day.date ? ' timeline-grid__cell--selected' : ''}${day.has_overdue ? ' timeline-grid__cell--overdue' : ''}${day.holidays?.length > 0 ? ' timeline-grid__cell--holiday' : ''}${day.is_before_today ? ' timeline-grid__cell--past' : ''}`}
+                    className={`timeline-grid__cell${day.is_today ? ' timeline-grid__cell--today' : ''}${hasActivity(day) ? ' timeline-grid__cell--has-items' : ''}${selectedDay?.date === day.date ? ' timeline-grid__cell--selected' : ''}${day.has_overdue ? ' timeline-grid__cell--overdue' : ''}${getHolidayClass(day.holidays)}${day.is_before_today ? ' timeline-grid__cell--past' : ''}`}
                     onClick={() => handleDayClick(day)}
                     title={day.holidays?.length > 0 ? (typeof day.holidays[0] === 'string' ? day.holidays[0] : day.holidays[0]?.title) : ''}
                   >

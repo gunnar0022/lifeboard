@@ -259,9 +259,10 @@
 .grid-dot--bill { background: #f59e0b; }
 .grid-dot--holiday { background: var(--color-life-manager); }
 
-.timeline-grid__cell--holiday {
-  background: color-mix(in srgb, var(--color-life-manager) 10%, transparent);
-}
+.timeline-grid__cell--holiday { background: color-mix(in srgb, var(--color-life-manager) 10%, transparent); }
+.timeline-grid__cell--holiday-jp { background: color-mix(in srgb, #DC2626 10%, transparent); }
+.timeline-grid__cell--holiday-us { background: color-mix(in srgb, #2563EB 10%, transparent); }
+.timeline-grid__cell--holiday-both { background: color-mix(in srgb, #7C3AED 12%, transparent); }
 
 .timeline-grid__cell--past {
   opacity: 0.5;
@@ -337,12 +338,15 @@
 
 .day-popup__holiday--jp { color: #DC2626; }
 .day-popup__holiday--us { color: #2563EB; }
-.day-popup__holiday--obs { font-weight: 400; font-style: italic; opacity: 0.8; }
+.day-popup__holiday--obs { font-weight: 400; font-style: italic; opacity: 0.75; }
 
 .day-popup__holiday-flag { font-size: 0.65rem; margin-left: 2px; }
 .day-popup__holiday-type {
   font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.03em;
-  color: var(--text-tertiary); margin-left: auto;
+  color: var(--text-tertiary); margin-left: auto; font-style: italic;
+}
+.day-popup__holiday-type--public {
+  color: var(--text-secondary); font-weight: 600; font-style: normal;
 }
 
 .day-popup__item {
