@@ -498,13 +498,26 @@ async def get_timeline(days: int = 14) -> list[dict]:
         personal_events = [e for e in day_events if not e.get("is_holiday")]
         holidays = [e for e in day_events if e.get("is_holiday")]
 
+        # Build holiday info with country and type
+        holiday_info = []
+        for h in holidays:
+            desc = (h.get("description") or "").lower()
+            is_public = "public holiday" in desc
+            source = h.get("source_calendar", "")
+            country = "jp" if "jp" in source else "us" if "us" in source else "other"
+            holiday_info.append({
+                "title": h["title"],
+                "country": country,
+                "type": "public" if is_public else "observance",
+            })
+
         timeline.append({
             "date": d_str,
             "day_name": d.strftime("%a"),
             "day_num": d.day,
             "is_today": i == 0,
             "events": len(personal_events),
-            "holidays": [h["title"] for h in holidays],
+            "holidays": holiday_info,
             "tasks": len(day_tasks),
             "bills": len(day_bills),
             "has_overdue": has_overdue if i == 0 else False,

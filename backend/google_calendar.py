@@ -165,9 +165,9 @@ async def _pull_from_google(service, time_min: str, time_max: str):
     personal_events = events_result.get("items", [])
 
     # Get Japanese holidays
-    holiday_events = []
+    jp_holidays = []
     try:
-        holidays_result = await asyncio.to_thread(
+        jp_result = await asyncio.to_thread(
             lambda: service.events().list(
                 calendarId="en.japanese#holiday@group.v.calendar.google.com",
                 timeMin=time_min,
@@ -177,20 +177,40 @@ async def _pull_from_google(service, time_min: str, time_max: str):
                 maxResults=100,
             ).execute()
         )
-        holiday_events = holidays_result.get("items", [])
+        jp_holidays = jp_result.get("items", [])
     except Exception as e:
         logger.warning(f"Could not fetch Japanese holidays: {e}")
+
+    # Get US holidays
+    us_holidays = []
+    try:
+        us_result = await asyncio.to_thread(
+            lambda: service.events().list(
+                calendarId="en.usa#holiday@group.v.calendar.google.com",
+                timeMin=time_min,
+                timeMax=time_max,
+                singleEvents=True,
+                orderBy="startTime",
+                maxResults=100,
+            ).execute()
+        )
+        us_holidays = us_result.get("items", [])
+    except Exception as e:
+        logger.warning(f"Could not fetch US holidays: {e}")
 
     db = await get_db()
     try:
         for event in personal_events:
             await _upsert_google_event(db, event, "personal", is_holiday=False)
 
-        for event in holiday_events:
-            await _upsert_google_event(db, event, "holidays", is_holiday=True)
+        for event in jp_holidays:
+            await _upsert_google_event(db, event, "holidays_jp", is_holiday=True)
+
+        for event in us_holidays:
+            await _upsert_google_event(db, event, "holidays_us", is_holiday=True)
 
         await db.commit()
-        logger.info(f"Pulled {len(personal_events)} personal + {len(holiday_events)} holiday events from Google")
+        logger.info(f"Pulled {len(personal_events)} personal + {len(jp_holidays)} JP + {len(us_holidays)} US holidays from Google")
     finally:
         await db.close()
 

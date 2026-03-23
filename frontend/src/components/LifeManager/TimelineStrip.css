@@ -90,6 +90,9 @@
   font-weight: 500;
 }
 
+.timeline-day__holiday--jp { color: #DC2626; }
+.timeline-day__holiday--us { color: #2563EB; }
+
 .timeline-day--selected {
   border-color: var(--text-primary);
   background: var(--bg-hover);
@@ -327,9 +330,19 @@
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: var(--color-life-manager);
   font-weight: 500;
-  padding: 2px 0;
+  padding: 3px 0;
+  color: var(--color-life-manager);
+}
+
+.day-popup__holiday--jp { color: #DC2626; }
+.day-popup__holiday--us { color: #2563EB; }
+.day-popup__holiday--obs { font-weight: 400; font-style: italic; opacity: 0.8; }
+
+.day-popup__holiday-flag { font-size: 0.65rem; margin-left: 2px; }
+.day-popup__holiday-type {
+  font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--text-tertiary); margin-left: auto;
 }
 
 .day-popup__item {

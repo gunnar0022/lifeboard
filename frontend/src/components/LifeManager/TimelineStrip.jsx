@@ -216,8 +216,11 @@ function DayPopup({ day, onClose, onEditEvent }) {
       {holidays.length > 0 && (
         <div className="day-popup__holidays">
           {holidays.map((h, i) => (
-            <div key={i} className="day-popup__holiday">
-              <Star size={11} /> {h}
+            <div key={i} className={`day-popup__holiday day-popup__holiday--${h.country || 'other'} ${h.type === 'observance' ? 'day-popup__holiday--obs' : ''}`}>
+              <Star size={11} />
+              <span>{typeof h === 'string' ? h : h.title}</span>
+              {h.country && <span className="day-popup__holiday-flag">{h.country === 'jp' ? '🇯🇵' : h.country === 'us' ? '🇺🇸' : ''}</span>}
+              {h.type === 'observance' && <span className="day-popup__holiday-type">obs</span>}
             </div>
           ))}
         </div>
@@ -423,7 +426,9 @@ export default function TimelineStrip({ timeline, onRefresh }) {
                 )}
               </div>
               {day.holidays?.length > 0 && (
-                <span className="timeline-day__holiday">{day.holidays[0]}</span>
+                <span className={`timeline-day__holiday timeline-day__holiday--${day.holidays[0]?.country || 'other'}`}>
+                  {typeof day.holidays[0] === 'string' ? day.holidays[0] : day.holidays[0]?.title}
+                </span>
               )}
             </motion.button>
           ))}
@@ -446,7 +451,7 @@ export default function TimelineStrip({ timeline, onRefresh }) {
                     key={day.date}
                     className={`timeline-grid__cell${day.is_today ? ' timeline-grid__cell--today' : ''}${hasActivity(day) ? ' timeline-grid__cell--has-items' : ''}${selectedDay?.date === day.date ? ' timeline-grid__cell--selected' : ''}${day.has_overdue ? ' timeline-grid__cell--overdue' : ''}${day.holidays?.length > 0 ? ' timeline-grid__cell--holiday' : ''}${day.is_before_today ? ' timeline-grid__cell--past' : ''}`}
                     onClick={() => handleDayClick(day)}
-                    title={day.holidays?.length > 0 ? day.holidays[0] : ''}
+                    title={day.holidays?.length > 0 ? (typeof day.holidays[0] === 'string' ? day.holidays[0] : day.holidays[0]?.title) : ''}
                   >
                     {day.is_month_start && (
                       <span className="timeline-grid__month-tag">{day.month_label}</span>
