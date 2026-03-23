@@ -23,12 +23,26 @@ export default function App() {
   const { data: config, loading: configLoading } = useApi('/api/config');
   const { data: nudges } = useApi('/api/nudges');
 
-  // Check setup status on load
+  // Check setup status on load — retry if backend isn't ready yet
   useEffect(() => {
-    fetch('/api/setup/status')
-      .then(r => r.json())
-      .then(data => setSetupComplete(data.setup_complete))
-      .catch(() => setSetupComplete(false));
+    let retries = 0;
+    const check = () => {
+      fetch('/api/setup/status')
+        .then(r => {
+          if (!r.ok) throw new Error('not ok');
+          return r.json();
+        })
+        .then(data => setSetupComplete(data.setup_complete))
+        .catch(() => {
+          retries++;
+          if (retries < 10) {
+            setTimeout(check, 1500); // retry every 1.5s up to 10 times
+          } else {
+            setSetupComplete(false); // after 15s of failures, assume first run
+          }
+        });
+    };
+    check();
   }, []);
 
   const handleNavigate = (panelId) => {

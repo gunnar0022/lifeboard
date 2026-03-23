@@ -58,6 +58,7 @@ export default function SetupWizard({ onComplete }) {
     health_calorie_goal: '',
     pay_cycle_day: '25',
     salary_is_net: true,
+    salary_amount: '',
     invest_symbol: '',
     invest_shares: '',
     invest_price: '',
@@ -128,44 +129,57 @@ export default function SetupWizard({ onComplete }) {
       if (data.health_activity) profile.activity_level = data.health_activity;
       if (data.health_calorie_goal) profile.daily_calorie_goal = parseInt(data.health_calorie_goal);
       if (Object.keys(profile).length > 0) {
-        await fetch('/api/setup/health-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(profile),
-        });
+        try {
+          const r = await fetch('/api/setup/health-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profile),
+          });
+          if (!r.ok) console.error('Health profile save failed:', await r.text());
+        } catch (e) { console.error('Health profile save error:', e); }
       }
     }
     if (currentStep === 'finance') {
+      const financeConfig = {
+        pay_cycle_day: parseInt(data.pay_cycle_day) || 25,
+        salary_is_net: true,
+      };
+      if (data.salary_amount) {
+        financeConfig.monthly_salary = parseInt(data.salary_amount);
+      }
       await fetch('/api/setup/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pay_cycle_day: parseInt(data.pay_cycle_day) || 25,
-          salary_is_net: data.salary_is_net,
-        }),
+        body: JSON.stringify(financeConfig),
       });
     }
     if (currentStep === 'investing' && data.invest_symbol.trim()) {
-      await fetch('/api/setup/add-holding', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          symbol: data.invest_symbol.trim().toUpperCase(),
-          shares: data.invest_shares,
-          price: data.invest_price,
-        }),
-      });
+      try {
+        const r = await fetch('/api/setup/add-holding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            symbol: data.invest_symbol.trim().toUpperCase(),
+            shares: data.invest_shares || '0',
+            price: data.invest_price || '0',
+          }),
+        });
+        if (!r.ok) console.error('Investing save failed:', await r.text());
+      } catch (e) { console.error('Investing save error:', e); }
     }
     if (currentStep === 'reading' && data.reading_title.trim()) {
-      await fetch('/api/setup/add-book', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: data.reading_title.trim(),
-          author: data.reading_author.trim() || undefined,
-          status: 'reading',
-        }),
-      });
+      try {
+        const r = await fetch('/api/setup/add-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: data.reading_title.trim(),
+            author: data.reading_author.trim() || null,
+            status: 'reading',
+          }),
+        });
+        if (!r.ok) console.error('Book save failed:', await r.text());
+      } catch (e) { console.error('Book save error:', e); }
     }
     if (currentStep === 'restart') {
       await fetch('/api/setup/complete', { method: 'POST' });
@@ -228,17 +242,43 @@ export default function SetupWizard({ onComplete }) {
               <span className="wizard__hint">Used in dashboard greetings and agent replies.</span>
             </div>
             <div className="wizard__field">
-              <label>Looks like you're in <strong>{data.timezone}</strong> — is that right?</label>
+              <label>
+                It looks like you're in <strong>{data.timezone}</strong> and it's currently{' '}
+                <strong>{new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: data.timezone })}</strong>.
+                {' '}Is that right?
+              </label>
               <div className="wizard__row">
                 <button className={`wizard__choice ${data.timezone_confirmed !== false ? 'wizard__choice--active' : ''}`} onClick={() => update({ timezone_confirmed: true })}>
-                  Yes, that's right
+                  Yes, that's correct
                 </button>
                 <button className={`wizard__choice ${data.timezone_confirmed === false ? 'wizard__choice--active' : ''}`} onClick={() => update({ timezone_confirmed: false })}>
-                  No, let me change it
+                  No, that's not my time
                 </button>
               </div>
               {data.timezone_confirmed === false && (
-                <input value={data.timezone} onChange={e => update({ timezone: e.target.value })} placeholder="e.g., America/New_York" />
+                <div className="wizard__field">
+                  <label>Select your timezone:</label>
+                  <select value={data.timezone} onChange={e => update({ timezone: e.target.value })}>
+                    <option value="Pacific/Honolulu">Hawaii (HST)</option>
+                    <option value="America/Anchorage">Alaska (AKST)</option>
+                    <option value="America/Los_Angeles">Pacific (PST)</option>
+                    <option value="America/Denver">Mountain (MST)</option>
+                    <option value="America/Chicago">Central (CST)</option>
+                    <option value="America/New_York">Eastern (EST)</option>
+                    <option value="America/Sao_Paulo">Brazil (BRT)</option>
+                    <option value="Europe/London">London (GMT)</option>
+                    <option value="Europe/Paris">Central Europe (CET)</option>
+                    <option value="Europe/Helsinki">Eastern Europe (EET)</option>
+                    <option value="Asia/Dubai">Dubai (GST)</option>
+                    <option value="Asia/Kolkata">India (IST)</option>
+                    <option value="Asia/Bangkok">Bangkok (ICT)</option>
+                    <option value="Asia/Shanghai">China (CST)</option>
+                    <option value="Asia/Tokyo">Japan (JST)</option>
+                    <option value="Asia/Seoul">Korea (KST)</option>
+                    <option value="Australia/Sydney">Sydney (AEST)</option>
+                    <option value="Pacific/Auckland">New Zealand (NZST)</option>
+                  </select>
+                </div>
               )}
             </div>
           </div>
@@ -400,14 +440,12 @@ export default function SetupWizard({ onComplete }) {
               <span className="wizard__hint">Budgets are tracked against your pay cycle, not the calendar month.</span>
             </div>
             <div className="wizard__field">
-              <label>Is your salary amount after tax?</label>
-              <div className="wizard__row">
-                <button className={`wizard__choice ${data.salary_is_net ? 'wizard__choice--active' : ''}`} onClick={() => update({ salary_is_net: true })}>Yes, after tax</button>
-                <button className={`wizard__choice ${!data.salary_is_net ? 'wizard__choice--active' : ''}`} onClick={() => update({ salary_is_net: false })}>No, before tax</button>
-              </div>
+              <label>How much do you take home each month? (after tax)</label>
+              <input type="number" value={data.salary_amount} onChange={e => update({ salary_amount: e.target.value })} placeholder="e.g., 250000" />
+              <span className="wizard__hint">This helps track your budget against actual income.</span>
             </div>
             <div className="wizard__agent-info">
-              <p>You can add bank accounts from the dashboard. The finance agent handles multi-currency (JPY/USD), budget alerts, and recurring payments.</p>
+              <p>You can add bank accounts from the dashboard. The finance agent handles multi-currency, budget alerts, and recurring payments.</p>
             </div>
           </div>
         );
