@@ -9,7 +9,7 @@ import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
 
 export default function LifeManagerPanel() {
-  const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline');
+  const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline?days=56');
   const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50');
   const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills');
   const { data: config } = useApi('/api/config');

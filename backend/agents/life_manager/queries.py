@@ -443,41 +443,58 @@ async def get_overdue() -> dict:
 async def get_timeline(days: int = 14) -> list[dict]:
     """Get timeline data for the next N days (for the dashboard timeline strip)."""
     today = _today()
-    all_tasks = await get_tasks(is_completed=False)
+    start_str = today.isoformat()
+    end_date = today + timedelta(days=days)
+    end_str = end_date.isoformat()
+
+    # Batch-fetch everything in 3 queries instead of N*2
+    db = await get_db()
+    try:
+        event_rows = await db.execute_fetchall(
+            """SELECT * FROM life_events
+               WHERE substr(start_time, 1, 10) >= ? AND substr(start_time, 1, 10) <= ?
+               AND sync_status != 'pending_delete'
+               ORDER BY start_time""",
+            [start_str, end_str],
+        )
+        all_events = [dict(r) for r in event_rows]
+
+        bill_rows = await db.execute_fetchall(
+            "SELECT * FROM life_bills WHERE next_due >= ? AND next_due <= ? AND is_paid = 0",
+            [start_str, end_str],
+        )
+        all_bills = [dict(r) for r in bill_rows]
+
+        task_rows = await db.execute_fetchall(
+            "SELECT * FROM life_tasks WHERE is_completed = 0"
+        )
+        all_tasks = [dict(r) for r in task_rows]
+    finally:
+        await db.close()
+
+    # Group by date
+    events_by_date = {}
+    for e in all_events:
+        d = e["start_time"][:10]
+        events_by_date.setdefault(d, []).append(e)
+
+    bills_by_date = {}
+    for b in all_bills:
+        bills_by_date.setdefault(b["next_due"], []).append(b)
+
+    # Check overdue once
+    overdue = await get_overdue()
+    has_overdue = bool(overdue["tasks"] or overdue["bills"])
+
     timeline = []
     for i in range(days):
         d = today + timedelta(days=i)
         d_str = d.isoformat()
 
-        # Events: match by date prefix (start_time may be full ISO datetime)
-        db = await get_db()
-        try:
-            event_rows = await db.execute_fetchall(
-                """SELECT * FROM life_events
-                   WHERE substr(start_time, 1, 10) = ?
-                   AND sync_status != 'pending_delete'
-                   ORDER BY start_time""",
-                [d_str],
-            )
-            day_events = [dict(r) for r in event_rows]
-
-            bill_rows = await db.execute_fetchall(
-                "SELECT * FROM life_bills WHERE next_due = ? AND is_paid = 0",
-                [d_str],
-            )
-            day_bills = [dict(r) for r in bill_rows]
-        finally:
-            await db.close()
-
+        day_events = events_by_date.get(d_str, [])
+        day_bills = bills_by_date.get(d_str, [])
         day_tasks = [t for t in all_tasks if t.get("due_date") == d_str]
 
-        # Check for overdue items on this day (only for today)
-        has_overdue = False
-        if i == 0:
-            overdue = await get_overdue()
-            has_overdue = bool(overdue["tasks"] or overdue["bills"])
-
-        # Separate holidays from personal events
         personal_events = [e for e in day_events if not e.get("is_holiday")]
         holidays = [e for e in day_events if e.get("is_holiday")]
 
@@ -490,7 +507,7 @@ async def get_timeline(days: int = 14) -> list[dict]:
             "holidays": [h["title"] for h in holidays],
             "tasks": len(day_tasks),
             "bills": len(day_bills),
-            "has_overdue": has_overdue,
+            "has_overdue": has_overdue if i == 0 else False,
             "items": personal_events + day_tasks + day_bills,
         })
 
