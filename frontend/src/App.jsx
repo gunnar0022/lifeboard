@@ -14,6 +14,7 @@ import './App.css';
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { data: agents, loading: agentsLoading } = useApi('/api/agents');
   const { data: config, loading: configLoading } = useApi('/api/config');
@@ -21,6 +22,7 @@ export default function App() {
 
   const handleNavigate = (panelId) => {
     setActivePanel(panelId);
+    setMobileMenuOpen(false);
   };
 
   const renderPanel = () => {
@@ -75,17 +77,24 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div className="app__mobile-overlay" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
       <Sidebar
         agents={agents || []}
         activePanel={activePanel}
         onNavigate={handleNavigate}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileMenuOpen}
       />
 
       <TopBar
         nudges={nudges || []}
         sidebarCollapsed={sidebarCollapsed}
+        onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
       <main

@@ -25,10 +25,10 @@ const ICON_MAP = {
   'book-open': BookOpen,
 };
 
-export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse }) {
+export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen }) {
   return (
     <motion.aside
-      className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}
+      className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${mobileOpen ? 'sidebar--mobile-open' : ''}`}
       animate={{ width: collapsed ? 72 : 260 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >

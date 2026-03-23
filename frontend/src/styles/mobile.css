@@ -1,0 +1,236 @@
+/* ── Mobile Responsiveness (max-width: 768px) ── */
+
+@media (max-width: 768px) {
+
+  /* ── Sidebar: hidden by default, slides in as overlay ── */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 260px !important;
+    z-index: 200;
+  }
+
+  .sidebar--mobile-open {
+    transform: translateX(0);
+  }
+
+  /* ── TopBar: scrolls with content, full width ── */
+  .topbar {
+    position: relative !important;
+    left: 0 !important;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+  }
+
+  .topbar__hamburger {
+    display: flex !important;
+  }
+
+  .topbar__title {
+    font-size: 1rem;
+  }
+
+  /* ── Content: no sidebar offset ── */
+  .app__content {
+    margin-left: 0 !important;
+    padding: var(--space-md);
+    padding-top: 0;
+  }
+
+  /* ── Home panel: pulse cards stack ── */
+  .home-panel__grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Life Manager: single column ── */
+  .life-panel__grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Timeline: compact ── */
+  .timeline-strip__scroll {
+    gap: 4px;
+  }
+
+  .timeline-day {
+    min-width: 52px;
+    padding: var(--space-xs) var(--space-xs);
+  }
+
+  /* ── 8-week grid: smaller cells ── */
+  .timeline-grid__cell {
+    min-height: 36px;
+    font-size: 0.7rem;
+  }
+
+  .timeline-grid__day-label {
+    font-size: 0.6rem;
+  }
+
+  /* ── Finance: account cards scroll ── */
+  .accounts-strip__cards {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .account-card {
+    min-width: 150px;
+  }
+
+  .accounts-strip__totals {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  /* ── Health: heatmap scrolls ── */
+  .heatmap__scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Investing: header stacks ── */
+  .investing-panel__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .portfolio-trend__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* ── Cards: no hover transform on mobile ── */
+  .card:hover {
+    transform: none !important;
+  }
+
+  /* ── Document search: full width inputs ── */
+  .doc-search__bar input {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+
+  /* ── QuickAddBar: stack inputs ── */
+  .quick-add-bar__inputs {
+    flex-wrap: wrap;
+  }
+
+  .quick-add-bar__input {
+    flex: 1 1 100%;
+    font-size: 16px;
+  }
+
+  .quick-add-bar__date {
+    font-size: 16px;
+  }
+
+  /* ── Reading & Creative panel: narrower content column ── */
+  .rc-panel__content {
+    max-width: 90%;
+  }
+
+  /* ── Floating snippets: fewer, smaller ── */
+  .floating-snippets__item {
+    max-width: 60%;
+    font-size: 0.7rem !important;
+  }
+
+  /* ── Creative workspace: mobile view-only ── */
+  .workspace {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .workspace__sidebar {
+    width: 100%;
+    max-height: 250px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .workspace__main {
+    flex-direction: column;
+  }
+
+  .workspace__panes--split .workspace__editor,
+  .workspace__panes--split .workspace__preview {
+    width: 100%;
+  }
+
+  .workspace__panes--split {
+    flex-direction: column;
+  }
+
+  .workspace__editor {
+    min-height: 200px;
+  }
+
+  .workspace__preview {
+    border-left: none;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .workspace__project-bar {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .workspace__project-tabs {
+    flex-wrap: wrap;
+  }
+
+  /* ── Event edit modal: full width ── */
+  .event-modal {
+    width: 95vw;
+    max-height: 90vh;
+  }
+
+  .event-modal__row {
+    flex-direction: column;
+  }
+
+  /* ── Doc edit modal: full width ── */
+  .doc-edit-modal {
+    width: 95vw;
+  }
+
+  .doc-edit-modal__row {
+    flex-direction: column;
+  }
+
+  /* ── Context menu: wider on mobile ── */
+  .ctx-menu {
+    min-width: 200px;
+  }
+
+  /* ── Concerns tracker ── */
+  .concern-item__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .concern-item__meta {
+    align-self: flex-end;
+  }
+}
+
+/* ── Hamburger button: hidden on desktop ── */
+.topbar__hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  margin-right: var(--space-xs);
+}
+
+.topbar__hamburger:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, Sun, Moon } from 'lucide-react';
+import { Bell, Sun, Moon, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TopBar.css';
 
@@ -17,7 +17,7 @@ function useTheme() {
   return { theme, toggle };
 }
 
-export default function TopBar({ nudges = [], sidebarCollapsed }) {
+export default function TopBar({ nudges = [], sidebarCollapsed, onMobileMenuToggle }) {
   const [now, setNow] = useState(new Date());
   const [showNudges, setShowNudges] = useState(false);
   const { theme, toggle: toggleTheme } = useTheme();
@@ -55,6 +55,11 @@ export default function TopBar({ nudges = [], sidebarCollapsed }) {
       }}
     >
       <div className="topbar__left">
+        {onMobileMenuToggle && (
+          <button className="topbar__hamburger" onClick={onMobileMenuToggle} aria-label="Menu">
+            <Menu size={22} />
+          </button>
+        )}
         <h1 className="topbar__title">LifeBoard</h1>
       </div>
 

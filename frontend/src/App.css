@@ -33,3 +33,23 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Mobile overlay for hamburger menu */
+.app__mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .app__mobile-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
+
+  .app__content {
+    margin-left: 0 !important;
+    padding-top: 0;
+  }
+}
