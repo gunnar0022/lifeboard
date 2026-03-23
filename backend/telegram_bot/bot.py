@@ -29,83 +29,144 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     display_name = config.get("display_name", "friend")
 
     await update.message.reply_text(
-        f"Hey {display_name}! Here's what I can do:\n\n"
-        "Just send me a message and I'll route it automatically:\n"
-        "  \U0001f4b0 *Finance* — spending, budget, accounts, transactions\n"
-        "  \U0001f4cb *Life Manager* — tasks, events, bills, documents\n"
-        "  \U0001f4aa *Health & Body* — meals, exercise, mood, medical\n\n"
-        "I can handle multi-topic messages too!\n"
-        'e.g. "spent 1000 on ramen, it had chashu and egg"\n'
-        "routes to Finance + Health automatically.\n\n"
-        "*/status* \u2014 Quick summary from all agents\n"
-        "*/help* \u2014 Show this message\n",
+        f"Hey {display_name}! Just send me a message and I'll route it automatically.\n\n"
+        "*Agents:*\n"
+        "  \U0001f4cb *Life Manager* \u2014 events, tasks, bills (syncs with Google Calendar)\n"
+        "  \U0001f4aa *Health & Body* \u2014 meals, exercise, mood, weight, concerns\n"
+        "  \U0001f4b0 *Finance* \u2014 spending, budget, accounts, transfers\n"
+        "  \U0001f4c8 *Investing* \u2014 stocks, portfolio, holdings, dividends\n"
+        "  \U0001fab6 *Reading & Creative* \u2014 idea capture, reading log\n"
+        "  \U0001f4c4 *Documents* \u2014 search, edit, delete uploaded docs\n"
+        "  \U0001fa7a *Dr. Fleet* \u2014 say \"see the doctor\" for a health consultation\n\n"
+        "*Tips:*\n"
+        "  \u2022 Multi-topic: \"spent 1000 on ramen\" \u2192 Finance + Health\n"
+        "  \u2022 Direct: \"tell health I had a burger\" routes to Health\n"
+        "  \u2022 Photos/PDFs auto-classified and stored as documents\n"
+        "  \u2022 Ask about docs: \"what's my license number?\"\n\n"
+        "*/status* \u2014 Daily briefing\n"
+        "*/help* \u2014 This message",
         parse_mode="Markdown",
     )
 
 
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Return a quick summary from all active agents."""
+    """Return a comprehensive daily briefing from all agents."""
     if not _is_authorized(update):
         return
 
-    from backend.agents.finance import queries as fq
+    from datetime import date as dt_date, datetime, timedelta
+    from zoneinfo import ZoneInfo
+
     config = get_config()
+    tz = ZoneInfo(config.get("timezone", "UTC"))
+    now = datetime.now(tz)
+    today_str = now.date().isoformat()
     symbol = "\u00a5" if config.get("primary_currency") == "JPY" else "$"
+    display_name = config.get("display_name", "friend")
 
+    sections = []
+
+    # Header
+    day_name = now.strftime("%A")
+    date_str = now.strftime("%B %d")
+    sections.append(f"\U0001f4ca *Good {('morning' if now.hour < 12 else 'afternoon' if now.hour < 18 else 'evening')}, {display_name}*\n{day_name}, {date_str}\n")
+
+    # Calendar — next 3 events
     try:
-        cycle = await fq.get_cycle_summary()
-        cycle_info = fq.get_cycle_day_info()
-        accounts = await fq.get_accounts(active_only=True)
-        total_balance = sum(a["current_balance"] for a in accounts if a["currency"] == config.get("primary_currency", "JPY"))
-
-        finance_status = (
-            f"\U0001f4b0 *Finance*\n"
-            f"  Balance: {symbol}{total_balance:,}\n"
-            f"  Cycle: {symbol}{cycle['expenses']:,} spent | {symbol}{cycle['income']:,} income\n"
-            f"  Day {cycle_info['current_day']} | {cycle_info['days_to_payday']} days to payday"
-        )
+        from backend.google_calendar import get_events_live
+        events = await get_events_live(days=7)
+        personal = [e for e in events if not e.get("is_holiday")][:3]
+        if personal:
+            event_lines = []
+            for e in personal:
+                start = e.get("start", e.get("start_time", ""))
+                time_str = ""
+                if "T" in str(start):
+                    time_str = str(start).split("T")[1][:5] + " "
+                event_lines.append(f"  \u2022 {time_str}{e.get('title', 'Event')}")
+            sections.append("\U0001f4c5 *Upcoming*\n" + "\n".join(event_lines))
+        else:
+            sections.append("\U0001f4c5 *Calendar*: Nothing coming up this week")
     except Exception:
-        finance_status = "\U0001f4b0 *Finance*: No data yet"
+        sections.append("\U0001f4c5 *Calendar*: Unavailable")
 
-    # Life Manager status
+    # Life Manager
     try:
         from backend.agents.life_manager import queries as lq
         pulse = await lq.get_pulse()
-        overdue = pulse["overdue_count"]
-        tasks_today = pulse["tasks_due_today"]
-        bills_7d = pulse["upcoming_bills"]
-        life_status = (
-            f"\U0001f4cb *Life Manager*\n"
-            f"  Tasks due today: {tasks_today}\n"
-            f"  Bills coming (7d): {bills_7d}\n"
-            f"  Overdue items: {overdue}"
-        )
+        parts = []
+        if pulse["tasks_due_today"] > 0:
+            parts.append(f"{pulse['tasks_due_today']} tasks due today")
+        if pulse["upcoming_bills"] > 0:
+            parts.append(f"{pulse['upcoming_bills']} bills this week")
+        if pulse["overdue_count"] > 0:
+            parts.append(f"\u26a0\ufe0f {pulse['overdue_count']} overdue")
+        if parts:
+            sections.append("\U0001f4cb *Life*: " + " \u2022 ".join(parts))
     except Exception:
-        life_status = "\U0001f4cb *Life Manager*: No data yet"
+        pass
 
-    # Health & Body status
+    # Health
     try:
         from backend.agents.health_body import queries as hq
-        from datetime import date as dt_date
         profile = await hq.get_profile()
         if profile:
-            today_str = dt_date.today().isoformat()
             meals = await hq.get_meals_for_date(today_str)
             today_cal = sum(m.get("calories", 0) for m in meals)
             goal = profile.get("daily_calorie_goal", 0)
-            weight_kg = round(profile.get("weight_g", 0) / 1000, 1) if profile.get("weight_g") else "?"
-            health_status = (
-                f"\U0001f4aa *Health & Body*\n"
-                f"  Today: {today_cal}/{goal} kcal ({len(meals)} meals)\n"
-                f"  Weight: {weight_kg}kg"
-            )
-        else:
-            health_status = "\U0001f4aa *Health & Body*: Profile not set up"
+            pct = f" ({int(today_cal/goal*100)}%)" if goal > 0 else ""
+            sections.append(f"\U0001f4aa *Health*: {today_cal:,}/{goal:,} kcal{pct} \u2022 {len(meals)} meals logged")
     except Exception:
-        health_status = "\U0001f4aa *Health & Body*: No data yet"
+        pass
+
+    # Health concerns
+    try:
+        from backend.agents.fleet.queries import get_active_concerns
+        concerns = await get_active_concerns()
+        if concerns:
+            concern_names = [c["title"] for c in concerns[:3]]
+            sections.append(f"\U0001fa7a *Concerns*: " + ", ".join(concern_names))
+    except Exception:
+        pass
+
+    # Finance
+    try:
+        from backend.agents.finance import queries as fq
+        cycle = await fq.get_cycle_summary()
+        cycle_info = fq.get_cycle_day_info()
+        net = cycle["income"] - cycle["expenses"]
+        sections.append(
+            f"\U0001f4b0 *Finance*: {symbol}{net:,} net \u2022 "
+            f"Day {cycle_info['current_day']}/{cycle_info['total_days']} \u2022 "
+            f"{cycle_info['days_to_payday']}d to payday"
+        )
+    except Exception:
+        pass
+
+    # Investing
+    try:
+        from backend.agents.investing.queries import get_portfolio_summary
+        portfolio = await get_portfolio_summary()
+        if portfolio.get("holding_count", 0) > 0:
+            total = portfolio["total_value"]
+            gain_pct = portfolio["gain_loss_pct"]
+            sign = "+" if gain_pct >= 0 else ""
+            sections.append(f"\U0001f4c8 *Portfolio*: {symbol}{total:,} ({sign}{gain_pct}%)")
+    except Exception:
+        pass
+
+    # Reading
+    try:
+        from backend.agents.reading_creative.queries import get_books
+        books = await get_books(status="reading")
+        if books:
+            titles = [b["title"] for b in books[:2]]
+            sections.append(f"\U0001f4d6 *Reading*: " + ", ".join(titles))
+    except Exception:
+        pass
 
     await update.message.reply_text(
-        f"\U0001f4ca *LifeBoard Status*\n\n{finance_status}\n\n{life_status}\n\n{health_status}",
+        "\n\n".join(sections),
         parse_mode="Markdown",
     )
 
@@ -267,8 +328,8 @@ async def start_bot():
 
     # Set bot commands for Telegram menu
     await _bot_app.bot.set_my_commands([
-        BotCommand("help", "Show available commands"),
-        BotCommand("status", "Quick summary from all agents"),
+        BotCommand("help", "What can LifeBoard do?"),
+        BotCommand("status", "Daily briefing from all agents"),
     ])
 
     # Initialize and start polling
