@@ -3,20 +3,24 @@
 :root {
   /* Base colors */
   --bg-primary: #FAFAF7;
+  --bg-secondary: #F5F5F0;
+  --bg-tertiary: #EDEDEA;
   --bg-card: #FFFFFF;
   --bg-sidebar: #FFFFFF;
   --bg-topbar: #FFFFFF;
-  --bg-hover: #F5F5F0;
-  --bg-skeleton: #F0F0EB;
+  --bg-hover: #F0F0EB;
+  --bg-skeleton: #EDEDEA;
 
   /* Text */
   --text-primary: #1A1A1A;
   --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
   --text-muted: #9CA3AF;
   --text-inverse: #FFFFFF;
 
   /* Borders & shadows */
   --border-light: #E5E7EB;
+  --border-subtle: #E5E7EB;
   --border-medium: #D1D5DB;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -31,7 +35,6 @@
   --color-reading-creative: #B07CD8;
   --color-career: #3B82F6;
   --color-projects: #EC4899;
-  --color-reading-creative: #14B8A6;
 
   /* Semantic colors */
   --color-income: #10B981;
@@ -78,6 +81,60 @@
 
   /* Stagger delay */
   --stagger-delay: 60ms;
+}
+
+/* ── Dark Mode ── */
+/* Warm dark — not aggressive black, just a comfortable evening palette */
+[data-theme="dark"] {
+  --bg-primary: #1C1C1E;
+  --bg-secondary: #232326;
+  --bg-tertiary: #2C2C30;
+  --bg-card: #252528;
+  --bg-sidebar: #1E1E20;
+  --bg-topbar: #1E1E20;
+  --bg-hover: #2F2F34;
+  --bg-skeleton: #2C2C30;
+
+  --text-primary: #E8E6E3;
+  --text-secondary: #A0A0A6;
+  --text-tertiary: #6E6E76;
+  --text-muted: #6E6E76;
+  --text-inverse: #1A1A1A;
+
+  --border-light: #38383C;
+  --border-subtle: #38383C;
+  --border-medium: #48484E;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.25);
+
+  /* Agent colors — slightly softened for dark backgrounds */
+  --color-finance: #14C4BE;
+  --color-life-manager: #FF8A82;
+  --color-health-body: #FFB340;
+  --color-investing: #9B7EFF;
+  --color-reading-creative: #C896E8;
+  --color-career: #5B9CF6;
+  --color-projects: #F472B6;
+
+  /* Semantic — slightly brighter on dark */
+  --color-income: #34D399;
+  --color-expense: #FB7185;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-alert: #FB7185;
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-skeleton) 25%,
+    #34343A 50%,
+    var(--bg-skeleton) 75%
+  );
+  background-size: 200% 100%;
 }
 
 /* Reset & base */

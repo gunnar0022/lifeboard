@@ -1,11 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TopBar.css';
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('lifeboard-theme') || 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('lifeboard-theme', theme);
+  }, [theme]);
+
+  const toggle = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+  return { theme, toggle };
+}
 
 export default function TopBar({ nudges = [], sidebarCollapsed }) {
   const [now, setNow] = useState(new Date());
   const [showNudges, setShowNudges] = useState(false);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -54,6 +69,15 @@ export default function TopBar({ nudges = [], sidebarCollapsed }) {
             {topNudge.text}
           </span>
         )}
+
+        <button
+          className="topbar__theme-btn"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
 
         <button
           className="topbar__notification-btn"
