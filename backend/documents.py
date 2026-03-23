@@ -29,6 +29,34 @@ VALID_CATEGORIES = {"finance", "health", "investing", "life"}
 
 # --- Classifier ---
 
+def _extract_pdf_content(file_path_on_disk: str) -> dict:
+    """Extract text and/or render pages as images from a PDF using pymupdf."""
+    import fitz  # pymupdf
+
+    doc = fitz.open(file_path_on_disk)
+    pages_text = []
+    pages_images = []
+
+    for page in doc:
+        text = page.get_text().strip()
+        if text:
+            pages_text.append(text)
+        else:
+            # No selectable text — render page as image for vision
+            pix = page.get_pixmap(dpi=200)
+            pages_images.append(pix.tobytes("png"))
+
+    doc.close()
+
+    full_text = "\n\n--- Page Break ---\n\n".join(pages_text) if pages_text else ""
+    return {
+        "text": full_text,
+        "images": pages_images,
+        "has_text": bool(full_text),
+        "page_count": len(pages_text) + len(pages_images),
+    }
+
+
 async def classify_document(
     file_path: str,
     original_filename: str,
@@ -38,33 +66,90 @@ async def classify_document(
     image_data: bytes = None,
 ) -> dict:
     """
-    Use Haiku to classify a document: generate title, summary, tags, and category.
-    For images, sends the image to Claude vision. For PDFs, sends filename + caption context.
+    Classify a document using Sonnet vision (images) or text extraction (PDFs).
+    Extracts specific data points: names, IDs, dates, amounts, addresses.
     """
     from backend import llm_client
+    import asyncio
 
-    system_prompt = f"""You are a document classifier. Analyze the uploaded document and return a JSON object with:
-- "title": short descriptive title (e.g., "Annual Health Checkup 2025", "March Electricity Bill")
-- "summary": 2-4 sentence summary capturing key details. For pay stubs: dates, amounts. For medical: findings, provider. For contracts: parties, terms, dates. For receipts: items, amounts, vendor. Be specific with numbers and dates.
-- "tags": array of tags from this set: {sorted(VALID_TAGS)}. Pick 1-3 most relevant.
-- "category": one of: finance, health, investing, life. Use "health" for medical/dental/vision/prescription docs. Use "finance" for receipts/invoices/pay-stubs/bank-statements. Use "investing" for portfolio/brokerage docs. Use "life" for contracts/leases/ID docs/legal/insurance or anything that doesn't clearly fit the other 3.
-- "date": ISO date if you can identify one from the document (nullable)
-- "provider": organization/company/clinic name if identifiable (nullable)
+    system_prompt = f"""You are a document data extractor. Your job is to READ the document and EXTRACT all important information.
+
+Return a JSON object with:
+- "title": short descriptive title (e.g., "Nevada Driver's License - Gunnar Anderson", "Employment Contract - TechCo Japan")
+- "summary": A structured extraction of ALL important data found. Format as a list:
+  * Full names (holder, issuer, parties involved)
+  * ID/license/account/policy numbers (EXACT numbers as written)
+  * Dates (birth, issue, expiry, effective — in ISO format where possible)
+  * Monetary amounts (salaries, fees, totals)
+  * Addresses (full addresses as written)
+  * Key terms, conditions, or findings (1-2 sentences max each)
+  Skip any field not present. Do NOT include boilerplate text, legal disclaimers, or generic descriptions.
+  Be SPECIFIC — copy exact numbers, names, and dates from the document.
+- "tags": array of tags from: {sorted(VALID_TAGS)}. Pick 1-3 most relevant.
+- "category": one of: finance, health, investing, life
+- "date": most relevant ISO date from the document (issue date, visit date, etc.)
+- "provider": organization/company/clinic name
 
 User context: "{user_caption or 'No caption provided'}"
 Filename: {original_filename}
 
-Return ONLY the JSON object, no other text."""
+Return ONLY the JSON object."""
 
     try:
-        result = await llm_client.process_message(
-            system_prompt=system_prompt,
-            user_message=f"Classify this document: {original_filename}. {user_caption}",
-            image_data=image_data if mime_type and mime_type.startswith("image/") else None,
-            image_media_type=mime_type if mime_type and mime_type.startswith("image/") else "image/jpeg",
-            max_tokens=500,
-            model=llm_client.MODEL_FAST,
+        is_image = mime_type and mime_type.startswith("image/")
+        is_pdf = mime_type and mime_type == "application/pdf"
+        send_image = None
+        send_mime = "image/jpeg"
+        extra_images = []
+        user_message = f"Extract all data from this document: {original_filename}"
+        if user_caption:
+            user_message += f"\nContext: {user_caption}"
+
+        if is_image and image_data:
+            # Direct image — send to Sonnet vision
+            send_image = image_data
+            send_mime = mime_type
+
+        elif is_pdf:
+            # Extract text or render as images
+            full_disk_path = str(PROJECT_ROOT / "data" / "files" / file_path)
+            pdf_content = await asyncio.to_thread(_extract_pdf_content, full_disk_path)
+
+            if pdf_content["has_text"]:
+                # Text-based PDF — send extracted text (no vision needed)
+                text_preview = pdf_content["text"][:8000]
+                user_message += f"\n\nExtracted PDF text ({pdf_content['page_count']} pages):\n{text_preview}"
+            elif pdf_content["images"]:
+                # Scanned PDF — send all pages as images (up to 6)
+                send_image = pdf_content["images"][0]
+                send_mime = "image/png"
+                extra_images = pdf_content["images"][1:6]
+                if len(pdf_content["images"]) > 1:
+                    user_message += f"\n\n(Scanned PDF: {len(pdf_content['images'])} pages)"
+
+        # Build API call — supports multiple images for multi-page scanned PDFs
+        import base64 as b64
+        content = []
+        if send_image:
+            content.append({
+                "type": "image",
+                "source": {"type": "base64", "media_type": send_mime, "data": b64.b64encode(send_image).decode()},
+            })
+            for extra_img in extra_images:
+                content.append({
+                    "type": "image",
+                    "source": {"type": "base64", "media_type": "image/png", "data": b64.b64encode(extra_img).decode()},
+                })
+        content.append({"type": "text", "text": user_message})
+
+        client = llm_client._get_client()
+        response = await client.messages.create(
+            model=llm_client.MODEL,  # Sonnet — better vision + extraction
+            max_tokens=1500,
+            system=system_prompt,
+            messages=[{"role": "user", "content": content}],
         )
+        result = llm_client._extract_json(response.content[0].text.strip())
 
         # Validate and sanitize
         title = result.get("title", original_filename)
@@ -83,8 +168,8 @@ Return ONLY the JSON object, no other text."""
             "provider": result.get("provider"),
         }
     except Exception as e:
-        logger.error(f"Document classification failed: {e}")
-        # Fallback: basic classification from filename/caption
+        logger.error(f"Document classification failed: {e}", exc_info=True)
+        # Fallback
         return {
             "title": original_filename,
             "summary": user_caption or "Document uploaded via Telegram",
