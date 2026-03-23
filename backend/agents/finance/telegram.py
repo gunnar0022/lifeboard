@@ -94,47 +94,5 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
 
 
 async def process_photo(update: Update, caption: str = None, send_reply: bool = True) -> str:
-    """Process a photo sent to the Finance agent (receipts, etc.)."""
-    global _conversation_history
-
-    # Download the photo
-    photo = update.message.photo[-1]  # Highest resolution
-    file = await photo.get_file()
-    image_data = await file.download_as_bytearray()
-
-    system_prompt = await build_system_prompt()
-
-    message_text = caption or "Here's a receipt/financial document. Extract the details."
-
-    action_data = await llm_client.process_message(
-        system_prompt=system_prompt,
-        user_message=message_text,
-        conversation_history=_conversation_history,
-        image_data=bytes(image_data),
-        image_media_type="image/jpeg",
-    )
-
-    _conversation_history.append({"role": "user", "content": f"[Photo] {message_text}"})
-
-    result = await execute_action(action_data, ACTION_REGISTRY)
-
-    reply_text = result["reply"]
-    _conversation_history.append({"role": "assistant", "content": reply_text})
-
-    if len(_conversation_history) > 10:
-        _conversation_history = _conversation_history[-10:]
-
-    # Handle clarify with keyboard
-    if send_reply:
-        if action_data.get("action") == "clarify" and result.get("options"):
-            buttons = [
-                [InlineKeyboardButton(opt, callback_data=f"finance:{opt}")]
-                for opt in result["options"]
-            ]
-            await update.message.reply_text(
-                reply_text, reply_markup=InlineKeyboardMarkup(buttons)
-            )
-        else:
-            await update.message.reply_text(reply_text)
-
-    return reply_text
+    """Photos go through the unified document classifier. Redirect to text handler."""
+    return await process_message(update, caption or "Photo received", send_reply)
