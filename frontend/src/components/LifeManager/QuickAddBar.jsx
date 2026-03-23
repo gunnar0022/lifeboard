@@ -32,9 +32,11 @@ export default function QuickAddBar({ currencySymbol, onSuccess }) {
           due_date: date || undefined,
         });
       } else if (type === 'event') {
+        const eventDate = date || new Date().toISOString().split('T')[0];
         await apiPost('/api/life/events', {
           title: title.trim(),
-          date: date || new Date().toISOString().split('T')[0],
+          start_time: eventDate,
+          all_day: true,
         });
       } else if (type === 'bill') {
         const amountInt = Math.round(parseFloat(amount) || 0);

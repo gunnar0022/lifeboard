@@ -254,6 +254,15 @@
 .grid-dot--event { background: #6366f1; }
 .grid-dot--task { background: #22c55e; }
 .grid-dot--bill { background: #f59e0b; }
+.grid-dot--holiday { background: var(--color-life-manager); }
+
+.timeline-grid__cell--holiday {
+  background: color-mix(in srgb, var(--color-life-manager) 10%, transparent);
+}
+
+.timeline-grid__cell--past {
+  opacity: 0.5;
+}
 
 /* ── Day detail popup ── */
 .day-popup {

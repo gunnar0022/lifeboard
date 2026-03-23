@@ -444,8 +444,9 @@ export default function TimelineStrip({ timeline, onRefresh }) {
                 {week.map(day => (
                   <button
                     key={day.date}
-                    className={`timeline-grid__cell${day.is_today ? ' timeline-grid__cell--today' : ''}${hasActivity(day) ? ' timeline-grid__cell--has-items' : ''}${selectedDay?.date === day.date ? ' timeline-grid__cell--selected' : ''}${day.has_overdue ? ' timeline-grid__cell--overdue' : ''}`}
+                    className={`timeline-grid__cell${day.is_today ? ' timeline-grid__cell--today' : ''}${hasActivity(day) ? ' timeline-grid__cell--has-items' : ''}${selectedDay?.date === day.date ? ' timeline-grid__cell--selected' : ''}${day.has_overdue ? ' timeline-grid__cell--overdue' : ''}${day.holidays?.length > 0 ? ' timeline-grid__cell--holiday' : ''}${day.is_before_today ? ' timeline-grid__cell--past' : ''}`}
                     onClick={() => handleDayClick(day)}
+                    title={day.holidays?.length > 0 ? day.holidays[0] : ''}
                   >
                     {day.is_month_start && (
                       <span className="timeline-grid__month-tag">{day.month_label}</span>
@@ -456,6 +457,7 @@ export default function TimelineStrip({ timeline, onRefresh }) {
                         {day.events > 0 && <span className="grid-dot grid-dot--event" />}
                         {day.tasks > 0 && <span className="grid-dot grid-dot--task" />}
                         {day.bills > 0 && <span className="grid-dot grid-dot--bill" />}
+                        {day.holidays?.length > 0 && <span className="grid-dot grid-dot--holiday" />}
                       </div>
                     )}
                   </button>
