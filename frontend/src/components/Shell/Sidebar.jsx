@@ -25,7 +25,7 @@ const ICON_MAP = {
   'book-open': BookOpen,
 };
 
-export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen }) {
+export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose }) {
   return (
     <motion.aside
       className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${mobileOpen ? 'sidebar--mobile-open' : ''}`}
@@ -47,12 +47,21 @@ export default function Sidebar({ agents, activePanel, onNavigate, collapsed, on
           )}
         </AnimatePresence>
         <button
-          className="sidebar__toggle"
+          className="sidebar__toggle sidebar__toggle--desktop"
           onClick={onToggleCollapse}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
+        {onMobileClose && (
+          <button
+            className="sidebar__toggle sidebar__toggle--mobile"
+            onClick={onMobileClose}
+            aria-label="Close menu"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
       </div>
 
       <nav className="sidebar__nav">

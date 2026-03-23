@@ -14,6 +14,15 @@
     transform: translateX(0);
   }
 
+  /* Hide desktop collapse toggle, show mobile close */
+  .sidebar__toggle--desktop {
+    display: none !important;
+  }
+
+  .sidebar__toggle--mobile {
+    display: flex !important;
+  }
+
   /* ── TopBar: scrolls with content, full width ── */
   .topbar {
     position: relative !important;
@@ -25,6 +34,11 @@
 
   .topbar__hamburger {
     display: flex !important;
+  }
+
+  /* Hide the nudge preview text on mobile — overlaps with logo */
+  .topbar__nudge-text {
+    display: none !important;
   }
 
   .topbar__title {
@@ -90,7 +104,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Investing: header stacks ── */
+  /* ── Investing: header stacks + text overflow fix ── */
   .investing-panel__header {
     flex-direction: column;
     align-items: flex-start;
@@ -100,6 +114,61 @@
   .portfolio-trend__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .portfolio-trend__value {
+    font-size: 1.3rem;
+  }
+
+  .portfolio-trend__gain {
+    font-size: 0.75rem;
+  }
+
+  .holdings-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .allocation-chart__legend {
+    font-size: 0.75rem;
+  }
+
+  /* ── Health: meal/exercise breakdown word wrap fix ── */
+  .recent-detail__meal,
+  .recent-detail__exercise,
+  .recent-detail__macro {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .recent-detail__macros {
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .profile-card {
+    flex-wrap: wrap;
+  }
+
+  /* ── Life Manager: tighter timeline + full-width cards ── */
+  .timeline-strip {
+    padding: var(--space-sm) !important;
+  }
+
+  .life-panel__grid {
+    gap: var(--space-sm);
+  }
+
+  .quick-add-bar {
+    padding: var(--space-sm) !important;
+  }
+
+  .doc-search {
+    padding: var(--space-sm) !important;
+  }
+
+  .card {
+    padding: var(--space-md) !important;
   }
 
   /* ── Cards: no hover transform on mobile ── */
@@ -137,7 +206,7 @@
     font-size: 0.7rem !important;
   }
 
-  /* ── Creative workspace: mobile view-only ── */
+  /* ── Creative workspace: stacked layout on mobile ── */
   .workspace {
     height: auto;
     min-height: 100vh;
@@ -154,22 +223,29 @@
     flex-direction: column;
   }
 
+  .workspace__editor-area {
+    min-height: 60vh;
+  }
+
+  .workspace__panes {
+    flex-direction: column;
+    min-height: 60vh;
+  }
+
   .workspace__panes--split .workspace__editor,
   .workspace__panes--split .workspace__preview {
     width: 100%;
   }
 
-  .workspace__panes--split {
-    flex-direction: column;
-  }
-
   .workspace__editor {
-    min-height: 200px;
+    min-height: 50vh;
+    flex: 1;
   }
 
   .workspace__preview {
     border-left: none;
     border-top: 1px solid var(--border-subtle);
+    min-height: 40vh;
   }
 
   .workspace__project-bar {
@@ -233,4 +309,9 @@
 .topbar__hamburger:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+/* Mobile close button: hidden on desktop */
+.sidebar__toggle--mobile {
+  display: none;
 }
