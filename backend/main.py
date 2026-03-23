@@ -227,7 +227,14 @@ async def setup_add_holding(body: dict):
             price_per_share=price_int,
             total_amount=int(float(body["shares"]) * price_int),
             currency=body.get("currency", "USD"),
+            date_str=body.get("date"),
         )
+    # Immediately fetch current market price
+    try:
+        from backend.agents.investing.scheduler import refresh_single_holding_price
+        await refresh_single_holding_price(holding["id"])
+    except Exception:
+        pass  # Non-critical — daily scheduler will catch it
     return {"ok": True}
 
 @app.post("/api/setup/add-book")

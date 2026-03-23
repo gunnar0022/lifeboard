@@ -62,6 +62,7 @@ export default function SetupWizard({ onComplete }) {
     invest_symbol: '',
     invest_shares: '',
     invest_price: '',
+    invest_date: '',
     reading_title: '',
     reading_author: '',
   });
@@ -162,6 +163,7 @@ export default function SetupWizard({ onComplete }) {
             symbol: data.invest_symbol.trim().toUpperCase(),
             shares: data.invest_shares || '0',
             price: data.invest_price || '0',
+            date: data.invest_date || undefined,
           }),
         });
         if (!r.ok) console.error('Investing save failed:', await r.text());
@@ -460,16 +462,23 @@ export default function SetupWizard({ onComplete }) {
               <input value={data.invest_symbol} onChange={e => update({ invest_symbol: e.target.value })} placeholder="e.g., AAPL" />
             </div>
             {data.invest_symbol && (
-              <div className="wizard__row">
-                <div className="wizard__field" style={{ flex: 1 }}>
-                  <label>Shares</label>
-                  <input type="number" value={data.invest_shares} onChange={e => update({ invest_shares: e.target.value })} placeholder="e.g., 10" />
+              <>
+                <div className="wizard__row">
+                  <div className="wizard__field" style={{ flex: 1 }}>
+                    <label>Shares</label>
+                    <input type="number" value={data.invest_shares} onChange={e => update({ invest_shares: e.target.value })} placeholder="e.g., 10" />
+                  </div>
+                  <div className="wizard__field" style={{ flex: 1 }}>
+                    <label>Buy price per share</label>
+                    <input type="number" value={data.invest_price} onChange={e => update({ invest_price: e.target.value })} placeholder="e.g., 150" />
+                  </div>
                 </div>
-                <div className="wizard__field" style={{ flex: 1 }}>
-                  <label>Buy price per share</label>
-                  <input type="number" value={data.invest_price} onChange={e => update({ invest_price: e.target.value })} placeholder="e.g., 150" />
+                <div className="wizard__field">
+                  <label>When did you buy it?</label>
+                  <input type="date" value={data.invest_date} onChange={e => update({ invest_date: e.target.value })} />
+                  <span className="wizard__hint">Optional — defaults to today if left blank.</span>
                 </div>
-              </div>
+              </>
             )}
             <div className="wizard__agent-info">
               <p>The investing agent tracks portfolio value, fetches live prices daily, and converts between currencies. Add more holdings via Telegram or the dashboard.</p>
