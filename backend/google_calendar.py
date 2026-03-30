@@ -152,6 +152,12 @@ async def sync_calendar():
         await _push_to_google(service, tz_name)
         await _detect_google_deletions(service, time_min, time_max)
         logger.info("Google Calendar sync completed")
+        try:
+            from backend.ws_manager import manager
+            await manager.broadcast("life_manager")
+            await manager.broadcast("home")
+        except Exception:
+            pass
     except Exception as e:
         error_str = str(e)
         logger.error(f"Google Calendar sync error: {e}", exc_info=True)

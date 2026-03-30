@@ -8,10 +8,11 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, UploadFile, Form
+from fastapi import FastAPI, HTTPException, UploadFile, Form, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from backend.ws_manager import manager as ws_manager
 
 from backend.database import init_db
 from backend.config import get_config, get_currency_symbol
@@ -678,6 +679,18 @@ async def view_document_file(doc_id: int):
         from fastapi import HTTPException
         raise HTTPException(404, "File missing from disk")
     return FileResponse(str(full_path), media_type=doc.get("mime_type", "application/octet-stream"), filename=doc.get("original_filename"))
+
+
+# --- WebSocket for live dashboard updates ---
+
+@app.websocket("/ws/updates")
+async def websocket_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except Exception:
+        ws_manager.disconnect(websocket)
 
 
 # --- Serve built frontend (production) --- (MUST be last — catch-all route)

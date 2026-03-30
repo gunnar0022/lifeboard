@@ -8,6 +8,18 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Map agent IDs to panel keys for WebSocket broadcasts
+_AGENT_TO_PANEL = {
+    "finance": "finance",
+    "investing": "investing",
+    "health_body": "health",
+    "life_manager": "life_manager",
+    "reading_creative": "reading_creative",
+}
+
+# Shopping actions get their own panel key
+_SHOPPING_ACTIONS = {"shopping_add", "shopping_remove", "shopping_check", "shopping_clear_checked", "shopping_list"}
+
 # Patterns that suggest the LLM thinks it performed an action.
 # Must be affirmative claims like "I've deleted..." or "Done! Logged..."
 # NOT matches for "I don't see" or "no X found" or "couldn't delete".
@@ -18,7 +30,7 @@ _ACTION_CLAIM_PATTERN = re.compile(
 )
 
 
-async def execute_action(action_data: dict, action_registry: dict) -> dict:
+async def execute_action(action_data: dict, action_registry: dict, agent_id: str = None) -> dict:
     """
     Validate and execute an action from the LLM.
 
@@ -26,6 +38,7 @@ async def execute_action(action_data: dict, action_registry: dict) -> dict:
         action_data: JSON action dict from Claude (must have "action" key).
         action_registry: Agent's ACTION_REGISTRY mapping action names to
                         {"handler": async_func, "required": [...], "optional": [...]}.
+        agent_id: Optional agent identifier for WebSocket broadcast.
 
     Returns:
         dict with "success" (bool), "result" (any), and "reply" (str).
@@ -93,6 +106,20 @@ async def execute_action(action_data: dict, action_registry: dict) -> dict:
     try:
         result = await handler(data)
         reply = action_data.get("reply", "Done!")
+
+        # Broadcast via WebSocket for live dashboard updates
+        if agent_id and not spec.get("is_read"):
+            try:
+                from backend.ws_manager import manager
+                panel = _AGENT_TO_PANEL.get(agent_id)
+                if action_name in _SHOPPING_ACTIONS:
+                    await manager.broadcast("shopping")
+                if panel:
+                    await manager.broadcast(panel)
+                await manager.broadcast("home")
+            except Exception:
+                pass  # Non-critical
+
         return {
             "success": True,
             "result": result,

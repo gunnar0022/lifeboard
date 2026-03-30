@@ -25,7 +25,7 @@ const ICON_MAP = {
   'book-open': BookOpen,
 };
 
-export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose }) {
+export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose, wsConnected }) {
   return (
     <motion.aside
       className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${mobileOpen ? 'sidebar--mobile-open' : ''}`}
@@ -92,6 +92,23 @@ export default function Sidebar({ agents, activePanel, onNavigate, collapsed, on
             />
           );
         })}
+
+        <div className="sidebar__ws-status" title={wsConnected ? 'Live updates active' : 'Reconnecting...'}>
+          <span className={`sidebar__ws-dot ${wsConnected ? 'sidebar__ws-dot--connected' : 'sidebar__ws-dot--disconnected'}`} />
+          <AnimatePresence mode="wait">
+            {!collapsed && (
+              <motion.span
+                className="sidebar__ws-label"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                {wsConnected ? 'Live' : 'Reconnecting...'}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
       </nav>
     </motion.aside>
   );

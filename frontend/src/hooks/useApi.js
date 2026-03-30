@@ -1,13 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext, createContext } from 'react';
 
 const API_BASE = '';
+
+// Refresh signal context — provided by App.jsx
+export const RefreshContext = createContext({});
 
 export function useApi(endpoint, options = {}) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const refreshSignal = useContext(RefreshContext);
 
-  const { skip = false } = options;
+  const { skip = false, panelKey = null } = options;
 
   const fetchData = useCallback(async () => {
     if (skip) return;
@@ -28,6 +32,13 @@ export function useApi(endpoint, options = {}) {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Auto-refresh when WebSocket signals a change for this panel
+  useEffect(() => {
+    if (panelKey && refreshSignal[panelKey]) {
+      fetchData();
+    }
+  }, [panelKey, refreshSignal[panelKey]]);
 
   return { data, loading, error, refetch: fetchData };
 }

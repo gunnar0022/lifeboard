@@ -253,3 +253,10 @@ async def run_price_refresh():
     today_str = date.today().isoformat()
     await queries.store_portfolio_snapshot(today_str, total_value, primary_currency, breakdown)
     logger.info(f"Portfolio snapshot stored: {primary_currency} {total_value:,} on {today_str}")
+
+    try:
+        from backend.ws_manager import manager
+        await manager.broadcast("investing")
+        await manager.broadcast("home")
+    except Exception:
+        pass

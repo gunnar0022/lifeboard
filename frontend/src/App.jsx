@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Shell/Sidebar';
 import TopBar from './components/Shell/TopBar';
 import HomePanel from './components/Shell/HomePanel';
@@ -10,14 +10,27 @@ import HealthPanel from './components/Health/HealthPanel';
 import InvestingPanel from './components/Investing/InvestingPanel';
 import ReadingCreativePanel from './components/ReadingCreative/ReadingCreativePanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
-import { useApi } from './hooks/useApi';
+import { useApi, RefreshContext } from './hooks/useApi';
+import { useWebSocket } from './hooks/useWebSocket';
 import './App.css';
 
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [panelVisibility, setPanelVisibility] = useState(null); // loaded from settings
+  const [panelVisibility, setPanelVisibility] = useState(null);
+  const [refreshSignal, setRefreshSignal] = useState({});
+
+  // WebSocket for live dashboard updates
+  const handleWsMessage = useCallback((message) => {
+    if (message.event === 'data_changed') {
+      setRefreshSignal(prev => ({
+        ...prev,
+        [message.panel]: message.timestamp,
+      }));
+    }
+  }, []);
+  const { connected: wsConnected } = useWebSocket(handleWsMessage);
 
   const [setupComplete, setSetupComplete] = useState(null); // null = loading, true/false
 
@@ -145,37 +158,40 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
-        <div className="app__mobile-overlay" onClick={() => setMobileMenuOpen(false)} />
-      )}
+    <RefreshContext.Provider value={refreshSignal}>
+      <div className="app">
+        {/* Mobile menu overlay */}
+        {mobileMenuOpen && (
+          <div className="app__mobile-overlay" onClick={() => setMobileMenuOpen(false)} />
+        )}
 
-      <Sidebar
-        agents={visibleAgents}
-        activePanel={activePanel}
-        onNavigate={handleNavigate}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        mobileOpen={mobileMenuOpen}
-        onMobileClose={() => setMobileMenuOpen(false)}
-      />
+        <Sidebar
+          agents={visibleAgents}
+          activePanel={activePanel}
+          onNavigate={handleNavigate}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          mobileOpen={mobileMenuOpen}
+          onMobileClose={() => setMobileMenuOpen(false)}
+          wsConnected={wsConnected}
+        />
 
-      <TopBar
-        nudges={nudges || []}
-        sidebarCollapsed={sidebarCollapsed}
-        onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
-        onNavigateSettings={() => handleNavigate('settings')}
-      />
+        <TopBar
+          nudges={nudges || []}
+          sidebarCollapsed={sidebarCollapsed}
+          onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onNavigateSettings={() => handleNavigate('settings')}
+        />
 
-      <main
-        className="app__content"
-        style={{
-          marginLeft: sidebarCollapsed ? 72 : 260,
-        }}
-      >
-        {renderPanel()}
-      </main>
-    </div>
+        <main
+          className="app__content"
+          style={{
+            marginLeft: sidebarCollapsed ? 72 : 260,
+          }}
+        >
+          {renderPanel()}
+        </main>
+      </div>
+    </RefreshContext.Provider>
   );
 }

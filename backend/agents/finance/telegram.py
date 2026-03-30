@@ -31,7 +31,7 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
 
     # Retry if LLM returned 'respond' when it should have returned an action
     if action_data.get("action") == "respond":
-        result = await execute_action(action_data, ACTION_REGISTRY)
+        result = await execute_action(action_data, ACTION_REGISTRY, "finance")
         if result.get("_hallucinated"):
             logger.info("Finance: retrying with correction prompt...")
             correction = (
@@ -49,7 +49,7 @@ async def process_message(update: Update, text: str, send_reply: bool = True) ->
     _conversation_history.append({"role": "user", "content": text})
 
     # Execute the action (LM-13d)
-    result = await execute_action(action_data, ACTION_REGISTRY)
+    result = await execute_action(action_data, ACTION_REGISTRY, "finance")
 
     # For read actions, format the data via Claude (LM-13f)
     action_name = action_data.get("action", "")

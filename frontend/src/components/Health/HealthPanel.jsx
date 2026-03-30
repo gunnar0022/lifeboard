@@ -20,11 +20,11 @@ const fadeUp = {
 };
 
 export default function HealthPanel() {
-  const { data: profile, loading: profileLoading, refetch: refetchProfile } = useApi('/api/health_body/profile');
-  const { data: heatmap, refetch: refetchHeatmap } = useApi('/api/health_body/heatmap?days=90');
-  const { data: recent, refetch: refetchRecent } = useApi('/api/health_body/recent');
-  const { data: measurements, refetch: refetchMeasurements } = useApi('/api/health_body/measurements');
-  const { data: concerns } = useApi('/api/health_body/concerns');
+  const { data: profile, loading: profileLoading, refetch: refetchProfile } = useApi('/api/health_body/profile', { panelKey: 'health' });
+  const { data: heatmap, refetch: refetchHeatmap } = useApi('/api/health_body/heatmap?days=90', { panelKey: 'health' });
+  const { data: recent, refetch: refetchRecent } = useApi('/api/health_body/recent', { panelKey: 'health' });
+  const { data: measurements, refetch: refetchMeasurements } = useApi('/api/health_body/measurements', { panelKey: 'health' });
+  const { data: concerns } = useApi('/api/health_body/concerns', { panelKey: 'health' });
 
   const hasProfile = profile && profile.id;
 

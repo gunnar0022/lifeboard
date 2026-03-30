@@ -24,16 +24,16 @@ const fadeUp = {
 };
 
 export default function FinancePanel() {
-  const { data: accounts, loading: accLoading, refetch: refetchAccounts } = useApi('/api/finance/accounts');
-  const { data: overview, refetch: refetchOverview } = useApi('/api/finance/accounts/overview');
-  const { data: cycle, refetch: refetchCycle } = useApi('/api/finance/cycle');
-  const { data: cycleInfo } = useApi('/api/finance/cycle/info');
-  const { data: budgetStatus, refetch: refetchBudget } = useApi('/api/finance/budget-status');
-  const { data: spending, refetch: refetchSpending } = useApi('/api/finance/spending-by-category');
-  const { data: trend } = useApi('/api/finance/cycle-trend');
-  const { data: transactions, refetch: refetchTxns } = useApi('/api/finance/transactions?limit=25');
-  const { data: transfers, refetch: refetchTransfers } = useApi('/api/finance/transfers?limit=10');
-  const { data: recurring, refetch: refetchRecurring } = useApi('/api/finance/recurring');
+  const { data: accounts, loading: accLoading, refetch: refetchAccounts } = useApi('/api/finance/accounts', { panelKey: 'finance' });
+  const { data: overview, refetch: refetchOverview } = useApi('/api/finance/accounts/overview', { panelKey: 'finance' });
+  const { data: cycle, refetch: refetchCycle } = useApi('/api/finance/cycle', { panelKey: 'finance' });
+  const { data: cycleInfo } = useApi('/api/finance/cycle/info', { panelKey: 'finance' });
+  const { data: budgetStatus, refetch: refetchBudget } = useApi('/api/finance/budget-status', { panelKey: 'finance' });
+  const { data: spending, refetch: refetchSpending } = useApi('/api/finance/spending-by-category', { panelKey: 'finance' });
+  const { data: trend } = useApi('/api/finance/cycle-trend', { panelKey: 'finance' });
+  const { data: transactions, refetch: refetchTxns } = useApi('/api/finance/transactions?limit=25', { panelKey: 'finance' });
+  const { data: transfers, refetch: refetchTransfers } = useApi('/api/finance/transfers?limit=10', { panelKey: 'finance' });
+  const { data: recurring, refetch: refetchRecurring } = useApi('/api/finance/recurring', { panelKey: 'finance' });
   const { data: categories } = useApi('/api/finance/categories');
   const { data: config } = useApi('/api/config');
 

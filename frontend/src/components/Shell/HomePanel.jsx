@@ -81,7 +81,7 @@ function PulseCard({ agent, index, onClick }) {
 
   // Fetch pulse data for active agents
   const pulseEndpoint = agent.id === 'life_manager' ? '/api/life/pulse' : `/api/${agent.id}/pulse`;
-  const { data: pulseData } = useApi(pulseEndpoint, { skip: isPlaceholder });
+  const { data: pulseData } = useApi(pulseEndpoint, { skip: isPlaceholder, panelKey: 'home' });
 
   return (
     <motion.div

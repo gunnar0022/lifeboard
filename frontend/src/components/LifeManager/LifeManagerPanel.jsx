@@ -10,10 +10,10 @@ import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
 
 export default function LifeManagerPanel() {
-  const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline?days=56');
-  const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50');
-  const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills');
-  const { data: shopping, refetch: refetchShopping } = useApi('/api/life/shopping');
+  const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline?days=56', { panelKey: 'life_manager' });
+  const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50', { panelKey: 'life_manager' });
+  const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills', { panelKey: 'life_manager' });
+  const { data: shopping, refetch: refetchShopping } = useApi('/api/life/shopping', { panelKey: 'shopping' });
   const { data: googleStatus } = useApi('/api/google/status');
   const { data: config } = useApi('/api/config');
 

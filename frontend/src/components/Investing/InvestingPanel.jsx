@@ -19,9 +19,9 @@ const fadeUp = {
 };
 
 export default function InvestingPanel() {
-  const { data: portfolio, loading: portfolioLoading } = useApi('/api/investing/portfolio');
-  const { data: snapshots } = useApi('/api/investing/snapshots?days=365');
-  const { data: holdings, refetch: refetchHoldings } = useApi('/api/investing/holdings');
+  const { data: portfolio, loading: portfolioLoading } = useApi('/api/investing/portfolio', { panelKey: 'investing' });
+  const { data: snapshots } = useApi('/api/investing/snapshots?days=365', { panelKey: 'investing' });
+  const { data: holdings, refetch: refetchHoldings } = useApi('/api/investing/holdings', { panelKey: 'investing' });
   const { data: config } = useApi('/api/config');
   const { data: fxRate } = useApi('/api/finance/exchange-rate');
 
