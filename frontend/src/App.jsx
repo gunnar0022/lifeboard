@@ -3,6 +3,7 @@ import Sidebar from './components/Shell/Sidebar';
 import TopBar from './components/Shell/TopBar';
 import HomePanel from './components/Shell/HomePanel';
 import SetupWizard from './components/Setup/SetupWizard';
+import SettingsPanel from './components/Settings/SettingsPanel';
 import FinancePanel from './components/Finance/FinancePanel';
 import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
 import HealthPanel from './components/Health/HealthPanel';
@@ -16,12 +17,21 @@ export default function App() {
   const [activePanel, setActivePanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [panelVisibility, setPanelVisibility] = useState(null); // loaded from settings
 
   const [setupComplete, setSetupComplete] = useState(null); // null = loading, true/false
 
   const { data: agents, loading: agentsLoading } = useApi('/api/agents');
   const { data: config, loading: configLoading } = useApi('/api/config');
   const { data: nudges } = useApi('/api/nudges');
+  const { data: settings } = useApi('/api/settings');
+
+  // Load panel visibility from settings
+  useEffect(() => {
+    if (settings?.panels) {
+      setPanelVisibility(settings.panels);
+    }
+  }, [settings]);
 
   // Check setup status on load — retry if backend isn't ready yet
   useEffect(() => {
@@ -50,14 +60,37 @@ export default function App() {
     setMobileMenuOpen(false);
   };
 
+  // Filter agents based on panel visibility
+  const visibleAgents = (agents || []).filter(agent => {
+    if (!agent.v1) return true; // Always show placeholder "coming soon" agents
+    if (!panelVisibility) return true; // No settings loaded yet, show all
+    return panelVisibility[agent.id] !== false;
+  });
+
   const renderPanel = () => {
     if (activePanel === 'home') {
       return (
         <HomePanel
           key="home"
-          agents={agents || []}
+          agents={visibleAgents}
           config={config}
           onNavigate={handleNavigate}
+        />
+      );
+    }
+
+    if (activePanel === 'settings') {
+      return (
+        <SettingsPanel
+          key="settings"
+          onThemeChange={() => {}}
+          onPanelVisibilityChange={(panels) => {
+            setPanelVisibility(panels);
+            // If current panel was hidden, go home
+            if (panels[activePanel] === false) {
+              setActivePanel('home');
+            }
+          }}
         />
       );
     }
@@ -122,7 +155,7 @@ export default function App() {
       )}
 
       <Sidebar
-        agents={agents || []}
+        agents={visibleAgents}
         activePanel={activePanel}
         onNavigate={handleNavigate}
         collapsed={sidebarCollapsed}
@@ -135,6 +168,7 @@ export default function App() {
         nudges={nudges || []}
         sidebarCollapsed={sidebarCollapsed}
         onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+        onNavigateSettings={() => handleNavigate('settings')}
       />
 
       <main

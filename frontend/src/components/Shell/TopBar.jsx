@@ -1,26 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Bell, Sun, Moon, Menu } from 'lucide-react';
+import { Bell, Settings, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './TopBar.css';
 
-function useTheme() {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('lifeboard-theme') || 'light';
-  });
-
+// Initialize theme from localStorage on first load
+function useInitTheme() {
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('lifeboard-theme', theme);
-  }, [theme]);
-
-  const toggle = () => setTheme(t => t === 'light' ? 'dark' : 'light');
-  return { theme, toggle };
+    const saved = localStorage.getItem('lifeboard-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  }, []);
 }
 
-export default function TopBar({ nudges = [], sidebarCollapsed, onMobileMenuToggle }) {
+export default function TopBar({ nudges = [], sidebarCollapsed, onMobileMenuToggle, onNavigateSettings }) {
+  useInitTheme();
   const [now, setNow] = useState(new Date());
   const [showNudges, setShowNudges] = useState(false);
-  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -77,11 +71,11 @@ export default function TopBar({ nudges = [], sidebarCollapsed, onMobileMenuTogg
 
         <button
           className="topbar__theme-btn"
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          onClick={onNavigateSettings}
+          aria-label="Settings"
+          title="Settings"
         >
-          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          <Settings size={18} />
         </button>
 
         <button

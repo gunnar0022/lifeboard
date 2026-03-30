@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -403,6 +403,159 @@ async def list_all_backups():
     """List all available backups."""
     from backend.backup import list_backups
     return list_backups()
+
+
+# --- Settings API ---
+
+@app.get("/api/settings")
+async def get_settings():
+    """Get user settings for the settings panel."""
+    from backend.config import get_config
+    config = get_config()
+    # Fetch evening_checkin_time from health profile
+    checkin_time = "21:00"
+    try:
+        from backend.database import get_db
+        db = await get_db()
+        try:
+            cursor = await db.execute("SELECT evening_checkin_time FROM health_profile LIMIT 1")
+            row = await cursor.fetchone()
+            if row:
+                checkin_time = row["evening_checkin_time"] or "21:00"
+        finally:
+            await db.close()
+    except Exception:
+        pass
+
+    return {
+        "theme": config.get("theme", "dark"),
+        "panels": config.get("panels", {
+            "finance": True, "investing": True, "health_body": True,
+            "life_manager": True, "reading_creative": True,
+        }),
+        "pay_cycle_day": config.get("pay_cycle_day", 25),
+        "evening_checkin_time": checkin_time,
+    }
+
+
+@app.put("/api/settings")
+async def update_settings(body: dict):
+    """Update user settings."""
+    from backend.config import get_config, CONFIG_PATH
+    import json as _json
+
+    config = get_config()
+    updated = False
+
+    for key in ("theme", "panels", "pay_cycle_day"):
+        if key in body:
+            config[key] = body[key]
+            updated = True
+
+    if updated:
+        # Invalidate cache
+        import backend.config as _cfg
+        _cfg._config_cache = None
+        _cfg._config_mtime = None
+        CONFIG_PATH.write_text(_json.dumps(config, indent=2, ensure_ascii=False))
+
+    # Evening checkin time goes to health_profile table
+    if "evening_checkin_time" in body:
+        try:
+            from backend.database import get_db
+            db = await get_db()
+            try:
+                await db.execute(
+                    "UPDATE health_profile SET evening_checkin_time = ?",
+                    (body["evening_checkin_time"],)
+                )
+                await db.commit()
+            finally:
+                await db.close()
+        except Exception as e:
+            logger.error(f"Failed to update evening_checkin_time: {e}")
+
+    return await get_settings()
+
+
+@app.get("/api/settings/backup")
+async def download_backup():
+    """Download the database as a backup file."""
+    import shutil
+    from datetime import date as _date
+    from fastapi.responses import FileResponse
+    from backend.database import DB_PATH, get_db
+
+    # WAL checkpoint to ensure .db file is self-contained
+    db = await get_db()
+    try:
+        await db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        await db.close()
+
+    # Copy to temp file for download
+    backup_name = f"lifeboard-backup-{_date.today().isoformat()}.db"
+    backup_path = DB_PATH.parent / backup_name
+    shutil.copy2(str(DB_PATH), str(backup_path))
+
+    return FileResponse(
+        path=str(backup_path),
+        filename=backup_name,
+        media_type="application/octet-stream",
+    )
+
+
+@app.post("/api/settings/restore")
+async def restore_backup(file: UploadFile):
+    """Restore database from an uploaded backup file."""
+    import shutil
+    import tempfile
+    from datetime import datetime as _dt
+    from backend.database import DB_PATH, get_db, init_db
+
+    # Save uploaded file to temp location
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
+    try:
+        content = await file.read()
+        tmp.write(content)
+        tmp.close()
+
+        # Validate it's a real SQLite database
+        import aiosqlite
+        try:
+            test_db = await aiosqlite.connect(tmp.name)
+            cursor = await test_db.execute("PRAGMA integrity_check")
+            result = await cursor.fetchone()
+            await test_db.close()
+            if result[0] != "ok":
+                raise ValueError(f"Database integrity check failed: {result[0]}")
+        except Exception as e:
+            os.unlink(tmp.name)
+            raise HTTPException(400, f"Invalid database file: {str(e)}")
+
+        # Safety backup of current database
+        timestamp = _dt.now().strftime("%Y%m%d-%H%M%S")
+        safety_path = DB_PATH.parent / f"lifeboard-pre-restore-{timestamp}.db"
+        shutil.copy2(str(DB_PATH), str(safety_path))
+        logger.info(f"Safety backup saved to {safety_path}")
+
+        # Replace the database
+        shutil.copy2(tmp.name, str(DB_PATH))
+        os.unlink(tmp.name)
+
+        # Reinitialize to ensure new tables exist
+        await init_db()
+
+        return {
+            "success": True,
+            "message": f"Database restored. Previous database saved as {safety_path.name}",
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Restore failed: {e}", exc_info=True)
+        raise HTTPException(500, f"Restore failed: {str(e)}")
 
 
 # --- Event enrichment (set reminders from dashboard) ---
