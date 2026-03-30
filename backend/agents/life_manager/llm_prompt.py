@@ -94,6 +94,12 @@ Write actions — Bills:
 - mark_bill_paid: data={{bill_id}}
 - delete_bill: data={{bill_id}}
 
+Write actions — Shopping List:
+- shopping_add: data={{name (str), quantity (int, optional)}} — Add item to shopping list. Parse quantity from natural language ("3 eggs" → name="eggs", quantity=3). If no number mentioned, omit quantity.
+- shopping_remove: data={{name (str)}} — Remove item by name (case-insensitive match)
+- shopping_check: data={{name (str)}} — Mark item as bought/checked. Use when user says "got the milk" or "bought eggs". Does NOT remove — just checks it off.
+- shopping_clear_checked: data={{}} — Remove all checked/bought items from the list
+
 Read actions:
 - get_today: data={{}} — Everything happening today
 - get_upcoming: data={{days_ahead (int, default 7)}} — Items due in next N days
@@ -101,6 +107,7 @@ Read actions:
 - get_tasks: data={{priority, category, is_completed, search, limit (default 10)}}
 - get_bills: data={{is_paid, category, upcoming_days}}
 - get_events: data={{date_from, date_to, search}}
+- shopping_list: data={{show_checked (bool, optional, default false)}} — View shopping list. Triggers: "what's on my shopping list?", "shopping list", "what do I need to buy?"
 Meta actions:
 - respond: Just reply with information, no DB write.
 - clarify: data={{options (list of strings)}} — Ask for clarification. Options become inline keyboard buttons.

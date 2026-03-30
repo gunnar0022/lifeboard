@@ -4,6 +4,7 @@ import { useApi } from '../../hooks/useApi';
 import TimelineStrip from './TimelineStrip';
 import BillsTracker from './BillsTracker';
 import TaskBoard from './TaskBoard';
+import ShoppingList from './ShoppingList';
 import DocumentSearch from './DocumentSearch';
 import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
@@ -12,13 +13,15 @@ export default function LifeManagerPanel() {
   const { data: timeline, refetch: refetchTimeline } = useApi('/api/life/timeline?days=56');
   const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50');
   const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills');
+  const { data: shopping, refetch: refetchShopping } = useApi('/api/life/shopping');
   const { data: config } = useApi('/api/config');
 
   const refetchAll = useCallback(() => {
     refetchTimeline();
     refetchTasks();
     refetchBills();
-  }, [refetchTimeline, refetchTasks, refetchBills]);
+    refetchShopping();
+  }, [refetchTimeline, refetchTasks, refetchBills, refetchShopping]);
 
   const currencySymbol = config?.currency_symbol || '$';
 
@@ -108,7 +111,10 @@ export default function LifeManagerPanel() {
         />
       </div>
 
-      {/* Section C — Quick Add & Documents */}
+      {/* Section C — Shopping List */}
+      <ShoppingList items={shopping || []} onRefresh={refetchShopping} />
+
+      {/* Section D — Quick Add & Documents */}
       <QuickAddBar
         currencySymbol={currencySymbol}
         onSuccess={refetchAll}

@@ -131,6 +131,40 @@ async def handle_get_events(data: dict) -> list:
     )
 
 
+# --- Shopping list handlers ---
+
+async def handle_shopping_add(data: dict) -> dict:
+    return await queries.add_shopping_item(
+        name=data["name"],
+        quantity=data.get("quantity"),
+    )
+
+
+async def handle_shopping_list(data: dict) -> list:
+    return await queries.get_shopping_list(
+        checked_filter=False if not data.get("show_checked") else None
+    )
+
+
+async def handle_shopping_remove(data: dict) -> dict:
+    result = await queries.shopping_remove_by_name(data["name"])
+    if result is None:
+        return {"not_found": True, "name": data["name"]}
+    return {"removed_id": result, "name": data["name"]}
+
+
+async def handle_shopping_check(data: dict) -> dict:
+    result = await queries.shopping_check_by_name(data["name"])
+    if result is None:
+        return {"not_found": True, "name": data["name"]}
+    return {"checked_id": result, "name": data["name"]}
+
+
+async def handle_shopping_clear_checked(data: dict) -> dict:
+    count = await queries.clear_checked_shopping()
+    return {"cleared": count}
+
+
 # --- ACTION_REGISTRY (LM-13d) ---
 
 ACTION_REGISTRY = {
@@ -228,6 +262,33 @@ ACTION_REGISTRY = {
         "handler": handle_get_events,
         "required": [],
         "optional": ["date_from", "date_to", "category", "search"],
+        "is_read": True,
+    },
+
+    # Write — Shopping List
+    "shopping_add": {
+        "handler": handle_shopping_add,
+        "required": ["name"],
+        "optional": ["quantity"],
+    },
+    "shopping_remove": {
+        "handler": handle_shopping_remove,
+        "required": ["name"],
+    },
+    "shopping_check": {
+        "handler": handle_shopping_check,
+        "required": ["name"],
+    },
+    "shopping_clear_checked": {
+        "handler": handle_shopping_clear_checked,
+        "required": [],
+    },
+
+    # Read — Shopping List
+    "shopping_list": {
+        "handler": handle_shopping_list,
+        "required": [],
+        "optional": ["show_checked"],
         "is_read": True,
     },
 }

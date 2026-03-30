@@ -252,3 +252,40 @@ async def get_upcoming(days: int = 7):
 @router.get("/overdue")
 async def get_overdue():
     return await queries.get_overdue()
+
+
+# ── Shopping List ────────────────────────────────────────────
+
+@router.get("/shopping")
+async def get_shopping(checked: bool = None):
+    return await queries.get_shopping_list(checked_filter=checked)
+
+
+@router.post("/shopping")
+async def add_shopping(body: dict):
+    return await queries.add_shopping_item(
+        name=body["name"],
+        quantity=body.get("quantity"),
+    )
+
+
+@router.put("/shopping/{item_id}")
+async def update_shopping(item_id: int, body: dict):
+    result = await queries.update_shopping_item(item_id, **body)
+    if not result:
+        raise HTTPException(404, "Item not found")
+    return result
+
+
+@router.delete("/shopping/checked")
+async def clear_checked_shopping():
+    count = await queries.clear_checked_shopping()
+    return {"cleared": count}
+
+
+@router.delete("/shopping/{item_id}")
+async def delete_shopping(item_id: int):
+    ok = await queries.delete_shopping_item(item_id)
+    if not ok:
+        raise HTTPException(404, "Item not found")
+    return {"success": True}

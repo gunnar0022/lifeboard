@@ -580,3 +580,144 @@ async def get_pulse() -> dict:
         "upcoming_bills": upcoming_unpaid,
         "overdue_count": overdue_count,
     }
+
+
+# ── Shopping List ────────────────────────────────────────────
+
+async def get_shopping_list(checked_filter=None):
+    """Get shopping list, unchecked first, then checked."""
+    db = await get_db()
+    try:
+        if checked_filter is not None:
+            cursor = await db.execute(
+                "SELECT * FROM shopping_list WHERE checked = ? ORDER BY checked ASC, created_at ASC",
+                (1 if checked_filter else 0,),
+            )
+        else:
+            cursor = await db.execute(
+                "SELECT * FROM shopping_list ORDER BY checked ASC, created_at ASC"
+            )
+        return [dict(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+async def add_shopping_item(name: str, quantity=None):
+    """Add item or increment quantity if duplicate unchecked item exists."""
+    db = await get_db()
+    try:
+        # Check for existing unchecked item with same name
+        cursor = await db.execute(
+            "SELECT * FROM shopping_list WHERE LOWER(name) = LOWER(?) AND checked = 0",
+            (name,),
+        )
+        existing = await cursor.fetchone()
+        if existing:
+            existing = dict(existing)
+            # Merge quantity
+            if quantity is not None:
+                new_qty = (existing["quantity"] or 0) + quantity
+                await db.execute(
+                    "UPDATE shopping_list SET quantity = ? WHERE id = ?",
+                    (new_qty, existing["id"]),
+                )
+                await db.commit()
+                existing["quantity"] = new_qty
+                return existing
+            elif existing["quantity"] is None:
+                return existing  # Already on list, no quantity change
+            else:
+                return existing  # Already on list with quantity
+        # Create new
+        cursor = await db.execute(
+            "INSERT INTO shopping_list (name, quantity) VALUES (?, ?)",
+            (name, quantity),
+        )
+        await db.commit()
+        new_id = cursor.lastrowid
+        cursor = await db.execute("SELECT * FROM shopping_list WHERE id = ?", (new_id,))
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+async def update_shopping_item(item_id: int, **fields):
+    """Update a shopping item (name, quantity, checked)."""
+    db = await get_db()
+    try:
+        sets = []
+        values = []
+        for k, v in fields.items():
+            if k in ("name", "quantity", "checked"):
+                sets.append(f"{k} = ?")
+                values.append(v)
+        if not sets:
+            return None
+        values.append(item_id)
+        await db.execute(
+            f"UPDATE shopping_list SET {', '.join(sets)} WHERE id = ?", values
+        )
+        await db.commit()
+        cursor = await db.execute("SELECT * FROM shopping_list WHERE id = ?", (item_id,))
+        row = await cursor.fetchone()
+        return dict(row) if row else None
+    finally:
+        await db.close()
+
+
+async def delete_shopping_item(item_id: int):
+    """Delete a single shopping item."""
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM shopping_list WHERE id = ?", (item_id,))
+        await db.commit()
+        return cursor.rowcount > 0
+    finally:
+        await db.close()
+
+
+async def clear_checked_shopping():
+    """Remove all checked items."""
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM shopping_list WHERE checked = 1")
+        await db.commit()
+        return cursor.rowcount
+    finally:
+        await db.close()
+
+
+async def shopping_remove_by_name(name: str):
+    """Remove first unchecked item matching name (case-insensitive)."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT id FROM shopping_list WHERE LOWER(name) = LOWER(?) AND checked = 0 LIMIT 1",
+            (name,),
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        await db.execute("DELETE FROM shopping_list WHERE id = ?", (row["id"],))
+        await db.commit()
+        return row["id"]
+    finally:
+        await db.close()
+
+
+async def shopping_check_by_name(name: str):
+    """Mark first unchecked item matching name as checked."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT id FROM shopping_list WHERE LOWER(name) = LOWER(?) AND checked = 0 LIMIT 1",
+            (name,),
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        await db.execute("UPDATE shopping_list SET checked = 1 WHERE id = ?", (row["id"],))
+        await db.commit()
+        return row["id"]
+    finally:
+        await db.close()

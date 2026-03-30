@@ -209,6 +209,14 @@ async def _create_life_manager_tables(db: aiosqlite.Connection):
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 
+        CREATE TABLE IF NOT EXISTS shopping_list (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            quantity INTEGER DEFAULT NULL,
+            checked BOOLEAN NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS life_tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,

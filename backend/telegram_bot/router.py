@@ -62,7 +62,7 @@ You route messages to LifeBoard agents. Return JSON only.
 
 Agents:
 - finance: money, spending, transactions, budget, accounts, salary, receipts, payments, transfers, recurring payments, income, interest
-- life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands (NOT workouts or exercise — those go to health_body)
+- life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands, shopping list, groceries, things to buy (NOT workouts or exercise — those go to health_body)
 - health_body: food, meals, exercise, workouts, sports, gym, weight, mood, energy, medical, calories, nutrition, sleep, health checkups, health concern updates (e.g. "back pain was better today"). Any physical activity (volleyball, running, etc.) goes here, not life_manager
 - investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
 - reading_creative: creative ideas, worldbuilding, story ideas, writing, books, reading list, finished reading, book recommendations
