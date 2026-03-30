@@ -4,7 +4,7 @@ import { CLASS_COLORS } from '../../dndUtils';
 
 export default function SpellRow({ spell, isConcentrating, className, onConcentrate, onRemove, editMode, dragHandleProps }) {
   const [expanded, setExpanded] = useState(false);
-  const classColor = CLASS_COLORS[className] || '#c9a96e';
+  const classColor = CLASS_COLORS[className] || 'var(--dnd-accent)';
 
   if (!spell) return null;
 

@@ -3,7 +3,7 @@ import { CLASS_COLORS } from '../../dndUtils';
 const LEVEL_LABELS = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
 
 export default function SpellSlotGrid({ slots, className, editMode, onUpdate }) {
-  const classColor = CLASS_COLORS[className] || '#c9a96e';
+  const classColor = CLASS_COLORS[className] || 'var(--dnd-accent)';
 
   const togglePip = (lvl, pipIndex) => {
     const slot = slots[lvl];

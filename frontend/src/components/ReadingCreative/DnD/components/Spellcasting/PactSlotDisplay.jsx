@@ -3,7 +3,7 @@ import { CLASS_COLORS } from '../../dndUtils';
 const LEVEL_LABELS = ['', '1st', '2nd', '3rd', '4th', '5th'];
 
 export default function PactSlotDisplay({ pactSlots, editMode, onUpdate }) {
-  const classColor = CLASS_COLORS['Warlock'] || '#5a2a5a';
+  const classColor = CLASS_COLORS['Warlock'] || 'var(--dnd-class-warlock)';
 
   const toggleSlot = () => {
     const available = pactSlots.current;

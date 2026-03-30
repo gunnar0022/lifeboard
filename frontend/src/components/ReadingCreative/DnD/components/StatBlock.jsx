@@ -17,7 +17,7 @@ export default function StatBlock({ character, editMode, onUpdate }) {
   const hp = combat.hpCurrent ?? 0;
   const hpMax = combat.hpMax ?? 1;
   const hpPct = hpMax > 0 ? (hp / hpMax) * 100 : 0;
-  const barColor = hpPct > 60 ? '#4a7a4a' : hpPct > 25 ? '#8a7a2a' : '#8b0000';
+  const barColor = hpPct > 60 ? 'var(--dnd-hp-healthy)' : hpPct > 25 ? 'var(--dnd-hp-wounded)' : 'var(--dnd-hp-critical)';
 
   const adjustHp = (delta) => {
     const next = Math.max(0, Math.min(hpMax + (combat.hpTemp || 0), hp + delta));
@@ -115,7 +115,7 @@ export default function StatBlock({ character, editMode, onUpdate }) {
           <span className="dnd-statblock__label">DEATH SAVES</span>
           <div className="dnd-statblock__death">
             <div className="dnd-statblock__death-row">
-              <span className="dnd-statblock__death-lbl" style={{ color: '#4a7a4a' }}>S</span>
+              <span className="dnd-statblock__death-lbl" style={{ color: 'var(--dnd-positive)' }}>S</span>
               {[0, 1, 2].map(i => (
                 <button key={`s${i}`}
                   className={`dnd-statblock__dot ${i < (combat.deathSaves?.successes || 0) ? 'dnd-statblock__dot--success' : ''}`}
@@ -127,7 +127,7 @@ export default function StatBlock({ character, editMode, onUpdate }) {
               ))}
             </div>
             <div className="dnd-statblock__death-row">
-              <span className="dnd-statblock__death-lbl" style={{ color: '#8b0000' }}>F</span>
+              <span className="dnd-statblock__death-lbl" style={{ color: 'var(--dnd-negative)' }}>F</span>
               {[0, 1, 2].map(i => (
                 <button key={`f${i}`}
                   className={`dnd-statblock__dot ${i < (combat.deathSaves?.failures || 0) ? 'dnd-statblock__dot--failure' : ''}`}

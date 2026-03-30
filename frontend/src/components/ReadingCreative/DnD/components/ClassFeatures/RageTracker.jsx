@@ -14,7 +14,7 @@ export default function RageTracker({ classFeature, editMode, onUpdate }) {
   return (
     <motion.div
       className={`dnd-rage ${active ? 'dnd-rage--active' : ''}`}
-      animate={active ? { boxShadow: '0 0 20px rgba(180,20,20,0.4)' } : { boxShadow: '0 0 0px rgba(180,20,20,0)' }}
+      animate={active ? { boxShadow: '0 0 20px rgba(180,20,20,var(--dnd-glow-opacity, 0.3))' } : { boxShadow: '0 0 0px rgba(180,20,20,0)' }}
     >
       <div className="dnd-rage__header">
         <h4 className="dnd-rage__title">RAGE</h4>

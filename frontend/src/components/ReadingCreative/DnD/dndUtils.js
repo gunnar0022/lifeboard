@@ -44,20 +44,44 @@ export const SKILLS = [
   { name: 'Survival', ability: 'WIS' },
 ];
 
+// CSS variable names for class colors (resolved at render time via getComputedStyle)
+export const CLASS_COLOR_VARS = {
+  Barbarian: '--dnd-class-barbarian',
+  Rogue: '--dnd-class-rogue',
+  Fighter: '--dnd-class-fighter',
+  Wizard: '--dnd-class-wizard',
+  Warlock: '--dnd-class-warlock',
+  Sorcerer: '--dnd-class-sorcerer',
+  Cleric: '--dnd-class-cleric',
+  Druid: '--dnd-class-druid',
+  Paladin: '--dnd-class-paladin',
+  Ranger: '--dnd-class-ranger',
+  Bard: '--dnd-class-bard',
+  Monk: '--dnd-class-monk',
+  Artificer: '--dnd-class-artificer',
+};
+
+// Returns var(--dnd-class-xxx) for use in inline styles
+export function classColor(className) {
+  const v = CLASS_COLOR_VARS[className];
+  return v ? `var(${v})` : 'var(--dnd-border)';
+}
+
+// Legacy constant — still exported so CLASS_NAMES works, but prefer classColor() for styles
 export const CLASS_COLORS = {
-  Barbarian: '#8b0000',
-  Rogue: '#4a2066',
-  Fighter: '#4a6580',
-  Wizard: '#1a3a6a',
-  Warlock: '#5a2a5a',
-  Sorcerer: '#8a4a00',
-  Cleric: '#c9a96e',
-  Druid: '#2a5a2a',
-  Paladin: '#8a8a3a',
-  Ranger: '#3a6a3a',
-  Bard: '#6a3a5a',
-  Monk: '#5a7a8a',
-  Artificer: '#6a5a3a',
+  Barbarian: 'var(--dnd-class-barbarian)',
+  Rogue: 'var(--dnd-class-rogue)',
+  Fighter: 'var(--dnd-class-fighter)',
+  Wizard: 'var(--dnd-class-wizard)',
+  Warlock: 'var(--dnd-class-warlock)',
+  Sorcerer: 'var(--dnd-class-sorcerer)',
+  Cleric: 'var(--dnd-class-cleric)',
+  Druid: 'var(--dnd-class-druid)',
+  Paladin: 'var(--dnd-class-paladin)',
+  Ranger: 'var(--dnd-class-ranger)',
+  Bard: 'var(--dnd-class-bard)',
+  Monk: 'var(--dnd-class-monk)',
+  Artificer: 'var(--dnd-class-artificer)',
 };
 
 export const CLASS_NAMES = Object.keys(CLASS_COLORS);

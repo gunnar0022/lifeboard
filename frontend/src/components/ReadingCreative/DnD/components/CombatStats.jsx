@@ -5,7 +5,7 @@ export default function CombatStats({ combat, abilities, editMode, onUpdate }) {
   const hp = combat.hpCurrent;
   const max = combat.hpMax;
   const pct = max > 0 ? (hp / max) * 100 : 0;
-  const barColor = pct > 60 ? '#4a7a4a' : pct > 25 ? '#8a7a2a' : '#8b0000';
+  const barColor = pct > 60 ? 'var(--dnd-hp-healthy)' : pct > 25 ? 'var(--dnd-hp-wounded)' : 'var(--dnd-hp-critical)';
 
   const adjustHp = (delta) => {
     const next = Math.max(0, Math.min(max + combat.hpTemp, hp + delta));
@@ -103,7 +103,7 @@ export default function CombatStats({ combat, abilities, editMode, onUpdate }) {
         <span className="dnd-combat__box-label">DEATH SAVES</span>
         <div className="dnd-combat__death-saves">
           <div className="dnd-combat__death-row">
-            <span className="dnd-combat__death-label" style={{ color: '#4a7a4a' }}>S</span>
+            <span className="dnd-combat__death-label" style={{ color: 'var(--dnd-positive)' }}>S</span>
             {[0, 1, 2].map(i => (
               <button key={`s${i}`}
                 className={`dnd-combat__death-dot ${i < (combat.deathSaves?.successes || 0) ? 'dnd-combat__death-dot--success' : ''}`}
@@ -116,7 +116,7 @@ export default function CombatStats({ combat, abilities, editMode, onUpdate }) {
             ))}
           </div>
           <div className="dnd-combat__death-row">
-            <span className="dnd-combat__death-label" style={{ color: '#8b0000' }}>F</span>
+            <span className="dnd-combat__death-label" style={{ color: 'var(--dnd-negative)' }}>F</span>
             {[0, 1, 2].map(i => (
               <button key={`f${i}`}
                 className={`dnd-combat__death-dot ${i < (combat.deathSaves?.failures || 0) ? 'dnd-combat__death-dot--failure' : ''}`}

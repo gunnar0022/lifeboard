@@ -55,7 +55,7 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
         </motion.button>
 
         {(characters || []).map(char => {
-          const classColor = CLASS_COLORS[char.class_name] || '#3a3228';
+          const classColor = CLASS_COLORS[char.class_name] || 'var(--dnd-border)';
           const updated = char.updated_at ? new Date(char.updated_at).toLocaleDateString() : '';
 
           return (

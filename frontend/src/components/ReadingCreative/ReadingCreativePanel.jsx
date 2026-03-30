@@ -48,7 +48,7 @@ export default function ReadingCreativePanel() {
 
   if (dndView === 'list') {
     return (
-      <div className="rc-panel rc-panel--dnd">
+      <div className="rc-panel rc-panel--dnd dnd-root">
         <div className="rc-panel__sub-header">
           <button className="rc-panel__back-btn" onClick={handleBackFromList}>
             &larr; Back
@@ -65,7 +65,7 @@ export default function ReadingCreativePanel() {
 
   if (dndView && typeof dndView === 'object') {
     return (
-      <div className="rc-panel rc-panel--dnd">
+      <div className="rc-panel rc-panel--dnd dnd-root">
         <CharacterSheet
           characterId={dndView.id}
           initialEditMode={dndView.editMode}

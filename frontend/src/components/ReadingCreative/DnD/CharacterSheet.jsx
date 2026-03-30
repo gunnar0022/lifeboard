@@ -187,7 +187,7 @@ export default function CharacterSheet({ characterId, initialEditMode, onBack })
 
   const meta = character.meta || {};
   const abilities = character.abilities || {};
-  const classColor = CLASS_COLORS[meta.className] || '#3a3228';
+  const classColor = CLASS_COLORS[meta.className] || 'var(--dnd-border)';
   const level = meta.level || 1;
   const profBonus = proficiencyBonus(level);
   const hasSpellcasting = !!character.spellcasting;

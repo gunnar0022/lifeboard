@@ -19,12 +19,15 @@ export default function FeatureList({ features, editMode, onUpdate }) {
   };
 
   const sourceColors = {
-    Barbarian: '#8b0000', Rogue: '#4a2066', Fighter: '#4a6580',
-    Subclass: '#c9a96e', Race: '#2a5a2a', Homebrew: '#8a4a00',
-    Wizard: '#1a3a6a', Warlock: '#5a2a5a', Cleric: '#c9a96e',
-    Druid: '#2a5a2a', Paladin: '#8a8a3a', Ranger: '#3a6a3a',
-    Bard: '#6a3a5a', Monk: '#5a7a8a', Artificer: '#6a5a3a',
-    Sorcerer: '#8a4a00',
+    Barbarian: 'var(--dnd-class-barbarian)', Rogue: 'var(--dnd-class-rogue)',
+    Fighter: 'var(--dnd-class-fighter)', Subclass: 'var(--dnd-accent)',
+    Race: 'var(--dnd-class-druid)', Homebrew: 'var(--dnd-class-sorcerer)',
+    Wizard: 'var(--dnd-class-wizard)', Warlock: 'var(--dnd-class-warlock)',
+    Cleric: 'var(--dnd-class-cleric)', Druid: 'var(--dnd-class-druid)',
+    Paladin: 'var(--dnd-class-paladin)', Ranger: 'var(--dnd-class-ranger)',
+    Bard: 'var(--dnd-class-bard)', Monk: 'var(--dnd-class-monk)',
+    Artificer: 'var(--dnd-class-artificer)', Sorcerer: 'var(--dnd-class-sorcerer)',
+    'Circle of Spores': 'var(--dnd-class-druid)',
   };
 
   return (
@@ -55,7 +58,7 @@ export default function FeatureList({ features, editMode, onUpdate }) {
                 <span className="dnd-features__name">{feat.name}</span>
                 {feat.source && (
                   <span className="dnd-features__source"
-                    style={{ borderColor: sourceColors[feat.source] || '#3a3228' }}>
+                    style={{ borderColor: sourceColors[feat.source] || 'var(--dnd-border)' }}>
                     {feat.source}
                   </span>
                 )}

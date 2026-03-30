@@ -1,7 +1,7 @@
 import { CLASS_COLORS } from '../../dndUtils';
 
 export default function ConcentrationBanner({ spellName, className, onDrop }) {
-  const classColor = CLASS_COLORS[className] || '#c9a96e';
+  const classColor = CLASS_COLORS[className] || 'var(--dnd-accent)';
 
   return (
     <div className="spell-concentration-banner" style={{ borderColor: classColor, boxShadow: `0 0 12px ${classColor}33` }}>
