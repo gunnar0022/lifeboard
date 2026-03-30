@@ -27,6 +27,7 @@ async def init_db():
         await _create_investing_tables(db)
         await _create_fleet_tables(db)
         await _create_reading_creative_tables(db)
+        await _create_dnd_tables(db)
         await _create_documents_table(db)
         await db.commit()
     finally:
@@ -340,6 +341,42 @@ async def _create_reading_creative_tables(db: aiosqlite.Connection):
             date_finished TEXT,
             date_added TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
             sort_order INTEGER NOT NULL DEFAULT 0
+        );
+    """)
+
+
+async def _create_dnd_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS dnd_characters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL DEFAULT 'New Character',
+            class_name TEXT NOT NULL DEFAULT '',
+            level INTEGER NOT NULL DEFAULT 1,
+            data TEXT NOT NULL DEFAULT '{}',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS dnd_spells (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            level INTEGER NOT NULL DEFAULT 0,
+            casting_time TEXT NOT NULL DEFAULT '1 action',
+            range TEXT NOT NULL DEFAULT '',
+            aoe TEXT DEFAULT NULL,
+            duration TEXT NOT NULL DEFAULT 'Instantaneous',
+            concentration BOOLEAN NOT NULL DEFAULT 0,
+            ritual BOOLEAN NOT NULL DEFAULT 0,
+            components TEXT NOT NULL DEFAULT '',
+            spell_type TEXT NOT NULL DEFAULT 'utility',
+            damage TEXT DEFAULT NULL,
+            save_type TEXT DEFAULT NULL,
+            save_effect TEXT DEFAULT NULL,
+            description TEXT NOT NULL DEFAULT '',
+            upcast TEXT DEFAULT NULL,
+            source TEXT NOT NULL DEFAULT 'PHB',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name, level)
         );
     """)
 

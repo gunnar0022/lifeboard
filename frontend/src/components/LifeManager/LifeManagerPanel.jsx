@@ -22,7 +22,10 @@ export default function LifeManagerPanel() {
 
   const currencySymbol = config?.currency_symbol || '$';
 
-  const hasData = (tasks && tasks.length > 0) || (bills && bills.length > 0);
+  const timelineHasEvents = timeline && Object.values(timeline).some(
+    d => (d.events > 0) || (d.holidays?.length > 0) || (d.items?.length > 0)
+  );
+  const hasData = (tasks && tasks.length > 0) || (bills && bills.length > 0) || timelineHasEvents;
   const isLoading = tasksLoading || billsLoading || (!tasks && !bills);
 
   if (isLoading) {
@@ -65,8 +68,8 @@ export default function LifeManagerPanel() {
           </div>
           <h3>No items tracked yet</h3>
           <p>
-            Get started by adding a task, bill, or document below, or message
-            the Telegram bot with <code>/l</code>.
+            Get started by adding a task, bill, or event below, or just
+            message the Telegram bot naturally.
           </p>
         </div>
 

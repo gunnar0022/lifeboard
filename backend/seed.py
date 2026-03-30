@@ -635,6 +635,297 @@ async def _has_data(table: str) -> bool:
         await db.close()
 
 
+async def seed_dnd_spells():
+    """Seed the DnD spell library."""
+    spells = [
+        # Cantrips (Level 0)
+        {"name": "Shillelagh", "level": 0, "casting_time": "1 bonus action", "range": "Touch", "duration": "1 minute", "concentration": False, "ritual": False, "components": "V, S, M (mistletoe)", "spell_type": "buff", "description": "Club or quarterstaff becomes magical. Use spellcasting ability for attacks. Damage die becomes d8.", "source": "PHB"},
+        {"name": "Druidcraft", "level": 0, "casting_time": "1 action", "range": "30ft", "aoe": "5ft cube", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "utility", "description": "Create a tiny harmless sensory effect that predicts weather, bloom a flower, create sensory effect, or light/snuff a small flame.", "source": "PHB"},
+        {"name": "Chill Touch", "level": 0, "casting_time": "1 action", "range": "120ft", "duration": "1 round", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "1d8 necrotic", "description": "Ranged spell attack. Hit creature can't regain HP until your next turn. Undead also have disadvantage on attacks against you. Scales at 5th (2d8), 11th (3d8), 17th (4d8).", "source": "PHB"},
+        {"name": "Fire Bolt", "level": 0, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "1d10 fire", "description": "Ranged spell attack. Flammable unattended objects ignite. Scales at 5th (2d10), 11th (3d10), 17th (4d10).", "source": "PHB"},
+        {"name": "Sacred Flame", "level": 0, "casting_time": "1 action", "range": "60ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "1d8 radiant", "save_type": "DEX", "save_effect": "negates", "description": "Target must succeed DEX save or take damage. No benefit from cover. Scales at 5th, 11th, 17th.", "source": "PHB"},
+        {"name": "Eldritch Blast", "level": 0, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "1d10 force", "description": "Ranged spell attack. Additional beams at 5th (2), 11th (3), 17th (4). Each beam attacks separately.", "source": "PHB"},
+        {"name": "Mage Hand", "level": 0, "casting_time": "1 action", "range": "30ft", "duration": "1 minute", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "utility", "description": "Spectral floating hand. Manipulate objects, open containers, retrieve items. Can't attack or carry more than 10 lbs.", "source": "PHB"},
+        {"name": "Prestidigitation", "level": 0, "casting_time": "1 action", "range": "10ft", "duration": "Up to 1 hour", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "utility", "description": "Minor magical trick. Sensory effect, light/snuff flame, clean/soil object, warm/cool/flavor material, small mark or symbol. Up to 3 non-instantaneous effects active.", "source": "PHB"},
+        # 1st Level
+        {"name": "Thunderwave", "level": 1, "casting_time": "1 action", "range": "Self", "aoe": "15ft cube", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "2d8 thunder", "save_type": "CON", "save_effect": "half damage", "description": "Each creature in 15ft cube originating from you makes CON save. Failed: 2d8 thunder + pushed 10ft. Success: half damage, no push. Unsecured objects pushed 10ft.", "upcast": "+1d8 per slot level above 1st", "source": "PHB"},
+        {"name": "Goodberry", "level": 1, "casting_time": "1 action", "range": "Touch", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S, M (sprig of mistletoe)", "spell_type": "healing", "description": "Create 10 magical berries. Eating one restores 1 HP and provides nourishment for a day. Berries lose potency after 24 hours.", "source": "PHB"},
+        {"name": "Absorb Elements", "level": 1, "casting_time": "1 reaction", "range": "Self", "duration": "1 round", "concentration": False, "ritual": False, "components": "S", "spell_type": "buff", "damage": "+1d6 (element)", "description": "When you take acid, cold, fire, lightning, or thunder damage, gain resistance to that damage type until your next turn. First melee attack on your next turn deals +1d6 of the triggering type.", "upcast": "+1d6 per slot level above 1st", "source": "PHB"},
+        {"name": "Faerie Fire", "level": 1, "casting_time": "1 action", "range": "60ft", "aoe": "20ft cube", "duration": "1 minute", "concentration": True, "ritual": False, "components": "V", "spell_type": "control", "save_type": "DEX", "save_effect": "negates", "description": "Objects and creatures in area outlined in light. Affected creatures shed dim light 10ft, can't benefit from invisibility. Attacks against affected creatures have advantage.", "source": "PHB"},
+        {"name": "Wild Cunning", "level": 1, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": True, "components": "V, S", "spell_type": "utility", "description": "Call on spirits of nature for aid. Effects vary: find water/food, shelter, safe path, or identify plants/animals. DM determines specifics.", "source": "PHB"},
+        {"name": "Entangle", "level": 1, "casting_time": "1 action", "range": "90ft", "aoe": "20ft square", "duration": "1 minute", "concentration": True, "ritual": False, "components": "V, S", "spell_type": "control", "save_type": "STR", "save_effect": "negates", "description": "Grasping weeds and vines sprout from ground. Creatures in area make STR save or become restrained. Restrained creature can use action to make STR check to free itself. Area is difficult terrain.", "source": "PHB"},
+        {"name": "Fog Cloud", "level": 1, "casting_time": "1 action", "range": "120ft", "aoe": "20ft sphere", "duration": "1 hour", "concentration": True, "ritual": False, "components": "V, S", "spell_type": "control", "description": "Create a 20ft radius sphere of fog centered on a point. Area is heavily obscured. Wind of 10+ mph disperses it.", "upcast": "+20ft radius per slot level above 1st", "source": "PHB"},
+        {"name": "Shield", "level": 1, "casting_time": "1 reaction", "range": "Self", "duration": "1 round", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "buff", "description": "+5 AC until start of your next turn, including against the triggering attack. Immune to Magic Missile for the duration.", "source": "PHB"},
+        {"name": "Magic Missile", "level": 1, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "3d4+3 force", "description": "Three darts, each dealing 1d4+1 force damage. All hit automatically. Can target same or different creatures.", "upcast": "+1 dart per slot level above 1st", "source": "PHB"},
+        {"name": "Cure Wounds", "level": 1, "casting_time": "1 action", "range": "Touch", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "healing", "damage": "1d8+mod", "description": "Restore 1d8 + spellcasting modifier HP to a creature you touch. No effect on undead or constructs.", "upcast": "+1d8 per slot level above 1st", "source": "PHB"},
+        {"name": "Healing Word", "level": 1, "casting_time": "1 bonus action", "range": "60ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V", "spell_type": "healing", "damage": "1d4+mod", "description": "Restore 1d4 + spellcasting modifier HP to a creature you can see in range.", "upcast": "+1d4 per slot level above 1st", "source": "PHB"},
+        {"name": "Hex", "level": 1, "casting_time": "1 bonus action", "range": "90ft", "duration": "1 hour", "concentration": True, "ritual": False, "components": "V, S, M (petrified eye of a newt)", "spell_type": "debuff", "damage": "1d6 necrotic", "description": "Curse a creature. Deal extra 1d6 necrotic damage on each hit. Target has disadvantage on ability checks of one chosen ability. If target drops to 0 HP, move hex to new creature as bonus action.", "upcast": "Duration: 3rd=8hr, 5th=24hr", "source": "PHB"},
+        # 2nd Level
+        {"name": "Pass Without Trace", "level": 2, "casting_time": "1 action", "range": "Self", "aoe": "30ft radius", "duration": "1 hour", "concentration": True, "ritual": False, "components": "V, S, M (ashes from burned mistletoe leaf)", "spell_type": "buff", "description": "You and each creature you choose within 30ft get +10 bonus to Stealth checks. Can't be tracked by nonmagical means unless you leave a trail intentionally.", "source": "PHB"},
+        {"name": "Heat Metal", "level": 2, "casting_time": "1 action", "range": "60ft", "duration": "1 minute", "concentration": True, "ritual": False, "components": "V, S, M (piece of iron)", "spell_type": "damage", "damage": "2d8 fire", "save_type": "CON", "description": "Choose manufactured metal object you can see. It glows red-hot. Creature in contact takes 2d8 fire damage. Until spell ends, use bonus action to repeat damage. Creature holding/wearing it has disadvantage on attacks and ability checks until start of your next turn.", "upcast": "+1d8 per slot level above 2nd", "source": "PHB"},
+        {"name": "Misty Step", "level": 2, "casting_time": "1 bonus action", "range": "Self", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V", "spell_type": "utility", "description": "Teleport up to 30 feet to an unoccupied space you can see.", "source": "PHB"},
+        {"name": "Spiritual Weapon", "level": 2, "casting_time": "1 bonus action", "range": "60ft", "duration": "1 minute", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "damage", "damage": "1d8+mod force", "description": "Create floating spectral weapon. Make melee spell attack on creation. Bonus action on subsequent turns to move 20ft and attack.", "upcast": "+1d8 per 2 slot levels above 2nd", "source": "PHB"},
+        {"name": "Hold Person", "level": 2, "casting_time": "1 action", "range": "60ft", "duration": "1 minute", "concentration": True, "ritual": False, "components": "V, S, M (small piece of iron)", "spell_type": "control", "save_type": "WIS", "save_effect": "negates", "description": "Target humanoid makes WIS save or is paralyzed. Repeat save at end of each turn. Attacks within 5ft of paralyzed creature are automatic crits.", "upcast": "+1 target per slot level above 2nd", "source": "PHB"},
+        # 3rd Level
+        {"name": "Fireball", "level": 3, "casting_time": "1 action", "range": "150ft", "aoe": "20ft sphere", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S, M (bat guano and sulfur)", "spell_type": "damage", "damage": "8d6 fire", "save_type": "DEX", "save_effect": "half damage", "description": "Bright streak detonates at a point in range. Each creature in 20ft sphere makes DEX save. Failed: 8d6 fire. Success: half. Ignites flammable objects not being worn/carried.", "upcast": "+1d6 per slot level above 3rd", "source": "PHB"},
+        {"name": "Counterspell", "level": 3, "casting_time": "1 reaction", "range": "60ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "S", "spell_type": "control", "description": "Attempt to interrupt a creature casting a spell. If 3rd level or lower, automatically countered. Higher level: make ability check DC 10 + spell level.", "upcast": "Auto-counters spells up to slot level used", "source": "PHB"},
+        {"name": "Dispel Magic", "level": 3, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "utility", "description": "End one spell on a target creature, object, or area. If 3rd level or lower, automatically ends. Higher level: make ability check DC 10 + spell level.", "upcast": "Auto-dispels spells up to slot level used", "source": "PHB"},
+    ]
+
+    db = await get_db()
+    try:
+        for s in spells:
+            await db.execute(
+                """INSERT OR IGNORE INTO dnd_spells
+                   (name, level, casting_time, range, aoe, duration, concentration, ritual,
+                    components, spell_type, damage, save_type, save_effect, description, upcast, source)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    s["name"], s["level"], s.get("casting_time", "1 action"),
+                    s.get("range", ""), s.get("aoe"), s.get("duration", "Instantaneous"),
+                    1 if s.get("concentration") else 0, 1 if s.get("ritual") else 0,
+                    s.get("components", ""), s.get("spell_type", "utility"),
+                    s.get("damage"), s.get("save_type"), s.get("save_effect"),
+                    s.get("description", ""), s.get("upcast"), s.get("source", "PHB"),
+                ),
+            )
+        await db.commit()
+        print(f"  [OK] {len(spells)} spells seeded")
+    finally:
+        await db.close()
+
+
+async def _get_spell_id(db, name):
+    """Helper to look up a spell ID by name."""
+    cursor = await db.execute("SELECT id FROM dnd_spells WHERE name = ?", (name,))
+    row = await cursor.fetchone()
+    return row["id"] if row else None
+
+
+async def seed_gandthalas():
+    """Seed Gandthalas Telciron (Level 3 Half-Elf Druid)."""
+    db = await get_db()
+    try:
+        # Resolve spell IDs
+        spell_names = {
+            "cantrips": ["Shillelagh", "Druidcraft", "Chill Touch"],
+            "prepared": ["Thunderwave", "Goodberry", "Absorb Elements", "Faerie Fire", "Wild Cunning", "Pass Without Trace", "Heat Metal"],
+            "known": ["Entangle", "Fog Cloud"],
+        }
+        cantrip_ids = [await _get_spell_id(db, n) for n in spell_names["cantrips"]]
+        prepared_ids = [await _get_spell_id(db, n) for n in spell_names["prepared"]]
+        known_ids = [await _get_spell_id(db, n) for n in spell_names["known"]]
+        # Filter out None
+        cantrip_ids = [i for i in cantrip_ids if i is not None]
+        prepared_ids = [i for i in prepared_ids if i is not None]
+        known_ids = [i for i in known_ids if i is not None]
+
+        gandthalas = {
+            "meta": {
+                "name": "Gandthalas Telciron",
+                "race": "Half-Elf",
+                "className": "Druid",
+                "level": 3,
+                "subclass": "Circle of Spores",
+                "background": "Faction Agent",
+                "alignment": "True Neutral",
+                "appearance": "Coppery skin. Barky hair with some grey wisps. Taller than average, thin but sturdy frame. Dark Traveler's Robes, worn and repaired in many places.",
+                "languages": ["Common", "Elvish", "Druidic", "Dwarvish", "Undercommon", "Celestial"],
+                "speed": 35,
+                "size": "Medium",
+                "bodyType": "Humanoid"
+            },
+            "abilities": {"STR": 8, "DEX": 14, "CON": 16, "INT": 10, "WIS": 16, "CHA": 10},
+            "saveProficiencies": ["INT", "WIS"],
+            "skillProficiencies": ["Nature", "Religion", "Insight", "Perception"],
+            "skillExpertise": [],
+            "proficiencies": {
+                "armor": ["Light", "Medium", "Shields"],
+                "weapons": ["Big Stick"],
+                "tools": []
+            },
+            "combat": {
+                "ac": 15,
+                "acSource": "Leather (11) + Shield (+2) + DEX (+2)",
+                "hpMax": 27, "hpCurrent": 27, "hpTemp": 0,
+                "hitDiceType": 8, "hitDiceRemaining": 3,
+                "deathSaves": {"successes": 0, "failures": 0}
+            },
+            "attacks": [
+                {"name": "Quarter Staff", "atkAbility": "STR", "damage": "d8", "damageType": "bludgeoning", "properties": "Shillelagh only - uses WIS for attack/damage when active", "affectedByClassFeature": False},
+                {"name": "Chill Touch", "atkAbility": "WIS", "damage": "1d8", "damageType": "necrotic", "properties": "120ft. No healing until your next turn.", "affectedByClassFeature": False}
+            ],
+            "features": [
+                {"name": "Druidic", "source": "Druid", "desc": "Secret language of Druids. Can speak it and use it to leave hidden messages."},
+                {"name": "Druid Cantrips", "source": "Druid", "desc": "Know Druid cantrips. Druidic Focus can be used as spellcasting focus."},
+                {"name": "Wild Shape", "source": "Druid", "desc": "Transform into an animal you've seen before. 10 minute duration. Current restrictions: no swimmers or flyers."},
+                {"name": "Halo of Spores", "source": "Circle of Spores", "desc": "D4 reaction damage to creatures within 10ft. Constitution save against DC 13. +1 D4 during symbiotic entity."},
+                {"name": "Symbiotic Entity", "source": "Circle of Spores", "desc": "Action to activate. 10 minute duration. +4 temp HP per level. Melee attacks do +D6 necrotic. Uses a Wild Shape charge."},
+                {"name": "Fey Ancestry", "source": "Race", "desc": "Advantage on saves against being charmed. Magic can't put you to sleep."},
+                {"name": "Darkvision", "source": "Race", "desc": "See in dim light within 60ft as if bright light. See in darkness as dim light."},
+                {"name": "Fleet of Foot", "source": "Race", "desc": "Base walking speed is 35 feet."}
+            ],
+            "classFeature": {
+                "type": "wild_shape",
+                "maxUses": 2, "currentUses": 2, "active": False, "rechargeOn": "short"
+            },
+            "equipment": [
+                "Leather Armor (11 AC)", "Wooden Shield (+2 AC)", "Quarter Staff",
+                "Explorer's Pack", "Emblem of Emerald Enclave", "The Telnoven",
+                "Paper Bird", "And the quill", "x3 10lb silver bars"
+            ],
+            "coins": {"CP": 0, "SP": 0, "EP": 0, "GP": 25, "PP": 0},
+            "customBoxes": [
+                {
+                    "title": "Personality",
+                    "fields": [
+                        {"label": "Trait", "value": "Waterdavian. Circle of Spores Druid training."},
+                        {"label": "Ideal", "value": "Returned to Waterdeep to work with Emerald Enclave."},
+                        {"label": "Bond", "value": "Faith: Jergal."},
+                    ]
+                }
+            ],
+            "spellcasting": {
+                "ability": "WIS",
+                "type": "prepared",
+                "slots": {"1": {"max": 4, "expended": 0}, "2": {"max": 2, "expended": 0}},
+                "cantrips": cantrip_ids,
+                "preparedSpells": prepared_ids,
+                "knownSpells": known_ids,
+                "spellOrder": {
+                    "cantrips": cantrip_ids,
+                    "prepared": prepared_ids,
+                    "known": known_ids
+                },
+                "concentratingOn": None
+            }
+        }
+
+        await db.execute(
+            "INSERT INTO dnd_characters (name, class_name, level, data) VALUES (?, ?, ?, ?)",
+            ("Gandthalas Telciron", "Druid", 3, json.dumps(gandthalas)),
+        )
+        await db.commit()
+        print("  [OK] Gandthalas Telciron seeded")
+    finally:
+        await db.close()
+
+
+async def seed_dnd():
+    """Seed DnD character sheet with Garden Opus."""
+    garden_opus = {
+        "meta": {
+            "name": "Garden Opus",
+            "race": "Uma (Bipedal Homebrew)",
+            "className": "Barbarian",
+            "level": 2,
+            "subclass": "Path of the Ancestral Guardian",
+            "background": "Athlete",
+            "alignment": "Chaotic Good",
+            "appearance": "5'8\"",
+            "languages": ["Common", "Sylvan", "Giant"],
+            "speed": 35,
+            "size": "Medium",
+            "bodyType": "Humanoid"
+        },
+        "abilities": {
+            "STR": 17, "DEX": 14, "CON": 16,
+            "INT": 8, "WIS": 10, "CHA": 8
+        },
+        "saveProficiencies": ["STR", "CON"],
+        "skillProficiencies": ["Acrobatics", "Athletics", "Insight", "Medicine", "Nature", "Survival"],
+        "skillExpertise": [],
+        "proficiencies": {
+            "armor": ["Light", "Medium", "Shields"],
+            "weapons": ["Simple", "Martial"],
+            "tools": ["Chariot"]
+        },
+        "combat": {
+            "ac": 15,
+            "acSource": "Unarmored Defense (10 + DEX + CON)",
+            "hpMax": 25, "hpCurrent": 25, "hpTemp": 0,
+            "hitDiceType": 12, "hitDiceRemaining": 2,
+            "deathSaves": {"successes": 0, "failures": 0}
+        },
+        "attacks": [
+            {
+                "name": "Maul", "atkAbility": "STR",
+                "damage": "2d6", "damageType": "bludgeoning",
+                "properties": "Heavy, Two-Handed",
+                "affectedByClassFeature": True
+            },
+            {
+                "name": "Thundering Rush", "atkAbility": "STR",
+                "damage": "d6", "damageType": "bludgeoning",
+                "properties": "25ft run-up. Miss = prone.",
+                "atkBonus": 2, "affectedByClassFeature": True
+            },
+            {
+                "name": "Handaxe", "atkAbility": "STR",
+                "damage": "d6", "damageType": "slashing",
+                "properties": "Light, Throwable (20/60)",
+                "affectedByClassFeature": True
+            },
+            {
+                "name": "Javelin", "atkAbility": "STR",
+                "damage": "d6", "damageType": "piercing",
+                "properties": "Throwable (30/120)",
+                "affectedByClassFeature": False
+            }
+        ],
+        "features": [
+            {"name": "Unarmored Defense", "source": "Barbarian", "desc": "AC = 10 + DEX mod + CON mod"},
+            {"name": "Reckless Attack", "source": "Barbarian", "desc": "First attack of your turn: advantage on STR melee attacks, but attacks against you have advantage until your next turn."},
+            {"name": "Danger Sense", "source": "Barbarian", "desc": "Advantage on DEX saving throws against effects you can see. Must not be blinded, deafened, or incapacitated."},
+            {"name": "Ancestral Protectors", "source": "Subclass", "desc": "While raging, the first creature you hit each turn is harassed by spirits. It has disadvantage attacking anyone but you, and targets other than you have resistance to its damage until your next turn."},
+            {"name": "Thundering Rush", "source": "Homebrew", "desc": "25ft straight-line run-up, then melee attack with expertise (+7 to hit). On miss, you fall prone. d6 + STR bludgeoning."},
+            {"name": "Equine Build", "source": "Race", "desc": "Count as one size larger for carrying capacity and push/drag/lift. Climbing costs extra movement."}
+        ],
+        "classFeature": {
+            "type": "rage",
+            "maxUses": 2, "currentUses": 2, "active": False,
+            "bonusDamage": 2,
+            "resistances": ["bludgeoning", "piercing", "slashing"],
+            "extraWhileActive": "Ancestral Protectors: first creature hit has disadvantage attacking others, others resist its damage"
+        },
+        "equipment": [
+            "Maul", "Handaxe", "Javelin", "Lucky Charm", "Backpack",
+            "Bedroll", "Mess kit", "Tinderbox", "10 torches",
+            "9 days of rations", "Waterskin", "50 feet of rope"
+        ],
+        "coins": {"CP": 0, "SP": 0, "EP": 0, "GP": 128, "PP": 0},
+        "customBoxes": [
+            {
+                "title": "Personality",
+                "fields": [
+                    {"label": "Trait", "value": "I get irritated if people praise someone else and not me."},
+                    {"label": "Ideal", "value": "Competition. I strive to test myself in all things. (Chaotic)"},
+                    {"label": "Bond", "value": "I will overcome a rival and prove myself their better."},
+                    {"label": "Flaw", "value": "I ignore anyone who doesn't compete and anyone who loses to me."}
+                ]
+            },
+            {
+                "title": "Appearance",
+                "fields": [
+                    {"label": "Description", "value": "5'8\", bipedal horse-person with a powerful build."}
+                ]
+            }
+        ],
+        "spellcasting": None
+    }
+
+    db = await get_db()
+    try:
+        await db.execute(
+            "INSERT INTO dnd_characters (name, class_name, level, data) VALUES (?, ?, ?, ?)",
+            ("Garden Opus", "Barbarian", 2, json.dumps(garden_opus)),
+        )
+        await db.commit()
+        print("  [OK] Garden Opus seeded")
+    finally:
+        await db.close()
+
+
 async def main():
     import sys
     print("LifeBoard Seed Script")
@@ -692,8 +983,18 @@ async def main():
     else:
         print("[SKIP] Documents — data already exists")
 
-    # Reading & Creative: no seed function — creative files live on disk
-    # and are discovered by sync_filesystem(). Books can be added via Telegram.
+    if not await _has_data("dnd_spells"):
+        print("\nSeeding DnD Spell Library...")
+        await seed_dnd_spells()
+    else:
+        print("[SKIP] DnD Spells -- data already exists")
+
+    if not await _has_data("dnd_characters"):
+        print("\nSeeding DnD Characters...")
+        await seed_dnd()
+        await seed_gandthalas()
+    else:
+        print("[SKIP] DnD Characters -- data already exists")
 
     print("\n" + "=" * 40)
     print("Done! Restart the backend to pick up changes.")

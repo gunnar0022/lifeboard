@@ -96,8 +96,8 @@ export default function FinancePanel() {
           <div className="finance-panel__empty-icon"><DollarSign size={40} /></div>
           <h3>No accounts set up yet</h3>
           <p>
-            Start by messaging the Telegram bot with <code>/f</code> to set up your
-            first account, or add one below.
+            Start by adding an account below, or message the Telegram bot
+            something like "add my bank account".
           </p>
           <QuickAddForm
             mode="account"

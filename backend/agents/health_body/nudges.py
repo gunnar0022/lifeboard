@@ -14,7 +14,7 @@ async def check_nudges() -> list[dict]:
     profile = await queries.get_profile()
     if not profile:
         nudges.append({
-            "text": "Health profile not set up yet — use /h to get started",
+            "text": "Health profile not set up yet — tell the Telegram bot your height, weight, and age",
             "severity": "info",
             "agent": "health_body",
         })

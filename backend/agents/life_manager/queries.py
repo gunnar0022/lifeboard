@@ -22,7 +22,9 @@ def _today() -> date:
 async def get_events(
     date_from: str = None,
     date_to: str = None,
+    category: str = None,
     search: str = None,
+    include_completed: bool = False,
     include_holidays: bool = True,
     limit: int = 50,
 ) -> list[dict]:
@@ -36,6 +38,9 @@ async def get_events(
         if date_to:
             sql += " AND start_time <= ?"
             params.append(date_to)
+        if category:
+            sql += " AND source_calendar = ?"
+            params.append(category)
         if not include_holidays:
             sql += " AND is_holiday = 0"
         if search:

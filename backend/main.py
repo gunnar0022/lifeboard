@@ -171,6 +171,10 @@ if env == "dev":
 for router in get_agent_routers():
     app.include_router(router)
 
+# DnD Character Sheet routes
+from backend.dnd import router as dnd_router
+app.include_router(dnd_router)
+
 
 # --- Setup Wizard API ---
 
@@ -210,11 +214,17 @@ async def setup_health_profile(body: dict):
 
 @app.post("/api/setup/add-holding")
 async def setup_add_holding(body: dict):
-    """Add an investment holding from the wizard."""
-    from backend.agents.investing.queries import add_holding, record_transaction
+    """Add an investment holding from the wizard (skips if symbol already exists)."""
+    from backend.agents.investing.queries import add_holding, record_transaction, get_holdings
+    # Prevent duplicates on repeated wizard runs
+    existing = await get_holdings()
+    symbol = body["symbol"].strip().upper()
+    for h in existing:
+        if h["symbol"] == symbol:
+            return {"ok": True, "skipped": True, "holding_id": h["id"]}
     holding = await add_holding(
-        symbol=body["symbol"],
-        name=body.get("name", body["symbol"]),
+        symbol=symbol,
+        name=body.get("name", symbol),
         asset_class=body.get("asset_class", "stock"),
         currency=body.get("currency", "USD"),
     )
@@ -239,10 +249,16 @@ async def setup_add_holding(body: dict):
 
 @app.post("/api/setup/add-book")
 async def setup_add_book(body: dict):
-    """Add a book from the wizard."""
-    from backend.agents.reading_creative.queries import add_book
+    """Add a book from the wizard (skips if title already exists)."""
+    from backend.agents.reading_creative.queries import add_book, get_books
+    # Prevent duplicates on repeated wizard runs
+    existing = await get_books()
+    title = body["title"].strip()
+    for b in existing:
+        if b["title"].lower() == title.lower():
+            return {"ok": True, "skipped": True}
     await add_book(
-        title=body["title"],
+        title=title,
         author=body.get("author"),
         status=body.get("status", "reading"),
     )

@@ -62,6 +62,8 @@ def discover_agents() -> list[dict]:
 
 def get_agent_routers():
     """Return FastAPI routers for all active real agents."""
+    import logging
+    logger = logging.getLogger("lifeboard")
     config = get_config()
     active_ids = config.get("active_agents", [])
     routers = []
@@ -71,7 +73,8 @@ def get_agent_routers():
             try:
                 mod = import_module(f"{agent_def['module']}.routes")
                 routers.append(mod.router)
-            except (ImportError, AttributeError):
-                pass
+                logger.info(f"Registered routes for agent: {agent_def['id']}")
+            except (ImportError, AttributeError) as e:
+                logger.error(f"Failed to load routes for agent {agent_def['id']}: {e}")
 
     return routers

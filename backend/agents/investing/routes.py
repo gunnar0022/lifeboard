@@ -180,6 +180,20 @@ async def latest_snapshot():
     return result
 
 
+# --- Price Refresh ---
+
+@router.post("/refresh-prices")
+async def refresh_prices():
+    """Manually trigger a price refresh for all holdings."""
+    from backend.agents.investing.scheduler import run_price_refresh
+    try:
+        await run_price_refresh()
+        return {"ok": True}
+    except Exception as e:
+        logger.error(f"Price refresh error: {e}")
+        raise HTTPException(500, f"Price refresh failed: {e}")
+
+
 # --- Health ---
 
 @router.get("/health")

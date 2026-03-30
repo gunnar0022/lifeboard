@@ -60,10 +60,36 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol,
 
   const slices = entries.map(([cls, data]) => {
     const pct = data.value / total;
-    const angle = pct * 360;
+    const displayValue = convertValue(data.value, nativeCurrency, dc, fxRate);
+
+    // Single-slice case: arc paths break at 360°, so draw two concentric circles instead
+    if (entries.length === 1) {
+      const d = [
+        `M ${cx - radius} ${cy}`,
+        `A ${radius} ${radius} 0 1 1 ${cx + radius} ${cy}`,
+        `A ${radius} ${radius} 0 1 1 ${cx - radius} ${cy}`,
+        `M ${cx - innerRadius} ${cy}`,
+        `A ${innerRadius} ${innerRadius} 0 1 0 ${cx + innerRadius} ${cy}`,
+        `A ${innerRadius} ${innerRadius} 0 1 0 ${cx - innerRadius} ${cy}`,
+        'Z',
+      ].join(' ');
+
+      return {
+        cls,
+        label: CLASS_LABELS[cls] || cls,
+        value: displayValue,
+        count: data.count,
+        pct,
+        d,
+        color: CLASS_COLORS[cls] || CLASS_COLORS.other,
+      };
+    }
+
+    // Cap at 359.9° — SVG arcs collapse to nothing at exactly 360°
+    const angle = Math.min(pct * 360, 359.9);
     const startAngle = cumulativeAngle;
     const endAngle = startAngle + angle;
-    cumulativeAngle = endAngle;
+    cumulativeAngle = startAngle + pct * 360;
 
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (endAngle * Math.PI) / 180;
@@ -85,8 +111,6 @@ export default function AllocationChart({ breakdown, totalValue, currencySymbol,
       `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix2} ${iy2}`,
       'Z',
     ].join(' ');
-
-    const displayValue = convertValue(data.value, nativeCurrency, dc, fxRate);
 
     return {
       cls,
