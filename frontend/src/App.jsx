@@ -83,13 +83,10 @@ export default function App() {
       return (
         <SettingsPanel
           key="settings"
+          onBack={() => setActivePanel('home')}
           onThemeChange={() => {}}
           onPanelVisibilityChange={(panels) => {
             setPanelVisibility(panels);
-            // If current panel was hidden, go home
-            if (panels[activePanel] === false) {
-              setActivePanel('home');
-            }
           }}
         />
       );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Sun, Moon, Download, Upload, Loader, Check, AlertTriangle } from 'lucide-react';
+import { Settings, Sun, Moon, Download, Upload, Loader, Check, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useApi, apiPut } from '../../hooks/useApi';
 import './SettingsPanel.css';
 
@@ -9,9 +9,11 @@ const PANEL_LABELS = {
   finance: 'Finance',
   investing: 'Investing',
   reading_creative: 'Reading & Creative',
+  career: 'Career',
+  projects: 'Projects',
 };
 
-export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange }) {
+export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, onBack }) {
   const { data: settings, loading } = useApi('/api/settings');
   const [local, setLocal] = useState(null);
   const [backupStatus, setBackupStatus] = useState('idle'); // idle | loading | done
@@ -135,6 +137,11 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange }
   return (
     <div className="settings">
       <div className="settings__header">
+        {onBack && (
+          <button className="settings__back" onClick={onBack}>
+            <ArrowLeft size={18} />
+          </button>
+        )}
         <Settings size={24} />
         <h2>Settings</h2>
       </div>
@@ -142,22 +149,23 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange }
       {/* Appearance */}
       <section className="settings__section">
         <h3 className="settings__section-title">Appearance</h3>
-        <div className="settings__row">
-          <span className="settings__label">Theme</span>
-          <div className="settings__theme-toggle">
-            <button
-              className={`settings__theme-btn ${currentTheme === 'light' ? 'settings__theme-btn--active' : ''}`}
-              onClick={() => handleThemeChange('light')}
-            >
-              <Sun size={14} /> Light
-            </button>
-            <button
-              className={`settings__theme-btn ${currentTheme === 'dark' ? 'settings__theme-btn--active' : ''}`}
-              onClick={() => handleThemeChange('dark')}
-            >
-              <Moon size={14} /> Dark
-            </button>
-          </div>
+        <div className="settings__theme-cards">
+          <button
+            className={`settings__theme-card ${currentTheme === 'light' ? 'settings__theme-card--active' : ''}`}
+            onClick={() => handleThemeChange('light')}
+          >
+            <Sun size={20} />
+            <span>Light</span>
+            {currentTheme === 'light' && <Check size={14} className="settings__theme-check" />}
+          </button>
+          <button
+            className={`settings__theme-card ${currentTheme === 'dark' ? 'settings__theme-card--active' : ''}`}
+            onClick={() => handleThemeChange('dark')}
+          >
+            <Moon size={20} />
+            <span>Dark</span>
+            {currentTheme === 'dark' && <Check size={14} className="settings__theme-check" />}
+          </button>
         </div>
       </section>
 
