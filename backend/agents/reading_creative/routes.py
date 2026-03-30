@@ -55,6 +55,7 @@ class BookUpdate(BaseModel):
     status: Optional[str] = None
     recommended_by: Optional[str] = None
     reflection: Optional[str] = None
+    rating: Optional[int] = None
     date_finished: Optional[str] = None
     sort_order: Optional[int] = None
 

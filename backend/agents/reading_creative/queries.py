@@ -554,7 +554,7 @@ async def add_book(title: str, author: str = None, status: str = "to_read",
 
 
 async def update_book(book_id: int, **fields) -> dict | None:
-    allowed = {"title", "author", "status", "recommended_by", "reflection", "date_finished", "sort_order"}
+    allowed = {"title", "author", "status", "recommended_by", "reflection", "rating", "date_finished", "sort_order"}
     updates = {k: v for k, v in fields.items() if k in allowed}
     if not updates:
         return None

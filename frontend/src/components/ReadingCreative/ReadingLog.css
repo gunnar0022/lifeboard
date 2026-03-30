@@ -199,13 +199,286 @@
   background: color-mix(in srgb, #B07CD8 12%, transparent);
 }
 
+.book-item__info--clickable {
+  cursor: pointer;
+}
+
+.book-item__expand-icon {
+  color: var(--text-tertiary);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.book-item__expand-icon--open {
+  transform: rotate(180deg);
+}
+
+.book-item__details {
+  overflow: hidden;
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) 28px;
+  border-left: 2px solid #B07CD8;
+  margin-left: var(--space-sm);
+}
+.book-item__detail {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+.book-item__detail strong {
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  margin-right: 0.3rem;
+}
+.book-item__detail--empty {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
 .book-item__reflection {
   font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.5;
-  padding: var(--space-xs) var(--space-sm) var(--space-xs) 28px;
-  font-style: italic;
-  border-left: 2px solid #B07CD8;
-  margin-left: var(--space-sm);
-  overflow: hidden;
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  gap: 2px;
+}
+.star-rating__star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px;
+  color: var(--text-tertiary);
+  transition: color 0.1s;
+}
+.star-rating__star--filled {
+  color: #d4a017;
+}
+
+.star-display {
+  display: inline-flex;
+  gap: 1px;
+  vertical-align: middle;
+}
+.star-display--filled {
+  color: #d4a017;
+  fill: #d4a017;
+}
+.star-display--empty {
+  color: var(--text-tertiary);
+  opacity: 0.3;
+}
+
+/* Completion Modal */
+.complete-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.complete-modal {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+}
+.complete-modal__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+.complete-modal__book {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.complete-modal__author {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+.complete-modal__field {
+  margin-bottom: 1rem;
+}
+.complete-modal__field label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+.complete-modal__textarea {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+.complete-modal__textarea:focus {
+  border-color: #B07CD8;
+}
+.complete-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.complete-modal__cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+.complete-modal__confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #B07CD8;
+  border: none;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.complete-modal__confirm:hover { opacity: 0.9; }
+
+/* Edit button in finished book details */
+.book-item__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  transition: all 0.15s;
+}
+.book-item__edit-btn:hover {
+  border-color: #B07CD8;
+  color: #B07CD8;
+}
+
+/* Edit form in finished book details */
+.book-item__edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.book-item__edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.book-item__edit-field label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+.book-item__edit-field input[type="date"] {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+.book-item__edit-field textarea {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.8rem;
+  resize: vertical;
+  line-height: 1.4;
+  outline: none;
+}
+.book-item__edit-field textarea:focus,
+.book-item__edit-field input:focus {
+  border-color: #B07CD8;
+}
+.book-item__edit-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+.book-item__edit-right {
+  display: flex;
+  gap: 0.4rem;
+}
+.book-item__edit-cancel {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+.book-item__edit-save {
+  background: #B07CD8;
+  border: none;
+  color: #fff;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.book-item__edit-save:hover { opacity: 0.9; }
+.book-item__edit-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0;
+  transition: color 0.15s;
+}
+.book-item__edit-delete:hover {
+  color: #c44;
 }

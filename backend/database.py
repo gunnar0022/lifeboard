@@ -320,6 +320,15 @@ async def _create_fleet_tables(db: aiosqlite.Connection):
 
 
 async def _create_reading_creative_tables(db: aiosqlite.Connection):
+    # Migrate: add rating column if missing (for existing databases)
+    try:
+        await db.execute("SELECT rating FROM reading_books LIMIT 1")
+    except Exception:
+        try:
+            await db.execute("ALTER TABLE reading_books ADD COLUMN rating INTEGER DEFAULT NULL")
+        except Exception:
+            pass  # Table doesn't exist yet, CREATE below will handle it
+
     await db.executescript("""
         CREATE TABLE IF NOT EXISTS creative_projects (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -346,6 +355,7 @@ async def _create_reading_creative_tables(db: aiosqlite.Connection):
             status TEXT NOT NULL CHECK(status IN ('to_read', 'reading', 'finished')),
             recommended_by TEXT,
             reflection TEXT,
+            rating INTEGER DEFAULT NULL,
             date_finished TEXT,
             date_added TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
             sort_order INTEGER NOT NULL DEFAULT 0
