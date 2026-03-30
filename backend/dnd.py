@@ -259,3 +259,163 @@ async def batch_spells(body: dict):
         return [dict(r) for r in rows]
     finally:
         await db.close()
+
+
+# ── Campaigns ───────────────────────────────────────────
+
+@router.get("/campaigns")
+async def list_campaigns():
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT id, name, color, updated_at FROM dnd_campaigns ORDER BY updated_at DESC"
+        )
+        return [dict(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.get("/campaigns/{campaign_id}")
+async def get_campaign(campaign_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_campaigns WHERE id = ?", (campaign_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Campaign not found")
+        return dict(row)
+    finally:
+        await db.close()
+
+
+@router.post("/campaigns")
+async def create_campaign(body: dict):
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "INSERT INTO dnd_campaigns (name, color) VALUES (?, ?)",
+            (body.get("name", "New Campaign"), body.get("color", "#c9a96e")),
+        )
+        await db.commit()
+        new_id = cursor.lastrowid
+        cursor = await db.execute("SELECT * FROM dnd_campaigns WHERE id = ?", (new_id,))
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.put("/campaigns/{campaign_id}")
+async def update_campaign(campaign_id: int, body: dict):
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for k in ("name", "color"):
+            if k in body:
+                sets.append(f"{k} = ?")
+                vals.append(body[k])
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        sets.append("updated_at = CURRENT_TIMESTAMP")
+        vals.append(campaign_id)
+        cursor = await db.execute(
+            f"UPDATE dnd_campaigns SET {', '.join(sets)} WHERE id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Campaign not found")
+        cursor = await db.execute("SELECT * FROM dnd_campaigns WHERE id = ?", (campaign_id,))
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/campaigns/{campaign_id}")
+async def delete_campaign(campaign_id: int):
+    db = await get_db()
+    try:
+        await db.execute("PRAGMA foreign_keys = ON")
+        cursor = await db.execute("DELETE FROM dnd_campaigns WHERE id = ?", (campaign_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Campaign not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
+# ── Campaign Notes ──────────────────────────────────────
+
+@router.get("/campaigns/{campaign_id}/notes")
+async def list_campaign_notes(campaign_id: int, type: str = None):
+    db = await get_db()
+    try:
+        if type:
+            cursor = await db.execute(
+                "SELECT * FROM dnd_campaign_notes WHERE campaign_id = ? AND type = ? ORDER BY updated_at DESC",
+                (campaign_id, type),
+            )
+        else:
+            cursor = await db.execute(
+                "SELECT * FROM dnd_campaign_notes WHERE campaign_id = ? ORDER BY updated_at DESC",
+                (campaign_id,),
+            )
+        return [dict(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.post("/campaigns/{campaign_id}/notes")
+async def create_campaign_note(campaign_id: int, body: dict):
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "INSERT INTO dnd_campaign_notes (campaign_id, type, title, body) VALUES (?, ?, ?, ?)",
+            (campaign_id, body.get("type", "note"), body.get("title", ""), body.get("body", "")),
+        )
+        await db.commit()
+        new_id = cursor.lastrowid
+        cursor = await db.execute("SELECT * FROM dnd_campaign_notes WHERE id = ?", (new_id,))
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.put("/campaigns/{campaign_id}/notes/{note_id}")
+async def update_campaign_note(campaign_id: int, note_id: int, body: dict):
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for k in ("type", "title", "body"):
+            if k in body:
+                sets.append(f"{k} = ?")
+                vals.append(body[k])
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        sets.append("updated_at = CURRENT_TIMESTAMP")
+        vals.extend([campaign_id, note_id])
+        cursor = await db.execute(
+            f"UPDATE dnd_campaign_notes SET {', '.join(sets)} WHERE campaign_id = ? AND id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Note not found")
+        cursor = await db.execute("SELECT * FROM dnd_campaign_notes WHERE id = ?", (note_id,))
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/campaigns/{campaign_id}/notes/{note_id}")
+async def delete_campaign_note(campaign_id: int, note_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "DELETE FROM dnd_campaign_notes WHERE campaign_id = ? AND id = ?",
+            (campaign_id, note_id),
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Note not found")
+        return {"success": True}
+    finally:
+        await db.close()

@@ -5,7 +5,7 @@ import { useApi } from '../../hooks/useApi';
 import FloatingSnippets from './FloatingSnippets';
 import ReadingLog from './ReadingLog';
 import CreativeWorkspace from './CreativeWorkspace';
-import CharacterList from './DnD/CharacterList';
+import DnDSelectionScreen from './DnD/DnDSelectionScreen';
 import CharacterSheet from './DnD/CharacterSheet';
 import './ReadingCreativePanel.css';
 import './DnD/dndStyles.css';
@@ -24,20 +24,20 @@ export default function ReadingCreativePanel() {
   const { data: projects, loading } = useApi('/api/reading_creative/projects');
   const { data: books, refetch: refetchBooks } = useApi('/api/reading_creative/books');
   const { data: snippets } = useApi('/api/reading_creative/snippets?count=52');
-  const { data: characters, refetch: refetchCharacters } = useApi('/api/dnd/characters');
+  const { data: campaigns } = useApi('/api/dnd/campaigns');
+  const { data: characters } = useApi('/api/dnd/characters');
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  const [dndView, setDndView] = useState(null); // null | 'list' | { id, editMode }
+  const [dndView, setDndView] = useState(null); // null | 'selection' | { id, editMode, campaignId }
 
-  const handleSelectCharacter = useCallback((id, editMode) => {
-    setDndView({ id, editMode });
+  const handleSelectCharacter = useCallback((id, editMode, campaignId) => {
+    setDndView({ id, editMode, campaignId });
   }, []);
 
   const handleBackFromSheet = useCallback(() => {
-    refetchCharacters();
-    setDndView('list');
-  }, [refetchCharacters]);
+    setDndView('selection');
+  }, []);
 
-  const handleBackFromList = useCallback(() => {
+  const handleBackFromSelection = useCallback(() => {
     setDndView(null);
   }, []);
 
@@ -46,19 +46,15 @@ export default function ReadingCreativePanel() {
     return <CreativeWorkspace onBack={() => setWorkspaceOpen(false)} />;
   }
 
-  if (dndView === 'list') {
+  if (dndView === 'selection') {
     return (
       <div className="rc-panel rc-panel--dnd dnd-root">
         <div className="rc-panel__sub-header">
-          <button className="rc-panel__back-btn" onClick={handleBackFromList}>
+          <button className="rc-panel__back-btn" onClick={handleBackFromSelection}>
             &larr; Back
           </button>
         </div>
-        <CharacterList
-          characters={characters || []}
-          onSelect={handleSelectCharacter}
-          onRefresh={refetchCharacters}
-        />
+        <DnDSelectionScreen onSelectCharacter={handleSelectCharacter} />
       </div>
     );
   }
@@ -69,6 +65,7 @@ export default function ReadingCreativePanel() {
         <CharacterSheet
           characterId={dndView.id}
           initialEditMode={dndView.editMode}
+          campaignId={dndView.campaignId}
           onBack={handleBackFromSheet}
         />
       </div>
@@ -91,6 +88,8 @@ export default function ReadingCreativePanel() {
       </div>
     );
   }
+
+  const totalDnD = (campaigns?.length || 0) + (characters?.length || 0);
 
   return (
     <div className="rc-panel">
@@ -130,13 +129,13 @@ export default function ReadingCreativePanel() {
         <motion.div variants={fadeUp}>
           <button
             className="rc-panel__workspace-btn card"
-            onClick={() => setDndView('list')}
+            onClick={() => setDndView('selection')}
           >
             <div className="rc-panel__workspace-info">
               <Swords size={20} />
               <div>
-                <strong>Characters</strong>
-                <span>{characters?.length || 0} character sheets</span>
+                <strong>D&D</strong>
+                <span>{campaigns?.length || 0} campaigns, {characters?.length || 0} characters</span>
               </div>
             </div>
             <span className="rc-panel__workspace-arrow">&rarr;</span>

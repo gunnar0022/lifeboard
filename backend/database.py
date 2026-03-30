@@ -386,6 +386,25 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(name, level)
         );
+
+        CREATE TABLE IF NOT EXISTS dnd_campaigns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL DEFAULT 'New Campaign',
+            color TEXT NOT NULL DEFAULT '#c9a96e',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS dnd_campaign_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            campaign_id INTEGER NOT NULL,
+            type TEXT NOT NULL DEFAULT 'note',
+            title TEXT NOT NULL DEFAULT '',
+            body TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (campaign_id) REFERENCES dnd_campaigns(id) ON DELETE CASCADE
+        );
     """)
 
 

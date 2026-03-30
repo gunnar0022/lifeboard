@@ -9,11 +9,13 @@ import ProficiencyTags from './components/ProficiencyTags';
 import InfoPanel from './components/InfoPanel';
 import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
+import NotesTab from './components/CampaignNotes/NotesTab';
 import useAutosave from './components/useAutosave';
 import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS } from './dndUtils';
 
-export default function CharacterSheet({ characterId, initialEditMode, onBack }) {
+export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack }) {
   const [character, setCharacter] = useState(null);
+  const [campaignName, setCampaignName] = useState('');
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(initialEditMode || false);
   const [tab, setTab] = useState('combat');
@@ -51,7 +53,13 @@ export default function CharacterSheet({ characterId, initialEditMode, onBack })
         setLoading(false);
       }
     })();
-  }, [characterId]);
+    // Fetch campaign name if campaignId provided
+    if (campaignId) {
+      fetch(`/api/dnd/campaigns/${campaignId}`).then(r => r.json())
+        .then(c => setCampaignName(c.name || ''))
+        .catch(() => {});
+    }
+  }, [characterId, campaignId]);
 
   const handleUpdate = (updates) => {
     setCharacter(prev => deepMerge(prev, updates));
@@ -192,12 +200,15 @@ export default function CharacterSheet({ characterId, initialEditMode, onBack })
   const profBonus = proficiencyBonus(level);
   const hasSpellcasting = !!character.spellcasting;
 
+  const hasCampaign = !!campaignId;
+
   const tabs = [
     { id: 'combat', label: 'Combat' },
     { id: 'skills', label: 'Skills' },
     { id: 'features', label: 'Features' },
     ...(hasSpellcasting ? [{ id: 'spells', label: 'Spells' }] : []),
     { id: 'info', label: 'Info' },
+    ...(hasCampaign ? [{ id: 'notes', label: 'Notes' }] : []),
   ];
 
   return (
@@ -261,6 +272,9 @@ export default function CharacterSheet({ characterId, initialEditMode, onBack })
         </div>
 
         <div className="dnd-sheet__header-right">
+          {campaignName && (
+            <span className="dnd-sheet__campaign-name">{campaignName}</span>
+          )}
           <button className="dnd-sheet__edit-toggle" onClick={() => setEditMode(!editMode)}>
             {editMode ? <><Eye size={14} /> View</> : <><Edit3 size={14} /> Edit</>}
           </button>
@@ -340,6 +354,10 @@ export default function CharacterSheet({ characterId, initialEditMode, onBack })
             equipment={character.equipment || []}
             coins={character.coins || {}}
             editMode={editMode} onUpdate={handleUpdate} />
+        )}
+
+        {tab === 'notes' && hasCampaign && (
+          <NotesTab campaignId={campaignId} />
         )}
       </div>
 

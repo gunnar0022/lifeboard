@@ -1636,3 +1636,427 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================
+   DnD SELECTION SCREEN (campaigns + characters)
+   ============================================ */
+.dnd-selection {
+  padding: 1rem;
+}
+.dnd-selection__section {
+  margin-bottom: 1.5rem;
+}
+.dnd-selection__section--characters {
+  border-top: 1px solid var(--dnd-border);
+  padding-top: 1.25rem;
+}
+.dnd-selection__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.dnd-selection__section-header .dnd-section-title { margin: 0; }
+.dnd-selection__context {
+  font-size: 0.8rem;
+  color: var(--dnd-text-dim);
+}
+.dnd-selection__context strong {
+  color: var(--dnd-accent);
+}
+.dnd-selection__campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.dnd-selection__skip {
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0.35rem 0;
+  transition: color 0.15s;
+}
+.dnd-selection__skip:hover { color: var(--dnd-text); }
+.dnd-selection__skip--active { color: var(--dnd-accent); }
+
+/* ============================================
+   CAMPAIGN CARD
+   ============================================ */
+.dnd-campaign-card {
+  position: relative;
+  border-radius: 8px;
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  border: 2px solid transparent;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.dnd-campaign-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--dnd-shadow-base);
+}
+.dnd-campaign-card--selected {
+  border-width: 2px;
+  box-shadow: 0 0 12px var(--dnd-shadow-base);
+}
+.dnd-campaign-card__name {
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+.dnd-campaign-card__dot {
+  font-size: 0.6rem;
+  opacity: 0.8;
+}
+.dnd-campaign-card__actions {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: flex;
+  gap: 0.2rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.dnd-campaign-card:hover .dnd-campaign-card__actions { opacity: 0.7; }
+.dnd-campaign-card__actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem;
+  display: flex;
+  opacity: 0.7;
+}
+.dnd-campaign-card__actions button:hover { opacity: 1; }
+
+/* Campaign card editing/creating */
+.dnd-campaign-card--editing,
+.dnd-campaign-card--creating {
+  cursor: default;
+  padding: 0.75rem;
+  gap: 0.5rem;
+  align-items: stretch;
+  text-align: left;
+}
+.dnd-campaign-card--confirm {
+  cursor: default;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.dnd-campaign-card__confirm-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.dnd-campaign-card__confirm-btns button {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.dnd-campaign-card__confirm-btns button:hover { opacity: 1; }
+.dnd-campaign-card__name-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed;
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 1rem;
+  padding: 0.25rem 0;
+  outline: none;
+  width: 100%;
+}
+.dnd-campaign-card__name-input::placeholder { opacity: 0.5; }
+.dnd-campaign-card__edit-btns {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+.dnd-campaign-card__edit-btns button {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  opacity: 0.8;
+}
+.dnd-campaign-card__edit-btns button:hover { opacity: 1; }
+.dnd-campaign-card__edit-btns button:disabled { opacity: 0.3; }
+
+/* ============================================
+   COLOR PICKER
+   ============================================ */
+.dnd-color-picker__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0.35rem;
+}
+.dnd-color-picker__swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s, border-color 0.1s;
+}
+.dnd-color-picker__swatch:hover { transform: scale(1.15); }
+.dnd-color-picker__swatch--active {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+  transform: scale(1.15);
+}
+.dnd-color-picker__custom {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.dnd-color-picker__hex-toggle {
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.6;
+  font-family: inherit;
+}
+.dnd-color-picker__hex-toggle:hover { opacity: 1; }
+.dnd-color-picker__hex-input {
+  width: 80px;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.3rem;
+}
+
+/* ============================================
+   CAMPAIGN NAME IN SHEET HEADER
+   ============================================ */
+.dnd-sheet__campaign-name {
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 0.85rem;
+  color: var(--dnd-text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   CAMPAIGN NOTES TAB
+   ============================================ */
+.dnd-notes-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Mini type tabs */
+.dnd-note-types {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--dnd-border);
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+.dnd-note-types__btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--dnd-text-dim);
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.dnd-note-types__btn:hover { color: var(--dnd-text); }
+.dnd-note-types__btn--active {
+  color: var(--dnd-accent);
+  border-bottom-color: var(--dnd-accent);
+}
+.dnd-note-types__icon { font-size: 0.9rem; }
+.dnd-note-types__count {
+  font-size: 0.65rem;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 8px;
+  padding: 0 0.3rem;
+  color: var(--dnd-text-muted);
+}
+
+/* Notes header */
+.dnd-notes-tab__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dnd-notes-tab__count {
+  font-size: 0.75rem;
+  color: var(--dnd-text-muted);
+  flex: 1;
+}
+.dnd-notes-tab__save-status {
+  font-size: 0.7rem;
+  color: var(--dnd-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.dnd-notes-tab__save-status--saving { color: var(--dnd-accent); }
+
+/* Notes list */
+.dnd-notes-tab__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.dnd-notes-tab__empty {
+  font-size: 0.85rem;
+  color: var(--dnd-text-faint);
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* Note card */
+.dnd-note-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.dnd-note-card:hover { border-color: var(--dnd-accent-dim); }
+.dnd-note-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+.dnd-note-card__title {
+  font-weight: 600;
+  color: var(--dnd-accent);
+  font-size: 0.9rem;
+}
+.dnd-note-card__body {
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  line-height: 1.4;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.dnd-note-card__delete {
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-faint);
+  cursor: pointer;
+  padding: 0.15rem;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  display: flex;
+  flex-shrink: 0;
+}
+.dnd-note-card:hover .dnd-note-card__delete { opacity: 1; }
+.dnd-note-card__delete:hover { color: var(--dnd-negative); }
+
+/* Note card editing */
+.dnd-note-card--editing {
+  cursor: default;
+  border-color: var(--dnd-accent-dim);
+}
+.dnd-note-card__edit-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.dnd-note-card__title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--dnd-text-muted);
+  color: var(--dnd-accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 0.15rem 0;
+  outline: none;
+}
+.dnd-note-card__title-input:focus { border-bottom-color: var(--dnd-accent); }
+.dnd-note-card__type-select {
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dnd-note-card__type-select option { background: var(--dnd-surface); }
+.dnd-note-card__body-input {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--dnd-border);
+  color: var(--dnd-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1.4;
+  padding: 0.35rem;
+  border-radius: 4px;
+  outline: none;
+  resize: vertical;
+  min-height: 3rem;
+  box-sizing: border-box;
+}
+.dnd-note-card__body-input:focus { border-color: var(--dnd-accent-dim); }
+.dnd-note-card__body-input::placeholder { color: var(--dnd-text-faint); }
+
+/* Note card confirm delete */
+.dnd-note-card--confirm {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--dnd-text-dim);
+  opacity: 0.7;
+}
+.dnd-note-card__confirm-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+.dnd-note-card__confirm-btns button {
+  background: transparent;
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+.dnd-note-card__confirm-btns button:hover {
+  border-color: var(--dnd-accent);
+  color: var(--dnd-accent);
+}
