@@ -41,6 +41,7 @@ Calendar events synced bidirectionally with **Google Calendar**, bills, tasks, a
 - **Custom reminders** — per-event Telegram notifications with flexible timing (before or after the event, for timezone-shifted scenarios like birthdays across date lines)
 - **Bills** — amounts, due dates, frequency, autopay tracking
 - **Tasks** — prioritized with due dates and categories
+- **Shopping list** — add/check/remove items via Telegram or dashboard, duplicate prevention, quantity tracking
 - **Unified document search** — all uploaded documents (photos, PDFs) searchable by text, tags, or category with inline viewing
 
 ### Health & Body
@@ -75,13 +76,26 @@ Portfolio tracking across stocks, ETFs, and crypto with multi-currency support.
 
 ### Reading & Creative
 
-A full markdown workspace with a reading log.
+A full markdown workspace, reading log, and D&D character sheet system.
 
 - **Creative workspace** — full-screen editor with file tree, multi-tab editing, live markdown preview, auto-save, project tabs, right-click context menus, drag-and-drop file organization
 - **Floating snippets** — physics-based ambient text from your writing that drifts across the panel background
 - **Reading log** — currently reading, to-read queue, finished books with reflections
 - **Idea capture** — Telegram messages routed to project _ideas/ folders
 - **Filesystem sync** — manually added folders auto-discovered on workspace load
+
+#### D&D Character Sheets
+
+A full interactive D&D 5e character sheet system with campaign management.
+
+- **Character sheets** — view/edit toggle, autosave, full stat block with calculated modifiers, ability scores, proficiencies, saving throws
+- **Combat** — class feature trackers (Rage toggle with glow, Wild Shape toggle, Cunning Action, Fighter Resources, generic fallback for all 13 classes), attack list with auto-calculated bonuses, HP bar with +/- buttons
+- **Skills** — grouped by ability, proficiency/expertise cycling, live modifier calculation
+- **Spellcasting** — shared spell library (28+ seeded spells), spell slot pip grid, prepared/known zones with drag-and-drop, concentration tracking with swap confirmation, Add Spell modal with search + create
+- **Campaigns** — create campaigns with custom colors, campaign-first selection flow, campaign notes system with 5 note types (Characters, Places, Quests, Items, Notes), inline click-to-edit with autosave
+- **Theming** — follows app's light/dark toggle. Dark mode: grimoire-at-night. Light mode: warm parchment. All colors via CSS variables
+- **Class support** — Barbarian, Rogue, Fighter with full interactive UI; all 13 classes with class feature data storage and generic display
+- **Rest system** — short/long rest buttons that intelligently reset HP, spell slots, class feature uses, hit dice, concentration
 
 ### Dr. Fleet — Health Consultation
 
@@ -141,11 +155,13 @@ frontend/src/
   styles/theme.css     # Light + dark mode themes
   components/
     Shell/             # Sidebar, TopBar (dark mode toggle), HomePanel
-    LifeManager/       # TimelineStrip, BillsTracker, TaskBoard, DocumentSearch
+    Setup/             # 12-step guided setup wizard
+    LifeManager/       # TimelineStrip, BillsTracker, TaskBoard, ShoppingList, DocumentSearch
     Health/            # Heatmap, RecentDetail, WeightTrend, ConcernsTracker
     Finance/           # AccountsStrip (blur toggle), CycleOverview, BudgetDonut
     Investing/         # PortfolioTrend, AllocationChart, HoldingsTable
     ReadingCreative/   # FloatingSnippets (physics), CreativeWorkspace, ReadingLog
+      DnD/             # Character sheets, campaigns, spell library, campaign notes
 ```
 
 ### Telegram Bot — LLM-Powered Router
@@ -205,7 +221,9 @@ cd frontend && npm install && npm run build && cd ..
 
 ### Configuration
 
-Create `.env` in the project root:
+On first launch, a **12-step setup wizard** guides you through all configuration — API keys, Telegram bot, Google Calendar, health profile, finance, and more. No manual file editing needed.
+
+Alternatively, create `.env` in the project root:
 
 ```
 ANTHROPIC_API_KEY=your_key
@@ -232,7 +250,7 @@ pm2 start ecosystem.config.js
 
 ### Google Calendar
 
-Visit `http://localhost:8000/api/google/auth` after starting the backend. Approve once — sync runs automatically.
+After entering Google credentials in the setup wizard and restarting, a **"Connect Google Calendar"** banner appears on the Life Manager panel. Click it to authorize via Google's consent screen. Approve once — sync runs automatically (hourly + reminders every minute).
 
 ---
 
