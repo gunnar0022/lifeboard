@@ -214,3 +214,105 @@
   border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; font-weight: 500;
 }
 .doc-edit-modal__save:disabled { opacity: 0.6; cursor: default; }
+
+/* Document header with upload button */
+.doc-search__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+.doc-search__header .chart-title { margin: 0; }
+.doc-search__upload-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  transition: all 0.15s;
+}
+.doc-search__upload-toggle:hover {
+  border-color: var(--color-life-manager);
+  color: var(--color-life-manager);
+}
+
+/* Upload form */
+.doc-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+.doc-upload__drop-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.doc-upload__drop-zone:hover {
+  border-color: var(--color-life-manager);
+}
+.doc-upload__drop-zone input[type="file"] {
+  display: none;
+}
+.doc-upload__placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.doc-upload__file-name {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.doc-upload input,
+.doc-upload select {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.8rem;
+  outline: none;
+}
+.doc-upload input:focus,
+.doc-upload select:focus {
+  border-color: var(--color-life-manager);
+}
+.doc-upload__row {
+  display: flex;
+  gap: 0.4rem;
+}
+.doc-upload__row input { flex: 1; }
+.doc-upload__row select { width: 110px; }
+.doc-upload__submit {
+  background: var(--color-life-manager);
+  color: white;
+  border: none;
+  padding: 0.45rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+.doc-upload__submit:hover { opacity: 0.9; }
+.doc-upload__submit:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, FileText, ChevronDown, ChevronRight, ExternalLink, X, AlertCircle,
-  Tag, Pencil, Save,
+  Tag, Pencil, Save, Upload, Plus,
 } from 'lucide-react';
 import './DocumentSearch.css';
 
@@ -108,6 +108,12 @@ export default function DocumentSearch() {
   const [searching, setSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // Upload state
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadForm, setUploadForm] = useState({ title: '', summary: '', tags: '', category: 'life', provider: '', date: '' });
+  const [uploading, setUploading] = useState(false);
+
   // Load available tags on mount
   useEffect(() => {
     fetch('/api/documents/tags')
@@ -163,12 +169,83 @@ export default function DocumentSearch() {
     window.open(`/api/documents/${doc.id}/view`, '_blank');
   };
 
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!uploadFile) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', uploadFile);
+      form.append('title', uploadForm.title || uploadFile.name);
+      form.append('summary', uploadForm.summary);
+      form.append('tags', uploadForm.tags);
+      form.append('category', uploadForm.category);
+      form.append('provider', uploadForm.provider);
+      form.append('date', uploadForm.date);
+      const res = await fetch('/api/documents/upload', { method: 'POST', body: form });
+      if (res.ok) {
+        setShowUpload(false);
+        setUploadFile(null);
+        setUploadForm({ title: '', summary: '', tags: '', category: 'life', provider: '', date: '' });
+        // Refresh tags and show all docs
+        fetch('/api/documents/tags').then(r => r.json()).then(setAvailableTags).catch(() => {});
+        showAll();
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="doc-search card">
-      <h3 className="chart-title">
-        <FileText size={16} />
-        Documents
-      </h3>
+      <div className="doc-search__header">
+        <h3 className="chart-title">
+          <FileText size={16} />
+          Documents
+        </h3>
+        <button className="doc-search__upload-toggle" onClick={() => setShowUpload(!showUpload)}>
+          {showUpload ? <X size={14} /> : <><Upload size={14} /> Upload</>}
+        </button>
+      </div>
+
+      {showUpload && (
+        <form className="doc-upload" onSubmit={handleUpload}>
+          <label className="doc-upload__drop-zone">
+            <input type="file" onChange={e => {
+              const f = e.target.files?.[0];
+              if (f) {
+                setUploadFile(f);
+                if (!uploadForm.title) setUploadForm(prev => ({ ...prev, title: f.name.replace(/\.[^.]+$/, '') }));
+              }
+            }} />
+            {uploadFile ? (
+              <span className="doc-upload__file-name">{uploadFile.name} ({(uploadFile.size / 1024).toFixed(0)} KB)</span>
+            ) : (
+              <span className="doc-upload__placeholder"><Plus size={16} /> Choose a file</span>
+            )}
+          </label>
+          <input placeholder="Title" value={uploadForm.title} onChange={e => setUploadForm({ ...uploadForm, title: e.target.value })} />
+          <input placeholder="Summary" value={uploadForm.summary} onChange={e => setUploadForm({ ...uploadForm, summary: e.target.value })} />
+          <div className="doc-upload__row">
+            <input placeholder="Tags (comma separated)" value={uploadForm.tags} onChange={e => setUploadForm({ ...uploadForm, tags: e.target.value })} />
+            <select value={uploadForm.category} onChange={e => setUploadForm({ ...uploadForm, category: e.target.value })}>
+              <option value="life">Life</option>
+              <option value="finance">Finance</option>
+              <option value="health">Health</option>
+              <option value="investing">Investing</option>
+            </select>
+          </div>
+          <div className="doc-upload__row">
+            <input placeholder="Provider / Source" value={uploadForm.provider} onChange={e => setUploadForm({ ...uploadForm, provider: e.target.value })} />
+            <input type="date" value={uploadForm.date} onChange={e => setUploadForm({ ...uploadForm, date: e.target.value })} />
+          </div>
+          <button className="doc-upload__submit" type="submit" disabled={uploading || !uploadFile}>
+            {uploading ? 'Uploading...' : 'Upload Document'}
+          </button>
+        </form>
+      )}
 
       <div className="doc-search__bar">
         <Search size={14} />

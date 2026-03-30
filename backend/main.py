@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -623,6 +623,48 @@ async def delete_document_entry(doc_id: int):
         from fastapi import HTTPException
         raise HTTPException(404, "Document not found")
     return {"ok": True}
+
+@app.post("/api/documents/upload")
+async def upload_document(
+    file: UploadFile,
+    title: str = Form(""),
+    summary: str = Form(""),
+    tags: str = Form(""),
+    category: str = Form("life"),
+    provider: str = Form(""),
+    date: str = Form(""),
+):
+    """Upload a document with manual metadata (no AI processing)."""
+    import uuid
+    from backend.documents import store_document
+
+    # Save file to disk
+    files_dir = PROJECT_ROOT / "data" / "files"
+    files_dir.mkdir(parents=True, exist_ok=True)
+
+    ext = Path(file.filename).suffix if file.filename else ""
+    safe_name = f"{uuid.uuid4().hex[:12]}{ext}"
+    file_path = files_dir / safe_name
+
+    content = await file.read()
+    file_path.write_bytes(content)
+
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+
+    doc = await store_document(
+        title=title or file.filename or "Untitled",
+        summary=summary or None,
+        tags=tag_list,
+        category=category or "life",
+        file_path=safe_name,
+        original_filename=file.filename,
+        mime_type=file.content_type,
+        file_size=len(content),
+        date=date or None,
+        provider=provider or None,
+    )
+    return doc
+
 
 @app.get("/api/documents/{doc_id}/view")
 async def view_document_file(doc_id: int):
