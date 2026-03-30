@@ -1,4 +1,5 @@
 import RageTracker from './RageTracker';
+import WildShapeTracker from './WildShapeTracker';
 import CunningActionPanel from './CunningActionPanel';
 import FighterResources from './FighterResources';
 import GenericResourceDisplay from './GenericResourceDisplay';
@@ -15,6 +16,8 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
   switch (type) {
     case 'rage':
       return <RageTracker classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
+    case 'wild_shape':
+      return <WildShapeTracker classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
     case 'cunning_action':
       return <CunningActionPanel classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
     case 'action_surge':

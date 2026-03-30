@@ -832,35 +832,78 @@
   transition: all 0.3s;
 }
 .dnd-rage--active {
-  border-color: #8b0000;
-  background: linear-gradient(135deg, #221c14 0%, #2a1210 100%);
+  border-color: var(--dnd-class-barbarian);
+  background: linear-gradient(135deg, var(--dnd-surface) 0%, var(--dnd-negative-bg) 100%);
 }
 .dnd-rage__header { display: flex; justify-content: space-between; align-items: baseline; }
 .dnd-rage__title {
-  font-family: 'Uncial Antiqua', serif; color: #8b0000;
+  font-family: 'Uncial Antiqua', serif; color: var(--dnd-class-barbarian);
   font-size: 0.9rem; letter-spacing: 0.1em; margin: 0;
 }
 .dnd-rage__uses { color: var(--dnd-text-dim); font-size: 0.85rem; }
-.dnd-rage__status--active { color: #ff4444; font-weight: 700; font-size: 0.85rem; }
+.dnd-rage__status--active { color: var(--dnd-negative); font-weight: 700; font-size: 0.85rem; }
 .dnd-rage__toggle {
   width: 100%; margin-top: 0.5rem; padding: 0.5rem;
-  background: rgba(139,0,0,0.15); border: 1px solid #8b0000;
-  color: #cc4444; border-radius: 6px; cursor: pointer;
+  background: rgba(139,0,0,0.15); border: 1px solid var(--dnd-class-barbarian);
+  color: var(--dnd-negative); border-radius: 6px; cursor: pointer;
   font-family: 'Uncial Antiqua', serif; font-size: 0.9rem;
   letter-spacing: 0.05em; transition: all 0.2s;
 }
 .dnd-rage__toggle:hover { background: rgba(139,0,0,0.3); }
 .dnd-rage__toggle:disabled { opacity: 0.3; cursor: default; }
-.dnd-rage__toggle--end { background: rgba(139,0,0,0.3); color: #ff6666; }
+.dnd-rage__toggle--end { background: rgba(139,0,0,0.3); color: var(--dnd-negative); }
 .dnd-rage__effects {
-  margin-top: 0.5rem; font-size: 0.85rem; color: #cc8888;
+  margin-top: 0.5rem; font-size: 0.85rem; color: var(--dnd-negative);
   line-height: 1.4;
 }
 .dnd-rage__effects p { margin: 0.15rem 0; }
-.dnd-rage__extra { color: #ccaa88; font-style: italic; }
+.dnd-rage__extra { color: var(--dnd-text-dim); font-style: italic; }
 .dnd-rage__edit { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .dnd-rage__edit-row { display: flex; align-items: center; gap: 0.5rem; }
 .dnd-rage__edit-row label { font-size: 0.75rem; color: var(--dnd-text-muted); min-width: 80px; }
+
+/* Wild Shape */
+.dnd-wildshape {
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  border-radius: 8px; padding: 0.75rem;
+  transition: all 0.3s;
+}
+.dnd-wildshape--active {
+  border-color: var(--dnd-class-druid);
+  background: linear-gradient(135deg, var(--dnd-surface) 0%, var(--dnd-positive-bg) 100%);
+}
+.dnd-wildshape__header { display: flex; justify-content: space-between; align-items: baseline; }
+.dnd-wildshape__title {
+  font-family: 'Uncial Antiqua', serif; color: var(--dnd-class-druid);
+  font-size: 0.9rem; letter-spacing: 0.1em; margin: 0;
+}
+.dnd-wildshape__uses { color: var(--dnd-text-dim); font-size: 0.85rem; }
+.dnd-wildshape__status--active { color: var(--dnd-positive); font-weight: 700; font-size: 0.85rem; }
+.dnd-wildshape__toggle {
+  width: 100%; margin-top: 0.5rem; padding: 0.5rem;
+  background: rgba(42,106,42,0.15); border: 1px solid var(--dnd-class-druid);
+  color: var(--dnd-positive); border-radius: 6px; cursor: pointer;
+  font-family: 'Uncial Antiqua', serif; font-size: 0.9rem;
+  letter-spacing: 0.05em; transition: all 0.2s;
+}
+.dnd-wildshape__toggle:hover { background: rgba(42,106,42,0.3); }
+.dnd-wildshape__toggle:disabled { opacity: 0.3; cursor: default; }
+.dnd-wildshape__toggle--end { background: rgba(42,106,42,0.3); color: var(--dnd-positive); }
+.dnd-wildshape__effects {
+  margin-top: 0.5rem; font-size: 0.85rem; color: var(--dnd-positive);
+  line-height: 1.4;
+}
+.dnd-wildshape__effects p { margin: 0.15rem 0; }
+.dnd-wildshape__recharge {
+  display: inline-block; margin-top: 0.4rem;
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--dnd-text-muted); background: var(--dnd-positive-bg);
+  border: 1px solid var(--dnd-positive-border); padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+.dnd-wildshape__edit { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-wildshape__edit-row { display: flex; align-items: center; gap: 0.5rem; }
+.dnd-wildshape__edit-row label { font-size: 0.75rem; color: var(--dnd-text-muted); min-width: 80px; }
 
 /* Cunning Action */
 .dnd-cunning {
