@@ -374,9 +374,11 @@ async def google_callback(code: str):
 
 @app.get("/api/google/status")
 async def google_status():
-    """Check if Google Calendar is connected."""
+    """Check if Google Calendar is connected and whether credentials are configured."""
+    import os
     from backend.google_calendar import is_connected
-    return {"connected": is_connected()}
+    has_creds = bool(os.getenv("GOOGLE_CLIENT_ID")) and bool(os.getenv("GOOGLE_CLIENT_SECRET"))
+    return {"connected": is_connected(), "has_credentials": has_creds}
 
 @app.post("/api/google/sync")
 async def google_sync():

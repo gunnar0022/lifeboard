@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { CalendarCheck } from 'lucide-react';
+import { CalendarCheck, Calendar, ExternalLink } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import TimelineStrip from './TimelineStrip';
 import BillsTracker from './BillsTracker';
@@ -14,6 +14,7 @@ export default function LifeManagerPanel() {
   const { data: tasks, loading: tasksLoading, refetch: refetchTasks } = useApi('/api/life/tasks?limit=50');
   const { data: bills, loading: billsLoading, refetch: refetchBills } = useApi('/api/life/bills');
   const { data: shopping, refetch: refetchShopping } = useApi('/api/life/shopping');
+  const { data: googleStatus } = useApi('/api/google/status');
   const { data: config } = useApi('/api/config');
 
   const refetchAll = useCallback(() => {
@@ -94,6 +95,22 @@ export default function LifeManagerPanel() {
           <h2 className="life-panel__title">Life Manager</h2>
         </div>
       </div>
+
+      {/* Google Calendar connection prompt */}
+      {googleStatus && !googleStatus.connected && googleStatus.has_credentials && (
+        <a
+          href="/api/google/auth"
+          className="life-panel__google-connect card"
+          target="_self"
+        >
+          <Calendar size={18} />
+          <div>
+            <strong>Connect Google Calendar</strong>
+            <span>Click to authorize — syncs events, holidays, and reminders</span>
+          </div>
+          <ExternalLink size={14} />
+        </a>
+      )}
 
       {/* Section A — Timeline */}
       <TimelineStrip timeline={timeline || []} onRefresh={refetchAll} />

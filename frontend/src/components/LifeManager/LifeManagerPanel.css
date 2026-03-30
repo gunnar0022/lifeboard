@@ -102,3 +102,33 @@
   gap: var(--space-lg);
   padding: var(--space-lg) 0;
 }
+
+/* Google Calendar connect banner */
+.life-panel__google-connect {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  border: 1px dashed var(--accent-color);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.life-panel__google-connect:hover {
+  border-style: solid;
+  background: var(--bg-secondary);
+}
+.life-panel__google-connect div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.life-panel__google-connect strong {
+  font-size: 0.9rem;
+}
+.life-panel__google-connect span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
