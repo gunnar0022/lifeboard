@@ -102,10 +102,17 @@ def _get_credentials() -> Credentials | None:
 
     if creds.expired and creds.refresh_token:
         from google.auth.transport.requests import Request
-        creds.refresh(Request())
-        # Save refreshed token
-        token_data["token"] = creds.token
-        TOKEN_PATH.write_text(json.dumps(token_data, indent=2))
+        try:
+            creds.refresh(Request())
+            # Save refreshed token
+            token_data["token"] = creds.token
+            TOKEN_PATH.write_text(json.dumps(token_data, indent=2))
+        except Exception as e:
+            logger.error(f"Failed to refresh Google token: {e}")
+            if "invalid_grant" in str(e):
+                logger.warning("Removing stale Google token file")
+                TOKEN_PATH.unlink(missing_ok=True)
+            return None
 
     return creds
 
@@ -146,7 +153,15 @@ async def sync_calendar():
         await _detect_google_deletions(service, time_min, time_max)
         logger.info("Google Calendar sync completed")
     except Exception as e:
+        error_str = str(e)
         logger.error(f"Google Calendar sync error: {e}", exc_info=True)
+        # If token is expired/revoked, delete it so user gets prompted to reconnect
+        if "invalid_grant" in error_str or "Token has been expired or revoked" in error_str:
+            logger.warning("Google OAuth token expired or revoked — removing stale token file")
+            try:
+                TOKEN_PATH.unlink(missing_ok=True)
+            except Exception:
+                pass
 
 
 async def _pull_from_google(service, time_min: str, time_max: str):
