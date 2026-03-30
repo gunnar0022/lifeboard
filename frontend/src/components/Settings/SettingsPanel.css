@@ -84,6 +84,7 @@
 .settings__theme-cards {
   display: flex;
   gap: var(--space-md);
+  justify-content: center;
 }
 .settings__theme-card {
   display: flex;
