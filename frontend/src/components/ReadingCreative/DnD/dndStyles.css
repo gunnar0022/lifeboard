@@ -2348,6 +2348,12 @@
   cursor: pointer;
 }
 .dnd-note-card__type-select option { background: var(--dnd-surface); }
+.dnd-note-card__done-btn {
+  background: transparent; border: 1px solid var(--dnd-accent-dim);
+  color: var(--dnd-accent); padding: 0.1rem 0.4rem; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.7rem;
+}
+.dnd-note-card__done-btn:hover { border-color: var(--dnd-accent); }
 .dnd-note-card__body-input {
   width: 100%;
   background: transparent;

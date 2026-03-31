@@ -18,16 +18,21 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
   const [confirming, setConfirming] = useState(false);
   const titleRef = useRef(null);
   const saveTimer = useRef(null);
+  const editingRef = useRef(editing);
+  editingRef.current = editing;
 
   useEffect(() => {
     if (editing && autoFocus && titleRef.current) titleRef.current.focus();
   }, [editing, autoFocus]);
 
-  // Sync from props when note changes externally
+  // Only sync from props when NOT editing — prevents refetch from
+  // resetting the user's in-progress text or kicking them out
   useEffect(() => {
-    setTitle(note.title);
-    setBody(note.body);
-    setType(note.type);
+    if (!editingRef.current) {
+      setTitle(note.title);
+      setBody(note.body);
+      setType(note.type);
+    }
   }, [note.id, note.title, note.body, note.type]);
 
   const scheduleAutosave = (updates) => {
@@ -52,12 +57,13 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
     onUpdate(note.id, { title, body, type: val });
   };
 
-  const handleBlur = () => {
-    // Save immediately on blur
+  const handleDone = () => {
+    // Flush any pending save
     if (saveTimer.current) clearTimeout(saveTimer.current);
     if (title !== note.title || body !== note.body || type !== note.type) {
       onUpdate(note.id, { title, body, type });
     }
+    setEditing(false);
   };
 
   useEffect(() => {
@@ -78,13 +84,7 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
 
   if (editing) {
     return (
-      <div className="dnd-note-card dnd-note-card--editing" onBlur={e => {
-        // Only close if focus moves outside this card
-        if (!e.currentTarget.contains(e.relatedTarget)) {
-          handleBlur();
-          setEditing(false);
-        }
-      }}>
+      <div className="dnd-note-card dnd-note-card--editing">
         <div className="dnd-note-card__edit-header">
           <input
             ref={titleRef}
@@ -102,6 +102,9 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
               <option key={t.id} value={t.id}>{t.icon} {t.label.slice(0, -1)}</option>
             ))}
           </select>
+          <button className="dnd-note-card__done-btn" onClick={handleDone} title="Done editing">
+            Done
+          </button>
           <button className="dnd-note-card__delete" onClick={() => setConfirming(true)}>
             <X size={14} />
           </button>
