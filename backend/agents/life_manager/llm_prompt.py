@@ -141,7 +141,8 @@ def _format_overdue(overdue: dict) -> str:
     total = len(events) + len(tasks) + len(bills)
     lines = [f"OVERDUE ({total} items):"]
     for e in events:
-        lines.append(f"  Event: [{e['id']}] {e['title']} (was {e['date']})")
+        event_date = e.get("start_time", "")[:10] if e.get("start_time") else e.get("date", "?")
+        lines.append(f"  Event: [{e['id']}] {e['title']} (was {event_date})")
     for t in tasks:
         lines.append(f"  Task: [{t['id']}] {t['title']} (due {t.get('due_date', '?')})")
     for b in bills:
@@ -157,8 +158,12 @@ def _format_upcoming(upcoming: dict) -> str:
         return "Next 3 days: Nothing upcoming"
     lines = ["Next 3 days:"]
     for e in events:
-        time_str = f" at {e['time']}" if e.get("time") else ""
-        lines.append(f"  {e['date']}: [{e['id']}] {e['title']}{time_str}")
+        # Events come from life_events table with start_time (ISO datetime)
+        start = e.get("start_time", "")
+        date_part = start[:10] if start else "?"
+        time_part = start[11:16] if len(start) > 11 else ""
+        time_str = f" at {time_part}" if time_part else ""
+        lines.append(f"  {date_part}: [{e['id']}] {e['title']}{time_str}")
     for t in tasks:
         lines.append(f"  {t.get('due_date', '?')}: Task [{t['id']}] {t['title']}")
     for b in bills:
