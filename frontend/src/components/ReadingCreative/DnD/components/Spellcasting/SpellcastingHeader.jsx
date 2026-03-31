@@ -14,6 +14,9 @@ export default function SpellcastingHeader({ spellcasting, abilities, level, edi
         {editMode ? (
           <select className="dnd-field spell-header__select" value={ability}
             onChange={e => onUpdate({ spellcasting: { ...spellcasting, ability: e.target.value } })}>
+            <option value="STR">STR</option>
+            <option value="DEX">DEX</option>
+            <option value="CON">CON</option>
             <option value="INT">INT</option>
             <option value="WIS">WIS</option>
             <option value="CHA">CHA</option>
