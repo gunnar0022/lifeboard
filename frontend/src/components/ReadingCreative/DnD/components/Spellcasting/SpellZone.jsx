@@ -3,7 +3,7 @@ import SpellRow from './SpellRow';
 
 const LEVEL_LABELS = { 0: 'Cantrips', 1: '1st Level', 2: '2nd Level', 3: '3rd Level', 4: '4th Level', 5: '5th Level', 6: '6th Level', 7: '7th Level', 8: '8th Level', 9: '9th Level' };
 
-export default function SpellZone({ title, subtitle, spellIds, spellOrder, spellCache, concentratingOn, className, editMode, onReorder, onConcentrate, onRemove, onEditSpell, onMoveTo, moveLabel, onAddSpell }) {
+export default function SpellZone({ title, subtitle, spellIds, spellOrder, spellCache, concentratingOn, className, editMode, onReorder, onConcentrate, onRemove, onEditSpell, onMoveTo, onReceiveDrop, moveLabel, onAddSpell }) {
   const [dragIdx, setDragIdx] = useState(null);
   const [dragOverIdx, setDragOverIdx] = useState(null);
   const dragRef = useRef(null);
@@ -59,13 +59,13 @@ export default function SpellZone({ title, subtitle, spellIds, spellOrder, spell
     dragRef.current = null;
   };
 
-  // Handle drops from other zones
+  // Handle drops from other zones — receives a spell INTO this zone
   const handleZoneDrop = (e) => {
     e.preventDefault();
     const spellId = parseInt(e.dataTransfer.getData('text/plain'));
     if (!spellId || displayIds.includes(spellId)) return;
-    // Spell is from another zone — move it here
-    if (onMoveTo) onMoveTo(spellId);
+    // Spell is from another zone — receive it into this zone
+    if (onReceiveDrop) onReceiveDrop(spellId);
     setDragOverIdx(null);
   };
 

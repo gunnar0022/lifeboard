@@ -10,7 +10,7 @@ const EMPTY_FORM = {
   senses: '',
 };
 
-const EMPTY_ATTACK = { name: '', toHit: '', damage: '', reach: '', attackRange: 'melee' };
+const EMPTY_ATTACK = { name: '', toHit: '', damage: '', reach: '', attackRange: 'melee', notes: '' };
 
 function BeastFormEditor({ form, onSave, onCancel, saveLabel }) {
   const [data, setData] = useState({ ...EMPTY_FORM, ...form });
@@ -85,6 +85,8 @@ function BeastFormEditor({ form, onSave, onCancel, saveLabel }) {
             <input className="dnd-field dnd-field--sm" placeholder="Reach" value={atk.reach || ''}
               onChange={e => updateAttack(i, 'reach', e.target.value)} />
           </div>
+          <input className="dnd-field" placeholder="Notes (e.g., grapple DC 11 on hit)" value={atk.notes || ''}
+            onChange={e => updateAttack(i, 'notes', e.target.value)} />
         </div>
       ))}
       <button className="dnd-add-btn" onClick={addAttack} style={{ fontSize: '0.7rem' }}>

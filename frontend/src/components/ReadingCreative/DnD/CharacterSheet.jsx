@@ -404,6 +404,36 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
                 level={level} editMode={editMode} onUpdate={handleUpdate} />
             </div>
             <div className="dnd-sheet__combat-col-right">
+              {/* Beast form attacks + abilities overlay */}
+              {character.classFeature?.activeForm === 'monster' && character.classFeature?.monsterForm && (
+                <div className="dnd-sheet__beast-combat">
+                  <div className="dnd-sheet__beast-attacks">
+                    <h3 className="dnd-section-title">Beast Attacks</h3>
+                    {(character.classFeature.monsterForm.attacks || []).map((atk, i) => (
+                      <div key={i} className="dnd-sheet__beast-atk-card">
+                        <div className="dnd-sheet__beast-atk-header">
+                          <span className="dnd-attacks__name">{atk.name}</span>
+                          <span className={`dnd-attacks__range-tag dnd-attacks__range-tag--${atk.attackRange || 'melee'}`}>
+                            {(atk.attackRange || 'melee') === 'melee' ? 'Melee' : 'Ranged'}
+                          </span>
+                          {atk.toHit && <span className="dnd-attacks__hit">{atk.toHit} to hit</span>}
+                        </div>
+                        {atk.damage && <div className="dnd-attacks__damage">{atk.damage}</div>}
+                        {atk.reach && <div className="dnd-attacks__props">Reach/Range: {atk.reach}</div>}
+                        {atk.notes && <div className="dnd-attacks__props">{atk.notes}</div>}
+                      </div>
+                    ))}
+                  </div>
+                  {(character.classFeature.monsterForm.special_abilities || []).length > 0 && (
+                    <div className="dnd-sheet__beast-abilities">
+                      <h3 className="dnd-section-title">Special Abilities</h3>
+                      {character.classFeature.monsterForm.special_abilities.map((ab, i) => (
+                        <div key={i} className="dnd-sheet__beast-ability-card">{ab}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               <AttackList attacks={character.attacks || []} abilities={abilities}
                 level={level} classFeature={character.classFeature}
                 editMode={editMode} onUpdate={handleUpdate} />

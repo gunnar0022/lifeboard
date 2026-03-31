@@ -323,6 +323,7 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
           onRemove={handleRemovePrepared}
           onEditSpell={handleEditSpell}
           onMoveTo={moveToKnown}
+          onReceiveDrop={moveToPrepared}
           moveLabel="Move to Known"
           onAddSpell={() => setAddModal('prepared')}
         />
@@ -343,6 +344,7 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
         onRemove={handleRemoveKnown}
         onEditSpell={handleEditSpell}
         onMoveTo={isPreparedCaster ? moveToPrepared : undefined}
+        onReceiveDrop={isPreparedCaster ? moveToKnown : undefined}
         moveLabel={isPreparedCaster ? 'Move to Prepared' : undefined}
         onAddSpell={() => setAddModal('known')}
       />

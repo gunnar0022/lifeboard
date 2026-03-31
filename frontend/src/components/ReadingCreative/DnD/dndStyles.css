@@ -2035,6 +2035,39 @@
   color: var(--dnd-text-muted);
 }
 
+/* Beast form combat overlay */
+.dnd-sheet__beast-combat {
+  margin-bottom: 1rem;
+}
+.dnd-sheet__beast-attacks,
+.dnd-sheet__beast-abilities {
+  margin-bottom: 0.75rem;
+}
+.dnd-sheet__beast-atk-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-class-druid);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  box-shadow: 0 0 8px rgba(42, 106, 42, var(--dnd-glow-opacity, 0.15));
+}
+.dnd-sheet__beast-atk-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.dnd-sheet__beast-ability-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-class-druid);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  line-height: 1.4;
+  box-shadow: 0 0 8px rgba(42, 106, 42, var(--dnd-glow-opacity, 0.15));
+}
+
 /* Beast form picker */
 .beast-picker {
   margin-top: 0.5rem;
