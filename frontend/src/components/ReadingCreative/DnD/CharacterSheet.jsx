@@ -62,6 +62,20 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   }, [characterId, campaignId]);
 
   const handleUpdate = (updates) => {
+    // Handle temp HP grant from Wild Shape (Spores)
+    if (updates.classFeature?._grantTempHp) {
+      const tempHp = updates.classFeature._grantTempHp;
+      delete updates.classFeature._grantTempHp;
+      setCharacter(prev => {
+        const merged = deepMerge(prev, updates);
+        // Only set temp HP if new value is higher (5e rule: doesn't stack)
+        if (tempHp > (merged.combat?.hpTemp || 0)) {
+          merged.combat = { ...merged.combat, hpTemp: tempHp };
+        }
+        return merged;
+      });
+      return;
+    }
     setCharacter(prev => deepMerge(prev, updates));
   };
 

@@ -20,7 +20,22 @@ export default function StatBlock({ character, editMode, onUpdate }) {
   const barColor = hpPct > 60 ? 'var(--dnd-hp-healthy)' : hpPct > 25 ? 'var(--dnd-hp-wounded)' : 'var(--dnd-hp-critical)';
 
   const adjustHp = (delta) => {
-    const next = Math.max(0, Math.min(hpMax + (combat.hpTemp || 0), hp + delta));
+    if (delta < 0) {
+      // Damage: deplete temp HP first
+      const tempHp = combat.hpTemp || 0;
+      const absDmg = Math.abs(delta);
+      if (tempHp > 0 && absDmg <= tempHp) {
+        onUpdate({ combat: { ...combat, hpTemp: tempHp - absDmg } });
+        return;
+      } else if (tempHp > 0) {
+        const overflow = absDmg - tempHp;
+        const next = Math.max(0, hp - overflow);
+        onUpdate({ combat: { ...combat, hpTemp: 0, hpCurrent: next } });
+        return;
+      }
+    }
+    // Healing or no temp HP
+    const next = Math.max(0, Math.min(hpMax, hp + delta));
     onUpdate({ combat: { ...combat, hpCurrent: next } });
   };
 
@@ -73,6 +88,12 @@ export default function StatBlock({ character, editMode, onUpdate }) {
           </div>
           <div className="dnd-statblock__hp-bar">
             <div className="dnd-statblock__hp-fill" style={{ width: `${Math.min(100, hpPct)}%`, background: barColor }} />
+            {(combat.hpTemp || 0) > 0 && (
+              <div className="dnd-statblock__hp-temp-fill"
+                style={{ width: `${Math.min(100, ((combat.hpTemp || 0) / hpMax) * 100)}%` }}
+                title={`Temp HP: ${combat.hpTemp}`}
+              />
+            )}
           </div>
           <div className="dnd-statblock__hp-btns">
             <button onClick={() => adjustHp(-5)}>-5</button>

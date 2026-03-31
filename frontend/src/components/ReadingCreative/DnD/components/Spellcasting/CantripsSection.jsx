@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import SpellRow from './SpellRow';
 
-export default function CantripsSection({ cantripIds, spellOrder, spellCache, className, editMode, onReorder, onRemove, onAddCantrip }) {
+export default function CantripsSection({ cantripIds, spellOrder, spellCache, className, editMode, onReorder, onRemove, onEditSpell, onAddCantrip, concentratingOn, onConcentrate }) {
   const [dragIdx, setDragIdx] = useState(null);
   const [dragOverIdx, setDragOverIdx] = useState(null);
   const dragRef = useRef(null);
@@ -63,9 +63,11 @@ export default function CantripsSection({ cantripIds, spellOrder, spellCache, cl
           >
             <SpellRow
               spell={spell}
-              isConcentrating={false}
+              isConcentrating={concentratingOn === id}
               className={className}
+              onConcentrate={onConcentrate}
               onRemove={onRemove}
+              onEditSpell={onEditSpell}
               editMode={editMode}
               dragHandleProps={{}}
             />

@@ -1,19 +1,40 @@
+import { useState, useRef } from 'react';
+
 export default function ProficiencyTags({ proficiencies, meta, editMode, onUpdate }) {
-  const handleChange = (category, value) => {
-    const items = value.split(',').map(s => s.trim()).filter(Boolean);
-    onUpdate({ proficiencies: { ...proficiencies, [category]: items } });
+  // Store raw text while editing to allow commas and special chars
+  const [editValues, setEditValues] = useState({});
+
+  const getEditValue = (key, items) => {
+    if (key in editValues) return editValues[key];
+    return (items || []).join(', ');
   };
 
-  const handleLangChange = (value) => {
-    const items = value.split(',').map(s => s.trim()).filter(Boolean);
-    onUpdate({ meta: { ...meta, languages: items } });
+  const handleTextChange = (key, value) => {
+    setEditValues(prev => ({ ...prev, [key]: value }));
   };
 
-  const renderRow = (label, items, onChange) => (
+  const commitChange = (key, category) => {
+    const raw = editValues[key];
+    if (raw === undefined) return;
+    const items = raw.split(',').map(s => s.trim()).filter(Boolean);
+    if (category === 'languages') {
+      onUpdate({ meta: { ...meta, languages: items } });
+    } else {
+      onUpdate({ proficiencies: { ...proficiencies, [category]: items } });
+    }
+    setEditValues(prev => { const n = { ...prev }; delete n[key]; return n; });
+  };
+
+  const renderRow = (label, items, key, category) => (
     <div className="dnd-prof-tags__row">
       <span className="dnd-prof-tags__label">{label}</span>
       {editMode ? (
-        <input className="dnd-field" value={(items || []).join(', ')} onChange={e => onChange(e.target.value)} />
+        <input
+          className="dnd-field"
+          value={getEditValue(key, items)}
+          onChange={e => handleTextChange(key, e.target.value)}
+          onBlur={() => commitChange(key, category)}
+        />
       ) : (
         <div className="dnd-prof-tags__tags">
           {(items || []).map((item, i) => (
@@ -29,10 +50,10 @@ export default function ProficiencyTags({ proficiencies, meta, editMode, onUpdat
     <div className="dnd-prof-tags">
       <h3 className="dnd-section-title">Proficiencies</h3>
       <div className="dnd-prof-tags__grid">
-        {renderRow('Armor', proficiencies.armor, v => handleChange('armor', v))}
-        {renderRow('Weapons', proficiencies.weapons, v => handleChange('weapons', v))}
-        {renderRow('Tools', proficiencies.tools, v => handleChange('tools', v))}
-        {renderRow('Languages', meta.languages, handleLangChange)}
+        {renderRow('Armor', proficiencies.armor, 'armor', 'armor')}
+        {renderRow('Weapons', proficiencies.weapons, 'weapons', 'weapons')}
+        {renderRow('Tools', proficiencies.tools, 'tools', 'tools')}
+        {renderRow('Languages', meta.languages, 'languages', 'languages')}
       </div>
     </div>
   );

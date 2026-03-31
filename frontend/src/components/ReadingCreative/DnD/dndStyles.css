@@ -498,11 +498,17 @@
 .dnd-statblock__hp-sep { color: var(--dnd-text-dim); font-size: 1.2rem; }
 .dnd-statblock__hp-max { font-size: 1.2rem; color: var(--dnd-text-dim); font-weight: 600; }
 .dnd-statblock__hp-bar {
+  position: relative;
   width: 90%; height: 6px; background: var(--dnd-border);
   border-radius: 3px; overflow: hidden; margin: 4px 0;
 }
 .dnd-statblock__hp-fill {
   height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s;
+}
+.dnd-statblock__hp-temp-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  border-radius: 3px; background: #4a8acc; opacity: 0.5;
+  transition: width 0.3s; pointer-events: none;
 }
 .dnd-statblock__hp-btns {
   display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: center;
@@ -559,9 +565,16 @@
 .dnd-attacks__remove:hover { color: #8b0000; }
 .dnd-attacks__header { display: flex; justify-content: space-between; align-items: baseline; }
 .dnd-attacks__name { font-weight: 700; color: var(--dnd-accent); }
-.dnd-attacks__hit { color: var(--dnd-text-dim); font-size: 0.85rem; }
+.dnd-attacks__range-tag {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600;
+}
+.dnd-attacks__range-tag--melee { background: rgba(139,0,0,0.15); color: var(--dnd-class-barbarian); }
+.dnd-attacks__range-tag--ranged { background: rgba(58,106,136,0.15); color: var(--dnd-class-fighter); }
+.dnd-attacks__hit { color: var(--dnd-text-dim); font-size: 0.85rem; margin-left: auto; }
 .dnd-attacks__damage { font-size: 0.9rem; }
-.dnd-attacks__rage-bonus { color: #8b0000; font-weight: 600; }
+.dnd-attacks__rage-bonus { color: var(--dnd-class-barbarian); font-weight: 600; }
+.dnd-attacks__spores-bonus { color: var(--dnd-class-druid); font-weight: 600; }
 .dnd-attacks__props { font-style: italic; color: var(--dnd-text-dim); font-size: 0.8rem; margin-top: 2px; }
 .dnd-attacks__edit-row { display: flex; gap: 0.5rem; align-items: center; }
 .dnd-attacks__checkbox {
@@ -904,6 +917,50 @@
 .dnd-wildshape__edit { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .dnd-wildshape__edit-row { display: flex; align-items: center; gap: 0.5rem; }
 .dnd-wildshape__edit-row label { font-size: 0.75rem; color: var(--dnd-text-muted); min-width: 80px; }
+.dnd-wildshape__auto-note { font-size: 0.75rem; color: var(--dnd-text-muted); font-style: italic; }
+
+/* Wild Shape form picker */
+.dnd-wildshape__picker {
+  margin-top: 0.5rem;
+}
+.dnd-wildshape__picker-label {
+  font-size: 0.8rem; color: var(--dnd-text-dim); margin: 0 0 0.35rem;
+}
+.dnd-wildshape__picker-btns {
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.dnd-wildshape__form-btn {
+  display: flex; flex-direction: column; gap: 0.1rem;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text); padding: 0.5rem 0.6rem; border-radius: 6px;
+  cursor: pointer; font-family: inherit; font-size: 0.85rem; text-align: left;
+  transition: border-color 0.15s;
+}
+.dnd-wildshape__form-btn:hover { border-color: var(--dnd-accent); }
+.dnd-wildshape__form-btn--spores:hover { border-color: var(--dnd-class-druid); }
+.dnd-wildshape__form-btn--monster:hover { border-color: var(--dnd-class-ranger); }
+.dnd-wildshape__form-btn--starry:hover { border-color: var(--dnd-class-wizard); }
+.dnd-wildshape__form-desc {
+  font-size: 0.7rem; color: var(--dnd-text-muted);
+}
+.dnd-wildshape__starry-picker {
+  display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.35rem;
+}
+.dnd-wildshape__starry-btn {
+  display: flex; flex-direction: column; gap: 0.1rem;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text); padding: 0.4rem 0.6rem; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.8rem; text-align: left;
+}
+.dnd-wildshape__starry-btn:hover { border-color: var(--dnd-class-wizard); }
+.dnd-wildshape__starry-btn strong { color: var(--dnd-accent); }
+.dnd-wildshape__starry-btn span { font-size: 0.7rem; color: var(--dnd-text-dim); }
+.dnd-wildshape__cancel {
+  background: transparent; border: none; color: var(--dnd-text-muted);
+  cursor: pointer; font-size: 0.75rem; margin-top: 0.35rem; padding: 0.2rem 0;
+  font-family: inherit;
+}
+.dnd-wildshape__cancel:hover { color: var(--dnd-text); }
 
 /* Cunning Action */
 .dnd-cunning {
@@ -1184,6 +1241,67 @@
   border-color: var(--dnd-accent);
   color: var(--dnd-accent);
 }
+.spell-slots__adj--remove:hover {
+  border-color: var(--dnd-negative);
+  color: var(--dnd-negative);
+}
+.spell-slots__two-col {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.spell-slots__standard, .spell-slots__special { flex: 1; min-width: 200px; }
+.spell-slots__special-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+.spell-slots__special-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 80px;
+}
+.spell-slots__special-label {
+  font-size: 0.8rem;
+  color: var(--dnd-accent);
+  font-weight: 600;
+}
+.spell-slots__special-spell {
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+  font-style: italic;
+}
+.spell-slots__special-recharge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dnd-text-muted);
+}
+.spell-slots__add-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.spell-slots__add-special {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+.spell-slots__add-special-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.spell-slots__add-special-row label {
+  font-size: 0.8rem;
+  color: var(--dnd-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
 
 /* --- Pact Slot Display --- */
 .spell-pact {
@@ -1424,8 +1542,51 @@
   font-size: 0.75rem;
 }
 .spell-row__remove-btn:hover {
-  border-color: #8b0000;
-  color: #c44;
+  border-color: var(--dnd-negative);
+  color: var(--dnd-negative);
+}
+.spell-row__edit-btn {
+  display: flex; align-items: center; gap: 0.25rem;
+  background: transparent; border: 1px solid var(--dnd-text-muted);
+  color: var(--dnd-text-dim); padding: 0.25rem 0.5rem;
+  border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
+}
+.spell-row__edit-btn:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+
+/* Spell edit form */
+.spell-row__edit-form {
+  padding: 0.5rem 0.75rem 0.75rem;
+  border-top: 1px solid var(--dnd-border);
+}
+.spell-row__edit-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem;
+}
+.spell-row__edit-field { display: flex; flex-direction: column; gap: 0.1rem; }
+.spell-row__edit-field label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dnd-text-muted); }
+.spell-row__edit-row-actions {
+  display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;
+}
+.spell-row__edit-check { display: flex; align-items: center; gap: 0.25rem; font-size: 0.8rem; color: var(--dnd-text-dim); cursor: pointer; }
+.spell-row__edit-check input { accent-color: var(--dnd-accent); }
+.spell-row__save-btn {
+  display: flex; align-items: center; gap: 0.2rem;
+  background: var(--dnd-accent); color: var(--dnd-bg); border: none;
+  padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 600;
+}
+.spell-row__cancel-btn {
+  background: transparent; border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim); padding: 0.25rem 0.5rem;
+  border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
+}
+.spell-row__delete-btn {
+  display: flex; align-items: center; gap: 0.2rem;
+  background: transparent; border: none; color: var(--dnd-text-faint);
+  cursor: pointer; font-family: inherit; font-size: 0.75rem; padding: 0.25rem 0;
+}
+.spell-row__delete-btn:hover { color: var(--dnd-negative); }
+@media (max-width: 700px) {
+  .spell-row__edit-grid { grid-template-columns: 1fr 1fr; }
 }
 
 /* --- Add Spell Modal --- */

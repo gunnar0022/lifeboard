@@ -5,6 +5,11 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
   const isRaging = classFeature?.type === 'rage' && classFeature?.active;
   const rageDamage = classFeature?.bonusDamage || 0;
 
+  // Circle of Spores symbiotic entity — +1d6 poison to melee only
+  const isSymbiotic = classFeature?.type === 'wild_shape' && classFeature?.active
+    && classFeature?.symbioticEntity;
+  const sporesDamage = isSymbiotic ? '+1d6 poison' : null;
+
   const handleAttackChange = (index, field, value) => {
     const updated = attacks.map((a, i) => i === index ? { ...a, [field]: value } : a);
     onUpdate({ attacks: updated });
@@ -14,7 +19,7 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
     onUpdate({
       attacks: [...attacks, {
         name: '', atkAbility: 'STR', damage: '1d6', damageType: 'slashing',
-        properties: '', affectedByClassFeature: false,
+        properties: '', affectedByClassFeature: false, attackRange: 'melee',
       }],
     });
   };
@@ -31,6 +36,8 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
           const atkMod = abilityMod(abilities[atk.atkAbility] || 10);
           const totalAtk = atkMod + profBonus + (atk.atkBonus || 0);
           const dmgMod = abilityMod(abilities[atk.atkAbility] || 10);
+          const range = atk.attackRange || 'melee';
+          const isMelee = range === 'melee';
 
           if (editMode) {
             return (
@@ -46,6 +53,11 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
                     <option value="INT">INT</option>
                     <option value="WIS">WIS</option>
                     <option value="CHA">CHA</option>
+                  </select>
+                  <select className="dnd-field" value={range}
+                    onChange={e => handleAttackChange(i, 'attackRange', e.target.value)}>
+                    <option value="melee">Melee</option>
+                    <option value="ranged">Ranged</option>
                   </select>
                   <input className="dnd-field" value={atk.damage} placeholder="Damage"
                     onChange={e => handleAttackChange(i, 'damage', e.target.value)} />
@@ -71,12 +83,18 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
             <div key={i} className="dnd-attacks__card">
               <div className="dnd-attacks__header">
                 <span className="dnd-attacks__name">{atk.name}</span>
+                <span className={`dnd-attacks__range-tag dnd-attacks__range-tag--${range}`}>
+                  {isMelee ? 'Melee' : 'Ranged'}
+                </span>
                 <span className="dnd-attacks__hit">{formatMod(totalAtk)} to hit</span>
               </div>
               <div className="dnd-attacks__damage">
                 {atk.damage} + {dmgMod} {atk.damageType}
                 {isRaging && atk.affectedByClassFeature && (
                   <span className="dnd-attacks__rage-bonus"> (+{rageDamage} rage)</span>
+                )}
+                {sporesDamage && isMelee && (
+                  <span className="dnd-attacks__spores-bonus"> ({sporesDamage})</span>
                 )}
               </div>
               {atk.properties && <div className="dnd-attacks__props">{atk.properties}</div>}

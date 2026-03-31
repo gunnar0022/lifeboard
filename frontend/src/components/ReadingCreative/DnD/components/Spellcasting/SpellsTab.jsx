@@ -242,6 +242,21 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
     }).catch(() => {});
   }, [sc, onUpdate]);
 
+  // Edit spell in library
+  const handleEditSpell = useCallback(async (spellData) => {
+    try {
+      await fetch(`/api/dnd/spells/${spellData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(spellData),
+      });
+      // Refresh cache
+      setSpellCache(prev => ({ ...prev, [spellData.id]: spellData }));
+    } catch (e) {
+      console.error('Failed to update spell:', e);
+    }
+  }, []);
+
   const preparedCount = (sc.preparedSpells || []).length;
 
   return (
@@ -269,7 +284,12 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
       {isPactMagic ? (
         <PactSlotDisplay pactSlots={sc.pactSlots || { max: 1, current: 1, level: 1 }} editMode={editMode} onUpdate={handlePactUpdate} />
       ) : (
-        <SpellSlotGrid slots={sc.slots || {}} className={meta.className} editMode={editMode} onUpdate={handleSlotUpdate} />
+        <SpellSlotGrid
+          slots={sc.slots || {}} specialSlots={sc.specialSlots || []}
+          className={meta.className} editMode={editMode}
+          onUpdate={handleSlotUpdate}
+          onUpdateSpecial={(specialSlots) => onUpdate({ spellcasting: { ...sc, specialSlots } })}
+        />
       )}
 
       {/* Cantrips */}
@@ -281,7 +301,10 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
         editMode={editMode}
         onReorder={handleCantripReorder}
         onRemove={handleRemoveCantrip}
+        onEditSpell={handleEditSpell}
         onAddCantrip={() => setAddModal('cantrip')}
+        concentratingOn={concentratingOn}
+        onConcentrate={handleConcentrate}
       />
 
       {/* Prepared zone (for prepared casters) */}
@@ -298,6 +321,7 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
           onReorder={handlePreparedReorder}
           onConcentrate={handleConcentrate}
           onRemove={handleRemovePrepared}
+          onEditSpell={handleEditSpell}
           onMoveTo={moveToKnown}
           moveLabel="Move to Known"
           onAddSpell={() => setAddModal('prepared')}
@@ -317,6 +341,7 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
         onReorder={handleKnownReorder}
         onConcentrate={handleConcentrate}
         onRemove={handleRemoveKnown}
+        onEditSpell={handleEditSpell}
         onMoveTo={isPreparedCaster ? moveToPrepared : undefined}
         moveLabel={isPreparedCaster ? 'Move to Prepared' : undefined}
         onAddSpell={() => setAddModal('known')}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Feather, Swords } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import FloatingSnippets from './FloatingSnippets';
@@ -48,27 +48,37 @@ export default function ReadingCreativePanel() {
 
   if (dndView === 'selection') {
     return (
-      <div className="rc-panel rc-panel--dnd dnd-root">
+      <motion.div
+        className="rc-panel rc-panel--dnd dnd-root"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      >
         <div className="rc-panel__sub-header">
           <button className="rc-panel__back-btn" onClick={handleBackFromSelection}>
             &larr; Back
           </button>
         </div>
         <DnDSelectionScreen onSelectCharacter={handleSelectCharacter} />
-      </div>
+      </motion.div>
     );
   }
 
   if (dndView && typeof dndView === 'object') {
     return (
-      <div className="rc-panel rc-panel--dnd dnd-root">
+      <motion.div
+        className="rc-panel rc-panel--dnd dnd-root"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      >
         <CharacterSheet
           characterId={dndView.id}
           initialEditMode={dndView.editMode}
           campaignId={dndView.campaignId}
           onBack={handleBackFromSheet}
         />
-      </div>
+      </motion.div>
     );
   }
 

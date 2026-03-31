@@ -3,7 +3,7 @@ import SpellRow from './SpellRow';
 
 const LEVEL_LABELS = { 0: 'Cantrips', 1: '1st Level', 2: '2nd Level', 3: '3rd Level', 4: '4th Level', 5: '5th Level', 6: '6th Level', 7: '7th Level', 8: '8th Level', 9: '9th Level' };
 
-export default function SpellZone({ title, subtitle, spellIds, spellOrder, spellCache, concentratingOn, className, editMode, onReorder, onConcentrate, onRemove, onMoveTo, moveLabel, onAddSpell }) {
+export default function SpellZone({ title, subtitle, spellIds, spellOrder, spellCache, concentratingOn, className, editMode, onReorder, onConcentrate, onRemove, onEditSpell, onMoveTo, moveLabel, onAddSpell }) {
   const [dragIdx, setDragIdx] = useState(null);
   const [dragOverIdx, setDragOverIdx] = useState(null);
   const dragRef = useRef(null);
@@ -110,6 +110,7 @@ export default function SpellZone({ title, subtitle, spellIds, spellOrder, spell
                     className={className}
                     onConcentrate={onConcentrate}
                     onRemove={onRemove}
+                    onEditSpell={onEditSpell}
                     editMode={editMode}
                     dragHandleProps={{}}
                   />
