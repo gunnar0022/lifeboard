@@ -38,12 +38,14 @@ export default function NotesTab({ campaignId }) {
     try {
       await apiPut(`/api/dnd/campaigns/${campaignId}/notes/${noteId}`, updates);
       setSaveStatus('saved');
-      refetch();
+      // Don't refetch — the local state in NoteCard is already correct.
+      // Refetching replaces all note objects, causing re-renders that
+      // can kick the user out of edit mode.
     } catch (e) {
       console.error('Failed to update note:', e);
       setSaveStatus('unsaved');
     }
-  }, [campaignId, refetch]);
+  }, [campaignId]);
 
   const handleDeleteNote = useCallback(async (noteId) => {
     try {
