@@ -397,6 +397,20 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             UNIQUE(name, level)
         );
 
+        CREATE TABLE IF NOT EXISTS dnd_beast_forms (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            cr TEXT NOT NULL DEFAULT '0',
+            hp INTEGER NOT NULL DEFAULT 10,
+            ac INTEGER NOT NULL DEFAULT 10,
+            speeds TEXT NOT NULL DEFAULT '{"walk": 30}',
+            ability_scores TEXT NOT NULL DEFAULT '{"STR": 10, "DEX": 10, "CON": 10}',
+            attacks TEXT NOT NULL DEFAULT '[]',
+            special_abilities TEXT NOT NULL DEFAULT '[]',
+            senses TEXT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS dnd_campaigns (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL DEFAULT 'New Campaign',

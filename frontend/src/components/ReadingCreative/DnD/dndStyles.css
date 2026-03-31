@@ -507,7 +507,7 @@
 }
 .dnd-statblock__hp-temp-fill {
   position: absolute; top: 0; left: 0; height: 100%;
-  border-radius: 3px; background: #4a8acc; opacity: 0.5;
+  border-radius: 3px; background: rgba(220, 230, 245, 0.7);
   transition: width 0.3s; pointer-events: none;
 }
 .dnd-statblock__hp-btns {
@@ -564,7 +564,7 @@
 }
 .dnd-attacks__remove:hover { color: #8b0000; }
 .dnd-attacks__header { display: flex; justify-content: space-between; align-items: baseline; }
-.dnd-attacks__name { font-weight: 700; color: var(--dnd-accent); }
+.dnd-attacks__name { font-weight: 700; color: var(--dnd-accent); margin-right: 0.4rem; }
 .dnd-attacks__range-tag {
   font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em;
   padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600;
@@ -2016,6 +2016,107 @@
   color: var(--dnd-text-dim);
   letter-spacing: 0.02em;
 }
+
+/* Beast form banner */
+.dnd-sheet__beast-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--dnd-positive-bg);
+  border: 1px solid var(--dnd-positive-border);
+  border-radius: 6px;
+  color: var(--dnd-positive);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.dnd-sheet__beast-peek {
+  font-size: 0.75rem;
+  color: var(--dnd-text-muted);
+}
+
+/* Beast form picker */
+.beast-picker {
+  margin-top: 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 0.6rem;
+  background: var(--dnd-bg);
+}
+.beast-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+.beast-picker__header h4 {
+  margin: 0;
+  font-family: 'Uncial Antiqua', serif;
+  color: var(--dnd-accent);
+  font-size: 0.85rem;
+}
+.beast-picker__close {
+  background: transparent; border: none; color: var(--dnd-text-muted);
+  cursor: pointer; padding: 0.1rem;
+}
+.beast-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.beast-picker__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--dnd-text);
+  text-align: left;
+  transition: border-color 0.15s;
+}
+.beast-picker__card:hover { border-color: var(--dnd-class-ranger); }
+.beast-picker__card-header { display: flex; justify-content: space-between; align-items: center; }
+.beast-picker__card-header strong { color: var(--dnd-accent); font-size: 0.85rem; }
+.beast-picker__cr { font-size: 0.7rem; color: var(--dnd-text-muted); }
+.beast-picker__card-stats {
+  display: flex; gap: 0.5rem; font-size: 0.7rem; color: var(--dnd-text-dim);
+}
+.beast-picker__delete {
+  position: absolute; top: 0.25rem; right: 0.25rem;
+  color: var(--dnd-text-faint); cursor: pointer; opacity: 0;
+  transition: opacity 0.15s;
+}
+.beast-picker__card:hover .beast-picker__delete { opacity: 1; }
+.beast-picker__delete:hover { color: var(--dnd-negative); }
+.beast-picker__empty {
+  font-size: 0.8rem; color: var(--dnd-text-faint); font-style: italic; padding: 0.5rem 0;
+}
+.beast-picker__create {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--dnd-border);
+}
+.beast-picker__create-row {
+  display: flex; gap: 0.4rem; align-items: center;
+}
+.beast-picker__create-row label {
+  font-size: 0.75rem; color: var(--dnd-text-dim);
+  display: flex; align-items: center; gap: 0.2rem;
+}
+.beast-picker__create-actions {
+  display: flex; gap: 0.4rem; justify-content: flex-end; margin-top: 0.25rem;
+}
+.beast-picker__save {
+  display: flex; align-items: center; gap: 0.2rem;
+  background: var(--dnd-accent); color: var(--dnd-bg); border: none;
+  padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 600;
+}
+.beast-picker__save:disabled { opacity: 0.4; }
 
 /* ============================================
    CAMPAIGN NOTES TAB

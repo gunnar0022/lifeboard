@@ -261,6 +261,101 @@ async def batch_spells(body: dict):
         await db.close()
 
 
+# ── Beast Forms ──────────────────────────────────────────
+
+@router.get("/beast-forms")
+async def list_beast_forms():
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_beast_forms ORDER BY name ASC")
+        rows = await cursor.fetchall()
+        result = []
+        for r in rows:
+            d = dict(r)
+            d["speeds"] = json.loads(d["speeds"]) if isinstance(d["speeds"], str) else d["speeds"]
+            d["ability_scores"] = json.loads(d["ability_scores"]) if isinstance(d["ability_scores"], str) else d["ability_scores"]
+            d["attacks"] = json.loads(d["attacks"]) if isinstance(d["attacks"], str) else d["attacks"]
+            d["special_abilities"] = json.loads(d["special_abilities"]) if isinstance(d["special_abilities"], str) else d["special_abilities"]
+            result.append(d)
+        return result
+    finally:
+        await db.close()
+
+
+@router.post("/beast-forms")
+async def create_beast_form(body: dict):
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            """INSERT INTO dnd_beast_forms (name, cr, hp, ac, speeds, ability_scores, attacks, special_abilities, senses)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                body.get("name", "Beast"),
+                body.get("cr", "0"),
+                body.get("hp", 10),
+                body.get("ac", 10),
+                json.dumps(body.get("speeds", {"walk": 30})),
+                json.dumps(body.get("ability_scores", {"STR": 10, "DEX": 10, "CON": 10})),
+                json.dumps(body.get("attacks", [])),
+                json.dumps(body.get("special_abilities", [])),
+                body.get("senses"),
+            ),
+        )
+        await db.commit()
+        new_id = cursor.lastrowid
+        cursor = await db.execute("SELECT * FROM dnd_beast_forms WHERE id = ?", (new_id,))
+        row = dict(await cursor.fetchone())
+        for k in ("speeds", "ability_scores", "attacks", "special_abilities"):
+            if isinstance(row[k], str):
+                row[k] = json.loads(row[k])
+        return row
+    finally:
+        await db.close()
+
+
+@router.put("/beast-forms/{form_id}")
+async def update_beast_form(form_id: int, body: dict):
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for k in ("name", "cr", "hp", "ac", "senses"):
+            if k in body:
+                sets.append(f"{k} = ?")
+                vals.append(body[k])
+        for k in ("speeds", "ability_scores", "attacks", "special_abilities"):
+            if k in body:
+                sets.append(f"{k} = ?")
+                vals.append(json.dumps(body[k]))
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        vals.append(form_id)
+        cursor = await db.execute(f"UPDATE dnd_beast_forms SET {', '.join(sets)} WHERE id = ?", vals)
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Beast form not found")
+        cursor = await db.execute("SELECT * FROM dnd_beast_forms WHERE id = ?", (form_id,))
+        row = dict(await cursor.fetchone())
+        for k in ("speeds", "ability_scores", "attacks", "special_abilities"):
+            if isinstance(row[k], str):
+                row[k] = json.loads(row[k])
+        return row
+    finally:
+        await db.close()
+
+
+@router.delete("/beast-forms/{form_id}")
+async def delete_beast_form(form_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM dnd_beast_forms WHERE id = ?", (form_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Beast form not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
 # ── Campaigns ───────────────────────────────────────────
 
 @router.get("/campaigns")

@@ -68,7 +68,6 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       delete updates.classFeature._grantTempHp;
       setCharacter(prev => {
         const merged = deepMerge(prev, updates);
-        // Only set temp HP if new value is higher (5e rule: doesn't stack)
         if (tempHp > (merged.combat?.hpTemp || 0)) {
           merged.combat = { ...merged.combat, hpTemp: tempHp };
         }
@@ -76,8 +75,61 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       });
       return;
     }
+    // Handle beast form transform — store real stats
+    if (updates.classFeature?._beastTransform) {
+      const beast = updates.classFeature._beastTransform;
+      delete updates.classFeature._beastTransform;
+      setCharacter(prev => {
+        const merged = deepMerge(prev, updates);
+        // Store real stats for revert
+        merged._realStats = {
+          combat: { ...prev.combat },
+          abilities: { ...prev.abilities },
+        };
+        // Swap to beast stats
+        merged.combat = {
+          ...merged.combat,
+          hpCurrent: beast.hp,
+          hpMax: beast.hp,
+          ac: beast.ac,
+          acSource: `${beast.name} (Beast Form)`,
+        };
+        merged.abilities = {
+          ...merged.abilities,
+          STR: beast.ability_scores?.STR || 10,
+          DEX: beast.ability_scores?.DEX || 10,
+          CON: beast.ability_scores?.CON || 10,
+        };
+        return merged;
+      });
+      return;
+    }
     setCharacter(prev => deepMerge(prev, updates));
   };
+
+  // Beast form revert — when wild shape ends, restore real stats
+  useEffect(() => {
+    if (!character) return;
+    const cf = character.classFeature;
+    const realStats = character._realStats;
+    if (realStats && (!cf?.active || cf?.activeForm !== 'monster')) {
+      setCharacter(prev => {
+        const restored = { ...prev };
+        // Restore real HP, but apply overflow damage
+        const beastHpLeft = prev.combat.hpCurrent;
+        if (beastHpLeft <= 0) {
+          // Beast dropped to 0 — overflow damage carries
+          const overflowDmg = Math.abs(beastHpLeft);
+          restored.combat = { ...realStats.combat, hpCurrent: Math.max(0, realStats.combat.hpCurrent - overflowDmg) };
+        } else {
+          restored.combat = { ...realStats.combat };
+        }
+        restored.abilities = { ...realStats.abilities };
+        delete restored._realStats;
+        return restored;
+      });
+    }
+  }, [character?.classFeature?.activeForm, character?.classFeature?.active]);
 
   // Class change detection
   useEffect(() => {
@@ -299,6 +351,19 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           </span>
         </div>
       </div>
+
+      {/* Top section: 3-row stat block */}
+      {/* Beast form banner */}
+      {character.classFeature?.activeForm === 'monster' && character.classFeature?.monsterForm && (
+        <div className="dnd-sheet__beast-banner">
+          <span>Wild Shaped: <strong>{character.classFeature.monsterForm.name}</strong></span>
+          {character._realStats && (
+            <span className="dnd-sheet__beast-peek">
+              Real HP: {character._realStats.combat.hpCurrent}/{character._realStats.combat.hpMax}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Top section: 3-row stat block */}
       <StatBlock character={character} editMode={editMode} onUpdate={handleUpdate} />

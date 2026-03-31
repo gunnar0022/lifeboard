@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import BeastFormPicker from './BeastFormPicker';
 
 const STARRY_FORMS = {
   Archer: 'Bonus action ranged spell attack. 1d8 + WIS mod radiant damage, 60 ft. range.',
@@ -99,7 +100,7 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
               <span className="dnd-wildshape__form-desc">+{4 * level} temp HP, +1d6 poison melee</span>
             </button>
             <button className="dnd-wildshape__form-btn dnd-wildshape__form-btn--monster"
-              onClick={() => activateForm('monster')}>
+              onClick={() => setShowFormPicker('beast')}>
               Beast Form
               <span className="dnd-wildshape__form-desc">Transform into a creature</span>
             </button>
@@ -119,6 +120,15 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
                 </button>
               ))}
             </div>
+          )}
+          {showFormPicker === 'beast' && (
+            <BeastFormPicker
+              onSelect={(beast) => activateForm('monster', {
+                monsterForm: beast,
+                _beastTransform: beast,
+              })}
+              onCancel={() => setShowFormPicker(true)}
+            />
           )}
           <button className="dnd-wildshape__cancel" onClick={() => setShowFormPicker(false)}>Cancel</button>
         </div>
@@ -154,10 +164,15 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
         </motion.div>
       )}
 
-      {active && activeForm === 'monster' && (
+      {active && activeForm === 'monster' && monsterForm && (
         <motion.div className="dnd-wildshape__effects"
           initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-          <p>Beast form active — track beast HP separately</p>
+          <p><strong>{monsterForm.name}</strong> (CR {monsterForm.cr})</p>
+          <p>HP {monsterForm.hp} | AC {monsterForm.ac}</p>
+          {monsterForm.speeds && (
+            <p>{Object.entries(monsterForm.speeds).filter(([,v]) => v > 0).map(([k,v]) => `${k} ${v}ft`).join(', ')}</p>
+          )}
+          {monsterForm.senses && <p>Senses: {monsterForm.senses}</p>}
           <p className="dnd-wildshape__auto-note">Overflow damage carries to real HP when beast drops to 0</p>
         </motion.div>
       )}
