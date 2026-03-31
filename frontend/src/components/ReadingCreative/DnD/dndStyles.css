@@ -2118,6 +2118,45 @@
 }
 .beast-picker__save:disabled { opacity: 0.4; }
 
+/* Beast card wrapper with edit/delete */
+.beast-picker__card-wrapper {
+  position: relative;
+}
+.beast-picker__card-actions {
+  position: absolute; top: 0.3rem; right: 0.3rem;
+  display: flex; gap: 0.2rem; opacity: 0; transition: opacity 0.15s;
+}
+.beast-picker__card-wrapper:hover .beast-picker__card-actions { opacity: 1; }
+.beast-picker__card-actions button {
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-muted); padding: 0.2rem; border-radius: 3px;
+  cursor: pointer; display: flex;
+}
+.beast-picker__card-actions button:hover { color: var(--dnd-accent); border-color: var(--dnd-accent); }
+.beast-picker__card-attacks {
+  display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.15rem;
+}
+.beast-picker__card-atk {
+  font-size: 0.65rem; color: var(--dnd-text-muted);
+  background: var(--dnd-bg); padding: 0.05rem 0.3rem; border-radius: 3px;
+}
+
+/* Beast form editor sections */
+.beast-picker__section-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--dnd-text-muted); margin-top: 0.5rem; margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--dnd-border); padding-bottom: 0.15rem;
+}
+.beast-picker__attack {
+  border: 1px solid var(--dnd-border); border-radius: 4px;
+  padding: 0.3rem; margin-bottom: 0.25rem;
+}
+.beast-picker__atk-remove {
+  background: transparent; border: none; color: var(--dnd-text-faint);
+  cursor: pointer; padding: 0.15rem; flex-shrink: 0;
+}
+.beast-picker__atk-remove:hover { color: var(--dnd-negative); }
+
 /* ============================================
    CAMPAIGN NOTES TAB
    ============================================ */
