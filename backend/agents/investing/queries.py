@@ -114,12 +114,22 @@ async def add_holding(symbol: str, name: str, asset_class: str,
     if currency is None:
         config = get_config()
         currency = config.get("primary_currency", "JPY")
+    symbol = symbol.upper()
     db = await get_db()
     try:
+        # Check if a holding with this symbol already exists
+        cursor = await db.execute(
+            "SELECT id FROM investing_holdings WHERE UPPER(symbol) = ? AND currency = ?",
+            (symbol, currency)
+        )
+        existing = await cursor.fetchone()
+        if existing:
+            return await get_holding(existing["id"])
+
         cursor = await db.execute(
             """INSERT INTO investing_holdings (symbol, name, asset_class, currency, notes)
                VALUES (?, ?, ?, ?, ?)""",
-            (symbol.upper(), name, asset_class, currency, notes)
+            (symbol, name, asset_class, currency, notes)
         )
         await db.commit()
         return await get_holding(cursor.lastrowid)
@@ -276,6 +286,100 @@ async def get_transactions(holding_id: int = None, limit: int = 50) -> list[dict
 
 async def get_recent_transactions(limit: int = 10) -> list[dict]:
     return await get_transactions(limit=limit)
+
+
+async def _recalculate_holding(db, holding_id: int):
+    """Replay all transactions for a holding to recompute total_shares and avg_cost_per_share."""
+    cursor = await db.execute(
+        "SELECT * FROM investing_transactions WHERE holding_id = ? ORDER BY date ASC, id ASC",
+        (holding_id,)
+    )
+    txns = [dict(r) for r in await cursor.fetchall()]
+
+    total_shares = 0.0
+    avg_cost = 0
+
+    for tx in txns:
+        if tx["type"] == "buy":
+            new_shares = total_shares + tx["shares"]
+            if new_shares > 0:
+                avg_cost = int(((total_shares * avg_cost) + (tx["shares"] * tx["price_per_share"])) / new_shares)
+            else:
+                avg_cost = tx["price_per_share"]
+            total_shares = new_shares
+        elif tx["type"] == "sell":
+            total_shares -= tx["shares"]
+        elif tx["type"] == "split":
+            if total_shares > 0 and tx["shares"] > 0:
+                old_shares = total_shares
+                total_shares = old_shares + tx["shares"]
+                split_ratio = total_shares / old_shares
+                avg_cost = int(avg_cost / split_ratio) if split_ratio > 0 else avg_cost
+        # dividend: no change to shares or avg cost
+
+    await db.execute(
+        """UPDATE investing_holdings
+           SET total_shares = ?, avg_cost_per_share = ?,
+               updated_at = strftime('%Y-%m-%dT%H:%M:%S', 'now')
+           WHERE id = ?""",
+        (max(total_shares, 0), avg_cost, holding_id)
+    )
+
+
+async def update_transaction(tx_id: int, **fields) -> dict | None:
+    """Update a transaction and recalculate the holding's cost basis."""
+    allowed = {"type", "shares", "price_per_share", "total_amount", "date", "notes"}
+    updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+    if not updates:
+        return None
+
+    db = await get_db()
+    try:
+        # Get holding_id before update
+        cursor = await db.execute(
+            "SELECT holding_id FROM investing_transactions WHERE id = ?", (tx_id,)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        holding_id = row["holding_id"]
+
+        set_clause = ", ".join(f"{k} = ?" for k in updates)
+        values = list(updates.values()) + [tx_id]
+        await db.execute(
+            f"UPDATE investing_transactions SET {set_clause} WHERE id = ?",
+            values
+        )
+
+        await _recalculate_holding(db, holding_id)
+        await db.commit()
+
+        cursor = await db.execute(
+            "SELECT * FROM investing_transactions WHERE id = ?", (tx_id,)
+        )
+        return dict(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+async def delete_transaction(tx_id: int) -> bool:
+    """Delete a transaction and recalculate the holding's cost basis."""
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            "SELECT holding_id FROM investing_transactions WHERE id = ?", (tx_id,)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return False
+        holding_id = row["holding_id"]
+
+        await db.execute("DELETE FROM investing_transactions WHERE id = ?", (tx_id,))
+        await _recalculate_holding(db, holding_id)
+        await db.commit()
+        return True
+    finally:
+        await db.close()
 
 
 # --- Accounts ---

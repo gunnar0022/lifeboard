@@ -18,12 +18,32 @@ lsof -ti:5173 2>/dev/null | xargs kill -9 2>/dev/null
 echo "       Ports clear."
 echo ""
 
+# ── Find a Python >= 3.10 (required for type union syntax) ──
+PYTHON=""
+for candidate in python3.14 python3.13 python3.12 python3.11 python3.10 python3; do
+    if command -v "$candidate" &>/dev/null; then
+        ver=$("$candidate" -c "import sys; print(sys.version_info >= (3, 10))" 2>/dev/null)
+        if [ "$ver" = "True" ]; then
+            PYTHON="$candidate"
+            break
+        fi
+    fi
+done
+
+if [ -z "$PYTHON" ]; then
+    echo "       ERROR: Python 3.10+ is required but not found."
+    echo "       Install it via: brew install python@3.12"
+    exit 1
+fi
+
+echo "       Using $PYTHON ($($PYTHON --version))"
+
 # ── Check dependencies ──
 echo "[2/4] Checking dependencies..."
 
-if ! python3 -m uvicorn --version &>/dev/null; then
+if ! $PYTHON -m uvicorn --version &>/dev/null; then
     echo "       ERROR: uvicorn not found."
-    echo "       Run: pip3 install -r backend/requirements.txt"
+    echo "       Run: $PYTHON -m pip install -r backend/requirements.txt"
     exit 1
 fi
 
@@ -38,7 +58,7 @@ echo ""
 
 # ── Start backend ──
 echo "[3/4] Starting backend on port 8000..."
-python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+$PYTHON -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
 
 # Give backend time to initialize (DB + Telegram + schedulers)

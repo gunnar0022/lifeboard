@@ -171,6 +171,16 @@ async def _create_health_tables(db: aiosqlite.Connection):
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 
+        CREATE TABLE IF NOT EXISTS nutrition_foods (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            calories INTEGER NOT NULL DEFAULT 0,
+            protein_g INTEGER NOT NULL DEFAULT 0,
+            carbs_g INTEGER NOT NULL DEFAULT 0,
+            fat_g INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
     """)
 
 

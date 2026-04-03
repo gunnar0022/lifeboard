@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { useApi } from '../../hooks/useApi';
+import { X, Pencil, Trash2, Check, XCircle } from 'lucide-react';
+import { useApi, apiPut, apiDelete } from '../../hooks/useApi';
 import './TransactionHistory.css';
 
 const TYPE_BADGES = {
@@ -15,10 +16,67 @@ function formatCurrency(amount, currency) {
   return `$${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-export default function TransactionHistory({ holding, currencySymbol, onClose }) {
-  const { data: transactions, loading } = useApi(
+export default function TransactionHistory({ holding, currencySymbol, onClose, onRefresh }) {
+  const { data: transactions, loading, refetch } = useApi(
     `/api/investing/transactions?holding_id=${holding.id}&limit=50`
   );
+  const [editingId, setEditingId] = useState(null);
+  const [editFields, setEditFields] = useState({});
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = (tx) => {
+    setEditingId(tx.id);
+    setConfirmDeleteId(null);
+    setEditFields({
+      type: tx.type,
+      shares: tx.shares,
+      price_per_share: tx.price_per_share,
+      total_amount: tx.total_amount,
+      date: tx.date,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditFields({});
+  };
+
+  const saveEdit = async (txId) => {
+    setSaving(true);
+    try {
+      await apiPut(`/api/investing/transactions/${txId}`, editFields);
+      setEditingId(null);
+      refetch();
+      onRefresh?.();
+    } catch (err) {
+      console.error('Failed to update transaction:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (txId) => {
+    if (confirmDeleteId !== txId) {
+      setConfirmDeleteId(txId);
+      setEditingId(null);
+      return;
+    }
+    setSaving(true);
+    try {
+      await apiDelete(`/api/investing/transactions/${txId}`);
+      setConfirmDeleteId(null);
+      refetch();
+      onRefresh?.();
+    } catch (err) {
+      console.error('Failed to delete transaction:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const currency = holding.currency;
+  const isJPY = currency === 'JPY';
 
   return (
     <AnimatePresence>
@@ -84,8 +142,81 @@ export default function TransactionHistory({ holding, currencySymbol, onClose })
             <div className="tx-history__list">
               {transactions.map(tx => {
                 const badge = TYPE_BADGES[tx.type] || { label: tx.type, className: 'other' };
+                const isEditing = editingId === tx.id;
+                const isConfirmingDelete = confirmDeleteId === tx.id;
+
+                if (isEditing) {
+                  return (
+                    <div key={tx.id} className="tx-history__row tx-history__row--editing">
+                      <select
+                        className="tx-history__edit-select"
+                        value={editFields.type}
+                        onChange={(e) => setEditFields({ ...editFields, type: e.target.value })}
+                        disabled={saving}
+                      >
+                        <option value="buy">Buy</option>
+                        <option value="sell">Sell</option>
+                        <option value="dividend">Dividend</option>
+                        <option value="split">Split</option>
+                      </select>
+                      <input
+                        type="date"
+                        className="tx-history__edit-input"
+                        value={editFields.date}
+                        onChange={(e) => setEditFields({ ...editFields, date: e.target.value })}
+                        disabled={saving}
+                      />
+                      <input
+                        type="number"
+                        className="tx-history__edit-input tx-history__edit-input--num"
+                        value={editFields.shares}
+                        onChange={(e) => setEditFields({ ...editFields, shares: parseFloat(e.target.value) || 0 })}
+                        step="any"
+                        placeholder="Shares"
+                        disabled={saving}
+                      />
+                      <input
+                        type="number"
+                        className="tx-history__edit-input tx-history__edit-input--num"
+                        value={isJPY ? editFields.price_per_share : editFields.price_per_share / 100}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value) || 0;
+                          setEditFields({
+                            ...editFields,
+                            price_per_share: isJPY ? Math.round(val) : Math.round(val * 100),
+                            total_amount: isJPY
+                              ? Math.round(editFields.shares * val)
+                              : Math.round(editFields.shares * val * 100),
+                          });
+                        }}
+                        step={isJPY ? '1' : '0.01'}
+                        placeholder="Price"
+                        disabled={saving}
+                      />
+                      <div className="tx-history__actions">
+                        <button
+                          className="tx-history__action-btn tx-history__action-btn--save"
+                          onClick={() => saveEdit(tx.id)}
+                          disabled={saving}
+                          title="Save"
+                        >
+                          <Check size={14} />
+                        </button>
+                        <button
+                          className="tx-history__action-btn tx-history__action-btn--cancel"
+                          onClick={cancelEdit}
+                          disabled={saving}
+                          title="Cancel"
+                        >
+                          <XCircle size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
-                  <div key={tx.id} className="tx-history__row">
+                  <div key={tx.id} className={`tx-history__row${isConfirmingDelete ? ' tx-history__row--deleting' : ''}`}>
                     <span className={`tx-history__badge ${badge.className}`}>
                       {badge.label}
                     </span>
@@ -99,6 +230,45 @@ export default function TransactionHistory({ holding, currencySymbol, onClose })
                     <span className="tx-history__total mono">
                       {formatCurrency(tx.total_amount, tx.currency)}
                     </span>
+                    <div className="tx-history__actions">
+                      {isConfirmingDelete ? (
+                        <>
+                          <button
+                            className="tx-history__action-btn tx-history__action-btn--confirm-delete"
+                            onClick={() => handleDelete(tx.id)}
+                            disabled={saving}
+                            title="Confirm delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                          <button
+                            className="tx-history__action-btn tx-history__action-btn--cancel"
+                            onClick={() => setConfirmDeleteId(null)}
+                            disabled={saving}
+                            title="Cancel"
+                          >
+                            <XCircle size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="tx-history__action-btn"
+                            onClick={() => startEdit(tx)}
+                            title="Edit"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            className="tx-history__action-btn tx-history__action-btn--delete"
+                            onClick={() => handleDelete(tx.id)}
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 );
               })}

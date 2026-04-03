@@ -69,6 +69,20 @@ class MeasurementCreate(BaseModel):
     date: Optional[str] = None
     notes: Optional[str] = None
 
+class FoodCreate(BaseModel):
+    name: str
+    calories: int = 0
+    protein_g: int = 0
+    carbs_g: int = 0
+    fat_g: int = 0
+
+class FoodUpdate(BaseModel):
+    name: Optional[str] = None
+    calories: Optional[int] = None
+    protein_g: Optional[int] = None
+    carbs_g: Optional[int] = None
+    fat_g: Optional[int] = None
+
 
 # --- Pulse ---
 
@@ -244,6 +258,57 @@ async def get_heatmap(days: int = 90):
 @router.get("/recent")
 async def get_recent(days: int = 3):
     return await queries.get_recent_detail(days=days)
+
+
+@router.get("/day/{date}")
+async def get_day_detail(date: str):
+    """Return individual meals and exercises for a specific date."""
+    meals = await queries.get_meals_for_date(date)
+    exercises = await queries.get_exercises_for_date(date)
+    summary = await queries.get_daily_summary(date)
+    return {
+        "date": date,
+        "meals": meals,
+        "exercises": exercises,
+        "total_calories": sum(m.get("calories", 0) for m in meals),
+        "total_protein_g": sum(m.get("protein_g", 0) for m in meals),
+        "total_carbs_g": sum(m.get("carbs_g", 0) for m in meals),
+        "total_fat_g": sum(m.get("fat_g", 0) for m in meals),
+        "total_exercise_minutes": sum(e.get("duration_minutes", 0) for e in exercises),
+        "mood": (summary or {}).get("mood"),
+        "energy": (summary or {}).get("energy"),
+    }
+
+
+# --- Nutrition Foods ---
+
+@router.get("/foods")
+async def list_foods():
+    return await queries.get_foods()
+
+
+@router.post("/foods")
+async def create_food(body: FoodCreate):
+    return await queries.add_food(
+        name=body.name, calories=body.calories,
+        protein_g=body.protein_g, carbs_g=body.carbs_g, fat_g=body.fat_g,
+    )
+
+
+@router.put("/foods/{food_id}")
+async def update_food(food_id: int, body: FoodUpdate):
+    existing = await queries.get_food(food_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Food not found")
+    return await queries.edit_food(food_id, **body.model_dump(exclude_none=True))
+
+
+@router.delete("/foods/{food_id}")
+async def remove_food(food_id: int):
+    ok = await queries.delete_food(food_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Food not found")
+    return {"ok": True}
 
 
 # --- Health Concerns (Fleet data, displayed in Health panel per LM-40) ---

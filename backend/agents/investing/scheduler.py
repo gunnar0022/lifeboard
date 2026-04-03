@@ -121,14 +121,29 @@ def _fetch_prices_sync(symbols: list[str]) -> dict[str, float | None]:
     for symbol in symbols:
         try:
             ticker = yf.Ticker(symbol)
-            info = ticker.fast_info
             price = None
-            # Try different price fields
+
+            # Try fast_info fields individually (each can raise internally)
             for field in ["lastPrice", "last_price", "previousClose", "previous_close"]:
-                val = getattr(info, field, None)
-                if val is not None and val > 0:
-                    price = float(val)
-                    break
+                try:
+                    val = getattr(ticker.fast_info, field, None)
+                    if val is not None and val > 0:
+                        price = float(val)
+                        break
+                except Exception:
+                    continue
+
+            # Fallback: try history if fast_info failed entirely
+            if price is None:
+                try:
+                    hist = ticker.history(period="5d")
+                    if not hist.empty and "Close" in hist.columns:
+                        last_close = hist["Close"].dropna().iloc[-1]
+                        if last_close > 0:
+                            price = float(last_close)
+                except Exception:
+                    pass
+
             results[symbol] = price
         except Exception as e:
             logger.warning(f"yfinance fetch failed for {symbol}: {e}")

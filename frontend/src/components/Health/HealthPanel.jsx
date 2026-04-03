@@ -6,6 +6,7 @@ import ProfileCard from './ProfileCard';
 import Heatmap from './Heatmap';
 import RecentDetail from './RecentDetail';
 import WeightTrend from './WeightTrend';
+import FoodDatabase from './FoodDatabase';
 import ConcernsTracker from './ConcernsTracker';
 import './HealthPanel.css';
 
@@ -97,6 +98,10 @@ export default function HealthPanel() {
 
       <motion.div variants={fadeUp}>
         <RecentDetail days={recent || []} />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <FoodDatabase />
       </motion.div>
 
       {measurements && measurements.length > 0 && (

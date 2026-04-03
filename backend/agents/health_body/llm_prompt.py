@@ -55,6 +55,10 @@ async def build_system_prompt() -> str:
     except Exception:
         concerns_str = "ACTIVE CONCERNS: None"
 
+    # Food database
+    foods = await queries.get_foods()
+    foods_str = _format_food_database(foods)
+
     # Onboarding
     onboarding_note = ""
     if not profile:
@@ -85,8 +89,11 @@ TODAY: {day_name}, {date_str}
 
 {concerns_str}
 
+{foods_str}
+
 RULES:
-- When the user reports food ("Had katsu curry for lunch", "ate a convenience store bento"), estimate calories, protein (g), carbs (g), and fat (g). Use reasonable estimates for Japanese food portions. Log silently with log_meal — NO confirmation step needed.
+- When the user reports food, check the FOOD DATABASE above first. For foods that match a database entry, use its exact macros and multiply by serving count if specified (e.g., "2 oikos yogurts" = 2x the stored values). For foods NOT in the database, estimate calories, protein (g), carbs (g), and fat (g) using reasonable estimates for typical portions. For mixed meals combining known and unknown items (e.g., "2 yogurts and restaurant ramen"), use exact values for known items and estimates for unknown, then combine all macros into a single log_meal. Log silently — NO confirmation step needed.
+- When the user asks to add a food to their database (e.g., "add oikos yogurt: 100cal 15g protein 3g fat 7g carbs"), use add_food. When they ask to remove one, use remove_food with the food_id from the database list above.
 - When the user reports exercise ("Jogged 30 minutes", "gym for an hour"), estimate calorie burn using their profile (weight, activity level). Log with log_exercise. NEVER mention the specific calorie burn number in your reply — just acknowledge the exercise naturally.
 - For mood/energy, use 1-5 scales (1=very low, 5=excellent). Use set_mood_energy.
 - Weight is stored in grams internally. Convert from user input: "81kg" = 81000, "81.5kg" = 81500, "180lbs" = ~81600. When user mentions a weigh-in, use log_measurement (which also updates profile weight).
@@ -94,7 +101,7 @@ RULES:
 - For evening check-in responses, parse everything from one natural message: mood, energy, exercise, any meals.
 - ACT IMMEDIATELY on ALL actions including deletes. Do NOT ask the user to confirm. Just do it and report what you did. If the user says "remove that meal" or "delete the last exercise", identify the item from context and execute the delete action directly.
 - Resolve relative dates ("yesterday", "this morning") using today's date above.
-- If the user asks about nutrition on a day older than 3 days, daily totals will be available but individual meals won't. Just present whatever data exists without explaining the difference.
+- Individual meal and exercise data is available for all historical days.
 - For multi-part messages (meal + exercise + mood in one message), use multi_action to log everything at once.
 - When the user mentions an update about a health concern (e.g., "back pain was better today", "headache hit again at 3pm"), log it with log_concern_update. Match the update to the most relevant active concern by title/context. If ambiguous, use clarify with concern titles as options. Concern logs are casual notes, not formal entries.
 
@@ -125,6 +132,10 @@ Write actions — Measurements:
 Write actions — Profile:
 - update_profile: data={{height_cm (float), weight_g (int), age (int), activity_level (sedentary/light/moderate/active/very_active), daily_calorie_goal (int), evening_checkin_time (HH:MM)}}
 
+Write actions — Food Database:
+- add_food: data={{name (str), calories (int), protein_g (int, optional), carbs_g (int, optional), fat_g (int, optional)}}
+- remove_food: data={{food_id (int)}}
+
 Write actions — Health Concerns:
 - log_concern_update: data={{content (str), concern_id (int, optional — omit if only one active concern)}}
 
@@ -135,6 +146,7 @@ Read actions:
 - get_recent_detail: data={{days (int, default 3)}}
 - get_heatmap_data: data={{days (int, default 90)}}
 - get_measurements: data={{limit (int, default 30)}}
+- list_foods: data={{}}
 Meta actions:
 - respond: Just reply, no DB write.
 - clarify: data={{options (list of strings)}} — Inline keyboard buttons.
@@ -223,6 +235,15 @@ def _format_latest_weight(latest: dict | None) -> str:
     kg = round(latest["weight_g"] / 1000, 1)
     return f"LATEST WEIGHT: {kg}kg on {latest['date']}"
 
+
+
+def _format_food_database(foods: list[dict]) -> str:
+    if not foods:
+        return "FOOD DATABASE: Empty — user can add items via 'add [food] to my food database: [macros]'"
+    lines = [f"FOOD DATABASE ({len(foods)} items):"]
+    for f in foods:
+        lines.append(f"  [{f['id']}] {f['name']} — {f['calories']} kcal | P:{f['protein_g']}g C:{f['carbs_g']}g F:{f['fat_g']}g")
+    return "\n".join(lines)
 
 
 def _format_active_concerns(concerns: list[dict]) -> str:

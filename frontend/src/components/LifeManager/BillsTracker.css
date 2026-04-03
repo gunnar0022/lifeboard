@@ -11,6 +11,62 @@
   color: var(--color-life-manager);
 }
 
+.bills-tracker__quick-add {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+}
+
+.bills-tracker__quick-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.bills-tracker__quick-add input[type="text"] {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.bills-tracker__quick-add input[type="text"]::placeholder {
+  color: var(--text-muted);
+}
+
+.bills-tracker__quick-amount {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.bills-tracker__quick-currency {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.bills-tracker__quick-amount input[type="number"] {
+  width: 72px;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  outline: none;
+  text-align: right;
+}
+
+.bills-tracker__quick-amount input[type="number"]::placeholder {
+  color: var(--text-muted);
+}
+
 .bills-tracker__empty {
   display: flex;
   flex-direction: column;

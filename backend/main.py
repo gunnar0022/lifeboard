@@ -176,6 +176,10 @@ for router in get_agent_routers():
 from backend.dnd import router as dnd_router
 app.include_router(dnd_router)
 
+# System Health dashboard
+from backend.system_health import router as system_health_router
+app.include_router(system_health_router)
+
 
 # --- Setup Wizard API ---
 

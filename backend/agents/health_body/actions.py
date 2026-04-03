@@ -109,6 +109,26 @@ async def handle_get_active_concerns(data: dict) -> list:
     return await get_active_concerns()
 
 
+# --- Food database handlers ---
+
+async def handle_add_food(data: dict) -> dict:
+    return await queries.add_food(
+        name=data["name"],
+        calories=data["calories"],
+        protein_g=data.get("protein_g", 0),
+        carbs_g=data.get("carbs_g", 0),
+        fat_g=data.get("fat_g", 0),
+    )
+
+
+async def handle_remove_food(data: dict) -> bool:
+    return await queries.delete_food(data["food_id"])
+
+
+async def handle_list_foods(data: dict) -> list:
+    return await queries.get_foods()
+
+
 # --- Read action handlers ---
 
 async def handle_get_profile(data: dict) -> dict:
@@ -237,6 +257,24 @@ ACTION_REGISTRY = {
         "handler": handle_log_concern_update,
         "required": ["content"],
         "optional": ["concern_id"],
+    },
+
+    # Write — Food Database
+    "add_food": {
+        "handler": handle_add_food,
+        "required": ["name", "calories"],
+        "optional": ["protein_g", "carbs_g", "fat_g"],
+    },
+    "remove_food": {
+        "handler": handle_remove_food,
+        "required": ["food_id"],
+    },
+
+    # Read — Food Database
+    "list_foods": {
+        "handler": handle_list_foods,
+        "required": [],
+        "is_read": True,
     },
 
     # Read — Active concerns

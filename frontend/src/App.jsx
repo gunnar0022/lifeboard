@@ -9,6 +9,7 @@ import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
 import HealthPanel from './components/Health/HealthPanel';
 import InvestingPanel from './components/Investing/InvestingPanel';
 import ReadingCreativePanel from './components/ReadingCreative/ReadingCreativePanel';
+import SystemHealthPanel from './components/SystemHealth/SystemHealthPanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
 import { useApi, RefreshContext } from './hooks/useApi';
 import { useWebSocket } from './hooks/useWebSocket';
@@ -16,6 +17,7 @@ import './App.css';
 
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
+  const [previousPanel, setPreviousPanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [panelVisibility, setPanelVisibility] = useState(null);
@@ -69,6 +71,9 @@ export default function App() {
   }, []);
 
   const handleNavigate = (panelId) => {
+    if (panelId === 'settings') {
+      setPreviousPanel(activePanel);
+    }
     setActivePanel(panelId);
     setMobileMenuOpen(false);
   };
@@ -96,7 +101,7 @@ export default function App() {
       return (
         <SettingsPanel
           key="settings"
-          onBack={() => setActivePanel('home')}
+          onBack={() => setActivePanel(previousPanel)}
           onThemeChange={() => {}}
           onPanelVisibilityChange={(panels) => {
             setPanelVisibility(panels);
@@ -123,6 +128,10 @@ export default function App() {
 
     if (activePanel === 'reading_creative') {
       return <ReadingCreativePanel key="reading_creative" />;
+    }
+
+    if (activePanel === 'system_health') {
+      return <SystemHealthPanel key="system_health" />;
     }
 
     // Placeholder agents

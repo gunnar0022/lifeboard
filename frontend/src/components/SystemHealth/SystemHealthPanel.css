@@ -1,0 +1,340 @@
+.sh-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.sh-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.sh-panel__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sh-panel__icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text-secondary) 12%, transparent);
+  color: var(--text-secondary);
+}
+
+.sh-panel__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sh-panel__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sh-panel__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: sh-pulse 2s ease-in-out infinite;
+}
+
+.sh-panel__pulse--error {
+  background: var(--color-alert);
+  animation: none;
+}
+
+@keyframes sh-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.sh-panel__last-updated {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sh-panel__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* System Identity */
+.sh-identity {
+  display: flex;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.sh-identity__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sh-identity__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sh-identity__value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Resource Gauges */
+.sh-gauges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .sh-gauges {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sh-gauge {
+  padding: var(--space-lg);
+}
+
+.sh-gauge__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.sh-gauge__big-number {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+
+.sh-gauge__detail {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sh-gauge__detail--muted {
+  color: var(--text-muted);
+}
+
+/* Usage bar */
+.sh-bar {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sh-bar__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Per-core cells */
+.sh-cores {
+  display: flex;
+  gap: 3px;
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.sh-cores__cell {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  transition: opacity 0.5s ease;
+}
+
+/* Network */
+.sh-network {
+  padding: var(--space-lg);
+}
+
+.sh-network__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.sh-network__rates {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .sh-network__rates {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sh-network__rate {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sh-network__rate-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sh-network__rate-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Top Processes */
+.sh-processes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .sh-processes {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sh-procs-table {
+  padding: var(--space-lg);
+}
+
+.sh-procs-table__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.sh-procs-table__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-procs-table__row {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 70px;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  align-items: center;
+}
+
+.sh-procs-table__row:not(.sh-procs-table__row--header):hover {
+  background: var(--bg-secondary);
+}
+
+.sh-procs-table__row--header {
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.6875rem;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: var(--space-xs);
+}
+
+.sh-procs-table__name {
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Services */
+.sh-services {
+  padding: var(--space-lg);
+}
+
+.sh-services__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.sh-services__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sh-services__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8125rem;
+}
+
+.sh-services__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sh-services__dot--ok { background: var(--color-success); }
+.sh-services__dot--warn { background: #f59e0b; }
+.sh-services__dot--grey { background: var(--text-muted); }
+
+.sh-services__name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sh-services__detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

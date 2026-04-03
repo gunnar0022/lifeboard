@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Receipt, CreditCard, Check, AlertCircle, Clock } from 'lucide-react';
+import { Receipt, CreditCard, Check, AlertCircle, Clock, Plus } from 'lucide-react';
 import { apiPost } from '../../hooks/useApi';
 import './BillsTracker.css';
 
@@ -21,6 +21,9 @@ function getDueStatus(nextDue) {
 
 export default function BillsTracker({ bills, currencySymbol, onRefresh }) {
   const [loading, setLoading] = useState(null);
+  const [billName, setBillName] = useState('');
+  const [billAmount, setBillAmount] = useState('');
+  const [adding, setAdding] = useState(false);
 
   const handleMarkPaid = async (billId) => {
     setLoading(billId);
@@ -31,6 +34,25 @@ export default function BillsTracker({ bills, currencySymbol, onRefresh }) {
       console.error('Failed to mark bill paid:', err);
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleQuickAdd = async (e) => {
+    e.preventDefault();
+    if (!billName.trim() || !billAmount) return;
+    setAdding(true);
+    try {
+      await apiPost('/api/life/bills', {
+        name: billName.trim(),
+        amount: Math.round(parseFloat(billAmount) || 0),
+      });
+      setBillName('');
+      setBillAmount('');
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to add bill:', err);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -47,6 +69,27 @@ export default function BillsTracker({ bills, currencySymbol, onRefresh }) {
           </span>
         )}
       </div>
+
+      <form className="bills-tracker__quick-add" onSubmit={handleQuickAdd}>
+        <Plus size={16} className="bills-tracker__quick-icon" />
+        <input
+          type="text"
+          placeholder="Add a bill..."
+          value={billName}
+          onChange={(e) => setBillName(e.target.value)}
+          disabled={adding}
+        />
+        <div className="bills-tracker__quick-amount">
+          <span className="bills-tracker__quick-currency">{currencySymbol}</span>
+          <input
+            type="number"
+            placeholder="0"
+            value={billAmount}
+            onChange={(e) => setBillAmount(e.target.value)}
+            disabled={adding}
+          />
+        </div>
+      </form>
 
       {unpaidBills.length === 0 ? (
         <div className="bills-tracker__empty">

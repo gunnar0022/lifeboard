@@ -106,14 +106,16 @@ function CombinedTotal({ byCurrency, fxRate, blurred }) {
 
 export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [hiddenAccounts, setHiddenAccounts] = useState(() => {
-    // Default: all accounts hidden
-    const set = new Set();
-    overview?.accounts?.forEach(a => set.add(a.id));
-    return set;
-  });
+  const [hiddenAccounts, setHiddenAccounts] = useState(new Set());
+  const [initialized, setInitialized] = useState(false);
   const [totalsHidden, setTotalsHidden] = useState(true);
   const { data: fxRate } = useApi('/api/finance/exchange-rate');
+
+  // Default all accounts to hidden once overview loads
+  if (!initialized && overview?.accounts?.length) {
+    setHiddenAccounts(new Set(overview.accounts.map(a => a.id)));
+    setInitialized(true);
+  }
   const { data: investingSnapshot } = useApi('/api/investing/latest-snapshot');
 
   const toggleAccount = (id) => {

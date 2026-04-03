@@ -37,6 +37,14 @@ class TransactionCreate(BaseModel):
     date: Optional[str] = None
     notes: Optional[str] = None
 
+class TransactionUpdate(BaseModel):
+    type: Optional[str] = None
+    shares: Optional[float] = None
+    price_per_share: Optional[int] = None
+    total_amount: Optional[int] = None
+    date: Optional[str] = None
+    notes: Optional[str] = None
+
 class AccountCreate(BaseModel):
     name: str
     type: str = "brokerage"
@@ -96,11 +104,18 @@ async def get_holding(holding_id: int):
 
 @router.post("/holdings")
 async def create_holding(body: HoldingCreate):
-    return await queries.add_holding(
+    from backend.agents.investing.scheduler import refresh_single_holding_price
+    result = await queries.add_holding(
         symbol=body.symbol, name=body.name,
         asset_class=body.asset_class, currency=body.currency,
         notes=body.notes,
     )
+    if result and result.get("id"):
+        try:
+            await refresh_single_holding_price(result["id"])
+        except Exception as e:
+            logger.warning(f"Price refresh after holding create failed: {e}")
+    return result
 
 
 @router.put("/holdings/{holding_id}")
@@ -131,12 +146,34 @@ async def list_transactions(
 
 @router.post("/transactions")
 async def create_transaction(body: TransactionCreate):
-    return await queries.record_transaction(
+    from backend.agents.investing.scheduler import refresh_single_holding_price
+    result = await queries.record_transaction(
         holding_id=body.holding_id, tx_type=body.type,
         shares=body.shares, price_per_share=body.price_per_share,
         total_amount=body.total_amount, currency=body.currency,
         date_str=body.date, notes=body.notes,
     )
+    try:
+        await refresh_single_holding_price(body.holding_id)
+    except Exception as e:
+        logger.warning(f"Price refresh after transaction failed: {e}")
+    return result
+
+
+@router.put("/transactions/{tx_id}")
+async def update_transaction(tx_id: int, body: TransactionUpdate):
+    result = await queries.update_transaction(tx_id, **body.model_dump(exclude_none=True))
+    if not result:
+        raise HTTPException(404, "Transaction not found")
+    return result
+
+
+@router.delete("/transactions/{tx_id}")
+async def delete_transaction(tx_id: int):
+    success = await queries.delete_transaction(tx_id)
+    if not success:
+        raise HTTPException(404, "Transaction not found")
+    return {"ok": True}
 
 
 # --- Accounts ---

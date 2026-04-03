@@ -9,6 +9,7 @@ import CycleTrend from './CycleTrend';
 import BudgetBars from './BudgetBars';
 import InsightsSection from './InsightsSection';
 import TransactionList from './TransactionList';
+import TransactionHistory from './TransactionHistory';
 import QuickAddForm from './QuickAddForm';
 import RecurringManager from './RecurringManager';
 import './FinancePanel.css';
@@ -197,6 +198,10 @@ export default function FinancePanel() {
           currencySymbol={currencySymbol}
           currency={currency}
         />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <TransactionHistory currency={currency} currencySymbol={currencySymbol} />
       </motion.div>
     </motion.div>
   );

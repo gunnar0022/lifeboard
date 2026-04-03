@@ -34,8 +34,8 @@ function formatShares(shares) {
   return shares.toLocaleString(undefined, { maximumFractionDigits: 6 });
 }
 
-export default function HoldingsTable({ holdings, currencySymbol, displayCurrency, fxRate }) {
-  const [collapsed, setCollapsed] = useState({});
+export default function HoldingsTable({ holdings, currencySymbol, displayCurrency, fxRate, onRefresh }) {
+  const [collapsed, setCollapsed] = useState({ stock: true, etf: true, crypto: true });
   const [selectedHolding, setSelectedHolding] = useState(null);
 
   const dc = displayCurrency || 'JPY';
@@ -136,6 +136,7 @@ export default function HoldingsTable({ holdings, currencySymbol, displayCurrenc
           holding={selectedHolding}
           currencySymbol={currencySymbol}
           onClose={() => setSelectedHolding(null)}
+          onRefresh={onRefresh}
         />
       )}
     </div>

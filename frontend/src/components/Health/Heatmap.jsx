@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Utensils, Dumbbell } from 'lucide-react';
 import './Heatmap.css';
 
 const CELL_SIZE = 15;
@@ -69,8 +71,103 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+function DayDetailModal({ date, onClose }) {
+  const [detail, setDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/health_body/day/${date}`)
+      .then(r => r.json())
+      .then(d => { setDetail(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [date]);
+
+  return (
+    <motion.div
+      className="heatmap-detail__overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="heatmap-detail__modal"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
+        transition={{ duration: 0.25 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="heatmap-detail__header">
+          <h3 className="heatmap-detail__title">{formatDate(date)}</h3>
+          <button className="heatmap-detail__close" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {loading && <p className="heatmap-detail__loading">Loading...</p>}
+
+        {!loading && detail && (
+          <>
+            <div className="heatmap-detail__summary">
+              <span>{detail.total_calories?.toLocaleString() || 0} kcal</span>
+              <span>P:{detail.total_protein_g || 0}g C:{detail.total_carbs_g || 0}g F:{detail.total_fat_g || 0}g</span>
+              {detail.total_exercise_minutes > 0 && <span>{detail.total_exercise_minutes} min exercise</span>}
+              {detail.mood && <span>Mood: {detail.mood}/5</span>}
+              {detail.energy && <span>Energy: {detail.energy}/5</span>}
+            </div>
+
+            {detail.meals?.length > 0 && (
+              <div className="heatmap-detail__section">
+                <h4 className="heatmap-detail__section-title"><Utensils size={14} /> Meals</h4>
+                {detail.meals.map(m => (
+                  <div key={m.id} className="heatmap-detail__item">
+                    <div className="heatmap-detail__item-main">
+                      {m.time && <span className="heatmap-detail__time">{m.time}</span>}
+                      <span className="heatmap-detail__desc">{m.description}</span>
+                    </div>
+                    <div className="heatmap-detail__item-meta">
+                      <span className="heatmap-detail__cal">{m.calories} kcal</span>
+                      <span className="heatmap-detail__macros">
+                        P:{m.protein_g}g C:{m.carbs_g}g F:{m.fat_g}g
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {detail.exercises?.length > 0 && (
+              <div className="heatmap-detail__section">
+                <h4 className="heatmap-detail__section-title"><Dumbbell size={14} /> Exercise</h4>
+                {detail.exercises.map(e => (
+                  <div key={e.id} className="heatmap-detail__item">
+                    <div className="heatmap-detail__item-main">
+                      {e.time && <span className="heatmap-detail__time">{e.time}</span>}
+                      <span className="heatmap-detail__desc">{e.description}</span>
+                    </div>
+                    <div className="heatmap-detail__item-meta">
+                      <span>{e.duration_minutes} min</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(!detail.meals?.length && !detail.exercises?.length) && (
+              <p className="heatmap-detail__empty">No individual records for this day.</p>
+            )}
+          </>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function Heatmap({ data }) {
   const [tooltip, setTooltip] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Arrange data into a 7-row grid (Mon=0 ... Sun=6)
   const { grid, weekCount, monthLabels } = useMemo(() => {
@@ -199,7 +296,8 @@ export default function Heatmap({ data }) {
                     });
                   }}
                   onMouseLeave={() => setTooltip(null)}
-                  style={{ cursor: 'default' }}
+                  onClick={() => setSelectedDate(day.date)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <rect
                     x={x}
@@ -267,6 +365,16 @@ export default function Heatmap({ data }) {
           {tooltip.day.energy && <div>Energy: {tooltip.day.energy}/5</div>}
         </div>
       )}
+
+      {/* Day detail modal */}
+      <AnimatePresence>
+        {selectedDate && (
+          <DayDetailModal
+            date={selectedDate}
+            onClose={() => setSelectedDate(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

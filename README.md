@@ -48,9 +48,10 @@ Calendar events synced bidirectionally with **Google Calendar**, bills, tasks, a
 
 Nutrition, exercise, mood tracking, body measurements, and health concern management.
 
-- **Meals** — logged with full macros parsed by Claude from natural descriptions
+- **Meals** — logged with full macros parsed by Claude from natural descriptions, historical data preserved indefinitely
+- **Food database** — custom nutrition database for known foods with exact macros per serving; serving multipliers for accuracy; falls back to AI estimation for unknown foods
 - **Exercise** — workouts with duration and calorie burn
-- **Daily summaries** — automatic end-of-day aggregation with 90-day activity heatmap
+- **Daily summaries** — automatic end-of-day aggregation with 90-day clickable activity heatmap (click any day to see individual meals and exercises)
 - **Health concerns** — trackable issues created during Fleet visits, updated via casual Telegram messages between visits
 - **Evening check-in** — scheduled Telegram prompt for mood and energy
 
@@ -60,17 +61,21 @@ Accounts, spending, budgets, recurring payments, and cross-currency transfers.
 
 - **Multi-currency** — JPY and USD accounts with live FX conversion
 - **Pay-cycle budgeting** — monthly limits tracked against your actual pay cycle, not calendar months
-- **Privacy blur** — per-account and totals eye toggle to hide balances from shoulder surfers
-- **Cycle summaries** — historical compression keeps the database lean
+- **Privacy blur** — per-account and totals eye toggle to hide balances from shoulder surfers (defaults to blurred)
+- **Net worth** — combined bank accounts + investment portfolio value with currency conversion
+- **Transaction history** — browsable month-by-month archive of all transactions with full persistence
+- **Cycle summaries** — historical compression generates AI insights while preserving raw data
 
 ### Investing
 
 Portfolio tracking across stocks, ETFs, and crypto with multi-currency support.
 
-- **Live prices** — daily yfinance refresh + immediate fetch on new holdings
+- **Live prices** — daily yfinance refresh + immediate fetch on new holdings (with history fallback)
 - **Multi-currency aggregation** — USD holdings converted to JPY using cached FX rates
 - **Portfolio trend** — interactive chart with crosshair hover
 - **Asset allocation** — donut chart with category breakdown
+- **Manual entry** — add holdings and transactions directly from the dashboard with symbol deduplication
+- **Transaction editing** — inline edit and delete on transaction history with automatic cost basis recalculation
 - **Projection calculator** — compound interest simulator
 - **USD/JPY toggle** — converts all values on the page
 
@@ -107,6 +112,18 @@ A headless personal health consultant that conducts clinic-style visits via Tele
 - **Mid-conversation record retrieval** — Fleet can look up your medical documents during a session
 - **Health concerns lifecycle** — creation, logging, resolution, reactivation, compression
 
+### System Health
+
+A live dashboard showing the Mac Mini server's vital signs, polled every 5 seconds.
+
+- **System identity** — hostname, macOS version, chip, uptime
+- **CPU** — overall and per-core usage with color-coded cells
+- **Memory** — used/available/swap with usage bar
+- **Disk** — APFS container-level usage (accurate on Apple Silicon), LifeBoard DB size
+- **Network** — real-time upload/download throughput rates
+- **Top processes** — top 10 by CPU and by memory
+- **Services** — FastAPI process status, SQLite DB size, Docker container status
+
 ### Document Classifier
 
 A Sonnet-powered system that processes all uploaded photos and PDFs.
@@ -131,6 +148,7 @@ backend/
   llm_client.py        # Anthropic API (Sonnet default, Haiku for routing)
   action_executor.py   # Validate-execute-respond with hallucination detection
   documents.py         # Unified document classifier + CRUD
+  system_health.py     # Live system metrics (CPU, memory, disk, network, processes)
   google_calendar.py   # OAuth, bidirectional sync, reminder scheduler
   seed.py              # Demo data (manual CLI, non-destructive)
   agents/
@@ -157,11 +175,12 @@ frontend/src/
     Shell/             # Sidebar, TopBar (dark mode toggle), HomePanel
     Setup/             # 12-step guided setup wizard
     LifeManager/       # TimelineStrip, BillsTracker, TaskBoard, ShoppingList, DocumentSearch
-    Health/            # Heatmap, RecentDetail, WeightTrend, ConcernsTracker
-    Finance/           # AccountsStrip (blur toggle), CycleOverview, BudgetDonut
-    Investing/         # PortfolioTrend, AllocationChart, HoldingsTable
+    Health/            # Heatmap (clickable), RecentDetail, WeightTrend, FoodDatabase, ConcernsTracker
+    Finance/           # AccountsStrip (blur toggle), CycleOverview, BudgetDonut, TransactionHistory
+    Investing/         # PortfolioTrend, AllocationChart, HoldingsTable, TransactionHistory
     ReadingCreative/   # FloatingSnippets (physics), CreativeWorkspace, ReadingLog
       DnD/             # Character sheets, campaigns, spell library, campaign notes
+    SystemHealth/      # Live server metrics dashboard
 ```
 
 ### Telegram Bot — LLM-Powered Router
@@ -174,10 +193,10 @@ The router uses **Haiku** with 8 exchanges of conversation history. It supports 
 |-------|----------|------|
 | Google Calendar | Hourly | Bidirectional event sync |
 | Google Calendar | Every minute | Send due reminders via Telegram |
-| Finance | Monthly (24th) | Compress transactions into cycle summaries |
+| Finance | Monthly (24th) | Generate cycle summaries with AI insights |
 | Finance | Monthly (1st) | Calculate and apply account interest |
 | Health & Body | Daily (configurable) | Evening check-in via Telegram |
-| Health & Body | Daily (2 AM) | Compress meals/exercises into daily summary |
+| Health & Body | Daily (2 AM) | Aggregate meals/exercises into daily summary |
 | Investing | Daily (6 PM) | Refresh prices via yfinance, store snapshot |
 | Fleet | Daily (4 AM) | Compress resolved concern logs > 90 days |
 | Fleet | On startup | Recover orphaned sessions |
@@ -195,6 +214,7 @@ The router uses **Haiku** with 8 exchanges of conversation history. It supports 
 | Telegram | python-telegram-bot v21 (async) |
 | Calendar | Google Calendar API with OAuth 2.0 |
 | Market Data | yfinance, frankfurter.app (FX rates) |
+| System Monitoring | psutil (CPU, memory, disk, network, processes) |
 | PDF Processing | pymupdf (text extraction + image rendering) |
 | Process Manager | PM2 (production) |
 

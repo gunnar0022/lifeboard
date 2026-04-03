@@ -6,7 +6,6 @@ import BillsTracker from './BillsTracker';
 import TaskBoard from './TaskBoard';
 import ShoppingList from './ShoppingList';
 import DocumentSearch from './DocumentSearch';
-import QuickAddBar from './QuickAddBar';
 import './LifeManagerPanel.css';
 
 export default function LifeManagerPanel() {
@@ -72,15 +71,20 @@ export default function LifeManagerPanel() {
           </div>
           <h3>No items tracked yet</h3>
           <p>
-            Get started by adding a task, bill, or event below, or just
-            message the Telegram bot naturally.
+            Get started by adding tasks and bills using the forms below,
+            or message the Telegram bot naturally.
           </p>
         </div>
 
-        <div style={{ marginTop: 'var(--space-lg)' }}>
-          <QuickAddBar
+        <div className="life-panel__grid" style={{ marginTop: 'var(--space-lg)' }}>
+          <BillsTracker
+            bills={[]}
             currencySymbol={currencySymbol}
-            onSuccess={refetchAll}
+            onRefresh={refetchAll}
+          />
+          <TaskBoard
+            tasks={[]}
+            onRefresh={refetchAll}
           />
         </div>
       </div>
@@ -131,12 +135,7 @@ export default function LifeManagerPanel() {
       {/* Section C — Shopping List */}
       <ShoppingList items={shopping || []} onRefresh={refetchShopping} />
 
-      {/* Section D — Quick Add & Documents */}
-      <QuickAddBar
-        currencySymbol={currencySymbol}
-        onSuccess={refetchAll}
-      />
-
+      {/* Section D — Documents */}
       <DocumentSearch />
     </div>
   );

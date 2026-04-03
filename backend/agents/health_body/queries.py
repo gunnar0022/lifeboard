@@ -370,6 +370,69 @@ async def get_latest_measurement() -> dict | None:
 
 # (Medical Documents and Health Files removed — now in unified backend/documents.py)
 
+# ──────────────────────── Nutrition Foods ────────────────────────
+
+async def get_foods() -> list[dict]:
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall("SELECT * FROM nutrition_foods ORDER BY name ASC")
+        return [dict(r) for r in rows]
+    finally:
+        await db.close()
+
+
+async def get_food(food_id: int) -> dict | None:
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall(
+            "SELECT * FROM nutrition_foods WHERE id = ?", [food_id]
+        )
+        return dict(rows[0]) if rows else None
+    finally:
+        await db.close()
+
+
+async def add_food(name: str, calories: int, protein_g: int = 0,
+                   carbs_g: int = 0, fat_g: int = 0) -> dict:
+    db = await get_db()
+    try:
+        cursor = await db.execute(
+            """INSERT INTO nutrition_foods (name, calories, protein_g, carbs_g, fat_g)
+               VALUES (?, ?, ?, ?, ?)""",
+            [name, calories, protein_g, carbs_g, fat_g],
+        )
+        await db.commit()
+        return await get_food(cursor.lastrowid)
+    finally:
+        await db.close()
+
+
+async def edit_food(food_id: int, **fields) -> dict | None:
+    allowed = {"name", "calories", "protein_g", "carbs_g", "fat_g"}
+    updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+    if not updates:
+        return await get_food(food_id)
+    db = await get_db()
+    try:
+        set_clause = ", ".join(f"{k} = ?" for k in updates)
+        values = list(updates.values()) + [food_id]
+        await db.execute(f"UPDATE nutrition_foods SET {set_clause} WHERE id = ?", values)
+        await db.commit()
+        return await get_food(food_id)
+    finally:
+        await db.close()
+
+
+async def delete_food(food_id: int) -> bool:
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM nutrition_foods WHERE id = ?", [food_id])
+        await db.commit()
+        return cursor.rowcount > 0
+    finally:
+        await db.close()
+
+
 # ──────────────────────── Aggregates ────────────────────────
 
 async def get_heatmap_data(days: int = 90) -> list[dict]:
@@ -496,7 +559,7 @@ async def get_pulse() -> dict:
 # ──────────────────────── Compression ────────────────────────
 
 async def get_uncompressed_dates(older_than_days: int = 3) -> list[str]:
-    """Find dates with individual meal/exercise rows older than N days."""
+    """Find dates with individual meal/exercise rows older than N days that lack a daily summary."""
     cutoff = (_today() - timedelta(days=older_than_days)).isoformat()
     db = await get_db()
     try:
@@ -506,18 +569,30 @@ async def get_uncompressed_dates(older_than_days: int = 3) -> list[str]:
         exercise_dates = await db.execute_fetchall(
             "SELECT DISTINCT date FROM health_exercises WHERE date < ?", [cutoff]
         )
+        # Get dates that already have a summary
+        summary_dates = await db.execute_fetchall(
+            "SELECT date FROM health_daily_summary WHERE total_calories > 0 OR total_exercise_minutes > 0"
+        )
+        existing = set()
+        for r in summary_dates:
+            existing.add(r[0] if isinstance(r, tuple) else dict(r)["date"])
+
         dates = set()
         for r in meal_dates:
-            dates.add(r[0] if isinstance(r, tuple) else dict(r)["date"])
+            d = r[0] if isinstance(r, tuple) else dict(r)["date"]
+            if d not in existing:
+                dates.add(d)
         for r in exercise_dates:
-            dates.add(r[0] if isinstance(r, tuple) else dict(r)["date"])
+            d = r[0] if isinstance(r, tuple) else dict(r)["date"]
+            if d not in existing:
+                dates.add(d)
         return sorted(dates)
     finally:
         await db.close()
 
 
 async def compress_day(date_str: str) -> bool:
-    """Compress a day's meals and exercises into a daily summary row, then delete originals."""
+    """Compress a day's meals and exercises into a daily summary row (originals kept for history)."""
     db = await get_db()
     try:
         # Gather meal totals
@@ -564,10 +639,6 @@ async def compress_day(date_str: str) -> bool:
                 [date_str, total_cal, total_pro, total_carb, total_fat,
                  total_ex_min, total_ex_cal],
             )
-
-        # Delete individual entries
-        await db.execute("DELETE FROM health_meals WHERE date = ?", [date_str])
-        await db.execute("DELETE FROM health_exercises WHERE date = ?", [date_str])
 
         await db.commit()
         return True

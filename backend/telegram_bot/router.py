@@ -65,7 +65,7 @@ Agents:
 - life_manager: tasks, events, calendar, documents, bills-as-tracking, deadlines, reminders, scheduling, appointments, errands, shopping list, groceries, things to buy (NOT workouts or exercise — those go to health_body)
 - health_body: food, meals, exercise, workouts, sports, gym, weight, mood, energy, medical, calories, nutrition, sleep, health checkups, health concern updates (e.g. "back pain was better today"). Any physical activity (volleyball, running, etc.) goes here, not life_manager
 - investing: stocks, portfolio, investments, shares, dividends, crypto, bonds, ETFs, market, buy/sell shares, brokerage
-- reading_creative: creative ideas, worldbuilding, story ideas, writing, books, reading list, finished reading, book recommendations
+- reading_creative: creative ideas, worldbuilding, story ideas, writing, books, reading list, finished reading, book recommendations, notes for creative projects, "add a note to [project]", capturing thoughts/ideas for specific projects
 - documents: looking up info from uploaded documents/PDFs, "what's my ID number", "what does my contract say", finding details in stored files. Use when the user asks about information that would be IN a document they've uploaded.
 - fleet: ONLY for explicit requests to see a doctor, talk to Fleet, start a medical consultation/clinic visit
 

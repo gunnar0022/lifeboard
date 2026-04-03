@@ -198,9 +198,8 @@ async def run_compression():
     )
     logger.info(f"Stored cycle summary for {cs} to {ce}")
 
-    # Step 3: Delete individual records (ONLY after summary is stored)
-    await queries.delete_cycle_transactions(cs, ce)
-    logger.info(f"Deleted compressed transactions for {cs} to {ce}")
+    # Individual transactions are kept for historical browsing.
+    # Cycle summaries provide fast aggregate access.
 
 
 async def _generate_insights(aggregated: dict) -> list[str]:

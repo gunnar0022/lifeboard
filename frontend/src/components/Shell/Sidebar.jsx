@@ -9,6 +9,7 @@ import {
   Briefcase,
   FolderKanban,
   BookOpen,
+  Monitor,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ const ICON_MAP = {
   'briefcase': Briefcase,
   'folder-kanban': FolderKanban,
   'book-open': BookOpen,
+  'monitor': Monitor,
 };
 
 export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose, wsConnected }) {
@@ -92,6 +94,17 @@ export default function Sidebar({ agents, activePanel, onNavigate, collapsed, on
             />
           );
         })}
+
+        <div className="sidebar__divider" />
+
+        <SidebarItem
+          icon="monitor"
+          label="System Health"
+          isActive={activePanel === 'system_health'}
+          onClick={() => onNavigate('system_health')}
+          collapsed={collapsed}
+          accentColor="var(--text-secondary)"
+        />
 
         <div className="sidebar__ws-status" title={wsConnected ? 'Live updates active' : 'Reconnecting...'}>
           <span className={`sidebar__ws-dot ${wsConnected ? 'sidebar__ws-dot--connected' : 'sidebar__ws-dot--disconnected'}`} />

@@ -12,4 +12,5 @@ yfinance==0.2.36
 google-api-python-client==2.193.0
 google-auth-oauthlib==1.3.0
 google-auth-httplib2==0.3.0
-pymupdf==1.27.2.2
+pymupdf>=1.24.0
+psutil>=5.9.0
