@@ -10,6 +10,7 @@ import HealthPanel from './components/Health/HealthPanel';
 import InvestingPanel from './components/Investing/InvestingPanel';
 import ReadingCreativePanel from './components/ReadingCreative/ReadingCreativePanel';
 import SystemHealthPanel from './components/SystemHealth/SystemHealthPanel';
+import ProjectsPanel from './components/Projects/ProjectsPanel';
 import PlaceholderPanel from './components/Shared/PlaceholderPanel';
 import { useApi, RefreshContext } from './hooks/useApi';
 import { useWebSocket } from './hooks/useWebSocket';
@@ -132,6 +133,10 @@ export default function App() {
 
     if (activePanel === 'system_health') {
       return <SystemHealthPanel key="system_health" />;
+    }
+
+    if (activePanel === 'projects') {
+      return <ProjectsPanel key="projects" />;
     }
 
     // Placeholder agents

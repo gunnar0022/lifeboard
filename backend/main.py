@@ -180,6 +180,10 @@ app.include_router(dnd_router)
 from backend.system_health import router as system_health_router
 app.include_router(system_health_router)
 
+# Projects tab
+from backend.projects import router as projects_router
+app.include_router(projects_router)
+
 
 # --- Setup Wizard API ---
 

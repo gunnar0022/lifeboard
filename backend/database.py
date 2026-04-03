@@ -29,6 +29,7 @@ async def init_db():
         await _create_reading_creative_tables(db)
         await _create_dnd_tables(db)
         await _create_documents_table(db)
+        await _create_projects_table(db)
         await db.commit()
     finally:
         await db.close()
@@ -459,5 +460,20 @@ async def _create_documents_table(db: aiosqlite.Connection):
             provider TEXT,
             extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+    """)
+
+
+async def _create_projects_table(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS projects (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            stage TEXT NOT NULL DEFAULT 'scaffolding' CHECK(stage IN ('working_on', 'mostly_polished', 'scaffolding')),
+            card_html TEXT,
+            context_bucket TEXT,
+            sort_order INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
     """)

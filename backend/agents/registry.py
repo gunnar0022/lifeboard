@@ -30,9 +30,9 @@ ALL_AGENTS = [
         "name": "Projects",
         "accent_color": "#EC4899",
         "icon": "folder-kanban",
-        "enabled": False,
-        "description": "Active projects, milestones, task tracking",
-        "v1": False,
+        "enabled": True,
+        "description": "Technical projects, portfolio, and context buckets",
+        "v1": True,
     },
 ]
 

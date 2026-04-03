@@ -112,6 +112,16 @@ A headless personal health consultant that conducts clinic-style visits via Tele
 - **Mid-conversation record retrieval** — Fleet can look up your medical documents during a session
 - **Health concerns lifecycle** — creation, logging, resolution, reactivation, compression
 
+### Projects
+
+A portfolio and project management dashboard for technical/coding projects, organized into three visual tiers.
+
+- **Bespoke cards** — each project gets a unique, hand-crafted HTML card with its own layout, colors, and visual identity reflecting the project's personality
+- **Three-tier organization** — Working On (active development), Mostly Polished (functional/presentable), Scaffolding (early stage)
+- **Context buckets** — structured JSON attached to each project containing summary, tech stack, key decisions, repo paths, and notes. Retrievable via API for Claude Code work sessions
+- **GitHub links** — automatic link to each project's repository
+- **Claude Code workflow** — projects are added and refreshed through Claude Code, which reads the repo, compiles the context bucket, and generates the card
+
 ### System Health
 
 A live dashboard showing the Mac Mini server's vital signs, polled every 5 seconds.
@@ -149,6 +159,7 @@ backend/
   action_executor.py   # Validate-execute-respond with hallucination detection
   documents.py         # Unified document classifier + CRUD
   system_health.py     # Live system metrics (CPU, memory, disk, network, processes)
+  projects.py          # Projects tab CRUD API with context buckets
   google_calendar.py   # OAuth, bidirectional sync, reminder scheduler
   seed.py              # Demo data (manual CLI, non-destructive)
   agents/
@@ -181,6 +192,7 @@ frontend/src/
     ReadingCreative/   # FloatingSnippets (physics), CreativeWorkspace, ReadingLog
       DnD/             # Character sheets, campaigns, spell library, campaign notes
     SystemHealth/      # Live server metrics dashboard
+    Projects/          # Project cards with tiered layout and context buckets
 ```
 
 ### Telegram Bot — LLM-Powered Router
