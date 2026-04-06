@@ -436,12 +436,50 @@ async def get_settings():
     except Exception:
         pass
 
+    # Migrate old flat panel keys to new dot-notation format
+    raw_panels = config.get("panels", {})
+    if raw_panels and not any('.' in k for k in raw_panels):
+        # Old format detected — migrate
+        migrated = {}
+        mapping = {
+            "life_manager": ("organizer", ["calendar", "tasks_bills", "documents"]),
+            "health_body": ("health_fitness", ["health", "fitness"]),
+            "finance": ("money", ["finance"]),
+            "investing": ("money", ["investing"]),
+            "reading_creative": ("creative", ["workspace", "reading", "dnd"]),
+            "projects": ("projects", []),
+        }
+        parents_seen = {}
+        for old_id, (parent, subs) in mapping.items():
+            was_on = raw_panels.get(old_id, True) is not False
+            if parent not in parents_seen:
+                parents_seen[parent] = False
+            if was_on:
+                parents_seen[parent] = True
+            for sub in subs:
+                migrated[f"{parent}.{sub}"] = was_on
+        for parent, visible in parents_seen.items():
+            migrated[parent] = visible
+        migrated.setdefault("system", True)
+        migrated.setdefault("system.health", True)
+        raw_panels = migrated
+
+    # Ensure defaults for any missing keys
+    defaults = {
+        "organizer": True, "organizer.calendar": True, "organizer.tasks_bills": True, "organizer.documents": True,
+        "health_fitness": True, "health_fitness.health": True, "health_fitness.fitness": True,
+        "money": True, "money.finance": True, "money.investing": True,
+        "creative": True, "creative.workspace": True, "creative.reading": True, "creative.dnd": True,
+        "projects": True,
+        "system": True, "system.health": True,
+    }
+    for key, default_val in defaults.items():
+        if key not in raw_panels:
+            raw_panels[key] = default_val
+
     return {
         "theme": config.get("theme", "dark"),
-        "panels": config.get("panels", {
-            "finance": True, "investing": True, "health_body": True,
-            "life_manager": True, "reading_creative": True,
-        }),
+        "panels": raw_panels,
         "pay_cycle_day": config.get("pay_cycle_day", 25),
         "evening_checkin_time": checkin_time,
     }

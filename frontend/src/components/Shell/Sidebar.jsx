@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
@@ -13,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { NAV_CONFIG, isPanelVisible } from '../../config/navigation';
 import './Sidebar.css';
 
 const ICON_MAP = {
@@ -27,7 +27,7 @@ const ICON_MAP = {
   'monitor': Monitor,
 };
 
-export default function Sidebar({ agents, activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose, wsConnected }) {
+export default function Sidebar({ activePanel, onNavigate, collapsed, onToggleCollapse, mobileOpen, onMobileClose, wsConnected, panelVisibility }) {
   return (
     <motion.aside
       className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${mobileOpen ? 'sidebar--mobile-open' : ''}`}
@@ -78,33 +78,20 @@ export default function Sidebar({ agents, activePanel, onNavigate, collapsed, on
 
         <div className="sidebar__divider" />
 
-        {agents.map((agent) => {
-          const isPlaceholder = !agent.v1;
+        {Object.entries(NAV_CONFIG).map(([panelId, config]) => {
+          if (!isPanelVisible(panelId, panelVisibility || {})) return null;
           return (
             <SidebarItem
-              key={agent.id}
-              icon={agent.icon}
-              label={agent.name}
-              isActive={activePanel === agent.id}
-              onClick={() => !isPlaceholder && onNavigate(agent.id)}
+              key={panelId}
+              icon={config.icon}
+              label={config.label}
+              isActive={activePanel === panelId}
+              onClick={() => onNavigate(panelId)}
               collapsed={collapsed}
-              accentColor={agent.accent_color}
-              disabled={isPlaceholder}
-              comingSoon={isPlaceholder}
+              accentColor={config.accent}
             />
           );
         })}
-
-        <div className="sidebar__divider" />
-
-        <SidebarItem
-          icon="monitor"
-          label="System Health"
-          isActive={activePanel === 'system_health'}
-          onClick={() => onNavigate('system_health')}
-          collapsed={collapsed}
-          accentColor="var(--text-secondary)"
-        />
 
         <div className="sidebar__ws-status" title={wsConnected ? 'Live updates active' : 'Reconnecting...'}>
           <span className={`sidebar__ws-dot ${wsConnected ? 'sidebar__ws-dot--connected' : 'sidebar__ws-dot--disconnected'}`} />
@@ -127,14 +114,13 @@ export default function Sidebar({ agents, activePanel, onNavigate, collapsed, on
   );
 }
 
-function SidebarItem({ icon, label, isActive, onClick, collapsed, accentColor, disabled, comingSoon }) {
+function SidebarItem({ icon, label, isActive, onClick, collapsed, accentColor }) {
   const IconComponent = ICON_MAP[icon] || Home;
 
   return (
     <button
-      className={`sidebar__item ${isActive ? 'sidebar__item--active' : ''} ${disabled ? 'sidebar__item--disabled' : ''}`}
+      className={`sidebar__item ${isActive ? 'sidebar__item--active' : ''}`}
       onClick={onClick}
-      disabled={disabled}
       style={{
         '--item-accent': accentColor,
       }}
@@ -153,7 +139,6 @@ function SidebarItem({ icon, label, isActive, onClick, collapsed, accentColor, d
             transition={{ duration: 0.15 }}
           >
             {label}
-            {comingSoon && <span className="sidebar__coming-soon">Soon</span>}
           </motion.span>
         )}
       </AnimatePresence>

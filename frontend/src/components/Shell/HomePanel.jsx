@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   DollarSign,
   CalendarCheck,
   HeartPulse,
   TrendingUp,
-  Briefcase,
   FolderKanban,
   BookOpen,
+  Monitor,
 } from 'lucide-react';
+import { NAV_CONFIG, isPanelVisible } from '../../config/navigation';
 import { useApi } from '../../hooks/useApi';
 import './HomePanel.css';
 
@@ -17,9 +17,19 @@ const ICON_MAP = {
   'calendar-check': CalendarCheck,
   'heart-pulse': HeartPulse,
   'trending-up': TrendingUp,
-  'briefcase': Briefcase,
   'folder-kanban': FolderKanban,
   'book-open': BookOpen,
+  'monitor': Monitor,
+};
+
+// Maps new panel IDs to backend agent pulse endpoints
+const PULSE_ENDPOINTS = {
+  organizer: { endpoint: '/api/life/pulse', panelKey: 'home' },
+  health_fitness: { endpoint: '/api/health_body/pulse', panelKey: 'home' },
+  money: { endpoint: '/api/finance/pulse', panelKey: 'home' },
+  creative: { endpoint: '/api/reading_creative/pulse', panelKey: 'home' },
+  projects: null, // no pulse
+  system: null,   // no pulse
 };
 
 function getGreeting(displayName) {
@@ -40,8 +50,12 @@ function getTodayString() {
   });
 }
 
-export default function HomePanel({ agents, config, onNavigate }) {
+export default function HomePanel({ config, panelVisibility, onNavigate }) {
   const displayName = config?.display_name || 'friend';
+
+  const visiblePanels = Object.entries(NAV_CONFIG).filter(
+    ([id]) => isPanelVisible(id, panelVisibility || {})
+  );
 
   return (
     <motion.div
@@ -62,12 +76,13 @@ export default function HomePanel({ agents, config, onNavigate }) {
       </motion.div>
 
       <div className="home-panel__pulse-strip">
-        {agents.map((agent, i) => (
+        {visiblePanels.map(([panelId, config], i) => (
           <PulseCard
-            key={agent.id}
-            agent={agent}
+            key={panelId}
+            panelId={panelId}
+            config={config}
             index={i}
-            onClick={() => agent.v1 && onNavigate(agent.id)}
+            onClick={() => onNavigate(panelId)}
           />
         ))}
       </div>
@@ -75,18 +90,20 @@ export default function HomePanel({ agents, config, onNavigate }) {
   );
 }
 
-function PulseCard({ agent, index, onClick }) {
-  const isPlaceholder = !agent.v1;
-  const IconComponent = ICON_MAP[agent.icon] || DollarSign;
+function PulseCard({ panelId, config, index, onClick }) {
+  const IconComponent = ICON_MAP[config.icon] || DollarSign;
+  const pulseConfig = PULSE_ENDPOINTS[panelId];
+  const hasPulse = !!pulseConfig;
 
-  // Fetch pulse data for active agents
-  const pulseEndpoint = agent.id === 'life_manager' ? '/api/life/pulse' : `/api/${agent.id}/pulse`;
-  const { data: pulseData } = useApi(pulseEndpoint, { skip: isPlaceholder, panelKey: 'home' });
+  const { data: pulseData } = useApi(
+    pulseConfig?.endpoint || '/api/config',
+    { skip: !hasPulse, panelKey: hasPulse ? pulseConfig.panelKey : null }
+  );
 
   return (
     <motion.div
-      className={`pulse-card ${isPlaceholder ? 'pulse-card--placeholder' : ''}`}
-      style={{ '--agent-color': agent.accent_color }}
+      className="pulse-card"
+      style={{ '--agent-color': config.accent }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -95,19 +112,17 @@ function PulseCard({ agent, index, onClick }) {
         ease: [0.4, 0, 0.2, 1],
       }}
       onClick={onClick}
-      role={isPlaceholder ? undefined : 'button'}
-      tabIndex={isPlaceholder ? undefined : 0}
+      role="button"
+      tabIndex={0}
     >
       <div className="pulse-card__header">
         <span className="pulse-card__icon">
           <IconComponent size={18} />
         </span>
-        <span className="pulse-card__name">{agent.name}</span>
+        <span className="pulse-card__name">{config.label}</span>
       </div>
 
-      {isPlaceholder ? (
-        <div className="pulse-card__coming-soon">Coming soon</div>
-      ) : (
+      {hasPulse ? (
         <div className="pulse-card__metrics">
           {pulseData?.metrics?.map((metric, i) => (
             <PulseMetric key={i} metric={metric} />
@@ -118,6 +133,10 @@ function PulseCard({ agent, index, onClick }) {
               <div className="skeleton pulse-card__skeleton" />
             </>
           )}
+        </div>
+      ) : (
+        <div className="pulse-card__metrics">
+          <div className="pulse-card__no-pulse">{config.label}</div>
         </div>
       )}
     </motion.div>

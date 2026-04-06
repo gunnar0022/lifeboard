@@ -301,7 +301,7 @@ function DayPopup({ day, onClose, onEditEvent }) {
 export default function TimelineStrip({ timeline, onRefresh }) {
   const scrollRef = useRef(null);
   const [selectedDay, setSelectedDay] = useState(null);
-  const [viewMode, setViewMode] = useState('strip'); // 'strip' or 'month'
+  const [viewMode, setViewMode] = useState('month'); // 'strip' or 'month'
   const [editingEvent, setEditingEvent] = useState(null);
 
   // Build 8-week grid (56 days), aligned to Monday start
@@ -383,19 +383,17 @@ export default function TimelineStrip({ timeline, onRefresh }) {
   return (
     <div className="timeline-strip card">
       <div className="timeline-strip__header">
-        <h3 className="chart-title">
-          {viewMode === 'strip' ? 'Next 14 Days' : 'Next 8 Weeks'}
-        </h3>
+        <h3 className="chart-title">Calendar</h3>
         <button
           className="timeline-strip__view-toggle"
           onClick={() => {
             setViewMode(viewMode === 'strip' ? 'month' : 'strip');
             setSelectedDay(null);
           }}
-          title={viewMode === 'strip' ? 'Show 8-week view' : 'Show strip view'}
+          title={viewMode === 'strip' ? 'Show grid view' : 'Show compact view'}
         >
           {viewMode === 'strip' ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-          {viewMode === 'strip' ? '8 weeks' : 'Compact'}
+          {viewMode === 'strip' ? 'Grid' : 'Compact'}
         </button>
       </div>
 

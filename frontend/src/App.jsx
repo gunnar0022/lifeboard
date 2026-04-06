@@ -1,23 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Shell/Sidebar';
 import TopBar from './components/Shell/TopBar';
+import SubTabBar from './components/Shell/SubTabBar';
 import HomePanel from './components/Shell/HomePanel';
 import SetupWizard from './components/Setup/SetupWizard';
 import SettingsPanel from './components/Settings/SettingsPanel';
 import FinancePanel from './components/Finance/FinancePanel';
-import LifeManagerPanel from './components/LifeManager/LifeManagerPanel';
-import HealthPanel from './components/Health/HealthPanel';
 import InvestingPanel from './components/Investing/InvestingPanel';
-import ReadingCreativePanel from './components/ReadingCreative/ReadingCreativePanel';
 import SystemHealthPanel from './components/SystemHealth/SystemHealthPanel';
 import ProjectsPanel from './components/Projects/ProjectsPanel';
-import PlaceholderPanel from './components/Shared/PlaceholderPanel';
+import OrganizerCalendar from './components/Organizer/OrganizerCalendar';
+import OrganizerTasksBills from './components/Organizer/OrganizerTasksBills';
+import OrganizerDocuments from './components/Organizer/OrganizerDocuments';
+import HealthTab from './components/HealthFitness/HealthTab';
+import FitnessTab from './components/HealthFitness/FitnessTab';
+import CreativeWorkspaceTab from './components/Creative/CreativeWorkspaceTab';
+import CreativeReading from './components/Creative/CreativeReading';
+import CreativeDnD from './components/Creative/CreativeDnD';
+import { NAV_CONFIG, getDefaultSubTab, migrateSettings } from './config/navigation';
 import { useApi, RefreshContext } from './hooks/useApi';
 import { useWebSocket } from './hooks/useWebSocket';
 import './App.css';
 
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
+  const [activeSubTab, setActiveSubTab] = useState(null);
   const [previousPanel, setPreviousPanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,21 +42,21 @@ export default function App() {
   }, []);
   const { connected: wsConnected } = useWebSocket(handleWsMessage);
 
-  const [setupComplete, setSetupComplete] = useState(null); // null = loading, true/false
+  const [setupComplete, setSetupComplete] = useState(null);
 
-  const { data: agents, loading: agentsLoading } = useApi('/api/agents');
   const { data: config, loading: configLoading } = useApi('/api/config');
   const { data: nudges } = useApi('/api/nudges');
   const { data: settings } = useApi('/api/settings');
 
-  // Load panel visibility from settings
+  // Load and migrate panel visibility from settings
   useEffect(() => {
     if (settings?.panels) {
-      setPanelVisibility(settings.panels);
+      const migrated = migrateSettings(settings.panels);
+      setPanelVisibility(migrated);
     }
   }, [settings]);
 
-  // Check setup status on load — retry if backend isn't ready yet
+  // Check setup status on load
   useEffect(() => {
     let retries = 0;
     const check = () => {
@@ -62,37 +69,37 @@ export default function App() {
         .catch(() => {
           retries++;
           if (retries < 10) {
-            setTimeout(check, 1500); // retry every 1.5s up to 10 times
+            setTimeout(check, 1500);
           } else {
-            setSetupComplete(false); // after 15s of failures, assume first run
+            setSetupComplete(false);
           }
         });
     };
     check();
   }, []);
 
-  const handleNavigate = (panelId) => {
+  const handleNavigate = (panelId, subTabId) => {
     if (panelId === 'settings') {
       setPreviousPanel(activePanel);
     }
     setActivePanel(panelId);
+    // Set sub-tab: use provided one, or default to first visible
+    const sub = subTabId || getDefaultSubTab(panelId, panelVisibility || {});
+    setActiveSubTab(sub);
     setMobileMenuOpen(false);
   };
 
-  // Filter agents based on panel visibility
-  const visibleAgents = (agents || []).filter(agent => {
-    if (!agent.v1) return true; // Always show placeholder "coming soon" agents
-    if (!panelVisibility) return true; // No settings loaded yet, show all
-    return panelVisibility[agent.id] !== false;
-  });
+  const handleSubTabChange = (subTabId) => {
+    setActiveSubTab(subTabId);
+  };
 
   const renderPanel = () => {
     if (activePanel === 'home') {
       return (
         <HomePanel
           key="home"
-          agents={visibleAgents}
           config={config}
+          panelVisibility={panelVisibility}
           onNavigate={handleNavigate}
         />
       );
@@ -107,48 +114,52 @@ export default function App() {
           onPanelVisibilityChange={(panels) => {
             setPanelVisibility(panels);
           }}
+          panelVisibility={panelVisibility}
         />
       );
     }
 
-    if (activePanel === 'finance') {
+    // --- Organizer ---
+    if (activePanel === 'organizer') {
+      if (activeSubTab === 'calendar') return <OrganizerCalendar key="org-cal" />;
+      if (activeSubTab === 'tasks_bills') return <OrganizerTasksBills key="org-tb" />;
+      if (activeSubTab === 'documents') return <OrganizerDocuments key="org-doc" />;
+      return <OrganizerCalendar key="org-cal" />;
+    }
+
+    // --- Health & Fitness ---
+    if (activePanel === 'health_fitness') {
+      if (activeSubTab === 'fitness') return <FitnessTab key="fitness" />;
+      return <HealthTab key="health" />;
+    }
+
+    // --- Money ---
+    if (activePanel === 'money') {
+      if (activeSubTab === 'investing') return <InvestingPanel key="investing" />;
       return <FinancePanel key="finance" />;
     }
 
-    if (activePanel === 'life_manager') {
-      return <LifeManagerPanel key="life_manager" />;
+    // --- Creative ---
+    if (activePanel === 'creative') {
+      if (activeSubTab === 'reading') return <CreativeReading key="reading" />;
+      if (activeSubTab === 'dnd') return <CreativeDnD key="dnd" />;
+      return <CreativeWorkspaceTab key="workspace" />;
     }
 
-    if (activePanel === 'health_body') {
-      return <HealthPanel key="health_body" />;
-    }
-
-    if (activePanel === 'investing') {
-      return <InvestingPanel key="investing" />;
-    }
-
-    if (activePanel === 'reading_creative') {
-      return <ReadingCreativePanel key="reading_creative" />;
-    }
-
-    if (activePanel === 'system_health') {
-      return <SystemHealthPanel key="system_health" />;
-    }
-
+    // --- Projects (no sub-tabs) ---
     if (activePanel === 'projects') {
       return <ProjectsPanel key="projects" />;
     }
 
-    // Placeholder agents
-    const agent = agents?.find((a) => a.id === activePanel);
-    if (agent) {
-      return <PlaceholderPanel key={agent.id} agent={agent} />;
+    // --- System ---
+    if (activePanel === 'system') {
+      return <SystemHealthPanel key="system-health" />;
     }
 
     return null;
   };
 
-  // Show wizard if setup isn't complete
+  // Loading states
   if (setupComplete === null) {
     return (
       <div className="app-loading">
@@ -162,7 +173,7 @@ export default function App() {
     return <SetupWizard onComplete={() => window.location.reload()} />;
   }
 
-  if (agentsLoading || configLoading) {
+  if (configLoading) {
     return (
       <div className="app-loading">
         <div className="app-loading__spinner" />
@@ -174,13 +185,11 @@ export default function App() {
   return (
     <RefreshContext.Provider value={refreshSignal}>
       <div className="app">
-        {/* Mobile menu overlay */}
         {mobileMenuOpen && (
           <div className="app__mobile-overlay" onClick={() => setMobileMenuOpen(false)} />
         )}
 
         <Sidebar
-          agents={visibleAgents}
           activePanel={activePanel}
           onNavigate={handleNavigate}
           collapsed={sidebarCollapsed}
@@ -188,6 +197,7 @@ export default function App() {
           mobileOpen={mobileMenuOpen}
           onMobileClose={() => setMobileMenuOpen(false)}
           wsConnected={wsConnected}
+          panelVisibility={panelVisibility}
         />
 
         <TopBar
@@ -203,6 +213,12 @@ export default function App() {
             marginLeft: sidebarCollapsed ? 72 : 260,
           }}
         >
+          <SubTabBar
+            panelId={activePanel}
+            activeSubTab={activeSubTab}
+            onSubTabChange={handleSubTabChange}
+            panelVisibility={panelVisibility || {}}
+          />
           {renderPanel()}
         </main>
       </div>

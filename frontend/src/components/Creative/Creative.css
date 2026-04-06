@@ -1,0 +1,28 @@
+.creative-tab {
+  position: relative;
+  min-height: 70vh;
+}
+
+.creative-tab__content {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  min-height: 50vh;
+}
+
+.creative-tab__content .rc-panel__workspace-btn {
+  width: 100%;
+}
+
+.creative-tab__loading {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+}

@@ -18,10 +18,9 @@ const CYCLE_MS = 6000;          // lifecycle tick interval
 const VISIBLE_TARGET = 25;      // how many on screen at once
 const FADE_DURATION = 1500;     // ms for fade in/out
 
-// Dead zones as fractions of container size
+// Dead zones as fractions of container size — centered button area
 const DEAD_ZONES = [
-  { x: 0.18, y: 0, w: 0.64, h: 0.07 },    // title bar area
-  { x: 0.30, y: 0.42, w: 0.40, h: 0.18 },  // under reading log — centered 40% of card
+  { x: 0.25, y: 0.30, w: 0.50, h: 0.25 },
 ];
 
 function estimateBox(snippet, containerW, containerH) {

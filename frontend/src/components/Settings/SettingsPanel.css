@@ -161,6 +161,37 @@
   display: none;
 }
 
+.settings__toggle--sm {
+  width: 36px;
+  height: 18px;
+}
+
+.settings__toggle--sm .settings__toggle-thumb {
+  width: 14px;
+  height: 14px;
+}
+
+/* Panel group hierarchy */
+.settings__panel-group {
+  margin-bottom: var(--space-xs);
+}
+
+.settings__subtab-toggles {
+  padding-left: var(--space-xl);
+  border-left: 2px solid var(--border-light);
+  margin-left: var(--space-md);
+  margin-top: var(--space-xs);
+}
+
+.settings__row--sub {
+  padding: var(--space-xs) 0;
+}
+
+.settings__label--sub {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
 /* Select & time inputs */
 .settings__select {
   background: var(--bg-secondary);

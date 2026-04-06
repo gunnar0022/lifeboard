@@ -1,0 +1,84 @@
+.hf-tab {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.hf-tab__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.hf-tab__empty {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+}
+
+.hf-tab__empty-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, #F59E0B 12%, transparent);
+  color: #F59E0B;
+}
+
+.hf-tab__empty h3 {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  margin: 0 0 var(--space-sm);
+}
+
+.hf-tab__empty p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Exercise heatmap shell */
+.fitness-heatmap-shell {
+  padding: var(--space-lg);
+}
+
+.fitness-heatmap-shell__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.fitness-heatmap-shell__empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+}
+
+.fitness-heatmap-shell__empty p {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: var(--space-sm) 0 var(--space-xs);
+}
+
+.fitness-heatmap-shell__empty span {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.fitness-empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}

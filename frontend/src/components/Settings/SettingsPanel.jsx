@@ -1,31 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { Settings, Sun, Moon, Download, Upload, Loader, Check, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useApi, apiPut } from '../../hooks/useApi';
+import { NAV_CONFIG, migrateSettings } from '../../config/navigation';
 import './SettingsPanel.css';
 
-const PANEL_LABELS = {
-  life_manager: 'Life Manager',
-  health_body: 'Health & Body',
-  finance: 'Finance',
-  investing: 'Investing',
-  reading_creative: 'Reading & Creative',
-  career: 'Career',
-  projects: 'Projects',
-};
-
-export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, onBack }) {
+export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, onBack, panelVisibility }) {
   const { data: settings, loading } = useApi('/api/settings');
   const [local, setLocal] = useState(null);
-  const [backupStatus, setBackupStatus] = useState('idle'); // idle | loading | done
+  const [backupStatus, setBackupStatus] = useState('idle');
   const [restoreFile, setRestoreFile] = useState(null);
   const [restoreModal, setRestoreModal] = useState(false);
-  const [restoreStatus, setRestoreStatus] = useState('idle'); // idle | loading | done | error
+  const [restoreStatus, setRestoreStatus] = useState('idle');
   const [restoreMsg, setRestoreMsg] = useState('');
   const fileRef = useRef(null);
   const checkinTimer = useRef(null);
 
   useEffect(() => {
-    if (settings && !local) setLocal(settings);
+    if (settings && !local) {
+      const migrated = { ...settings, panels: migrateSettings(settings.panels) };
+      setLocal(migrated);
+    }
   }, [settings]);
 
   const update = async (field, value) => {
@@ -40,8 +34,34 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
 
   const updatePanel = async (key, enabled) => {
     const panels = { ...local.panels, [key]: enabled };
-    // Prevent disabling all panels
-    if (!Object.values(panels).some(v => v)) return;
+
+    // If toggling a parent off, disable all its sub-tabs too
+    const config = NAV_CONFIG[key];
+    if (config?.subtabs && !enabled) {
+      for (const sub of Object.keys(config.subtabs)) {
+        panels[`${key}.${sub}`] = false;
+      }
+    }
+    // If toggling a parent on, enable all its sub-tabs
+    if (config?.subtabs && enabled) {
+      for (const sub of Object.keys(config.subtabs)) {
+        if (panels[`${key}.${sub}`] === false) {
+          panels[`${key}.${sub}`] = true;
+        }
+      }
+    }
+
+    // If toggling a sub-tab on, make sure parent is on
+    if (key.includes('.') && enabled) {
+      const parentKey = key.split('.')[0];
+      panels[parentKey] = true;
+    }
+
+    // Prevent disabling all top-level panels
+    const topLevelKeys = Object.keys(NAV_CONFIG);
+    const anyEnabled = topLevelKeys.some(k => panels[k] !== false);
+    if (!anyEnabled) return;
+
     const next = { ...local, panels };
     setLocal(next);
     if (onPanelVisibilityChange) onPanelVisibilityChange(panels);
@@ -132,7 +152,6 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
   }
 
   const currentTheme = local.theme || 'dark';
-  const enabledCount = Object.values(local.panels || {}).filter(Boolean).length;
 
   return (
     <div className="settings">
@@ -169,25 +188,44 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
         </div>
       </section>
 
-      {/* Panels */}
+      {/* Panels — hierarchical */}
       <section className="settings__section">
         <h3 className="settings__section-title">Panels</h3>
         <p className="settings__hint">Show or hide dashboard panels. Data is preserved when a panel is hidden.</p>
-        {Object.entries(PANEL_LABELS).map(([key, label]) => {
-          const enabled = local.panels?.[key] !== false;
-          const isLast = enabled && enabledCount <= 1;
+        {Object.entries(NAV_CONFIG).map(([panelId, config]) => {
+          const parentEnabled = local.panels?.[panelId] !== false;
           return (
-            <div key={key} className="settings__row">
-              <span className="settings__label">{label}</span>
-              <button
-                className={`settings__toggle ${enabled ? 'settings__toggle--on' : ''}`}
-                onClick={() => !isLast && updatePanel(key, !enabled)}
-                disabled={isLast}
-                title={isLast ? 'At least one panel must be enabled' : ''}
-              >
-                <span className="settings__toggle-thumb" />
-                <span className="settings__toggle-label">{enabled ? 'ON' : 'OFF'}</span>
-              </button>
+            <div key={panelId} className="settings__panel-group">
+              <div className="settings__row">
+                <span className="settings__label">{config.label}</span>
+                <button
+                  className={`settings__toggle ${parentEnabled ? 'settings__toggle--on' : ''}`}
+                  onClick={() => updatePanel(panelId, !parentEnabled)}
+                >
+                  <span className="settings__toggle-thumb" />
+                  <span className="settings__toggle-label">{parentEnabled ? 'ON' : 'OFF'}</span>
+                </button>
+              </div>
+              {config.subtabs && parentEnabled && (
+                <div className="settings__subtab-toggles">
+                  {Object.entries(config.subtabs).map(([subKey, subConfig]) => {
+                    const fullKey = `${panelId}.${subKey}`;
+                    const subEnabled = local.panels?.[fullKey] !== false;
+                    return (
+                      <div key={fullKey} className="settings__row settings__row--sub">
+                        <span className="settings__label settings__label--sub">{subConfig.label}</span>
+                        <button
+                          className={`settings__toggle settings__toggle--sm ${subEnabled ? 'settings__toggle--on' : ''}`}
+                          onClick={() => updatePanel(fullKey, !subEnabled)}
+                        >
+                          <span className="settings__toggle-thumb" />
+                          <span className="settings__toggle-label">{subEnabled ? 'ON' : 'OFF'}</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
@@ -244,9 +282,7 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
         <div className="settings__data-block">
           <div>
             <strong>Restore</strong>
-            <p className="settings__hint">
-              Upload a previous backup to replace all current data.
-            </p>
+            <p className="settings__hint">Upload a previous backup to replace all current data.</p>
             <p className="settings__warning">
               <AlertTriangle size={14} /> This will overwrite everything. A safety copy of your current database will be saved automatically.
             </p>
