@@ -97,12 +97,15 @@ async def get_pulse():
             if group["currency"] == primary_currency:
                 primary_total = group["total"]
 
-        net_remaining = cycle["income"] - cycle["expenses"]
+        # Use configured salary as the baseline, falling back to recorded income
+        monthly_salary = config.get("monthly_salary", 0)
+        income_base = monthly_salary if monthly_salary > 0 else cycle["income"]
+        net_remaining = income_base - cycle["expenses"]
         budget_pct = budget_status["percentage"] if budget_status["total_budget"] > 0 else 0
         prefix = "¥" if primary_currency == "JPY" else "$"
 
         # On an empty cycle (e.g. payday), show total balance instead of ¥0 net
-        if net_remaining == 0 and cycle["income"] == 0:
+        if net_remaining == 0 and income_base == 0:
             net_label = "Balance"
             net_value = f"{prefix}{primary_total:,}"
         else:

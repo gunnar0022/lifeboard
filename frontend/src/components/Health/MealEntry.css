@@ -118,21 +118,63 @@
   font-size: 0.8125rem;
 }
 
-/* Serving row */
-.meal-entry__serving-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-md);
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
+.meal-entry__food-add {
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.1s;
 }
 
-.meal-entry__serving-input {
-  width: 60px;
+.meal-entry__food-item:hover .meal-entry__food-add {
+  opacity: 1;
+}
+
+/* Cart */
+.meal-entry__cart {
+  margin: var(--space-sm) 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.meal-entry__cart-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-xs);
+}
+
+.meal-entry__cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.meal-entry__cart-name {
   font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meal-entry__cart-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.meal-entry__cart-servings {
+  width: 48px;
+  font-size: 0.75rem;
   font-family: var(--font-mono);
-  padding: 4px 6px;
+  padding: 2px 4px;
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-sm);
   background: var(--bg-primary);
@@ -140,9 +182,35 @@
   text-align: center;
 }
 
-.meal-entry__preview {
-  font-size: 0.75rem;
+.meal-entry__cart-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
   color: var(--text-muted);
+  cursor: pointer;
+}
+
+.meal-entry__cart-btn:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.meal-entry__cart-btn--remove:hover {
+  color: var(--color-alert);
+}
+
+.meal-entry__cart-totals {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-light);
 }
 
 /* Manual mode */

@@ -58,7 +58,7 @@ function NetWorth({ byCurrency, fxRate, investingSnapshot, blurred }) {
       <button
         className="accounts-strip__fx-toggle accounts-strip__fx-toggle--net"
         onClick={() => setTargetCurrency(t => t === 'JPY' ? 'USD' : 'JPY')}
-        title={`1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})`}
+        title={fxRate ? `1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})` : ''}
       >
         {targetCurrency}
       </button>
@@ -93,7 +93,7 @@ function CombinedTotal({ byCurrency, fxRate, blurred }) {
       <button
         className="accounts-strip__fx-toggle"
         onClick={() => setTargetCurrency(t => t === 'JPY' ? 'USD' : 'JPY')}
-        title={`1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})`}
+        title={fxRate ? `1 USD = ¥${fxRate.usd_to_jpy?.toLocaleString()} (${fxRate.date})` : ''}
       >
         {targetCurrency}
       </button>
