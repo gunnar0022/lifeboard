@@ -214,15 +214,18 @@ async def add_exercise(
     description: str = "",
     duration_minutes: int = 0,
     estimated_calories: int = 0,
+    intensity: str = "light",
 ) -> dict:
     if not exercise_date:
         exercise_date = _today().isoformat()
+    if intensity not in ("light", "heavy"):
+        intensity = "light"
     db = await get_db()
     try:
         cursor = await db.execute(
             """INSERT INTO health_exercises (date, time, description,
-               duration_minutes, estimated_calories) VALUES (?, ?, ?, ?, ?)""",
-            [exercise_date, time, description, duration_minutes, estimated_calories],
+               duration_minutes, estimated_calories, intensity) VALUES (?, ?, ?, ?, ?, ?)""",
+            [exercise_date, time, description, duration_minutes, estimated_calories, intensity],
         )
         await db.commit()
         return await get_exercise(cursor.lastrowid)

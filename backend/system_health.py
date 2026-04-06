@@ -232,6 +232,19 @@ def _get_services() -> dict:
     }
 
 
+@router.get("/api/weather")
+async def weather():
+    """Get cached weather data for dashboard."""
+    from backend.schedulers import get_cached_weather, WEATHER_CODES
+    weekly = await get_cached_weather("week_daily")
+    hourly = await get_cached_weather("today_hourly")
+    return {
+        "weekly": weekly,
+        "hourly": hourly,
+        "codes": {str(k): v for k, v in WEATHER_CODES.items()},
+    }
+
+
 @router.get("/api/system-health")
 async def system_health():
     now = datetime.now(timezone.utc).isoformat()

@@ -38,6 +38,7 @@ async def handle_log_exercise(data: dict) -> dict:
         description=data["description"],
         duration_minutes=data["duration_minutes"],
         estimated_calories=data["estimated_calories"],
+        intensity=data.get("intensity", "light"),
     )
 
 
@@ -189,7 +190,7 @@ ACTION_REGISTRY = {
     "log_exercise": {
         "handler": handle_log_exercise,
         "required": ["description", "duration_minutes", "estimated_calories"],
-        "optional": ["date", "time"],
+        "optional": ["date", "time", "intensity"],
     },
     "edit_exercise": {
         "handler": handle_edit_exercise,

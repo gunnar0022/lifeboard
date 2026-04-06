@@ -1,7 +1,5 @@
 """Finance agent — FastAPI routes (dashboard API per LM-08)."""
-import time
 import logging
-import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -342,38 +340,11 @@ async def list_cycle_summaries():
 
 # --- Exchange Rate ---
 
-_fx_cache: dict = {"rate": None, "updated_at": 0}
-_FX_TTL = 3600  # 1 hour cache
-
-
 @router.get("/exchange-rate")
 async def exchange_rate():
-    """USD/JPY exchange rate from ECB via frankfurter.app, cached 1 hour."""
-    now = time.time()
-
-    if _fx_cache["rate"] and (now - _fx_cache["updated_at"]) < _FX_TTL:
-        return _fx_cache["rate"]
-
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get("https://api.frankfurter.app/latest?from=USD&to=JPY")
-            resp.raise_for_status()
-            data = resp.json()
-            usd_to_jpy = data["rates"]["JPY"]
-            result = {
-                "usd_to_jpy": usd_to_jpy,
-                "jpy_to_usd": round(1 / usd_to_jpy, 6),
-                "source": "ECB via frankfurter.app",
-                "date": data.get("date"),
-            }
-            _fx_cache["rate"] = result
-            _fx_cache["updated_at"] = now
-            return result
-    except Exception as e:
-        logger.warning(f"Exchange rate fetch failed: {e}")
-        if _fx_cache["rate"]:
-            return _fx_cache["rate"]
-        raise HTTPException(503, "Exchange rate unavailable")
+    """USD/JPY exchange rate from DB (updated daily by scheduler)."""
+    from backend.schedulers import get_cached_fx_rate
+    return await get_cached_fx_rate()
 
 
 # --- Health ---

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ExternalLink, Plus, Check } from 'lucide-react';
 import { useApi, apiPost } from '../../hooks/useApi';
 import TimelineStrip from '../LifeManager/TimelineStrip';
+import WeatherStrip from './WeatherStrip';
 import './Organizer.css';
 
 const fadeUp = {
@@ -110,6 +111,10 @@ export default function OrganizerCalendar() {
           <ExternalLink size={14} />
         </motion.a>
       )}
+
+      <motion.div variants={fadeUp}>
+        <WeatherStrip />
+      </motion.div>
 
       <motion.div variants={fadeUp}>
         <AddEventForm onSuccess={refetchTimeline} />

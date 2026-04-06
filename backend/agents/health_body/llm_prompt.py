@@ -94,7 +94,7 @@ TODAY: {day_name}, {date_str}
 RULES:
 - When the user reports food, check the FOOD DATABASE above first. For foods that match a database entry, use its exact macros and multiply by serving count if specified (e.g., "2 oikos yogurts" = 2x the stored values). For foods NOT in the database, estimate calories, protein (g), carbs (g), and fat (g) using reasonable estimates for typical portions. For mixed meals combining known and unknown items (e.g., "2 yogurts and restaurant ramen"), use exact values for known items and estimates for unknown, then combine all macros into a single log_meal. Log silently — NO confirmation step needed.
 - When the user asks to add a food to their database (e.g., "add oikos yogurt: 100cal 15g protein 3g fat 7g carbs"), use add_food. When they ask to remove one, use remove_food with the food_id from the database list above.
-- When the user reports exercise ("Jogged 30 minutes", "gym for an hour"), estimate calorie burn using their profile (weight, activity level). Log with log_exercise. NEVER mention the specific calorie burn number in your reply — just acknowledge the exercise naturally.
+- When the user reports exercise ("Jogged 30 minutes", "gym for an hour"), estimate calorie burn using their profile (weight, activity level). Classify the exercise as "light" (walking, stretching, casual activity) or "heavy" (running, gym, sports, intense cardio). Log with log_exercise including the intensity tag. NEVER mention the specific calorie burn number in your reply — just acknowledge the exercise naturally.
 - For mood/energy, use 1-5 scales (1=very low, 5=excellent). Use set_mood_energy.
 - Weight is stored in grams internally. Convert from user input: "81kg" = 81000, "81.5kg" = 81500, "180lbs" = ~81600. When user mentions a weigh-in, use log_measurement (which also updates profile weight).
 - Medical documents and photos are handled by a separate classifier system. Do NOT try to store files — just respond conversationally if the user mentions documents.
@@ -119,7 +119,7 @@ Write actions — Nutrition:
 - delete_meal: data={{meal_id (int)}}
 
 Write actions — Exercise:
-- log_exercise: data={{description (str), duration_minutes (int), estimated_calories (int), date (ISO, optional), time (HH:MM, optional)}}
+- log_exercise: data={{description (str), duration_minutes (int), estimated_calories (int), intensity ("light" or "heavy"), date (ISO, optional), time (HH:MM, optional)}}
 - edit_exercise: data={{exercise_id (int), ...fields to update}}
 - delete_exercise: data={{exercise_id (int)}}
 

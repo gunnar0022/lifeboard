@@ -8,6 +8,31 @@ const CELL_SIZE = 15;
 const CELL_GAP = 3;
 const DAY_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
 
+// 30-block RGB color ramp: Red(0%) → Yellow(50%) → Green(100%) → Cyan(120%) → Blue(140%)
+const COLOR_RAMP = (() => {
+  const anchors = [
+    { pct: 0, r: 255, g: 0, b: 0 },       // Red
+    { pct: 50, r: 255, g: 255, b: 0 },     // Yellow
+    { pct: 100, r: 0, g: 255, b: 0 },      // Green
+    { pct: 120, r: 0, g: 255, b: 255 },    // Cyan
+    { pct: 140, r: 0, g: 0, b: 255 },      // Blue
+  ];
+  const ramp = [];
+  for (let block = 0; block < 30; block++) {
+    const pct = (block / 29) * 140;
+    let i = 0;
+    while (i < anchors.length - 2 && anchors[i + 1].pct < pct) i++;
+    const a = anchors[i], b = anchors[i + 1];
+    const t = (pct - a.pct) / (b.pct - a.pct);
+    ramp.push([
+      Math.round(a.r + (b.r - a.r) * t),
+      Math.round(a.g + (b.g - a.g) * t),
+      Math.round(a.b + (b.b - a.b) * t),
+    ]);
+  }
+  return ramp;
+})();
+
 function getColor(day) {
   if (!day) {
     return { bg: 'var(--bg-skeleton)', text: 'var(--text-tertiary)' };
@@ -22,50 +47,39 @@ function getColor(day) {
     return { bg: 'var(--bg-skeleton)', text: 'var(--text-tertiary)' };
   }
 
-  const goal = day.calorie_goal || 2000;
+  const goal = day.calorie_goal || 2200;
 
-  // Exercise dramatically boosts saturation and vividness
-  const exFactor = Math.min(exMin / 60, 1); // 0-1 scale, capped at 60min
-  const baseSat = 30;
-  const sat = baseSat + exFactor * 65; // 30% base → 95% with 60+ min exercise
-
-  // Mood-only or exercise-only (no calories)
+  // No calories but has exercise/mood — use a neutral green/blue
   if (cal === 0) {
-    const hue = exMin > 0 ? 150 : 210;
+    const mult = exMin > 0 ? (exMin >= 30 ? 1.0 : 0.85) : 0.7;
+    const base = exMin > 0 ? [0, 200, 100] : [100, 130, 180];
     return {
-      bg: `hsl(${hue}, ${sat}%, 50%)`,
+      bg: `rgb(${Math.round(base[0] * mult)}, ${Math.round(base[1] * mult)}, ${Math.round(base[2] * mult)})`,
       text: 'rgba(255,255,255,0.9)',
     };
   }
 
-  // Smooth gradient hue based on calorie ratio
-  // Under (0.5) = warm amber 40° → on target (1.0) = green 145° → over (1.5+) = cool blue 220°
-  const ratio = Math.max(0.3, Math.min(1.8, cal / goal));
-  let hue;
-  if (ratio <= 1.0) {
-    // Amber (40) → Green (145), interpolated smoothly
-    const t = (ratio - 0.3) / 0.7; // 0 at ratio 0.3, 1 at ratio 1.0
-    hue = 40 + t * 105;
-  } else {
-    // Green (145) → Blue (220), interpolated smoothly
-    const t = Math.min((ratio - 1.0) / 0.5, 1); // 0 at ratio 1.0, 1 at ratio 1.5
-    hue = 145 + t * 75;
-  }
+  // Map calories to block index (0-29)
+  const pct = Math.min(cal / goal, 1.4);
+  const blockIdx = Math.min(29, Math.max(0, Math.round((pct / 1.4) * 29)));
+  let [r, g, b] = COLOR_RAMP[blockIdx];
 
-  // Lightness: slightly darker when closer to target, lighter at extremes
-  const deviation = Math.abs(ratio - 1.0);
-  let lightness = 48 - deviation * 8;
-  lightness = Math.max(35, Math.min(58, lightness));
-
-  // Exercise makes it pop — lower lightness = richer color
+  // Exercise brightness multiplier
+  // None=0.7, light (<30min or single)=0.85, heavy (30+min or 2+ exercises)=1.0
+  let mult = 0.7;
   if (exMin > 0) {
-    lightness -= exFactor * 8;
-    lightness = Math.max(30, lightness);
+    mult = exMin >= 30 ? 1.0 : 0.85;
   }
+
+  r = Math.round(r * mult);
+  g = Math.round(g * mult);
+  b = Math.round(b * mult);
+
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
 
   return {
-    bg: `hsl(${Math.round(hue)}, ${Math.round(sat)}%, ${Math.round(lightness)}%)`,
-    text: lightness < 45 ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)',
+    bg: `rgb(${r}, ${g}, ${b})`,
+    text: luminance < 140 ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)',
   };
 }
 

@@ -30,6 +30,7 @@ async def init_db():
         await _create_dnd_tables(db)
         await _create_documents_table(db)
         await _create_projects_table(db)
+        await _create_system_tables(db)
         await db.commit()
     finally:
         await db.close()
@@ -147,6 +148,7 @@ async def _create_health_tables(db: aiosqlite.Connection):
             description TEXT NOT NULL,
             duration_minutes INTEGER NOT NULL DEFAULT 0,
             estimated_calories INTEGER NOT NULL DEFAULT 0,
+            intensity TEXT NOT NULL DEFAULT 'light' CHECK(intensity IN ('light', 'heavy')),
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
 
@@ -462,6 +464,39 @@ async def _create_documents_table(db: aiosqlite.Connection):
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
     """)
+
+
+async def _create_system_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS exchange_rates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pair TEXT NOT NULL,
+            rate REAL NOT NULL,
+            fetched_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS weather_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            location_key TEXT NOT NULL,
+            payload TEXT NOT NULL,
+            fetched_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            scope TEXT NOT NULL CHECK(scope IN ('today_hourly', 'week_daily'))
+        );
+
+        CREATE TABLE IF NOT EXISTS briefing_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sent_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            content TEXT NOT NULL
+        );
+    """)
+
+    # Seed exchange rate if empty
+    cursor = await db.execute("SELECT COUNT(*) FROM exchange_rates WHERE pair = 'JPY_USD'")
+    count = (await cursor.fetchone())[0]
+    if count == 0:
+        await db.execute(
+            "INSERT INTO exchange_rates (pair, rate) VALUES ('JPY_USD', 159.0)"
+        )
 
 
 async def _create_projects_table(db: aiosqlite.Connection):

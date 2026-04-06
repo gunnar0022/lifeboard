@@ -97,6 +97,15 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"Google Calendar scheduler failed: {e}")
 
+    # System schedulers (FX, weather, morning briefing)
+    system_schedulers_running = False
+    try:
+        from backend.schedulers import start_schedulers as start_system_schedulers
+        await start_system_schedulers()
+        system_schedulers_running = True
+    except Exception as e:
+        logger.error(f"System schedulers failed to start: {e}")
+
     # Backup scheduler
     backup_running = False
     try:
@@ -143,6 +152,13 @@ async def lifespan(app: FastAPI):
             await stop_sync_scheduler()
         except Exception as e:
             logger.error(f"Google Calendar scheduler stop error: {e}")
+
+    if system_schedulers_running:
+        try:
+            from backend.schedulers import stop_schedulers as stop_system_schedulers
+            await stop_system_schedulers()
+        except Exception as e:
+            logger.error(f"System schedulers stop error: {e}")
 
     if backup_running:
         try:
@@ -310,47 +326,31 @@ async def get_agents():
     return discover_agents()
 
 
-@app.get("/api/nudges")
-async def get_nudges():
-    """Aggregated nudges from all agents."""
+async def _collect_nudges() -> list[dict]:
+    """Collect nudges from all agents. Used by both API and morning briefing."""
     all_nudges = []
-    errors = []
-    try:
-        from backend.agents.finance.nudges import check_nudges as finance_nudges
-        all_nudges.extend(await finance_nudges())
-    except Exception as e:
-        logger.error(f"Finance nudge check failed: {e}")
-        errors.append(f"finance: {e}")
-    try:
-        from backend.agents.life_manager.nudges import check_nudges as life_nudges
-        all_nudges.extend(await life_nudges())
-    except Exception as e:
-        logger.error(f"Life Manager nudge check failed: {e}")
-        errors.append(f"life_manager: {e}")
-    try:
-        from backend.agents.health_body.nudges import check_nudges as health_nudges
-        all_nudges.extend(await health_nudges())
-    except Exception as e:
-        logger.error(f"Health nudge check failed: {e}")
-        errors.append(f"health_body: {e}")
-    try:
-        from backend.agents.investing.nudges import check_nudges as investing_nudges
-        all_nudges.extend(await investing_nudges())
-    except Exception as e:
-        logger.error(f"Investing nudge check failed: {e}")
-        errors.append(f"investing: {e}")
-    try:
-        from backend.agents.reading_creative.nudges import check_nudges as creative_nudges
-        all_nudges.extend(await creative_nudges())
-    except Exception as e:
-        logger.error(f"Reading & Creative nudge check failed: {e}")
-        errors.append(f"reading_creative: {e}")
-    if errors:
-        logger.error(f"Nudge errors: {errors}")
-    # Sort: alert > warning > info
+    for mod_path, label in [
+        ("backend.agents.finance.nudges", "Finance"),
+        ("backend.agents.life_manager.nudges", "Life Manager"),
+        ("backend.agents.health_body.nudges", "Health"),
+        ("backend.agents.investing.nudges", "Investing"),
+        ("backend.agents.reading_creative.nudges", "Creative"),
+    ]:
+        try:
+            from importlib import import_module
+            mod = import_module(mod_path)
+            all_nudges.extend(await mod.check_nudges())
+        except Exception as e:
+            logger.error(f"{label} nudge check failed: {e}")
     severity_order = {"alert": 0, "warning": 1, "info": 2}
     all_nudges.sort(key=lambda n: severity_order.get(n.get("severity", "info"), 3))
     return all_nudges
+
+
+@app.get("/api/nudges")
+async def get_nudges():
+    """Aggregated nudges from all agents."""
+    return await _collect_nudges()
 
 
 # --- Google Calendar OAuth ---

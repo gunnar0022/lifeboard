@@ -1,0 +1,142 @@
+.weather-strip {
+  padding: var(--space-lg);
+}
+
+.weather-strip__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.weather-strip__location {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.weather-strip__loading {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+}
+
+.weather-strip__days {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+  scrollbar-width: none;
+}
+
+.weather-strip__days::-webkit-scrollbar {
+  display: none;
+}
+
+.weather-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  cursor: default;
+  min-width: 64px;
+  transition: all 0.15s;
+}
+
+.weather-day--today {
+  border-color: var(--border-medium);
+  cursor: pointer;
+}
+
+.weather-day--today:hover {
+  border-color: var(--text-muted);
+}
+
+.weather-day--expanded {
+  border-color: var(--color-life-manager, #F97066);
+}
+
+.weather-day__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.weather-day--today .weather-day__label {
+  color: var(--text-primary);
+}
+
+.weather-day__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.weather-day__temps {
+  display: flex;
+  gap: 4px;
+  font-size: 0.75rem;
+}
+
+.weather-day__hi {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.weather-day__lo {
+  color: var(--text-muted);
+}
+
+/* Hourly detail */
+.weather-hourly {
+  overflow: hidden;
+  margin-top: var(--space-sm);
+}
+
+.weather-hourly__scroll {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  padding: var(--space-sm) 0;
+  scrollbar-width: none;
+}
+
+.weather-hourly__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.weather-hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  min-width: 48px;
+}
+
+.weather-hour__time {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.weather-hour__icon {
+  font-size: 1rem;
+}
+
+.weather-hour__temp {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.weather-hour__precip {
+  font-size: 0.625rem;
+  color: #3b82f6;
+  font-weight: 600;
+}
