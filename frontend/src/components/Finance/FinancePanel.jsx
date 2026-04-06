@@ -164,6 +164,7 @@ export default function FinancePanel() {
         <BudgetBars
           budgetStatus={budgetStatus}
           currencySymbol={currencySymbol}
+          onRefresh={refetchAll}
         />
       </motion.div>
 

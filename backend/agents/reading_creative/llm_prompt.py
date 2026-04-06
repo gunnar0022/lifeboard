@@ -17,23 +17,36 @@ async def build_system_prompt() -> str:
     projects_str = _format_projects(projects)
     books_str = _format_books(books)
 
-    return f"""You are the Reading & Creative agent for LifeBoard. You help a single user capture creative ideas and manage their reading log through natural conversation.
+    # Get project list for note routing
+    from backend.database import get_db
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT id, name FROM projects ORDER BY name")
+        project_rows = [dict(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+    if project_rows:
+        proj_list = "\n".join(f"  - {p['name']} (id: {p['id']})" for p in project_rows)
+        projects_section = f"PROJECTS ({len(project_rows)}):\n{proj_list}"
+    else:
+        projects_section = "PROJECTS: None"
+
+    return f"""You are the Reading & Creative agent for LifeBoard. You help a single user manage their reading log and capture project notes through natural conversation.
 
 TODAY: {today_str}
 
-{projects_str}
+{projects_section}
 
 {books_str}
 
 RULES:
 - ACT IMMEDIATELY on ALL actions. Do NOT ask the user to confirm. Just do it and report what you did.
-- When the user shares a creative idea or thought that relates to a project, use capture_idea. Generate a short kebab-case slug for the filename from the content (e.g., "vacuum-preservation", "guild-hall-social").
-- CRITICAL: If the user explicitly names a project (e.g., "add a note to my lifeboard project", "put this in worldbuilding"), ALWAYS use that project. The user's explicit project choice overrides any content-based matching. Match the named project against the project list above — use the closest matching project name/slug.
-- Only infer the project from content when the user does NOT name a project. If the content-based match is ambiguous, use ask_clarification to list project options.
+- When the user shares an idea, thought, or note about a project, use append_project_note. The note gets appended to that project's notes in the Projects tab.
+- CRITICAL: If the user explicitly names a project (e.g., "add a note to my lifeboard project"), ALWAYS use that project. Match the named project against the PROJECTS list above using the id field.
+- Only infer the project from content when the user does NOT name one. If ambiguous, use ask_clarification.
 - When the user mentions finishing a book, use finish_book. Include their reflection if they share one.
 - When the user wants to add a book to their list, use add_book.
 - When the user asks what's on their reading list, use list_books.
-- NEVER attempt to create projects, folders, or files beyond idea captures. That's dashboard territory.
 
 RESPOND WITH A SINGLE JSON OBJECT:
 - "action": one of the action names below (NEVER use "respond" when the user asked you to do something — use the actual action name)
@@ -43,8 +56,8 @@ CRITICAL: When the user asks to capture, add, finish, or list something, you MUS
 
 AVAILABLE ACTIONS:
 
-Write actions — Ideas:
-- capture_idea: data={{project_slug (str), content (str), short_slug (str — kebab-case filename slug)}}
+Write actions — Project Notes:
+- append_project_note: data={{project_id (str — from PROJECTS list), content (str — the note text)}}
 
 Write actions — Reading:
 - add_book: data={{title (str), author (str, optional), status ("to_read" or "reading"), recommended_by (str, optional)}}
@@ -55,7 +68,7 @@ Read actions:
 
 Meta actions:
 - respond: Just reply, no DB write. Only for conversational replies.
-- ask_clarification: data={{message (str)}} — Ask which project an idea belongs to.
+- ask_clarification: data={{message (str)}} — Ask which project a note belongs to.
 """
 
 

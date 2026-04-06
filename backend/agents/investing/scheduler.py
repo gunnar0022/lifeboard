@@ -252,14 +252,15 @@ async def run_price_refresh():
     breakdown = {}
 
     for h in refreshed_holdings:
-        market_value = h["market_value"]
-        # Convert to primary currency
-        # fx_rates gives "how many primary per 1 foreign unit" but market_value
-        # is in smallest unit (cents for USD per LM-06). Divide by 100 for USD.
+        market_value = h["market_value"]  # in smallest unit (cents for USD, yen for JPY)
         rate = fx_rates.get(h["currency"], 1.0)
-        if h["currency"] != primary_currency and h["currency"] in ("USD", "EUR", "GBP"):
-            rate = rate / 100  # convert from cents to whole units before FX
-        converted_value = int(market_value * rate)
+
+        # Convert from smallest unit to whole currency, apply FX, then to primary smallest unit
+        if h["currency"] == "JPY":
+            converted_value = int(market_value * rate)  # already in yen
+        else:
+            # USD/EUR/GBP: market_value is in cents, rate is "JPY per 1 whole unit"
+            converted_value = int((market_value / 100) * rate)
         total_value += converted_value
 
         cls = h["asset_class"]

@@ -30,10 +30,17 @@ class ProjectUpdate(BaseModel):
     stage: Optional[str] = None
     card_html: Optional[str] = None
     context_bucket: Optional[dict] = None
+    notes: Optional[str] = None
     sort_order: Optional[int] = None
 
 class StageUpdate(BaseModel):
     stage: str
+
+class NotesUpdate(BaseModel):
+    notes: str
+
+class NotesAppend(BaseModel):
+    content: str
 
 
 # --- Endpoints ---
@@ -143,6 +150,8 @@ async def update_project(project_id: str, body: ProjectUpdate):
             updates["card_html"] = body.card_html
         if body.context_bucket is not None:
             updates["context_bucket"] = json.dumps(body.context_bucket)
+        if body.notes is not None:
+            updates["notes"] = body.notes
         if body.sort_order is not None:
             updates["sort_order"] = body.sort_order
 
@@ -175,6 +184,60 @@ async def update_stage(project_id: str, body: StageUpdate):
         )
         await db.commit()
         return {"ok": True, "stage": body.stage}
+    finally:
+        await db.close()
+
+
+@router.get("/{project_id}/notes")
+async def get_notes(project_id: str):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT notes FROM projects WHERE id = ?", (project_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Project not found")
+        return {"notes": row["notes"] or ""}
+    finally:
+        await db.close()
+
+
+@router.put("/{project_id}/notes")
+async def replace_notes(project_id: str, body: NotesUpdate):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT id FROM projects WHERE id = ?", (project_id,))
+        if not await cursor.fetchone():
+            raise HTTPException(404, "Project not found")
+        await db.execute(
+            "UPDATE projects SET notes = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%S', 'now') WHERE id = ?",
+            (body.notes, project_id),
+        )
+        await db.commit()
+        return {"ok": True}
+    finally:
+        await db.close()
+
+
+@router.post("/{project_id}/notes/append")
+async def append_notes(project_id: str, body: NotesAppend):
+    """Append a timestamped entry to a project's notes."""
+    from datetime import datetime
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT notes FROM projects WHERE id = ?", (project_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Project not found")
+        existing = row["notes"] or ""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        entry = f"\n[{timestamp}] {body.content}"
+        updated = existing + entry
+        await db.execute(
+            "UPDATE projects SET notes = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%S', 'now') WHERE id = ?",
+            (updated.strip(), project_id),
+        )
+        await db.commit()
+        return {"ok": True}
     finally:
         await db.close()
 

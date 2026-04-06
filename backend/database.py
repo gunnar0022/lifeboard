@@ -472,6 +472,7 @@ async def _create_projects_table(db: aiosqlite.Connection):
             stage TEXT NOT NULL DEFAULT 'scaffolding' CHECK(stage IN ('working_on', 'mostly_polished', 'scaffolding')),
             card_html TEXT,
             context_bucket TEXT,
+            notes TEXT NOT NULL DEFAULT '',
             sort_order INTEGER DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
             updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))

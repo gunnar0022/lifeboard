@@ -170,3 +170,97 @@
   color: var(--text-primary);
   background: color-mix(in srgb, var(--text-muted) 16%, transparent);
 }
+
+/* Fallback card */
+.project-card__fallback {
+  padding: var(--space-xl);
+  text-align: center;
+  background: var(--bg-secondary);
+}
+
+/* Notes toggle and editor */
+.project-card__notes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  background: color-mix(in srgb, var(--text-muted) 8%, transparent);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.15s;
+}
+
+.project-card__notes-toggle:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+}
+
+.project-card__notes-dirty {
+  color: var(--color-alert);
+}
+
+.project-card__notes-saving {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.project-card__notes {
+  overflow: hidden;
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.project-card__notes-editor {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+.project-card__notes-editor:focus {
+  border-color: #EC4899;
+}
+
+/* Drag and drop */
+.project-card[draggable] {
+  cursor: grab;
+}
+
+.project-card[draggable]:active {
+  cursor: grabbing;
+}
+
+.projects-tier--drag-over {
+  background: color-mix(in srgb, #EC4899 6%, transparent);
+  border-radius: var(--radius-md);
+  transition: background 0.15s;
+}
+
+.projects-tier__empty-drop {
+  padding: var(--space-xl);
+  text-align: center;
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

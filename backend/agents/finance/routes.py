@@ -279,6 +279,20 @@ async def upsert_budget(body: BudgetSet):
     return await queries.set_budget(category=body.category, monthly_limit=body.monthly_limit)
 
 
+@router.delete("/budgets/{budget_id}")
+async def delete_budget(budget_id: int):
+    from backend.database import get_db
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM finance_budgets WHERE id = ?", (budget_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Budget not found")
+        return {"ok": True}
+    finally:
+        await db.close()
+
+
 # --- Aggregates ---
 
 @router.get("/cycle")

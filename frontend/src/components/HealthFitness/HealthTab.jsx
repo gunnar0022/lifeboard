@@ -5,6 +5,7 @@ import ProfileCard from '../Health/ProfileCard';
 import Heatmap from '../Health/Heatmap';
 import RecentDetail from '../Health/RecentDetail';
 import FoodDatabase from '../Health/FoodDatabase';
+import MealEntry from '../Health/MealEntry';
 import ConcernsTracker from '../Health/ConcernsTracker';
 import './HealthFitness.css';
 
@@ -56,6 +57,10 @@ export default function HealthTab() {
 
       <motion.div variants={fadeUp}>
         <RecentDetail days={recent || []} />
+      </motion.div>
+
+      <motion.div variants={fadeUp}>
+        <MealEntry onSuccess={() => { /* refetch handled by websocket */ }} />
       </motion.div>
 
       <motion.div variants={fadeUp}>

@@ -17,52 +17,54 @@ function getColor(day) {
   const hasMood = day.mood != null;
   const hasAnyData = cal > 0 || exMin > 0 || hasMood;
 
-  // No data at all — skeleton
   if (!hasAnyData) {
     return { bg: 'var(--bg-skeleton)', text: 'var(--text-tertiary)' };
   }
 
   const goal = day.calorie_goal || 2000;
 
-  // Saturation based on exercise intensity
-  let sat;
-  if (exMin === 0) sat = 15;
-  else if (exMin < 30) sat = 40;
-  else if (exMin <= 60) sat = 65;
-  else sat = 90;
+  // Exercise dramatically boosts saturation and vividness
+  const exFactor = Math.min(exMin / 60, 1); // 0-1 scale, capped at 60min
+  const baseSat = 30;
+  const sat = baseSat + exFactor * 65; // 30% base → 95% with 60+ min exercise
 
-  // If only mood/exercise data (no calories), use a neutral warm tone
+  // Mood-only or exercise-only (no calories)
   if (cal === 0) {
-    const hue = exMin > 0 ? 142 : 200; // green if exercised, blue-gray if mood only
+    const hue = exMin > 0 ? 150 : 210;
     return {
-      bg: `hsl(${hue}, ${sat}%, 55%)`,
-      text: 'rgba(255,255,255,0.85)',
+      bg: `hsl(${hue}, ${sat}%, 50%)`,
+      text: 'rgba(255,255,255,0.9)',
     };
   }
 
-  const ratio = cal / goal;
-
-  // Hue based on calorie adherence
-  let hue, lightness;
-  if (ratio < 0.8) {
-    // Under — amber/yellow
-    hue = 45;
-    lightness = 55 - (0.8 - ratio) * 20;
-  } else if (ratio <= 1.2) {
-    // On target — green
-    hue = 142;
-    lightness = 50;
+  // Smooth gradient hue based on calorie ratio
+  // Under (0.5) = warm amber 40° → on target (1.0) = green 145° → over (1.5+) = cool blue 220°
+  const ratio = Math.max(0.3, Math.min(1.8, cal / goal));
+  let hue;
+  if (ratio <= 1.0) {
+    // Amber (40) → Green (145), interpolated smoothly
+    const t = (ratio - 0.3) / 0.7; // 0 at ratio 0.3, 1 at ratio 1.0
+    hue = 40 + t * 105;
   } else {
-    // Over — blue
-    hue = 220;
-    lightness = 50 + (ratio - 1.2) * 15;
+    // Green (145) → Blue (220), interpolated smoothly
+    const t = Math.min((ratio - 1.0) / 0.5, 1); // 0 at ratio 1.0, 1 at ratio 1.5
+    hue = 145 + t * 75;
   }
 
-  lightness = Math.max(30, Math.min(70, lightness));
+  // Lightness: slightly darker when closer to target, lighter at extremes
+  const deviation = Math.abs(ratio - 1.0);
+  let lightness = 48 - deviation * 8;
+  lightness = Math.max(35, Math.min(58, lightness));
+
+  // Exercise makes it pop — lower lightness = richer color
+  if (exMin > 0) {
+    lightness -= exFactor * 8;
+    lightness = Math.max(30, lightness);
+  }
 
   return {
-    bg: `hsl(${hue}, ${sat}%, ${lightness}%)`,
-    text: lightness < 50 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.6)',
+    bg: `hsl(${Math.round(hue)}, ${Math.round(sat)}%, ${Math.round(lightness)}%)`,
+    text: lightness < 45 ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)',
   };
 }
 

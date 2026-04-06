@@ -151,7 +151,7 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
     );
   }
 
-  const currentTheme = local.theme || 'dark';
+  const currentTheme = local.theme || localStorage.getItem('lifeboard-theme') || 'dark';
 
   return (
     <div className="settings">

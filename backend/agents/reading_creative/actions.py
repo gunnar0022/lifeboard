@@ -1,17 +1,38 @@
 """
 Reading & Creative agent — ACTION_REGISTRY.
-Telegram actions: idea capture, reading log management.
+Telegram actions: project note appending, reading log management.
 """
 from backend.agents.reading_creative import queries
 
 
-async def handle_capture_idea(data: dict) -> dict:
-    short_slug = data.get("short_slug", "idea")
-    return await queries.capture_idea(
-        project_slug=data["project_slug"],
-        content=data["content"],
-        short_slug=short_slug,
-    )
+async def handle_append_project_note(data: dict) -> dict:
+    """Append a note to a project's notes field via the projects API."""
+    from datetime import datetime
+    from backend.database import get_db
+
+    project_id = data["project_id"]
+    content = data["content"]
+
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT notes FROM projects WHERE id = ?", (project_id,))
+        row = await cursor.fetchone()
+        if not row:
+            return {"error": f"Project '{project_id}' not found"}
+
+        existing = row["notes"] or ""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        entry = f"\n[{timestamp}] {content}"
+        updated = (existing + entry).strip()
+
+        await db.execute(
+            "UPDATE projects SET notes = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%S', 'now') WHERE id = ?",
+            (updated, project_id),
+        )
+        await db.commit()
+        return {"ok": True, "project_id": project_id}
+    finally:
+        await db.close()
 
 
 async def handle_add_book(data: dict) -> dict:
@@ -38,10 +59,9 @@ async def handle_list_books(data: dict) -> list:
 
 
 ACTION_REGISTRY = {
-    "capture_idea": {
-        "handler": handle_capture_idea,
-        "required": ["project_slug", "content"],
-        "optional": ["short_slug"],
+    "append_project_note": {
+        "handler": handle_append_project_note,
+        "required": ["project_id", "content"],
     },
     "add_book": {
         "handler": handle_add_book,

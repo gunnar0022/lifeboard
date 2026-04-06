@@ -21,9 +21,8 @@ function formatBalance(amount, currency, blurred) {
 function NetWorth({ byCurrency, fxRate, investingSnapshot, blurred }) {
   const [targetCurrency, setTargetCurrency] = useState('JPY');
 
-  if (!investingSnapshot || !investingSnapshot.total_value) return null;
   if (!byCurrency || byCurrency.length === 0) return null;
-  if (!fxRate) return null;
+  if (!investingSnapshot || !investingSnapshot.total_value) return null;
 
   // Calculate bank totals in target currency
   let bankTotal = 0;
@@ -70,21 +69,19 @@ function NetWorth({ byCurrency, fxRate, investingSnapshot, blurred }) {
 function CombinedTotal({ byCurrency, fxRate, blurred }) {
   const [targetCurrency, setTargetCurrency] = useState('JPY');
 
-  if (!fxRate || !byCurrency || byCurrency.length < 2) return null;
+  if (!byCurrency || byCurrency.length === 0) return null;
 
-  const jpyGroup = byCurrency.find(g => g.currency === 'JPY');
-  const usdGroup = byCurrency.find(g => g.currency === 'USD');
-  if (!jpyGroup || !usdGroup) return null;
-
-  let combined;
-  if (targetCurrency === 'JPY') {
-    // Convert USD (stored in cents) to JPY
-    const usdInJpy = Math.round((usdGroup.total / 100) * fxRate.usd_to_jpy);
-    combined = jpyGroup.total + usdInJpy;
-  } else {
-    // Convert JPY to USD cents
-    const jpyInUsdCents = Math.round(jpyGroup.total * fxRate.jpy_to_usd * 100);
-    combined = usdGroup.total + jpyInUsdCents;
+  let combined = 0;
+  for (const g of byCurrency) {
+    if (g.currency === targetCurrency) {
+      combined += g.total;
+    } else if (g.currency === 'USD' && targetCurrency === 'JPY' && fxRate) {
+      combined += Math.round((g.total / 100) * fxRate.usd_to_jpy);
+    } else if (g.currency === 'JPY' && targetCurrency === 'USD' && fxRate) {
+      combined += Math.round(g.total * fxRate.jpy_to_usd * 100);
+    } else {
+      combined += g.total; // fallback same-unit
+    }
   }
 
   return (
