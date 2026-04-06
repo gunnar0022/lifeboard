@@ -236,6 +236,43 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
         <h3 className="settings__section-title">Schedule</h3>
         <div className="settings__row">
           <div>
+            <span className="settings__label">Timezone</span>
+            <span className="settings__hint-inline">Used for schedulers, briefings, and weather</span>
+          </div>
+          <select
+            className="settings__select"
+            value={local.timezone || 'Asia/Tokyo'}
+            onChange={e => update('timezone', e.target.value)}
+          >
+            <optgroup label="Japan">
+              <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="America/New_York">America/New_York (EST)</option>
+              <option value="America/Chicago">America/Chicago (CST)</option>
+              <option value="America/Denver">America/Denver (MST)</option>
+              <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+              <option value="America/Anchorage">America/Anchorage (AKST)</option>
+              <option value="Pacific/Honolulu">Pacific/Honolulu (HST)</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="Europe/London">Europe/London (GMT)</option>
+              <option value="Europe/Paris">Europe/Paris (CET)</option>
+              <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+            </optgroup>
+            <optgroup label="Asia-Pacific">
+              <option value="Asia/Seoul">Asia/Seoul (KST)</option>
+              <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+              <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+              <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="UTC">UTC</option>
+            </optgroup>
+          </select>
+        </div>
+        <div className="settings__row">
+          <div>
             <span className="settings__label">Pay cycle day</span>
             <span className="settings__hint-inline">Day of month your pay cycle starts</span>
           </div>

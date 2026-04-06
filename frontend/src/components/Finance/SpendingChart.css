@@ -75,3 +75,15 @@
   font-weight: 600;
   color: var(--text-primary);
 }
+
+.legend-item--clickable {
+  cursor: pointer;
+  padding: 4px var(--space-sm);
+  margin: -4px calc(-1 * var(--space-sm));
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.legend-item--clickable:hover {
+  background: var(--bg-secondary);
+}

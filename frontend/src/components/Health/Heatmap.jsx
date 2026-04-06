@@ -367,23 +367,29 @@ export default function Heatmap({ data }) {
         </svg>
       </div>
 
-      {/* Legend */}
+      {/* Legend — uses actual ramp samples with 0.85x multiplier for visibility */}
       <div className="heatmap__legend">
         <div className="heatmap__legend-section">
           <span className="heatmap__legend-label">Calories:</span>
-          <span className="heatmap__legend-swatch" style={{ background: 'hsl(45, 50%, 55%)' }} />
-          <span className="heatmap__legend-text">Under</span>
-          <span className="heatmap__legend-swatch" style={{ background: 'hsl(142, 50%, 50%)' }} />
-          <span className="heatmap__legend-text">On target</span>
-          <span className="heatmap__legend-swatch" style={{ background: 'hsl(220, 50%, 50%)' }} />
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[3].map(c => Math.round(c * 0.85))})` }} />
+          <span className="heatmap__legend-text">Low</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[7].map(c => Math.round(c * 0.85))})` }} />
+          <span className="heatmap__legend-text">Half</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[14].map(c => Math.round(c * 0.85))})` }} />
+          <span className="heatmap__legend-text">Target</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[21].map(c => Math.round(c * 0.85))})` }} />
           <span className="heatmap__legend-text">Over</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[28].map(c => Math.round(c * 0.85))})` }} />
+          <span className="heatmap__legend-text">High</span>
         </div>
         <div className="heatmap__legend-section">
           <span className="heatmap__legend-label">Exercise:</span>
-          <span className="heatmap__legend-swatch" style={{ background: 'hsl(142, 15%, 50%)' }} />
-          <span className="heatmap__legend-text">Rest</span>
-          <span className="heatmap__legend-swatch" style={{ background: 'hsl(142, 90%, 50%)' }} />
-          <span className="heatmap__legend-text">Active</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[14].map(c => Math.round(c * 0.7))})` }} />
+          <span className="heatmap__legend-text">None</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[14].map(c => Math.round(c * 0.85))})` }} />
+          <span className="heatmap__legend-text">Light</span>
+          <span className="heatmap__legend-swatch" style={{ background: `rgb(${COLOR_RAMP[14]})` }} />
+          <span className="heatmap__legend-text">Heavy</span>
         </div>
       </div>
 

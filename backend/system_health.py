@@ -245,6 +245,15 @@ async def weather():
     }
 
 
+@router.post("/api/weather/refresh")
+async def weather_refresh():
+    """Force re-fetch weather data (e.g., after location change)."""
+    from backend.schedulers import fetch_weather
+    await fetch_weather("week_daily")
+    await fetch_weather("today_hourly")
+    return {"ok": True}
+
+
 @router.get("/api/system-health")
 async def system_health():
     now = datetime.now(timezone.utc).isoformat()

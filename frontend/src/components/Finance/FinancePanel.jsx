@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import AccountsStrip from './AccountsStrip';
@@ -10,6 +10,7 @@ import BudgetBars from './BudgetBars';
 import InsightsSection from './InsightsSection';
 import TransactionList from './TransactionList';
 import TransactionHistory from './TransactionHistory';
+import TransactionFilter from './TransactionFilter';
 import QuickAddForm from './QuickAddForm';
 import RecurringManager from './RecurringManager';
 import './FinancePanel.css';
@@ -48,6 +49,8 @@ export default function FinancePanel() {
     refetchTransfers();
     refetchRecurring();
   }, [refetchAccounts, refetchOverview, refetchCycle, refetchBudget, refetchSpending, refetchTxns, refetchTransfers, refetchRecurring]);
+
+  const [filter, setFilter] = useState(null); // {type: 'account'|'category', value, label}
 
   const hasAccounts = accounts && accounts.length > 0;
   // Determine display currency from accounts (most common), falling back to config
@@ -135,6 +138,7 @@ export default function FinancePanel() {
           onRefresh={refetchAll}
           accounts={accounts}
           categories={categories || []}
+          onAccountClick={(acc) => setFilter({ type: 'account', value: String(acc.id), label: acc.name })}
         />
       </motion.div>
 
@@ -153,6 +157,7 @@ export default function FinancePanel() {
         <SpendingChart
           spending={spending}
           currencySymbol={currencySymbol}
+          onCategoryClick={(cat) => setFilter({ type: 'category', value: cat, label: cat })}
         />
         <CycleTrend
           trend={trend}
@@ -165,6 +170,7 @@ export default function FinancePanel() {
           budgetStatus={budgetStatus}
           currencySymbol={currencySymbol}
           onRefresh={refetchAll}
+          onCategoryClick={(cat) => setFilter({ type: 'category', value: cat, label: cat })}
         />
       </motion.div>
 
@@ -204,6 +210,18 @@ export default function FinancePanel() {
       <motion.div variants={fadeUp}>
         <TransactionHistory currency={currency} currencySymbol={currencySymbol} />
       </motion.div>
+
+      <AnimatePresence>
+        {filter && (
+          <TransactionFilter
+            filterType={filter.type}
+            filterValue={filter.value}
+            filterLabel={filter.label}
+            currency={currency}
+            onClose={() => setFilter(null)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -7,7 +7,7 @@ const COLORS = [
   '#6366F1', '#84CC16', '#F97316', '#06B6D4',
 ];
 
-export default function SpendingChart({ spending, currencySymbol }) {
+export default function SpendingChart({ spending, currencySymbol, onCategoryClick }) {
   const categories = spending?.[0]?.categories || [];
 
   if (categories.length === 0) {
@@ -67,7 +67,11 @@ export default function SpendingChart({ spending, currencySymbol }) {
       </div>
       <div className="spending-chart__legend">
         {data.map((d, i) => (
-          <div key={d.name} className="legend-item">
+          <div
+            key={d.name}
+            className={`legend-item ${onCategoryClick ? 'legend-item--clickable' : ''}`}
+            onClick={() => onCategoryClick?.(d.name)}
+          >
             <span className="legend-dot" style={{ background: COLORS[i % COLORS.length] }} />
             <span className="legend-label">{d.name}</span>
             <span className="legend-value mono">{currencySymbol}{d.value.toLocaleString()}</span>

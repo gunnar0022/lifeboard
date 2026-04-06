@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
+import { apiPut } from '../../hooks/useApi';
 import './WeatherStrip.css';
 
 const WEATHER_ICONS = {
@@ -10,6 +12,12 @@ const WEATHER_ICONS = {
   '80': '🌧️', '81': '🌧️', '82': '🌧️',
   '71': '🌨️', '73': '🌨️', '75': '🌨️', '77': '🌨️', '85': '🌨️', '86': '🌨️',
   '95': '⛈️', '96': '⛈️', '99': '⛈️',
+};
+
+const LOCATIONS = {
+  oyama: 'Oyama, Tochigi',
+  yurihonjo: 'Yurihonjo, Akita',
+  tokyo: 'Tokyo',
 };
 
 function getIcon(code) {
@@ -30,8 +38,10 @@ export default function WeatherStrip() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [todayExpanded, setTodayExpanded] = useState(false);
+  const [activeLocation, setActiveLocation] = useState('oyama');
 
-  useEffect(() => {
+  const fetchWeather = () => {
+    setLoading(true);
     fetch('/api/weather')
       .then(r => {
         if (!r.ok) throw new Error('not ok');
@@ -39,7 +49,28 @@ export default function WeatherStrip() {
       })
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    // Load current location from settings
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(s => { if (s.weather_location) setActiveLocation(s.weather_location); })
+      .catch(() => {});
+    fetchWeather();
   }, []);
+
+  const handleLocationChange = async (key) => {
+    setActiveLocation(key);
+    try {
+      await apiPut('/api/settings', { weather_location: key });
+      // Trigger a re-fetch of weather with new location
+      await fetch('/api/weather/refresh', { method: 'POST' });
+      setTimeout(fetchWeather, 1000); // Give backend time to fetch
+    } catch (e) {
+      console.error('Failed to change location:', e);
+    }
+  };
 
   if (loading || !data?.weekly?.daily) {
     return (
@@ -59,17 +90,25 @@ export default function WeatherStrip() {
   const { weekly, hourly } = data;
   const daily = weekly.daily;
   const dates = daily.time || [];
-  const location = weekly._location || '';
-  const stale = weekly._fetched_at;
-
-  // Hourly data for today
+  const location = weekly._location || LOCATIONS[activeLocation] || '';
   const todayHourly = hourly?.hourly;
 
   return (
     <div className="weather-strip card">
       <div className="weather-strip__header">
         <span className="chart-title">Weather</span>
-        <span className="weather-strip__location">{location}</span>
+        <div className="weather-strip__location-select">
+          <MapPin size={12} />
+          <select
+            value={activeLocation}
+            onChange={(e) => handleLocationChange(e.target.value)}
+            className="weather-strip__location-dropdown"
+          >
+            {Object.entries(LOCATIONS).map(([key, name]) => (
+              <option key={key} value={key}>{name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="weather-strip__days">
@@ -99,7 +138,6 @@ export default function WeatherStrip() {
         })}
       </div>
 
-      {/* Today's hourly detail */}
       {todayExpanded && todayHourly && (
         <motion.div
           className="weather-hourly"
@@ -113,7 +151,6 @@ export default function WeatherStrip() {
               const temp = todayHourly.temperature_2m?.[i];
               const code = todayHourly.weathercode?.[i] ?? 0;
               const precip = todayHourly.precipitation_probability?.[i] ?? 0;
-              // Only show daylight hours (6-22)
               const h = parseInt(hour);
               if (h < 6 || h > 22) return null;
               return (

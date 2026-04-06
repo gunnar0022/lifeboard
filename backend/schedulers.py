@@ -102,6 +102,11 @@ async def _fx_loop():
 # ──────────────────────── Weather ────────────────────────
 
 def _get_active_location() -> dict:
+    config = get_config()
+    active_key = config.get("weather_location", None)
+    if active_key and active_key in LOCATIONS:
+        return {"key": active_key, **LOCATIONS[active_key]}
+    # Fallback to hardcoded active flag
     for key, loc in LOCATIONS.items():
         if loc.get("active"):
             return {"key": key, **loc}

@@ -4,7 +4,7 @@ import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
 import { useApi, apiPost, apiDelete } from '../../hooks/useApi';
 import './BudgetBars.css';
 
-export default function BudgetBars({ budgetStatus, currencySymbol, onRefresh }) {
+export default function BudgetBars({ budgetStatus, currencySymbol, onRefresh, onCategoryClick }) {
   const { data: budgets, refetch: refetchBudgets } = useApi('/api/finance/budgets');
   const { data: availableCategories } = useApi('/api/finance/categories');
   const [showAdd, setShowAdd] = useState(false);
@@ -146,7 +146,10 @@ export default function BudgetBars({ budgetStatus, currencySymbol, onRefresh }) 
           return (
             <div key={cat.category} className="budget-bar-item">
               <div className="budget-bar-item__header">
-                <span className="budget-bar-item__name">{cat.category}</span>
+                <span
+                  className={`budget-bar-item__name ${onCategoryClick ? 'budget-bar-item__name--clickable' : ''}`}
+                  onClick={() => onCategoryClick?.(cat.category)}
+                >{cat.category}</span>
                 {isEditing ? (
                   <div className="budget-bar-item__edit-row">
                     <input

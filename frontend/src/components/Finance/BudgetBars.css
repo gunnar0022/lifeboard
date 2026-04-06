@@ -192,3 +192,13 @@
 .budget-bar-item__edit-row .budget-bar-item__action {
   opacity: 1;
 }
+
+.budget-bar-item__name--clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.budget-bar-item__name--clickable:hover {
+  color: var(--color-finance);
+  text-decoration: underline;
+}

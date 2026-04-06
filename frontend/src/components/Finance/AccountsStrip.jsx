@@ -102,7 +102,7 @@ function CombinedTotal({ byCurrency, fxRate, blurred }) {
   );
 }
 
-export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories }) {
+export default function AccountsStrip({ overview, currency, currencySymbol, onRefresh, accounts, categories, onAccountClick }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [hiddenAccounts, setHiddenAccounts] = useState(new Set());
   const [initialized, setInitialized] = useState(false);
@@ -139,6 +139,8 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06, duration: 0.4 }}
+              onClick={() => onAccountClick?.(acc)}
+              style={{ cursor: onAccountClick ? 'pointer' : 'default' }}
             >
               <div className="account-card__icon">
                 <Icon size={18} />
@@ -151,7 +153,7 @@ export default function AccountsStrip({ overview, currency, currencySymbol, onRe
               </div>
               <button
                 className="account-card__eye"
-                onClick={() => toggleAccount(acc.id)}
+                onClick={(e) => { e.stopPropagation(); toggleAccount(acc.id); }}
                 title={isHidden ? 'Show' : 'Hide'}
               >
                 {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}

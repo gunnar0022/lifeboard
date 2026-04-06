@@ -481,6 +481,8 @@ async def get_settings():
         "theme": config.get("theme", "dark"),
         "panels": raw_panels,
         "pay_cycle_day": config.get("pay_cycle_day", 25),
+        "timezone": config.get("timezone", "Asia/Tokyo"),
+        "weather_location": config.get("weather_location", "oyama"),
         "evening_checkin_time": checkin_time,
     }
 
