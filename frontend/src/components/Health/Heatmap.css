@@ -234,6 +234,36 @@
   color: var(--text-muted);
 }
 
+.heatmap-detail__delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.heatmap-detail__item:hover .heatmap-detail__delete-btn {
+  opacity: 1;
+}
+
+.heatmap-detail__delete-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-alert);
+}
+
+.heatmap-detail__delete-btn:disabled {
+  opacity: 0.3;
+}
+
 .heatmap-detail__loading,
 .heatmap-detail__empty {
   text-align: center;

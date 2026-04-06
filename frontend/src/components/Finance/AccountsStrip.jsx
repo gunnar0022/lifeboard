@@ -23,6 +23,7 @@ function NetWorth({ byCurrency, fxRate, investingSnapshot, blurred }) {
 
   if (!byCurrency || byCurrency.length === 0) return null;
   if (!investingSnapshot || !investingSnapshot.total_value) return null;
+  if (!fxRate) return null;
 
   // Calculate bank totals in target currency
   let bankTotal = 0;

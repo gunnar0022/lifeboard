@@ -1,10 +1,24 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Utensils, Dumbbell, Smile, Zap } from 'lucide-react';
+import { ChevronDown, Utensils, Dumbbell, Smile, Zap, Trash2 } from 'lucide-react';
+import { apiDelete } from '../../hooks/useApi';
 import './RecentDetail.css';
 
-export default function RecentDetail({ days }) {
+export default function RecentDetail({ days, onRefresh }) {
   const [expanded, setExpanded] = useState(days?.[0]?.date || null);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleDeleteMeal = async (mealId) => {
+    setDeletingId(mealId);
+    try {
+      await apiDelete(`/api/health_body/meals/${mealId}`);
+      onRefresh?.();
+    } catch (e) {
+      console.error('Failed to delete meal:', e);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (!days || days.length === 0) {
     return (
@@ -92,6 +106,14 @@ export default function RecentDetail({ days }) {
                                 P:{m.protein_g}g C:{m.carbs_g}g F:{m.fat_g}g
                               </span>
                             </span>
+                            <button
+                              className="recent-detail__delete-btn"
+                              onClick={(e) => { e.stopPropagation(); handleDeleteMeal(m.id); }}
+                              disabled={deletingId === m.id}
+                              title="Delete meal"
+                            >
+                              <Trash2 size={12} />
+                            </button>
                           </div>
                         ))}
                       </div>

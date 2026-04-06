@@ -18,7 +18,7 @@ const fadeUp = {
 export default function HealthTab() {
   const { data: profile, loading } = useApi('/api/health_body/profile', { panelKey: 'health' });
   const { data: heatmap } = useApi('/api/health_body/heatmap?days=90', { panelKey: 'health' });
-  const { data: recent } = useApi('/api/health_body/recent', { panelKey: 'health' });
+  const { data: recent, refetch: refetchRecent } = useApi('/api/health_body/recent', { panelKey: 'health' });
   const { data: concerns } = useApi('/api/health_body/concerns', { panelKey: 'health' });
 
   if (loading) {
@@ -56,7 +56,7 @@ export default function HealthTab() {
       </motion.div>
 
       <motion.div variants={fadeUp}>
-        <RecentDetail days={recent || []} />
+        <RecentDetail days={recent || []} onRefresh={refetchRecent} />
       </motion.div>
 
       <motion.div variants={fadeUp}>

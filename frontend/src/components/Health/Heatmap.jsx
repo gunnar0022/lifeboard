@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Utensils, Dumbbell } from 'lucide-react';
+import { X, Utensils, Dumbbell, Trash2 } from 'lucide-react';
+import { apiDelete } from '../../hooks/useApi';
 import './Heatmap.css';
 
 const CELL_SIZE = 15;
@@ -76,14 +77,29 @@ function formatDate(dateStr) {
 function DayDetailModal({ date, onClose }) {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
-  useEffect(() => {
+  const fetchDetail = () => {
     setLoading(true);
     fetch(`/api/health_body/day/${date}`)
       .then(r => r.json())
       .then(d => { setDetail(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [date]);
+  };
+
+  useEffect(() => { fetchDetail(); }, [date]);
+
+  const handleDeleteMeal = async (mealId) => {
+    setDeletingId(mealId);
+    try {
+      await apiDelete(`/api/health_body/meals/${mealId}`);
+      fetchDetail();
+    } catch (e) {
+      console.error('Failed to delete meal:', e);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <motion.div
@@ -128,6 +144,14 @@ function DayDetailModal({ date, onClose }) {
                     <div className="heatmap-detail__item-main">
                       {m.time && <span className="heatmap-detail__time">{m.time}</span>}
                       <span className="heatmap-detail__desc">{m.description}</span>
+                      <button
+                        className="heatmap-detail__delete-btn"
+                        onClick={() => handleDeleteMeal(m.id)}
+                        disabled={deletingId === m.id}
+                        title="Delete meal"
+                      >
+                        <Trash2 size={12} />
+                      </button>
                     </div>
                     <div className="heatmap-detail__item-meta">
                       <span className="heatmap-detail__cal">{m.calories} kcal</span>
