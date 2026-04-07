@@ -17,62 +17,57 @@ from backend.agents.investing import queries
 
 logger = logging.getLogger(__name__)
 
-_price_refresh_task: asyncio.Task | None = None
+_noon_task: asyncio.Task | None = None
+_evening_task: asyncio.Task | None = None
+
+# Track daily portfolio values for averaging
+_daily_values: dict = {}  # {"2026-04-07": [value1, value2], ...}
 
 
 async def start_scheduler():
-    """Start the daily price refresh background task."""
-    global _price_refresh_task
-    _price_refresh_task = asyncio.create_task(_daily_price_refresh_loop())
-    logger.info("Investing price refresh scheduler started")
+    """Start noon and evening price refresh tasks."""
+    global _noon_task, _evening_task
+    _noon_task = asyncio.create_task(_price_refresh_loop(12, 3, "noon"))
+    _evening_task = asyncio.create_task(_price_refresh_loop(18, 0, "evening"))
+    logger.info("Investing price refresh scheduler started (noon + evening)")
 
 
 async def stop_scheduler():
-    """Stop the daily price refresh background task."""
-    global _price_refresh_task
-    if _price_refresh_task and not _price_refresh_task.done():
-        _price_refresh_task.cancel()
-        try:
-            await _price_refresh_task
-        except asyncio.CancelledError:
-            pass
-    _price_refresh_task = None
+    """Stop both price refresh tasks."""
+    global _noon_task, _evening_task
+    for task in [_noon_task, _evening_task]:
+        if task and not task.done():
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+    _noon_task = _evening_task = None
     logger.info("Investing scheduler stopped")
 
 
-async def _daily_price_refresh_loop():
-    """Run price refresh daily at 18:00 in user's timezone."""
+async def _price_refresh_loop(hour: int, minute: int, label: str):
+    """Run price refresh at the specified hour daily."""
+    from datetime import timedelta
     config = get_config()
-    tz_name = config.get("timezone", "UTC")
-    tz = ZoneInfo(tz_name)
-    target_hour = 18
-    target_minute = 0
+    tz = ZoneInfo(config.get("timezone", "Asia/Tokyo"))
 
     while True:
         try:
             now = datetime.now(tz)
-            target = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
-            if now >= target:
-                # Already past target time today, schedule for tomorrow
-                target = target.replace(day=target.day + 1)
-                # Handle month rollover
-                try:
-                    target = target.replace(day=target.day)
-                except ValueError:
-                    # Month rollover — use timedelta
-                    from datetime import timedelta
-                    target = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0) + timedelta(days=1)
+            target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if target <= now:
+                target += timedelta(days=1)
 
             wait_seconds = (target - now).total_seconds()
-            logger.info(f"Next price refresh in {wait_seconds/3600:.1f}h at {target}")
+            logger.info(f"Next {label} price refresh in {wait_seconds/3600:.1f}h")
             await asyncio.sleep(wait_seconds)
 
             await run_price_refresh()
         except asyncio.CancelledError:
             break
         except Exception as e:
-            logger.error(f"Price refresh loop error: {e}")
-            # Wait 1 hour before retrying on error
+            logger.error(f"Price refresh loop ({label}) error: {e}")
             await asyncio.sleep(3600)
 
 
@@ -257,7 +252,7 @@ async def run_price_refresh():
 
     logger.info(f"Updated prices for {updated_count}/{len(holdings)} holdings")
 
-    # Build and store portfolio snapshot
+    # Build portfolio value for snapshot
     refreshed_holdings = await queries.get_holdings()
     if not refreshed_holdings:
         return
@@ -281,8 +276,34 @@ async def run_price_refresh():
         breakdown[cls] = breakdown.get(cls, 0) + converted_value
 
     today_str = get_today().isoformat()
-    await queries.store_portfolio_snapshot(today_str, total_value, primary_currency, breakdown)
-    logger.info(f"Portfolio snapshot stored: {primary_currency} {total_value:,} on {today_str}")
+
+    # Track this check's value for daily averaging
+    if today_str not in _daily_values:
+        _daily_values[today_str] = []
+    _daily_values[today_str].append({"total": total_value, "breakdown": dict(breakdown)})
+
+    # Average all checks for today
+    checks = _daily_values[today_str]
+    if len(checks) > 1:
+        avg_total = int(sum(c["total"] for c in checks) / len(checks))
+        avg_breakdown = {}
+        for cls_key in breakdown:
+            avg_breakdown[cls_key] = int(sum(c["breakdown"].get(cls_key, 0) for c in checks) / len(checks))
+        snapshot_total = avg_total
+        snapshot_breakdown = avg_breakdown
+        logger.info(f"Portfolio snapshot averaged from {len(checks)} checks: {primary_currency} {snapshot_total:,}")
+    else:
+        snapshot_total = total_value
+        snapshot_breakdown = breakdown
+        logger.info(f"Portfolio snapshot (first check): {primary_currency} {snapshot_total:,}")
+
+    await queries.store_portfolio_snapshot(today_str, snapshot_total, primary_currency, snapshot_breakdown)
+    logger.info(f"Portfolio snapshot stored for {today_str}")
+
+    # Clean old daily values (keep only today)
+    for k in list(_daily_values.keys()):
+        if k != today_str:
+            del _daily_values[k]
 
     try:
         from backend.ws_manager import manager
