@@ -102,10 +102,24 @@ async def _fetch_exchange_rates(currencies: set[str], primary_currency: str) -> 
                 if rate > 0:
                     rates[cur] = 1.0 / rate  # How many primary per 1 foreign
     except Exception as e:
-        logger.warning(f"Exchange rate fetch failed: {e}")
-        # Fallback: assume 1:1 if we can't get rates
-        for cur in needed:
-            rates[cur] = 1.0
+        logger.warning(f"Exchange rate fetch failed, trying cached rate: {e}")
+        # Fallback: use cached rate from exchange_rates table
+        try:
+            from backend.schedulers import get_cached_fx_rate
+            cached = await get_cached_fx_rate()
+            if cached and cached.get("usd_to_jpy"):
+                # We need "how many primary (JPY) per 1 foreign (USD)"
+                if primary_currency == "JPY" and "USD" in needed:
+                    rates["USD"] = cached["usd_to_jpy"]
+                elif primary_currency == "USD" and "JPY" in needed:
+                    rates["JPY"] = cached["jpy_to_usd"]
+                logger.info(f"Using cached FX rate: {rates}")
+            else:
+                for cur in needed:
+                    rates[cur] = 1.0
+        except Exception:
+            for cur in needed:
+                rates[cur] = 1.0
 
     return rates
 
