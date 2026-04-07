@@ -1,7 +1,7 @@
 """Investing agent — FastAPI routes."""
 import logging
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from backend.agents.investing import queries
 from backend.config import get_config, get_currency_symbol
@@ -13,6 +13,8 @@ router = APIRouter(prefix="/api/investing", tags=["investing"])
 
 # --- Request models ---
 
+VALID_ASSET_CLASSES = {"stock", "etf", "crypto", "bond", "other"}
+
 class HoldingCreate(BaseModel):
     symbol: str
     name: str
@@ -20,12 +22,35 @@ class HoldingCreate(BaseModel):
     currency: Optional[str] = None
     notes: Optional[str] = None
 
+    @field_validator('symbol')
+    @classmethod
+    def symbol_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Symbol cannot be empty')
+        return v.strip().upper()
+
+    @field_validator('name')
+    @classmethod
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Name cannot be empty')
+        return v.strip()
+
+    @field_validator('asset_class')
+    @classmethod
+    def valid_asset_class(cls, v):
+        if v not in VALID_ASSET_CLASSES:
+            raise ValueError(f'Asset class must be one of: {", ".join(VALID_ASSET_CLASSES)}')
+        return v
+
 class HoldingUpdate(BaseModel):
     symbol: Optional[str] = None
     name: Optional[str] = None
     asset_class: Optional[str] = None
     currency: Optional[str] = None
     notes: Optional[str] = None
+
+VALID_TX_TYPES = {"buy", "sell", "dividend", "split"}
 
 class TransactionCreate(BaseModel):
     holding_id: int
@@ -36,6 +61,27 @@ class TransactionCreate(BaseModel):
     currency: Optional[str] = None
     date: Optional[str] = None
     notes: Optional[str] = None
+
+    @field_validator('type')
+    @classmethod
+    def valid_type(cls, v):
+        if v not in VALID_TX_TYPES:
+            raise ValueError(f'Type must be one of: {", ".join(VALID_TX_TYPES)}')
+        return v
+
+    @field_validator('shares')
+    @classmethod
+    def shares_non_negative(cls, v):
+        if v < 0:
+            raise ValueError('Shares cannot be negative')
+        return v
+
+    @field_validator('price_per_share')
+    @classmethod
+    def price_non_negative(cls, v):
+        if v < 0:
+            raise ValueError('Price cannot be negative')
+        return v
 
 class TransactionUpdate(BaseModel):
     type: Optional[str] = None

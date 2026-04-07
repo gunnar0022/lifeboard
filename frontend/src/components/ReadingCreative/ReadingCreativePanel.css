@@ -1,57 +1,4 @@
-.rc-panel {
-  position: relative;
-}
-
-/* Foreground content: centered narrow column above the floating text */
-.rc-panel__content {
-  position: relative;
-  z-index: 1;
-  max-width: 60%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-  padding: var(--space-md) 0;
-}
-
-.rc-panel__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rc-panel__title-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.rc-panel__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, #B07CD8 12%, transparent);
-  color: #B07CD8;
-}
-
-.rc-panel__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.rc-panel__loading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  max-width: 60%;
-  margin: 0 auto;
-}
-
-/* Cards get a frosted glass effect so they're readable over floating text */
+/* Workspace button styles — used by Creative tab components */
 .rc-panel__workspace-btn {
   width: 100%;
   display: flex;
@@ -97,29 +44,4 @@
 .rc-panel__workspace-arrow {
   font-size: 1.5rem;
   color: #B07CD8;
-}
-
-/* DnD sub-views */
-.rc-panel--dnd {
-  padding-bottom: 0;
-  min-height: auto;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.rc-panel__sub-header {
-  padding: 0.5rem 1rem;
-}
-.rc-panel__back-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.9rem;
-  padding: 0.3rem 0;
-}
-.rc-panel__back-btn:hover {
-  color: var(--text-primary);
 }

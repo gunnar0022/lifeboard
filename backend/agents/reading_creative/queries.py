@@ -682,45 +682,6 @@ async def get_snippets(count: int = 8) -> list[dict]:
     return snippets[:count]
 
 
-# --- Idea Capture ---
-
-async def capture_idea(project_slug: str, content: str, short_slug: str = "idea") -> dict:
-    """Create a timestamped idea file in the project's _ideas/ folder."""
-    _ensure_creative_root()
-
-    ideas_dir = CREATIVE_ROOT / project_slug / "_ideas"
-    ideas_dir.mkdir(parents=True, exist_ok=True)
-
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    filename = f"{date_str}_{short_slug}.md"
-    file_path = ideas_dir / filename
-
-    # Avoid overwrites
-    counter = 1
-    while file_path.exists():
-        filename = f"{date_str}_{short_slug}-{counter}.md"
-        file_path = ideas_dir / filename
-        counter += 1
-
-    file_path.write_text(content, encoding="utf-8")
-
-    # Update file index
-    project = await get_project_by_slug(project_slug)
-    if project:
-        rel_path = f"{project_slug}/_ideas/{filename}"
-        db = await get_db()
-        try:
-            await db.execute(
-                "INSERT OR IGNORE INTO creative_file_index (project_id, file_path, file_name, is_directory) VALUES (?, ?, ?, 0)",
-                (project["id"], rel_path, filename),
-            )
-            await db.commit()
-        finally:
-            await db.close()
-
-    return {"file": filename, "project": project_slug, "path": f"{project_slug}/_ideas/{filename}"}
-
-
 # --- Pulse ---
 
 async def get_pulse() -> dict:

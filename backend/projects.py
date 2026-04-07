@@ -3,7 +3,8 @@ import json
 import logging
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, field_validator
 from typing import Optional
 
 from backend.database import get_db
@@ -23,6 +24,20 @@ class ProjectCreate(BaseModel):
     stage: str = "scaffolding"
     card_html: Optional[str] = None
     context_bucket: Optional[dict] = None
+
+    @field_validator('id')
+    @classmethod
+    def valid_slug(cls, v):
+        if not v or not re.match(r'^[a-z0-9][a-z0-9-]*$', v):
+            raise ValueError('Project ID must be a lowercase slug (letters, numbers, hyphens)')
+        return v
+
+    @field_validator('name')
+    @classmethod
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Project name cannot be empty')
+        return v.strip()
     sort_order: int = 0
 
 class ProjectUpdate(BaseModel):

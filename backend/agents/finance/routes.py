@@ -1,7 +1,7 @@
 """Finance agent — FastAPI routes (dashboard API per LM-08)."""
 import logging
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from backend.agents.finance import queries
 from backend.config import get_config
@@ -38,6 +38,20 @@ class TransactionCreate(BaseModel):
     is_recurring: bool = False
     recurring_id: Optional[int] = None
 
+    @field_validator('amount')
+    @classmethod
+    def amount_not_zero(cls, v):
+        if v == 0:
+            raise ValueError('Amount cannot be zero')
+        return v
+
+    @field_validator('category')
+    @classmethod
+    def category_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Category cannot be empty')
+        return v.strip()
+
 class TransactionUpdate(BaseModel):
     amount: Optional[int] = None
     account_id: Optional[int] = None
@@ -52,6 +66,20 @@ class TransferCreate(BaseModel):
     to_amount: Optional[int] = None
     description: Optional[str] = None
     date: Optional[str] = None
+
+    @field_validator('from_amount')
+    @classmethod
+    def amount_positive(cls, v):
+        if v <= 0:
+            raise ValueError('Transfer amount must be positive')
+        return v
+
+    @field_validator('to_account_id')
+    @classmethod
+    def accounts_differ(cls, v, info):
+        if info.data.get('from_account_id') == v:
+            raise ValueError('Cannot transfer to the same account')
+        return v
 
 class RecurringCreate(BaseModel):
     name: str
@@ -74,6 +102,20 @@ class RecurringUpdate(BaseModel):
 class BudgetSet(BaseModel):
     category: str
     monthly_limit: int
+
+    @field_validator('category')
+    @classmethod
+    def category_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Category cannot be empty')
+        return v.strip()
+
+    @field_validator('monthly_limit')
+    @classmethod
+    def limit_positive(cls, v):
+        if v <= 0:
+            raise ValueError('Budget limit must be positive')
+        return v
 
 
 # --- Pulse endpoint (Home panel) ---

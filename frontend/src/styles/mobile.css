@@ -57,8 +57,8 @@
     grid-template-columns: 1fr !important;
   }
 
-  /* ── Life Manager: single column ── */
-  .life-panel__grid {
+  /* ── Organizer: single column ── */
+  .organizer-tab__grid {
     grid-template-columns: 1fr !important;
   }
 
@@ -155,12 +155,8 @@
     padding: var(--space-sm) !important;
   }
 
-  .life-panel__grid {
+  .organizer-tab__grid {
     gap: var(--space-sm);
-  }
-
-  .quick-add-bar {
-    padding: var(--space-sm) !important;
   }
 
   .doc-search {
@@ -179,25 +175,6 @@
   /* ── Document search: full width inputs ── */
   .doc-search__bar input {
     font-size: 16px; /* Prevents iOS zoom */
-  }
-
-  /* ── QuickAddBar: stack inputs ── */
-  .quick-add-bar__inputs {
-    flex-wrap: wrap;
-  }
-
-  .quick-add-bar__input {
-    flex: 1 1 100%;
-    font-size: 16px;
-  }
-
-  .quick-add-bar__date {
-    font-size: 16px;
-  }
-
-  /* ── Reading & Creative panel: narrower content column ── */
-  .rc-panel__content {
-    max-width: 90%;
   }
 
   /* ── Floating snippets: fewer, smaller ── */

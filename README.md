@@ -29,120 +29,120 @@ The LLM is the parser, not the database. Claude never stores state — it reads 
 
 ---
 
-## Agents
+## Dashboard Navigation
 
-LifeBoard runs **six specialized agents** and a **headless consultation agent**, each owning its own domain.
+The dashboard uses a two-level navigation system:
 
-### Life Manager
+- **Sidebar** (left) — primary navigation between major sections
+- **Sub-tab bar** (top) — secondary navigation within each section
 
-Calendar events synced bidirectionally with **Google Calendar**, bills, tasks, and a unified document vault.
+| Sidebar | Sub-tabs | Description |
+|---------|----------|-------------|
+| **Organizer** | Calendar · Tasks & Bills · Documents | Schedule, to-dos, document vault |
+| **Health & Fitness** | Health · Fitness | Nutrition, exercise, mood, weight |
+| **Money** | Finance · Investing | Accounts, budgets, portfolio |
+| **Creative** | Workspace · Reading · D&D | Writing, books, character sheets |
+| **Projects** | — | Technical project portfolio |
+| **System** | Health | Server monitoring |
 
-- **Google Calendar sync** — hourly bidirectional sync. Events created via Telegram push to Google; events added on your phone pull into LifeBoard. Japanese holidays included.
-- **Custom reminders** — per-event Telegram notifications with flexible timing (before or after the event, for timezone-shifted scenarios like birthdays across date lines)
-- **Bills** — amounts, due dates, frequency, autopay tracking
-- **Tasks** — prioritized with due dates and categories
-- **Shopping list** — add/check/remove items via Telegram or dashboard, duplicate prevention, quantity tracking
-- **Unified document search** — all uploaded documents (photos, PDFs) searchable by text, tags, or category with inline viewing
+Sub-tabs can be individually toggled on/off in Settings. Disabling a parent hides the entire sidebar item.
 
-### Health & Body
+---
 
-Nutrition, exercise, mood tracking, body measurements, and health concern management.
+## Features by Section
 
-- **Meals** — logged with full macros parsed by Claude from natural descriptions, historical data preserved indefinitely
-- **Food database** — custom nutrition database for known foods with exact macros per serving; serving multipliers for accuracy; falls back to AI estimation for unknown foods
-- **Exercise** — workouts with duration and calorie burn
-- **Daily summaries** — automatic end-of-day aggregation with 90-day clickable activity heatmap (click any day to see individual meals and exercises)
-- **Health concerns** — trackable issues created during Fleet visits, updated via casual Telegram messages between visits
+### Organizer
+
+Calendar, tasks, bills, shopping, and document management — split across three sub-tabs.
+
+- **Google Calendar sync** — hourly bidirectional sync with Japanese holidays
+- **Weather strip** — 7-day forecast with clickable today detail (Open-Meteo, configurable location)
+- **Inline event creation** — add events directly from the Calendar tab
+- **Bills** — inline add form, due date tracking, autopay badges
+- **Tasks** — inline add, priority levels, due dates
+- **Shopping list** — add/check/remove with duplicate prevention
+- **Document vault** — all uploaded files searchable by text, tags, or category
+
+### Health & Fitness
+
+Nutrition and exercise tracking split into Health and Fitness sub-tabs.
+
+- **Meals** — logged via Telegram with AI-estimated macros, or manually from the dashboard
+- **Food database** — custom foods with exact macros; serving multipliers; AI fallback for unknown foods
+- **Manual meal entry** — multi-item cart from food database, or freeform macro input
+- **Activity heatmap** — 90-day clickable grid with 30-block RGB color ramp (Red→Yellow→Green→Cyan→Blue). Exercise intensity modulates brightness (none=dim, light=medium, heavy=vivid)
+- **Exercise tagging** — light/heavy classification via Telegram agent
+- **Meal deletion** — delete from heatmap detail modal or recent activity section
+- **Weight trend** — line chart with direction indicator
+- **Health concerns** — created during Fleet visits, updated via casual Telegram messages
 - **Evening check-in** — scheduled Telegram prompt for mood and energy
 
-### Finance
+### Money
 
-Accounts, spending, budgets, recurring payments, and cross-currency transfers.
+Finance and Investing under one sidebar item with independent sub-tabs.
 
-- **Multi-currency** — JPY and USD accounts with live FX conversion
-- **Pay-cycle budgeting** — monthly limits tracked against your actual pay cycle, not calendar months
-- **Privacy blur** — per-account and totals eye toggle to hide balances from shoulder surfers (defaults to blurred)
-- **Net worth** — combined bank accounts + investment portfolio value with currency conversion
-- **Transaction history** — browsable month-by-month archive of all transactions with full persistence
+#### Finance
+- **Multi-currency** — JPY and USD accounts with live FX conversion (daily from frankfurter.app, cached in DB)
+- **Pay-cycle budgeting** — monthly limits tracked against actual pay cycle
+- **Budget management** — add, edit, delete budgets directly from dashboard
+- **Privacy blur** — per-account and totals eye toggle (defaults to blurred)
+- **Net worth** — combined bank accounts + investment portfolio with currency conversion
+- **Transaction drill-down** — click any account card or category to see filtered transaction history with month navigation
+- **Transfer mode** — quick-add form supports account-to-account transfers
+- **Transaction history** — browsable month-by-month archive with full persistence
 - **Cycle summaries** — historical compression generates AI insights while preserving raw data
 
-### Investing
-
-Portfolio tracking across stocks, ETFs, and crypto with multi-currency support.
-
-- **Live prices** — daily yfinance refresh + immediate fetch on new holdings (with history fallback)
-- **Multi-currency aggregation** — USD holdings converted to JPY using cached FX rates
+#### Investing
+- **Live prices** — three daily yfinance checks (5am, noon, 6pm) with averaged daily snapshots
+- **FX fallback** — if live rate API fails, uses cached exchange rate instead of 1:1
 - **Portfolio trend** — interactive chart with crosshair hover
 - **Asset allocation** — donut chart with category breakdown
-- **Manual entry** — add holdings and transactions directly from the dashboard with symbol deduplication
-- **Transaction editing** — inline edit and delete on transaction history with automatic cost basis recalculation
+- **Manual entry** — add holdings and transactions from dashboard with symbol deduplication
+- **Transaction editing** — inline edit/delete with automatic cost basis recalculation
 - **Projection calculator** — compound interest simulator
 - **USD/JPY toggle** — converts all values on the page
 
-### Reading & Creative
+### Creative
 
-A full markdown workspace, reading log, and D&D character sheet system.
+Writing workspace, reading log, and D&D — each on its own sub-tab.
 
-- **Creative workspace** — full-screen editor with file tree, multi-tab editing, live markdown preview, auto-save, project tabs, right-click context menus, drag-and-drop file organization
-- **Floating snippets** — physics-based ambient text from your writing that drifts across the panel background
+- **Creative workspace** — full-screen editor with file tree, multi-tab editing, live markdown preview, auto-save, project tabs, drag-and-drop file organization
+- **Floating snippets** — physics-based ambient text from your writing
 - **Reading log** — currently reading, to-read queue, finished books with reflections
-- **Idea capture** — Telegram messages routed to project _ideas/ folders
-- **Filesystem sync** — manually added folders auto-discovered on workspace load
-
-#### D&D Character Sheets
-
-A full interactive D&D 5e character sheet system with campaign management.
-
-- **Character sheets** — view/edit toggle, autosave, full stat block with calculated modifiers, ability scores, proficiencies, saving throws
-- **Combat** — class feature trackers (Rage toggle with glow, Wild Shape toggle, Cunning Action, Fighter Resources, generic fallback for all 13 classes), attack list with auto-calculated bonuses, HP bar with +/- buttons
-- **Skills** — grouped by ability, proficiency/expertise cycling, live modifier calculation
-- **Spellcasting** — shared spell library (28+ seeded spells), spell slot pip grid, prepared/known zones with drag-and-drop, concentration tracking with swap confirmation, Add Spell modal with search + create
-- **Campaigns** — create campaigns with custom colors, campaign-first selection flow, campaign notes system with 5 note types (Characters, Places, Quests, Items, Notes), inline click-to-edit with autosave
-- **Theming** — follows app's light/dark toggle. Dark mode: grimoire-at-night. Light mode: warm parchment. All colors via CSS variables
-- **Class support** — Barbarian, Rogue, Fighter with full interactive UI; all 13 classes with class feature data storage and generic display
-- **Rest system** — short/long rest buttons that intelligently reset HP, spell slots, class feature uses, hit dice, concentration
-
-### Dr. Fleet — Health Consultation
-
-A headless personal health consultant that conducts clinic-style visits via Telegram, powered by **Claude Opus**.
-
-- **Clinic visits** — multi-turn conversations with medical briefing injection
-- **Session lock** — all Telegram messages bypass the router during a visit
-- **Three-way handshake** — no database writes until you confirm Fleet's action checklist
-- **Mid-conversation record retrieval** — Fleet can look up your medical documents during a session
-- **Health concerns lifecycle** — creation, logging, resolution, reactivation, compression
+- **D&D character sheets** — full 5e character management with campaigns, spell library, combat tracking
 
 ### Projects
 
-A portfolio and project management dashboard for technical/coding projects, organized into three visual tiers.
+Technical project portfolio with bespoke visual cards and context buckets.
 
-- **Bespoke cards** — each project gets a unique, hand-crafted HTML card with its own layout, colors, and visual identity reflecting the project's personality
-- **Three-tier organization** — Working On (active development), Mostly Polished (functional/presentable), Scaffolding (early stage)
-- **Context buckets** — structured JSON attached to each project containing summary, tech stack, key decisions, repo paths, and notes. Retrievable via API for Claude Code work sessions
+- **Bespoke cards** — each project gets a unique hand-crafted HTML card reflecting the project's personality
+- **Three-tier organization** — Working On, Mostly Polished, Scaffolding
+- **Drag-and-drop** — move projects between tiers by dragging
+- **Project notes** — clickable dropdown with auto-saving textarea; Telegram agent appends timestamped notes
+- **Context buckets** — structured JSON with summary, tech stack, key decisions, repo paths (retrievable via API for Claude Code sessions)
 - **GitHub links** — automatic link to each project's repository
-- **Claude Code workflow** — projects are added and refreshed through Claude Code, which reads the repo, compiles the context bucket, and generates the card
 
-### System Health
+### System
 
-A live dashboard showing the Mac Mini server's vital signs, polled every 5 seconds.
+Server monitoring and diagnostics.
 
 - **System identity** — hostname, macOS version, chip, uptime
-- **CPU** — overall and per-core usage with color-coded cells
-- **Memory** — used/available/swap with usage bar
-- **Disk** — APFS container-level usage (accurate on Apple Silicon), LifeBoard DB size
-- **Network** — real-time upload/download throughput rates
-- **Top processes** — top 10 by CPU and by memory
-- **Services** — FastAPI process status, SQLite DB size, Docker container status
+- **CPU/Memory/Disk** — live gauges with APFS-accurate disk usage on Apple Silicon
+- **Network** — real-time upload/download throughput
+- **Top processes** — by CPU and by memory
+- **Services** — FastAPI status, SQLite DB size, Docker container status
 
-### Document Classifier
+### Dr. Fleet — Health Consultation
 
-A Sonnet-powered system that processes all uploaded photos and PDFs.
+A headless personal health consultant powered by **Claude Opus**, conducted via Telegram.
 
-- **Sonnet vision** — reads text from photos of IDs, receipts, medical documents
-- **PDF text extraction** — pymupdf extracts selectable text; scanned PDFs rendered as images for vision
-- **Structured extraction** — pulls exact names, ID numbers, dates, amounts, addresses
-- **Auto-classification** — assigns tags from a 24-tag vocabulary and categorizes as finance/health/investing/life
-- **Telegram CRUD** — ask questions about documents, edit metadata, or delete via natural language
+- **Clinic visits** — multi-turn conversations with medical briefing injection
+- **Session lock** — all messages bypass the router during a visit
+- **Health concerns lifecycle** — creation, logging, resolution, reactivation, compression
+
+### Morning Briefing
+
+Automated daily Telegram message at 7:00 AM with weather, calendar, alerts, and yesterday's health snapshot. Gracefully degrades if any data source fails.
 
 ---
 
@@ -154,21 +154,21 @@ A Sonnet-powered system that processes all uploaded photos and PDFs.
 backend/
   main.py              # App entry, lifespan, Google OAuth, document API
   database.py          # Schema definitions, init_db()
-  config.py            # user_config.json loader
+  config.py            # user_config.json loader, timezone-aware get_today()/get_now()
   llm_client.py        # Anthropic API (Sonnet default, Haiku for routing)
   action_executor.py   # Validate-execute-respond with hallucination detection
   documents.py         # Unified document classifier + CRUD
-  system_health.py     # Live system metrics (CPU, memory, disk, network, processes)
-  projects.py          # Projects tab CRUD API with context buckets
+  system_health.py     # Live system metrics + weather API
+  projects.py          # Projects tab CRUD API with context buckets and notes
+  schedulers.py        # System schedulers (FX rates, weather, morning briefing)
   google_calendar.py   # OAuth, bidirectional sync, reminder scheduler
-  seed.py              # Demo data (manual CLI, non-destructive)
   agents/
     registry.py        # Agent auto-discovery
     finance/           # Budget, accounts, transactions
     life_manager/      # Calendar, bills, tasks (Google Calendar integrated)
-    health_body/       # Nutrition, exercise, mood, concerns
-    investing/         # Portfolio, holdings, snapshots
-    reading_creative/  # Workspace, books, idea capture
+    health_body/       # Nutrition, exercise, mood, concerns, food database
+    investing/         # Portfolio, holdings, snapshots (3x daily price refresh)
+    reading_creative/  # Workspace, books, project notes
     fleet/             # Dr. Fleet consultation (Opus)
   telegram_bot/
     bot.py             # Bot lifecycle, handlers
@@ -179,39 +179,44 @@ backend/
 
 ```
 frontend/src/
-  App.jsx              # Panel routing
-  hooks/useApi.js      # Shared fetch hook
+  App.jsx              # Two-level panel routing (sidebar + sub-tabs)
+  config/navigation.js # NAV_CONFIG — single source of truth for tab structure
+  hooks/useApi.js      # Shared fetch hook with WebSocket auto-refresh
   styles/theme.css     # Light + dark mode themes
   components/
-    Shell/             # Sidebar, TopBar (dark mode toggle), HomePanel
+    Shell/             # Sidebar, TopBar, SubTabBar, HomePanel
     Setup/             # 12-step guided setup wizard
-    LifeManager/       # TimelineStrip, BillsTracker, TaskBoard, ShoppingList, DocumentSearch
-    Health/            # Heatmap (clickable), RecentDetail, WeightTrend, FoodDatabase, ConcernsTracker
-    Finance/           # AccountsStrip (blur toggle), CycleOverview, BudgetDonut, TransactionHistory
+    Settings/          # Hierarchical panel toggles, timezone, theme
+    Organizer/         # Calendar, Tasks & Bills, Documents, WeatherStrip
+    HealthFitness/     # Health tab, Fitness tab (split from old Health panel)
+    Health/            # Heatmap, RecentDetail, WeightTrend, FoodDatabase, MealEntry, ConcernsTracker
+    Finance/           # AccountsStrip, CycleOverview, BudgetBars, TransactionFilter, TransactionHistory
     Investing/         # PortfolioTrend, AllocationChart, HoldingsTable, TransactionHistory
-    ReadingCreative/   # FloatingSnippets (physics), CreativeWorkspace, ReadingLog
-      DnD/             # Character sheets, campaigns, spell library, campaign notes
+    Creative/          # WorkspaceTab, Reading, D&D (split from old ReadingCreative panel)
+    ReadingCreative/   # CreativeWorkspace, FloatingSnippets, ReadingLog
+      DnD/             # Character sheets, campaigns, spell library
     SystemHealth/      # Live server metrics dashboard
-    Projects/          # Project cards with tiered layout and context buckets
+    Projects/          # Project cards with tiered layout, notes, drag-and-drop
 ```
-
-### Telegram Bot — LLM-Powered Router
-
-The router uses **Haiku** with 8 exchanges of conversation history. It supports single-agent routing, multi-agent fan-out, explicit agent delegation, context-enriched summaries, document retrieval, Fleet session lock, and hallucination detection with auto-retry.
 
 ### Background Schedulers
 
-| Agent | Schedule | Task |
-|-------|----------|------|
+| Scheduler | Schedule | Task |
+|-----------|----------|------|
+| FX Rate | Daily (6:00 AM) | Pull JPY/USD rate from frankfurter.app |
+| Weather (daily) | Daily (6:00 AM) | Refresh 7-day forecast from Open-Meteo |
+| Weather (hourly) | Every hour | Refresh today's hourly forecast |
+| Morning Briefing | Daily (7:00 AM) | Compose and send Telegram summary |
 | Google Calendar | Hourly | Bidirectional event sync |
 | Google Calendar | Every minute | Send due reminders via Telegram |
 | Finance | Monthly (24th) | Generate cycle summaries with AI insights |
 | Finance | Monthly (1st) | Calculate and apply account interest |
 | Health & Body | Daily (configurable) | Evening check-in via Telegram |
-| Health & Body | Daily (2 AM) | Aggregate meals/exercises into daily summary |
-| Investing | Daily (6 PM) | Refresh prices via yfinance, store snapshot |
+| Health & Body | Daily (3 AM) | Aggregate meals/exercises into daily summary |
+| Investing | 3x daily (5 AM, noon, 6 PM) | Refresh prices via yfinance, store averaged snapshot |
 | Fleet | Daily (4 AM) | Compress resolved concern logs > 90 days |
-| Fleet | On startup | Recover orphaned sessions |
+
+All schedulers use the user's configured timezone via `get_today()` / `get_now()` from `config.py`.
 
 ---
 
@@ -221,13 +226,14 @@ The router uses **Haiku** with 8 exchanges of conversation history. It supports 
 |-------|-----------|
 | Frontend | React 18, Vite 6, Framer Motion, Recharts, Lucide Icons |
 | Backend | Python, FastAPI, uvicorn, aiosqlite |
-| Database | SQLite (WAL mode, foreign keys, raw SQL) |
+| Database | SQLite (WAL mode, raw SQL, no ORM) |
 | AI | Anthropic Claude — Opus (Fleet), Sonnet 4.5 (agents + classifier), Haiku 4.5 (routing) |
 | Telegram | python-telegram-bot v21 (async) |
 | Calendar | Google Calendar API with OAuth 2.0 |
 | Market Data | yfinance, frankfurter.app (FX rates) |
-| System Monitoring | psutil (CPU, memory, disk, network, processes) |
-| PDF Processing | pymupdf (text extraction + image rendering) |
+| Weather | Open-Meteo (free, no API key) |
+| System Monitoring | psutil |
+| PDF Processing | pymupdf |
 | Process Manager | PM2 (production) |
 
 ---
@@ -272,9 +278,6 @@ GOOGLE_CLIENT_SECRET=your_client_secret
 uvicorn backend.main:app --host 0.0.0.0 --port 8000
 cd frontend && npm run dev  # separate terminal
 
-# Windows one-click
-start.bat
-
 # Production
 cd frontend && npm run build && cd ..
 pm2 start ecosystem.config.js
@@ -282,7 +285,7 @@ pm2 start ecosystem.config.js
 
 ### Google Calendar
 
-After entering Google credentials in the setup wizard and restarting, a **"Connect Google Calendar"** banner appears on the Life Manager panel. Click it to authorize via Google's consent screen. Approve once — sync runs automatically (hourly + reminders every minute).
+After entering Google credentials in the setup wizard and restarting, a **"Connect Google Calendar"** banner appears on the Organizer > Calendar tab. Click it to authorize via Google's consent screen. Approve once — sync runs automatically.
 
 ---
 
