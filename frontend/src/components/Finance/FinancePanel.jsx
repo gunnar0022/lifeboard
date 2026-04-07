@@ -193,7 +193,10 @@ export default function FinancePanel() {
       <motion.div variants={fadeUp}>
         <RecurringManager
           recurring={recurring || []}
+          accounts={accounts || []}
+          categories={categories || []}
           currencySymbol={currencySymbol}
+          currency={currency}
           onRefresh={refetchAll}
         />
       </motion.div>

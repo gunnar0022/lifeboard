@@ -2,6 +2,36 @@
   margin-bottom: var(--space-lg);
 }
 
+.recurring-manager__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.recurring-manager__header .chart-title {
+  margin: 0;
+}
+
+.recurring-manager__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.recurring-manager__add-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--color-finance);
+}
+
 .recurring-list {
   display: flex;
   flex-direction: column;
@@ -22,6 +52,10 @@
 .recurring-item:hover {
   background: var(--bg-hover);
   border-radius: var(--radius-sm);
+}
+
+.recurring-item--deleting {
+  background: rgba(239, 68, 68, 0.06);
 }
 
 .recurring-item__icon {
@@ -98,4 +132,140 @@
   font-size: 0.6875rem;
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* Action buttons */
+.recurring-item__actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.recurring-item:hover .recurring-item__actions,
+.recurring-item--deleting .recurring-item__actions {
+  opacity: 1;
+}
+
+.recurring-item__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.recurring-item__action:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.recurring-item__action--delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-alert);
+}
+
+.recurring-item__action--confirm {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-alert);
+}
+
+.recurring-item__action--confirm:hover {
+  background: var(--color-alert);
+  color: white;
+}
+
+/* Add/Edit form */
+.recurring-form {
+  padding: var(--space-sm) 0;
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.recurring-form--inline {
+  padding: var(--space-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border-bottom: none;
+  margin-bottom: 4px;
+}
+
+.recurring-form__row {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-xs);
+}
+
+.recurring-form__input {
+  flex: 1;
+  min-width: 100px;
+  font-size: 0.8125rem;
+  padding: 6px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.recurring-form__input--num {
+  max-width: 100px;
+  font-family: var(--font-mono);
+}
+
+.recurring-form__select {
+  font-size: 0.8125rem;
+  padding: 6px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-width: 90px;
+}
+
+.recurring-form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.recurring-form__submit,
+.recurring-form__cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.recurring-form__submit {
+  background: var(--color-finance);
+  color: white;
+}
+
+.recurring-form__submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.recurring-form__cancel {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
 }
