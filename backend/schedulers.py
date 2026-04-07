@@ -18,7 +18,6 @@ logger = logging.getLogger("lifeboard")
 
 # --- Location config for weather ---
 LOCATIONS = {
-    "oyama": {"name": "Oyama, Tochigi", "lat": 36.3146, "lon": 139.8003, "active": True},
     "yurihonjo": {"name": "Yurihonjo, Akita", "lat": 39.3854, "lon": 140.0496},
     "tokyo": {"name": "Tokyo", "lat": 35.6762, "lon": 139.6503},
 }
@@ -135,9 +134,29 @@ WEATHER_CODES = {
 }
 
 
+def _get_location_by_key(key: str) -> dict | None:
+    if key in LOCATIONS:
+        return {"key": key, **LOCATIONS[key]}
+    return None
+
+
+async def fetch_weather_for_location(scope: str, location_key: str = None):
+    """Fetch weather for a specific location (or active default)."""
+    if location_key and location_key in LOCATIONS:
+        loc = {"key": location_key, **LOCATIONS[location_key]}
+    else:
+        loc = _get_active_location()
+    return await _fetch_weather_impl(loc, scope)
+
+
 async def fetch_weather(scope: str = "week_daily"):
-    """Fetch weather from Open-Meteo and cache it."""
+    """Fetch weather for the active location."""
     loc = _get_active_location()
+    return await _fetch_weather_impl(loc, scope)
+
+
+async def _fetch_weather_impl(loc: dict, scope: str):
+    """Internal: fetch weather from Open-Meteo and cache it."""
     try:
         params = {
             "latitude": loc["lat"],
@@ -177,8 +196,11 @@ async def fetch_weather(scope: str = "week_daily"):
         return None
 
 
-async def get_cached_weather(scope: str = "week_daily") -> dict | None:
-    loc = _get_active_location()
+async def get_cached_weather(scope: str = "week_daily", location_key: str = None) -> dict | None:
+    if location_key and location_key in LOCATIONS:
+        loc = {"key": location_key, **LOCATIONS[location_key]}
+    else:
+        loc = _get_active_location()
     db = await get_db()
     try:
         cursor = await db.execute(

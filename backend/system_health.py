@@ -246,11 +246,12 @@ async def weather():
 
 
 @router.post("/api/weather/refresh")
-async def weather_refresh():
-    """Force re-fetch weather data (e.g., after location change)."""
-    from backend.schedulers import fetch_weather
-    await fetch_weather("week_daily")
-    await fetch_weather("today_hourly")
+async def weather_refresh(body: dict = None):
+    """Force re-fetch weather data, optionally for a specific location."""
+    from backend.schedulers import fetch_weather_for_location
+    location_key = (body or {}).get("location")
+    await fetch_weather_for_location("week_daily", location_key)
+    await fetch_weather_for_location("today_hourly", location_key)
     return {"ok": True}
 
 

@@ -15,7 +15,6 @@ const WEATHER_ICONS = {
 };
 
 const LOCATIONS = {
-  oyama: 'Oyama, Tochigi',
   yurihonjo: 'Yurihonjo, Akita',
   tokyo: 'Tokyo',
 };
@@ -38,7 +37,7 @@ export default function WeatherStrip() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [todayExpanded, setTodayExpanded] = useState(false);
-  const [activeLocation, setActiveLocation] = useState('oyama');
+  const [activeLocation, setActiveLocation] = useState('yurihonjo');
 
   const fetchWeather = () => {
     setLoading(true);
@@ -62,13 +61,22 @@ export default function WeatherStrip() {
 
   const handleLocationChange = async (key) => {
     setActiveLocation(key);
+    setLoading(true);
     try {
-      await apiPut('/api/settings', { weather_location: key });
-      // Trigger a re-fetch of weather with new location
-      await fetch('/api/weather/refresh', { method: 'POST' });
-      setTimeout(fetchWeather, 1000); // Give backend time to fetch
+      // Save preference and fetch weather for the new location in parallel
+      await Promise.all([
+        apiPut('/api/settings', { weather_location: key }),
+        fetch('/api/weather/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ location: key }),
+        }),
+      ]);
+      // Now fetch the updated cached data
+      fetchWeather();
     } catch (e) {
       console.error('Failed to change location:', e);
+      setLoading(false);
     }
   };
 
