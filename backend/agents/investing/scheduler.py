@@ -17,6 +17,7 @@ from backend.agents.investing import queries
 
 logger = logging.getLogger(__name__)
 
+_morning_task: asyncio.Task | None = None
 _noon_task: asyncio.Task | None = None
 _evening_task: asyncio.Task | None = None
 
@@ -26,23 +27,24 @@ _daily_values: dict = {}  # {"2026-04-07": [value1, value2], ...}
 
 async def start_scheduler():
     """Start noon and evening price refresh tasks."""
-    global _noon_task, _evening_task
+    global _morning_task, _noon_task, _evening_task
+    _morning_task = asyncio.create_task(_price_refresh_loop(5, 0, "morning"))
     _noon_task = asyncio.create_task(_price_refresh_loop(12, 3, "noon"))
     _evening_task = asyncio.create_task(_price_refresh_loop(18, 0, "evening"))
-    logger.info("Investing price refresh scheduler started (noon + evening)")
+    logger.info("Investing price refresh scheduler started (5am + noon + evening)")
 
 
 async def stop_scheduler():
     """Stop both price refresh tasks."""
-    global _noon_task, _evening_task
-    for task in [_noon_task, _evening_task]:
+    global _morning_task, _noon_task, _evening_task
+    for task in [_morning_task, _noon_task, _evening_task]:
         if task and not task.done():
             task.cancel()
             try:
                 await task
             except asyncio.CancelledError:
                 pass
-    _noon_task = _evening_task = None
+    _morning_task = _noon_task = _evening_task = None
     logger.info("Investing scheduler stopped")
 
 
