@@ -2,13 +2,13 @@
 Reading & Creative agent — LLM system prompt with dynamic state injection.
 """
 from datetime import date
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.reading_creative import queries
 
 
 async def build_system_prompt() -> str:
     config = get_config()
-    today = date.today()
+    today = get_today()
     today_str = today.strftime("%B %d, %Y")
 
     projects = await queries.get_projects()

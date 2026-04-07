@@ -3,14 +3,14 @@ Investing agent — LLM system prompt template with state injection.
 The prompt is NOT static — it includes current portfolio state on every call.
 """
 from datetime import date
-from backend.config import get_config, get_currency_symbol
+from backend.config import get_config, get_currency_symbol, get_today
 from backend.agents.investing import queries
 
 
 async def build_system_prompt() -> str:
     """Build the Investing agent system prompt with injected current state."""
     config = get_config()
-    today = date.today()
+    today = get_today()
     primary_currency = config.get("primary_currency", "JPY")
     symbol = get_currency_symbol()
 

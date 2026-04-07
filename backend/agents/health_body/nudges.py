@@ -3,13 +3,14 @@ Health & Body agent — nudge checks.
 Returns a list of {text, severity, agent} dicts for the dashboard notification bar.
 """
 from datetime import date, datetime
+from backend.config import get_today
 from backend.agents.health_body import queries
 
 
 async def check_nudges() -> list[dict]:
     """Return active health nudges."""
     nudges = []
-    today_str = date.today().isoformat()
+    today_str = get_today().isoformat()
 
     profile = await queries.get_profile()
     if not profile:

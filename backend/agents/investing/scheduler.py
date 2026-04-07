@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.investing import queries
 
 logger = logging.getLogger(__name__)
@@ -266,7 +266,7 @@ async def run_price_refresh():
         cls = h["asset_class"]
         breakdown[cls] = breakdown.get(cls, 0) + converted_value
 
-    today_str = date.today().isoformat()
+    today_str = get_today().isoformat()
     await queries.store_portfolio_snapshot(today_str, total_value, primary_currency, breakdown)
     logger.info(f"Portfolio snapshot stored: {primary_currency} {total_value:,} on {today_str}")
 

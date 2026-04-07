@@ -137,8 +137,8 @@ async def handle_get_profile(data: dict) -> dict:
 
 
 async def handle_get_today_nutrition(data: dict) -> dict:
-    from datetime import date as dt_date
-    today_str = dt_date.today().isoformat()
+    from backend.config import get_today
+    today_str = get_today().isoformat()
     meals = await queries.get_meals_for_date(today_str)
     exercises = await queries.get_exercises_for_date(today_str)
     profile = await queries.get_profile()

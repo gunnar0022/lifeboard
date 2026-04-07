@@ -10,7 +10,7 @@ import logging
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.finance import queries
 
 logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ async def run_interest_calculation():
         logger.info("No interest-bearing accounts, skipping interest calculation")
         return
 
-    today_str = date.today().replace(day=1).isoformat()
+    today_str = get_today().replace(day=1).isoformat()
     credited = 0
 
     for acc in accounts:

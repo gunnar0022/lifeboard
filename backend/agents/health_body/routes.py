@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from pathlib import Path
+from backend.config import get_today
 from backend.agents.health_body import queries
 
 router = APIRouter(prefix="/api/health_body", tags=["health_body"])
@@ -215,8 +216,7 @@ async def delete_exercise(exercise_id: int):
 @router.get("/daily-summary")
 async def get_daily_summary(date: str = None):
     if not date:
-        from datetime import date as dt_date
-        date = dt_date.today().isoformat()
+        date = get_today().isoformat()
     return await queries.get_daily_summary(date) or {}
 
 

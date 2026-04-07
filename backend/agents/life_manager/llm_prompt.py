@@ -3,14 +3,14 @@ Life Manager agent — LLM system prompt template with state injection (LM-13b, 
 The prompt is NOT static — it includes current life data state on every call.
 """
 from datetime import date, datetime, timedelta
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.life_manager import queries
 
 
 async def build_system_prompt() -> str:
     """Build the Life Manager system prompt with injected current state."""
     config = get_config()
-    today = date.today()
+    today = get_today()
 
     # Gather current state
     today_items = await queries.get_today_items()

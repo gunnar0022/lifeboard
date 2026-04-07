@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from backend.database import get_db
-from backend.config import get_config
+from backend.config import get_config, get_today
 
 logger = logging.getLogger("lifeboard")
 
@@ -347,7 +347,7 @@ async def send_morning_briefing():
     # Check if already sent today
     db = await get_db()
     try:
-        today = date.today().isoformat()
+        today = get_today().isoformat()
         cursor = await db.execute(
             "SELECT id FROM briefing_history WHERE sent_at >= ?", (today,)
         )

@@ -1,7 +1,9 @@
 import json
 import os
+from datetime import datetime, date as date_type
 from pathlib import Path
 from functools import lru_cache
+from zoneinfo import ZoneInfo
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CONFIG_PATH = PROJECT_ROOT / "user_config.json"
@@ -40,6 +42,18 @@ def get_currency_symbol(currency_code: str = None) -> str:
     if currency_code is None:
         currency_code = get_config().get("primary_currency", "USD")
     return CURRENCY_SYMBOLS.get(currency_code, "$")
+
+
+def get_today() -> date_type:
+    """Get today's date in the user's configured timezone."""
+    tz = ZoneInfo(get_config().get("timezone", "Asia/Tokyo"))
+    return datetime.now(tz).date()
+
+
+def get_now() -> datetime:
+    """Get current datetime in the user's configured timezone."""
+    tz = ZoneInfo(get_config().get("timezone", "Asia/Tokyo"))
+    return datetime.now(tz)
 
 
 def _default_config() -> dict:

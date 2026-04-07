@@ -10,7 +10,7 @@ import logging
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.health_body import queries
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ async def _evening_checkin_loop():
             await asyncio.sleep(wait_seconds)
 
             # Check if we already have mood/energy for today (skip if so)
-            today_str = date.today().isoformat()
+            today_str = get_today().isoformat()
             summary = await queries.get_daily_summary(today_str)
             if summary and summary.get("mood"):
                 continue
@@ -89,7 +89,7 @@ async def _send_checkin_message():
     if not profile:
         return
 
-    today_str = date.today().isoformat()
+    today_str = get_today().isoformat()
     meals = await queries.get_meals_for_date(today_str)
     meal_count = len(meals)
 

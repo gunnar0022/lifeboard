@@ -3,14 +3,14 @@ Finance agent — LLM system prompt template with state injection (LM-13b, LM-13
 The prompt is NOT static — it includes current financial state on every call.
 """
 from datetime import date, datetime
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.finance import queries
 
 
 async def build_system_prompt() -> str:
     """Build the Finance agent system prompt with injected current state."""
     config = get_config()
-    today = date.today()
+    today = get_today()
     cycle_info = queries.get_cycle_day_info(today)
 
     # Gather current state

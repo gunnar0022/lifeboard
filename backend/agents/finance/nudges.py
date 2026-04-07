@@ -5,7 +5,7 @@ Checks budget thresholds and recurring item due dates.
 import logging
 from datetime import date, timedelta
 from backend.agents.finance import queries
-from backend.config import get_currency_symbol
+from backend.config import get_currency_symbol, get_today
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ async def check_nudges() -> list[dict]:
 
         # Recurring item nudges
         recurring = await queries.get_recurring(active_only=True)
-        today = date.today()
+        today = get_today()
         for item in recurring:
             due = date.fromisoformat(item["next_due"])
             days_until = (due - today).days

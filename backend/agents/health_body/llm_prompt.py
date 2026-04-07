@@ -3,14 +3,14 @@ Health & Body agent — LLM system prompt with dynamic state injection.
 Rebuilt on every message with current health data.
 """
 from datetime import date
-from backend.config import get_config
+from backend.config import get_config, get_today
 from backend.agents.health_body import queries
 
 
 async def build_system_prompt() -> str:
     """Build the Health & Body system prompt with injected current state."""
     config = get_config()
-    today = date.today()
+    today = get_today()
     day_name = today.strftime("%A")
     date_str = today.strftime("%B %d, %Y")
     today_iso = today.isoformat()

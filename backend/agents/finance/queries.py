@@ -6,7 +6,7 @@ All amounts stored as integers (smallest currency unit per LM-06).
 import json
 from datetime import date, datetime, timedelta
 from backend.database import get_db
-from backend.config import get_config
+from backend.config import get_config, get_today
 
 
 def _get_cycle_dates(reference_date: date = None, offset: int = 0) -> tuple[date, date]:
@@ -17,7 +17,7 @@ def _get_cycle_dates(reference_date: date = None, offset: int = 0) -> tuple[date
     """
     config = get_config()
     pay_day = config.get("pay_cycle_day", 1)
-    ref = reference_date or date.today()
+    ref = reference_date or get_today()
 
     # Determine which cycle we're in
     if ref.day >= pay_day:
@@ -53,7 +53,7 @@ def _get_cycle_dates(reference_date: date = None, offset: int = 0) -> tuple[date
 
 def get_cycle_day_info(reference_date: date = None) -> dict:
     """Return current cycle day number, total days, and days until payday."""
-    ref = reference_date or date.today()
+    ref = reference_date or get_today()
     cycle_start, cycle_end = _get_cycle_dates(ref)
     total_days = (cycle_end - cycle_start).days + 1
     current_day = (ref - cycle_start).days + 1
@@ -182,7 +182,7 @@ async def log_transaction(amount: int, account_id: int, category: str,
     amount: positive = income, negative = expense.
     """
     if date_str is None:
-        date_str = date.today().isoformat()
+        date_str = get_today().isoformat()
 
     db = await get_db()
     try:
@@ -352,7 +352,7 @@ async def log_transfer(from_account_id: int, to_account_id: int,
                         description: str = None, date_str: str = None) -> dict:
     """Log a transfer and update both account balances atomically (LM-17)."""
     if date_str is None:
-        date_str = date.today().isoformat()
+        date_str = get_today().isoformat()
     if to_amount is None:
         to_amount = from_amount
 

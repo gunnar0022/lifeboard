@@ -10,7 +10,7 @@ import logging
 import time
 from datetime import date, datetime, timedelta
 from backend.database import get_db
-from backend.config import get_config
+from backend.config import get_config, get_today
 
 logger = logging.getLogger("lifeboard")
 
@@ -182,7 +182,7 @@ async def record_transaction(holding_id: int, tx_type: str, shares: float,
     LM-34: BUY uses weighted average. SELL keeps avg unchanged. SPLIT adjusts both.
     """
     if date_str is None:
-        date_str = date.today().isoformat()
+        date_str = get_today().isoformat()
     if currency is None:
         config = get_config()
         currency = config.get("primary_currency", "JPY")
@@ -448,7 +448,7 @@ async def unlink_holding_account(holding_id: int, account_id: int) -> bool:
 async def get_portfolio_snapshots(days: int = 365) -> list[dict]:
     db = await get_db()
     try:
-        cutoff = (date.today() - timedelta(days=days)).isoformat()
+        cutoff = (get_today() - timedelta(days=days)).isoformat()
         cursor = await db.execute(
             """SELECT * FROM investing_portfolio_snapshots
                WHERE date >= ?

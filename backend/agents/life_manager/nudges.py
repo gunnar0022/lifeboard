@@ -5,7 +5,7 @@ Checks bill due dates, high-priority task deadlines, and document expiry.
 import logging
 from datetime import date, timedelta
 from backend.agents.life_manager import queries
-from backend.config import get_currency_symbol
+from backend.config import get_currency_symbol, get_today
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ async def check_nudges() -> list[dict]:
     Each nudge: {"text": str, "severity": "info"|"warning"|"alert", "agent": "life_manager"}
     """
     nudges = []
-    today = date.today()
+    today = get_today()
     symbol = get_currency_symbol()
 
     try:
