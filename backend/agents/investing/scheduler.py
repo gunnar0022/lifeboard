@@ -1,12 +1,14 @@
 """
-Investing agent — daily price refresh scheduler.
-Uses yfinance to update current_price on holdings, then stores a portfolio snapshot.
+Investing agent — price refresh scheduler (3x daily).
+Uses Finnhub API (primary) with yfinance fallback to update current_price on holdings,
+then stores an averaged portfolio snapshot.
 LM-36: Exchange rates are cached once per refresh cycle, NOT per-holding.
 LM-33: Portfolio snapshots are NEVER compressed.
 """
 import asyncio
 import json
 import logging
+import os
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
@@ -121,10 +123,64 @@ async def _fetch_exchange_rates(currencies: set[str], primary_currency: str) -> 
     return rates
 
 
-def _fetch_prices_sync(symbols: list[str]) -> dict[str, float | None]:
+# Crypto symbols need special formatting for Finnhub
+FINNHUB_CRYPTO_MAP = {
+    "BTC": "BINANCE:BTCUSDT",
+    "ETH": "BINANCE:ETHUSDT",
+    "SOL": "BINANCE:SOLUSDT",
+    "ADA": "BINANCE:ADAUSDT",
+    "DOT": "BINANCE:DOTUSDT",
+    "DOGE": "BINANCE:DOGEUSDT",
+}
+
+
+async def _fetch_prices_finnhub(symbols: list[str]) -> dict[str, float | None]:
     """
-    Synchronous yfinance price fetch (called via asyncio.to_thread).
+    Fetch prices from Finnhub API (primary source).
     Returns {symbol: price_float} or {symbol: None} on failure.
+    """
+    api_key = os.getenv("FINNHUB_API_KEY", "")
+    if not api_key:
+        logger.warning("FINNHUB_API_KEY not set, skipping Finnhub fetch")
+        return {s: None for s in symbols}
+
+    results = {}
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            for symbol in symbols:
+                finnhub_symbol = FINNHUB_CRYPTO_MAP.get(symbol, symbol)
+                try:
+                    resp = await client.get(
+                        f"https://finnhub.io/api/v1/quote?symbol={finnhub_symbol}&token={api_key}"
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        # "c" is current price, "pc" is previous close
+                        price = data.get("c") or data.get("pc")
+                        if price and price > 0:
+                            results[symbol] = float(price)
+                            logger.debug(f"Finnhub: {symbol} = {price}")
+                        else:
+                            results[symbol] = None
+                    else:
+                        logger.warning(f"Finnhub {symbol}: HTTP {resp.status_code}")
+                        results[symbol] = None
+                except Exception as e:
+                    logger.warning(f"Finnhub {symbol} error: {e}")
+                    results[symbol] = None
+    except Exception as e:
+        logger.error(f"Finnhub client error: {e}")
+        for s in symbols:
+            if s not in results:
+                results[s] = None
+
+    return results
+
+
+def _fetch_prices_yfinance_sync(symbols: list[str]) -> dict[str, float | None]:
+    """
+    Fallback: synchronous yfinance price fetch.
+    Only called for symbols that Finnhub couldn't resolve.
     """
     import yfinance as yf
     results = {}
@@ -133,8 +189,6 @@ def _fetch_prices_sync(symbols: list[str]) -> dict[str, float | None]:
         try:
             ticker = yf.Ticker(symbol)
             price = None
-
-            # Try fast_info fields individually (each can raise internally)
             for field in ["lastPrice", "last_price", "previousClose", "previous_close"]:
                 try:
                     val = getattr(ticker.fast_info, field, None)
@@ -143,8 +197,6 @@ def _fetch_prices_sync(symbols: list[str]) -> dict[str, float | None]:
                         break
                 except Exception:
                     continue
-
-            # Fallback: try history if fast_info failed entirely
             if price is None:
                 try:
                     hist = ticker.history(period="5d")
@@ -154,12 +206,32 @@ def _fetch_prices_sync(symbols: list[str]) -> dict[str, float | None]:
                             price = float(last_close)
                 except Exception:
                     pass
-
             results[symbol] = price
         except Exception as e:
-            logger.warning(f"yfinance fetch failed for {symbol}: {e}")
+            logger.warning(f"yfinance fallback failed for {symbol}: {e}")
             results[symbol] = None
 
+    return results
+
+
+async def _fetch_prices(symbols: list[str]) -> dict[str, float | None]:
+    """
+    Fetch prices: Finnhub first, yfinance fallback for any misses.
+    """
+    # Primary: Finnhub
+    results = await _fetch_prices_finnhub(symbols)
+
+    # Check for misses
+    missed = [s for s in symbols if results.get(s) is None]
+    if missed:
+        logger.info(f"Finnhub missed {len(missed)} symbols, trying yfinance fallback: {missed}")
+        fallback = await asyncio.to_thread(_fetch_prices_yfinance_sync, missed)
+        for s, price in fallback.items():
+            if price is not None:
+                results[s] = price
+
+    found = sum(1 for v in results.values() if v is not None)
+    logger.info(f"Price fetch: {found}/{len(symbols)} resolved")
     return results
 
 
@@ -196,7 +268,7 @@ async def refresh_single_holding_price(holding_id: int) -> int | None:
         symbol = db_holding["symbol"]
         currency = db_holding["currency"]
 
-        prices = await asyncio.to_thread(_fetch_prices_sync, [symbol])
+        prices = await _fetch_prices([symbol])
         raw_price = prices.get(symbol)
 
         if raw_price is None:
@@ -234,9 +306,9 @@ async def run_price_refresh():
     fx_rates = await _fetch_exchange_rates(currencies, primary_currency)
     logger.info(f"Exchange rates cached: {fx_rates}")
 
-    # Fetch prices in thread pool (yfinance is synchronous)
+    # Fetch prices: Finnhub primary, yfinance fallback
     symbols = [h["symbol"] for h in holdings]
-    prices = await asyncio.to_thread(_fetch_prices_sync, symbols)
+    prices = await _fetch_prices(symbols)
 
     now_iso = datetime.now().isoformat()
     updated_count = 0
