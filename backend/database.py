@@ -30,6 +30,7 @@ async def init_db():
         await _create_dnd_tables(db)
         await _create_documents_table(db)
         await _create_projects_table(db)
+        await _create_garmin_tables(db)
         await _create_system_tables(db)
         await db.commit()
     finally:
@@ -463,6 +464,53 @@ async def _create_documents_table(db: aiosqlite.Connection):
             extracted_data TEXT,
             created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
         );
+    """)
+
+
+async def _create_garmin_tables(db: aiosqlite.Connection):
+    await db.executescript("""
+        CREATE TABLE IF NOT EXISTS garmin_daily_summary (
+            date                    TEXT PRIMARY KEY,
+            body_battery_max        INTEGER,
+            body_battery_min        INTEGER,
+            body_battery_charged    INTEGER,
+            body_battery_drained    INTEGER,
+            hrv_last_night_avg      INTEGER,
+            hrv_status              TEXT,
+            resting_heart_rate      INTEGER,
+            stress_avg              INTEGER,
+            stress_max              INTEGER,
+            sleep_duration_seconds  INTEGER,
+            sleep_score             INTEGER,
+            sleep_deep_seconds      INTEGER,
+            sleep_light_seconds     INTEGER,
+            sleep_rem_seconds       INTEGER,
+            sleep_awake_seconds     INTEGER,
+            steps                   INTEGER,
+            steps_goal              INTEGER,
+            distance_meters         REAL,
+            floors_climbed          INTEGER,
+            active_calories         INTEGER,
+            total_calories          INTEGER,
+            active_minutes          INTEGER,
+            workout_count           INTEGER DEFAULT 0,
+            workout_total_seconds   INTEGER DEFAULT 0,
+            raw_json                TEXT,
+            ingested_at             TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_garmin_daily_date ON garmin_daily_summary(date);
+
+        CREATE TABLE IF NOT EXISTS garmin_ingest_log (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+            status          TEXT NOT NULL,
+            dates_updated   TEXT,
+            error_message   TEXT,
+            duration_ms     INTEGER
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_garmin_ingest_run ON garmin_ingest_log(run_at);
     """)
 
 

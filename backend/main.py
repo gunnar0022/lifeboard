@@ -200,6 +200,10 @@ app.include_router(system_health_router)
 from backend.projects import router as projects_router
 app.include_router(projects_router)
 
+# Garmin health data
+from backend.garmin.routes import router as garmin_router
+app.include_router(garmin_router)
+
 
 # --- Setup Wizard API ---
 

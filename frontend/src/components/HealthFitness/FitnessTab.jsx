@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Dumbbell } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import WeightTrend from '../Health/WeightTrend';
+import GarminTile from './GarminTile';
 import './HealthFitness.css';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
@@ -15,17 +15,8 @@ export default function FitnessTab() {
 
   return (
     <motion.div className="hf-tab" variants={stagger} initial="hidden" animate="visible">
-      {/* Exercise heatmap shell — ready for smartwatch API integration */}
-      <motion.div variants={fadeUp} className="fitness-heatmap-shell card">
-        <div className="fitness-heatmap-shell__header">
-          <Dumbbell size={16} />
-          <span>Exercise Activity</span>
-        </div>
-        <div className="fitness-heatmap-shell__empty">
-          <Dumbbell size={32} />
-          <p>Smartwatch integration coming soon</p>
-          <span>This heatmap will populate with exercise data from your connected device.</span>
-        </div>
+      <motion.div variants={fadeUp}>
+        <GarminTile />
       </motion.div>
 
       {measurements && measurements.length > 0 && (

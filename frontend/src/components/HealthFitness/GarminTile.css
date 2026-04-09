@@ -1,0 +1,251 @@
+.garmin-tile {
+  padding: var(--space-lg);
+}
+
+.garmin-tile__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.garmin-tile__range-btns {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.garmin-tile__range-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.garmin-tile__range-btn--active {
+  background: color-mix(in srgb, #F59E0B 12%, transparent);
+  color: #F59E0B;
+  border-color: #F59E0B;
+}
+
+.garmin-tile__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.garmin-tile__empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+}
+
+.garmin-tile__empty p {
+  margin: var(--space-sm) 0;
+  font-size: 0.875rem;
+}
+
+.garmin-tile__sync-btn {
+  padding: 6px 16px;
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #F59E0B;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.garmin-tile__sync-btn:hover {
+  background: #F59E0B;
+  color: white;
+}
+
+/* Hero: Body Battery */
+.garmin-tile__hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.garmin-tile__bb-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.garmin-tile__bb-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.garmin-tile__bb-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #F59E0B;
+  line-height: 1;
+}
+
+.garmin-tile__bb-yesterday {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Stats strip */
+.garmin-tile__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.garmin-tile__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+}
+
+.garmin-tile__stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.garmin-tile__stat-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.garmin-tile__stat-pct {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.garmin-tile__stat-sub {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+/* Sleep score dots */
+.garmin-tile__dots {
+  display: flex;
+  gap: 3px;
+}
+
+.garmin-tile__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-medium);
+}
+
+.garmin-tile__dot--filled {
+  background: #818CF8;
+}
+
+/* Workouts */
+.garmin-tile__workouts {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: var(--space-xs) 0;
+}
+
+/* Multi-day charts */
+.garmin-tile__chart-section {
+  margin-bottom: var(--space-md);
+}
+
+.garmin-tile__chart-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.garmin-tile__mini-charts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+@media (max-width: 600px) {
+  .garmin-tile__mini-charts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.garmin-tile__mini-chart {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.garmin-tile__mini-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.garmin-tile__mini-latest {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* Footer */
+.garmin-tile__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-light);
+  margin-top: var(--space-sm);
+}
+
+.garmin-tile__sync-time {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.garmin-tile__warn {
+  color: var(--color-alert);
+}
+
+.garmin-tile__stale-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+}
