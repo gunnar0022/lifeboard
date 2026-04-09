@@ -174,6 +174,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.rechargeOn === 'short') {
         if ('currentUses' in cf) cf.currentUses = cf.maxUses || 0;
       }
+      // Ancestral Guardian: Consult the Spirits resets on short rest
+      if ('consultSpiritsUsed' in cf) {
+        cf.consultSpiritsUsed = false;
+      }
       // Rune Knight: rune invocations reset on short rest
       if (cf.runeInvocations) {
         const resetInvocations = {};

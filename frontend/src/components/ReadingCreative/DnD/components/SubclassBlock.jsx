@@ -3,6 +3,7 @@ import RuneKnightBlock from './ClassFeatures/RuneKnightBlock';
 import AssassinBlock from './ClassFeatures/AssassinBlock';
 import CircleOfStarsBlock from './ClassFeatures/CircleOfStarsBlock';
 import CircleOfSporesBlock from './ClassFeatures/CircleOfSporesBlock';
+import AncestralGuardianBlock from './ClassFeatures/AncestralGuardianBlock';
 
 /**
  * SubclassBlock — displays subclass features in the Combat tab.
@@ -32,6 +33,9 @@ export default function SubclassBlock({ character, editMode, onUpdate }) {
     }
     if (subclass === 'Circle of Spores') {
       return <CircleOfSporesBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
+    }
+    if (subclass === 'Path of the Ancestral Guardian') {
+      return <AncestralGuardianBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
     }
     return null;
   };

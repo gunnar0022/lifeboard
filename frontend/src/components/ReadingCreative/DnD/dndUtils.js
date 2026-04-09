@@ -139,7 +139,7 @@ export const SUBCLASS_LISTS = {
   Barbarian: [
     { name: 'Path of the Berserker', implemented: false },
     { name: 'Path of the Totem Warrior', implemented: false },
-    { name: 'Path of the Ancestral Guardian', implemented: false },
+    { name: 'Path of the Ancestral Guardian', implemented: true },
     { name: 'Path of the Storm Herald', implemented: false },
     { name: 'Path of the Zealot', implemented: false },
     { name: 'Path of the Beast', implemented: false },
