@@ -3,8 +3,7 @@ import { ArrowLeft, Edit3, Eye, Check, Loader } from 'lucide-react';
 import StatBlock from './components/StatBlock';
 import StatusBar from './components/StatusBar';
 import AttackList from './components/AttackList';
-import SkillList from './components/SkillList';
-import SaveThrows from './components/SaveThrows';
+import StatsTab from './components/StatsTab';
 import FeatureList from './components/FeatureList';
 import ProficiencyTags from './components/ProficiencyTags';
 import InfoPanel from './components/InfoPanel';
@@ -304,7 +303,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const tabs = [
     { id: 'combat', label: 'Combat' },
     { id: 'equipment', label: 'Equipment' },
-    { id: 'skills', label: 'Skills' },
+    { id: 'stats', label: 'Stats' },
     { id: 'features', label: 'Features' },
     ...(hasSpellcasting ? [{ id: 'spells', label: 'Spells' }] : []),
     { id: 'info', label: 'Info' },
@@ -441,10 +440,6 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
               <SubclassBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
-              <ProficiencyTags proficiencies={character.proficiencies || {}}
-                meta={meta} editMode={editMode} onUpdate={handleUpdate} />
-              <SaveThrows abilities={abilities} saveProficiencies={character.saveProficiencies || []}
-                level={level} editMode={editMode} onUpdate={handleUpdate} />
             </div>
             <div className="dnd-sheet__combat-col-right">
               {/* Beast form attacks + abilities overlay */}
@@ -480,6 +475,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
               <AttackList attacks={character.attacks || []} abilities={abilities}
                 level={level} classFeature={character.classFeature}
                 editMode={editMode} onUpdate={handleUpdate} />
+              <ProficiencyTags proficiencies={character.proficiencies || {}}
+                meta={meta} editMode={editMode} onUpdate={handleUpdate} />
             </div>
           </div>
         )}
@@ -488,11 +485,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <EquipmentTab character={character} editMode={editMode} onUpdate={handleUpdate} />
         )}
 
-        {tab === 'skills' && (
-          <SkillList abilities={abilities}
-            skillProficiencies={character.skillProficiencies || []}
-            skillExpertise={character.skillExpertise || []}
-            level={level} editMode={editMode} onUpdate={handleUpdate} />
+        {tab === 'stats' && (
+          <StatsTab character={character} editMode={editMode} onUpdate={handleUpdate} />
         )}
 
         {tab === 'features' && (

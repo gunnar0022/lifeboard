@@ -208,25 +208,7 @@ export default function StatBlock({ character, editMode, onUpdate }) {
         </div>
       </div>
 
-      {/* Row 3: Ability Scores */}
-      <div className="dnd-statblock__row">
-        {ABILITIES.map(ab => {
-          const score = abilities[ab] || 10;
-          const mod = abilityMod(score);
-          return (
-            <div key={ab} className="dnd-statblock__cell dnd-statblock__cell--sm">
-              <span className="dnd-statblock__label">{ab}</span>
-              <span className="dnd-statblock__mid">{formatMod(mod)}</span>
-              {editMode ? (
-                <input type="number" className="dnd-statblock__score-input" value={score}
-                  min={1} max={30} onChange={e => handleAbility(ab, e.target.value)} />
-              ) : (
-                <span className="dnd-statblock__score">{score}</span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* Ability scores moved to Stats tab */}
     </div>
   );
 }

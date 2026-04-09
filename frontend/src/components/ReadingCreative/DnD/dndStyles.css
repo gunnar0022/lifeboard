@@ -3074,6 +3074,150 @@
   font-size: 0.7rem;
 }
 
+/* ============================================
+   STATS TAB (Abilities + Saves + Skills unified)
+   ============================================ */
+.dnd-stats-tab {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .dnd-stats-tab { grid-template-columns: 1fr; }
+}
+
+.dnd-stats-tab__ability-group {
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.4rem;
+  padding: 0.5rem;
+  background: var(--dnd-surface);
+}
+
+.dnd-stats-tab__ability-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--dnd-border);
+  margin-bottom: 0.4rem;
+}
+
+.dnd-stats-tab__ability-core {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dnd-stats-tab__ability-name {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dnd-accent);
+  min-width: 4rem;
+}
+
+.dnd-stats-tab__score {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--dnd-border);
+  min-width: 1.8rem;
+  text-align: center;
+}
+
+.dnd-stats-tab__score-input {
+  width: 2.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.1rem 0.2rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.25rem;
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  font-family: inherit;
+}
+
+.dnd-stats-tab__mod {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+}
+
+.dnd-stats-tab__save {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  transition: background 0.1s;
+}
+
+.dnd-stats-tab__save:hover { background: var(--dnd-surface-hover); }
+
+.dnd-stats-tab__save-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dnd-stats-tab__save-mod {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-stats-tab__save-mod--prof { color: var(--dnd-positive); }
+
+.dnd-stats-tab__prof-dot {
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+  cursor: pointer;
+}
+
+.dnd-stats-tab__prof-dot--active { color: var(--dnd-positive); }
+.dnd-stats-tab__prof-dot--expert { color: var(--dnd-accent); }
+
+.dnd-stats-tab__skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dnd-stats-tab__skill-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.2rem;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.dnd-stats-tab__skill-row:hover { background: var(--dnd-surface-hover); }
+
+.dnd-stats-tab__skill-mod {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dnd-text-dim);
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+.dnd-stats-tab__skill-mod--prof { color: var(--dnd-positive); }
+
+.dnd-stats-tab__skill-name {
+  font-size: 0.75rem;
+  color: var(--dnd-text);
+}
+
 .dnd-features__edit-meta {
   display: flex;
   gap: 0.5rem;
