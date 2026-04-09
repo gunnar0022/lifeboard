@@ -2988,11 +2988,46 @@
   font-size: 0.7rem;
 }
 
-.dnd-runeKnight__rune-desc {
+.dnd-runeKnight__rune-details {
+  margin-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dnd-runeKnight__rune-passive,
+.dnd-runeKnight__rune-invoke-desc {
   font-size: 0.7rem;
   color: var(--dnd-text-dim);
-  margin: 0.2rem 0 0;
   line-height: 1.4;
+}
+
+.dnd-runeKnight__rune-passive strong,
+.dnd-runeKnight__rune-invoke-desc strong {
+  color: var(--dnd-text);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dnd-runeKnight__rune-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-runeKnight__rune-lvl {
+  font-size: 0.6rem;
+  color: var(--dnd-accent);
+  margin-left: 0.3rem;
+}
+
+.dnd-runeKnight__locked-label {
+  width: 100%;
+  font-size: 0.65rem;
+  color: var(--dnd-text-dim);
+  font-style: italic;
+  padding: 0.2rem 0;
 }
 
 .dnd-runeKnight__empty {

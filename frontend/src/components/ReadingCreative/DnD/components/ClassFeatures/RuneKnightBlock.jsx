@@ -1,13 +1,50 @@
 import { useState } from 'react';
 
 const RUNE_LIST = [
-  { name: 'Cloud Rune', desc: 'When hit, redirect attack to another creature within 30ft. Also: ADV on Deception and Sleight of Hand.' },
-  { name: 'Fire Rune', desc: 'On hit, extra 2d6 fire + restrained for 1 min (STR save). Also: double proficiency on tool checks.' },
-  { name: 'Frost Rune', desc: 'Bonus action: +2 to STR/CON checks and saves for 10 min. Also: ADV on Animal Handling and Intimidation.' },
-  { name: 'Stone Rune', desc: 'Reaction: charm creature within 30ft, incapacitated + speed 0 for 1 min (WIS save). Also: ADV on Insight, darkvision 120ft.' },
-  { name: 'Hill Rune', desc: 'Bonus action: resistance to bludgeoning/slashing/piercing for 1 min. Also: ADV on saves vs. poison, resistance to poison.' },
-  { name: 'Storm Rune', desc: 'Bonus action: enter prophetic state for 1 min — reaction to impose ADV/DISADV on any roll within 60ft. Also: ADV on Arcana, can\'t be surprised.' },
+  {
+    name: 'Cloud Rune',
+    minLevel: 3,
+    passive: 'ADV on Sleight of Hand and Deception checks.',
+    invoke: 'Reaction: when you or a creature within 30ft is hit by an attack, choose a different creature within 30ft (other than the attacker) to become the target instead, using the same roll. Works regardless of range.',
+  },
+  {
+    name: 'Fire Rune',
+    minLevel: 3,
+    passive: 'Proficiency bonus doubled for ability checks using tool proficiency.',
+    invoke: 'On weapon hit: extra 2d6 fire damage + target must succeed STR save or be restrained for 1 min (2d6 fire at start of each turn, repeat save at end of turn).',
+  },
+  {
+    name: 'Frost Rune',
+    minLevel: 3,
+    passive: 'ADV on Animal Handling and Intimidation checks.',
+    invoke: 'Bonus action: +2 to all STR and CON ability checks and saving throws for 10 minutes.',
+  },
+  {
+    name: 'Stone Rune',
+    minLevel: 3,
+    passive: 'ADV on Insight checks. Darkvision 120ft.',
+    invoke: 'Reaction: when a creature ends its turn within 30ft, force WIS save. On fail: charmed for 1 min (speed 0, incapacitated, dreamy stupor). Repeat save at end of each turn.',
+  },
+  {
+    name: 'Hill Rune',
+    minLevel: 7,
+    passive: 'ADV on saves against poison. Resistance to poison damage.',
+    invoke: 'Bonus action: resistance to bludgeoning, piercing, and slashing damage for 1 minute.',
+  },
+  {
+    name: 'Storm Rune',
+    minLevel: 7,
+    passive: 'ADV on Arcana checks. Can\'t be surprised while not incapacitated.',
+    invoke: 'Bonus action: prophetic state for 1 min. Use reaction to give ADV or DISADV to any attack roll, save, or ability check made by a creature within 60ft.',
+  },
 ];
+
+// Rune Knight: number of runes known by level
+function maxRunesKnown(level) {
+  if (level >= 15) return 5;
+  if (level >= 7) return 4;
+  return 2; // 3rd level
+}
 
 export default function RuneKnightBlock({ character, editMode, onUpdate }) {
   const cf = character.classFeature || {};
@@ -111,7 +148,8 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
       <div className="dnd-runeKnight__section">
         <div className="dnd-runeKnight__rune-header">
           <h4 className="dnd-runeKnight__subtitle">Rune Carver</h4>
-          {editMode && (
+          <span className="dnd-runeKnight__rune-count">{knownRunes.length}/{maxRunesKnown(level)} runes</span>
+          {knownRunes.length < maxRunesKnown(level) && (
             <button className="dnd-runeKnight__add-rune" onClick={() => setShowRunePicker(!showRunePicker)}>
               + Rune
             </button>
@@ -120,16 +158,24 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
 
         {showRunePicker && (
           <div className="dnd-runeKnight__rune-picker">
-            {RUNE_LIST.filter(r => !knownRunes.includes(r.name)).map(rune => (
-              <button key={rune.name} className="dnd-runeKnight__rune-option" onClick={() => addRune(rune.name)}>
-                {rune.name}
-              </button>
-            ))}
+            {RUNE_LIST
+              .filter(r => !knownRunes.includes(r.name) && r.minLevel <= level)
+              .map(rune => (
+                <button key={rune.name} className="dnd-runeKnight__rune-option" onClick={() => addRune(rune.name)} title={rune.passive}>
+                  {rune.name}
+                  {rune.minLevel > 3 && <span className="dnd-runeKnight__rune-lvl">Lvl {rune.minLevel}+</span>}
+                </button>
+              ))}
+            {RUNE_LIST.filter(r => !knownRunes.includes(r.name) && r.minLevel > level).length > 0 && (
+              <div className="dnd-runeKnight__locked-label">
+                Locked ({RUNE_LIST.filter(r => r.minLevel > level).map(r => r.name).join(', ')} — requires level {RUNE_LIST.find(r => r.minLevel > level)?.minLevel}+)
+              </div>
+            )}
           </div>
         )}
 
         {knownRunes.length === 0 && (
-          <p className="dnd-runeKnight__empty">No runes inscribed. {editMode ? 'Click + Rune to add.' : ''}</p>
+          <p className="dnd-runeKnight__empty">No runes inscribed. Click + Rune to add.</p>
         )}
 
         {knownRunes.map(runeName => {
@@ -152,7 +198,14 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
                   <button className="dnd-runeKnight__remove-rune" onClick={() => removeRune(runeName)}>X</button>
                 )}
               </div>
-              <p className="dnd-runeKnight__rune-desc">{rune?.desc || ''}</p>
+              <div className="dnd-runeKnight__rune-details">
+                <div className="dnd-runeKnight__rune-passive">
+                  <strong>Passive:</strong> {rune?.passive || ''}
+                </div>
+                <div className="dnd-runeKnight__rune-invoke-desc">
+                  <strong>Invoke:</strong> {rune?.invoke || ''}
+                </div>
+              </div>
             </div>
           );
         })}
