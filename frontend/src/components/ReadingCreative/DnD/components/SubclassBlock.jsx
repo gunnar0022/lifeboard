@@ -1,5 +1,6 @@
 import { SUBCLASS_LISTS } from '../dndUtils';
 import RuneKnightBlock from './ClassFeatures/RuneKnightBlock';
+import AssassinBlock from './ClassFeatures/AssassinBlock';
 
 /**
  * SubclassBlock — displays subclass info in the Combat tab.
@@ -30,6 +31,9 @@ export default function SubclassBlock({ character, editMode, onUpdate }) {
   const renderSubclassFeatures = () => {
     if (subclass === 'Rune Knight') {
       return <RuneKnightBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
+    }
+    if (subclass === 'Assassin') {
+      return <AssassinBlock character={character} />;
     }
     return null;
   };

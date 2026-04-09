@@ -159,7 +159,7 @@ export const SUBCLASS_LISTS = {
   ],
   Rogue: [
     { name: 'Thief', implemented: false },
-    { name: 'Assassin', implemented: false },
+    { name: 'Assassin', implemented: true },
     { name: 'Arcane Trickster', implemented: false },
     { name: 'Mastermind', implemented: false },
     { name: 'Swashbuckler', implemented: false },

@@ -3076,6 +3076,61 @@
 }
 
 /* ============================================
+   ASSASSIN SUBCLASS
+   ============================================ */
+.dnd-assassin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dnd-assassin__feature {
+  padding: 0.4rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+}
+
+.dnd-assassin__feature-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.dnd-assassin__feature-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--dnd-class-rogue);
+}
+
+.dnd-assassin__feature-level {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  background: var(--dnd-surface);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dnd-assassin__feature-desc {
+  font-size: 0.75rem;
+  color: var(--dnd-text-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dnd-assassin__reminder {
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--dnd-class-rogue);
+  opacity: 0.8;
+}
+
+/* ============================================
    STATS TAB (Abilities + Saves + Skills unified)
    ============================================ */
 .dnd-stats-tab {
