@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { abilityMod, formatMod, proficiencyBonus } from '../../dndUtils';
 
 const CONSTELLATIONS = {
@@ -18,21 +19,34 @@ const CONSTELLATIONS = {
 export default function CircleOfStarsBlock({ character, editMode, onUpdate }) {
   const cf = character.classFeature || {};
   const level = character.meta?.level || 2;
-  const wis = character.abilities?.WIS || 10;
   const profBonus = proficiencyBonus(level);
-  const wisMod = abilityMod(wis);
   const isUpgraded = level >= 10;
+  const [showPicker, setShowPicker] = useState(false);
 
-  // Star Map: guiding bolt free casts = proficiency bonus
+  const isInStarryForm = cf.activeForm === 'starry' && cf.active;
+  const activeConstellation = cf.starryConstellation || null;
+  const canActivate = (cf.currentUses || 0) > 0 && !cf.active;
+
+  // Star Map: guiding bolt free casts
   const guidingBoltMax = profBonus;
   const guidingBoltUsed = cf.guidingBoltUsed || 0;
 
   // Cosmic Omen (6th level)
   const cosmicOmen = cf.cosmicOmen || { type: null, usesRemaining: profBonus };
 
-  // Track constellation while in starry form
-  const activeConstellation = cf.starryConstellation || null;
-  const isInStarryForm = cf.activeForm === 'starry' && cf.active;
+  const activateStarryForm = (constellation) => {
+    if (!canActivate) return;
+    onUpdate({
+      classFeature: {
+        ...cf,
+        active: true,
+        currentUses: (cf.currentUses || 1) - 1,
+        activeForm: 'starry',
+        starryConstellation: constellation,
+      },
+    });
+    setShowPicker(false);
+  };
 
   const useGuidingBolt = () => {
     if (guidingBoltUsed >= guidingBoltMax) return;
@@ -54,38 +68,61 @@ export default function CircleOfStarsBlock({ character, editMode, onUpdate }) {
 
   return (
     <div className="dnd-stars">
-      {/* Star Map */}
+      {/* Starry Form activation */}
       <div className="dnd-stars__section">
-        <h4 className="dnd-stars__subtitle">Star Map</h4>
-        <p className="dnd-stars__desc">Know Guidance cantrip. Guiding Bolt always prepared.</p>
-        <div className="dnd-stars__resource-row">
-          <span className="dnd-stars__resource-label">Guiding Bolt (free):</span>
-          <span className="dnd-stars__resource-count">{guidingBoltMax - guidingBoltUsed}/{guidingBoltMax}</span>
+        <h4 className="dnd-stars__subtitle">Starry Form</h4>
+        {!isInStarryForm && !showPicker && (
           <button
-            className="dnd-stars__use-btn"
-            onClick={useGuidingBolt}
-            disabled={guidingBoltUsed >= guidingBoltMax}
+            className="dnd-stars__activate-btn"
+            onClick={() => setShowPicker(true)}
+            disabled={!canActivate}
+            title={!canActivate ? (cf.active ? 'Already in a form' : 'No Wild Shape uses remaining') : 'Expend Wild Shape to enter Starry Form'}
           >
-            Cast
+            ENTER STARRY FORM
           </button>
-        </div>
+        )}
+        {showPicker && (
+          <div className="dnd-stars__constellation-picker">
+            {Object.entries(CONSTELLATIONS).map(([name, data]) => (
+              <button key={name} className="dnd-stars__constellation-pick-btn" onClick={() => activateStarryForm(name)}>
+                <strong>{name}</strong>
+                <span>{isUpgraded ? data.upgraded : data.base}</span>
+              </button>
+            ))}
+            <button className="dnd-stars__cancel-pick" onClick={() => setShowPicker(false)}>Cancel</button>
+          </div>
+        )}
+        {isInStarryForm && (
+          <div className="dnd-stars__active-form">
+            <span className="dnd-stars__active-badge">STARRY FORM: {activeConstellation}</span>
+            <p className="dnd-stars__desc-sm">Sheds bright light 10ft, dim 10ft. Lasts 10 min.</p>
+            {isUpgraded && <p className="dnd-stars__upgrade-note">Can change constellation at start of each turn.</p>}
+          </div>
+        )}
       </div>
 
-      {/* Starry Form Reference */}
+      {/* Constellation reference */}
       <div className="dnd-stars__section">
-        <h4 className="dnd-stars__subtitle">Starry Form Constellations</h4>
-        <p className="dnd-stars__desc-sm">Expend Wild Shape as bonus action. Sheds bright light 10ft, dim 10ft. Lasts 10 min.</p>
+        <h4 className="dnd-stars__subtitle">Constellations</h4>
         {Object.entries(CONSTELLATIONS).map(([name, data]) => (
           <div key={name} className={`dnd-stars__constellation ${isInStarryForm && activeConstellation === name ? 'dnd-stars__constellation--active' : ''}`}>
             <span className="dnd-stars__constellation-name">{name}</span>
-            <span className="dnd-stars__constellation-desc">
-              {isUpgraded ? data.upgraded : data.base}
-            </span>
+            <span className="dnd-stars__constellation-desc">{isUpgraded ? data.upgraded : data.base}</span>
           </div>
         ))}
-        {isUpgraded && (
-          <p className="dnd-stars__upgrade-note">Twinkling Constellations: can change constellation at start of each turn.</p>
-        )}
+      </div>
+
+      {/* Star Map */}
+      <div className="dnd-stars__section">
+        <h4 className="dnd-stars__subtitle">Star Map</h4>
+        <p className="dnd-stars__desc-sm">Know Guidance cantrip. Guiding Bolt always prepared.</p>
+        <div className="dnd-stars__resource-row">
+          <span className="dnd-stars__resource-label">Guiding Bolt (free):</span>
+          <span className="dnd-stars__resource-count">{guidingBoltMax - guidingBoltUsed}/{guidingBoltMax}</span>
+          <button className="dnd-stars__use-btn" onClick={useGuidingBolt} disabled={guidingBoltUsed >= guidingBoltMax}>
+            Cast
+          </button>
+        </div>
       </div>
 
       {/* Cosmic Omen (6th level) */}
@@ -98,23 +135,17 @@ export default function CircleOfStarsBlock({ character, editMode, onUpdate }) {
                 <span className={`dnd-stars__omen-badge dnd-stars__omen-badge--${cosmicOmen.type.toLowerCase()}`}>
                   {cosmicOmen.type} (rolled {cosmicOmen.roll})
                 </span>
-                <span className="dnd-stars__resource-count">{cosmicOmen.usesRemaining}/{profBonus} uses</span>
-                <button className="dnd-stars__use-btn" onClick={useCosmicOmen} disabled={cosmicOmen.usesRemaining <= 0}>
-                  Use
-                </button>
+                <span className="dnd-stars__resource-count">{cosmicOmen.usesRemaining}/{profBonus}</span>
+                <button className="dnd-stars__use-btn" onClick={useCosmicOmen} disabled={cosmicOmen.usesRemaining <= 0}>Use</button>
               </>
             ) : (
-              <button className="dnd-stars__roll-btn" onClick={rollCosmicOmen}>
-                Roll Cosmic Omen
-              </button>
+              <button className="dnd-stars__roll-btn" onClick={rollCosmicOmen}>Roll Cosmic Omen</button>
             )}
           </div>
           <p className="dnd-stars__desc-sm">
-            {cosmicOmen.type === 'Weal'
-              ? 'Reaction: add 1d6 to a creature\'s attack, save, or ability check within 30ft.'
-              : cosmicOmen.type === 'Woe'
-              ? 'Reaction: subtract 1d6 from a creature\'s attack, save, or ability check within 30ft.'
-              : 'After long rest, roll a die to determine Weal or Woe for the day.'}
+            {cosmicOmen.type === 'Weal' ? 'Reaction: add 1d6 to attack, save, or ability check within 30ft.'
+              : cosmicOmen.type === 'Woe' ? 'Reaction: subtract 1d6 from attack, save, or ability check within 30ft.'
+              : 'After long rest, roll to determine Weal or Woe.'}
           </p>
         </div>
       )}

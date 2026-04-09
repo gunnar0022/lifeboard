@@ -2,44 +2,31 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import BeastFormPicker from './BeastFormPicker';
 
-const STARRY_FORMS = {
-  Archer: 'Bonus action ranged spell attack. 1d8 + WIS mod radiant damage, 60 ft. range.',
-  Chalice: 'When you cast a healing spell using a spell slot, you or a creature within 30 ft. regains 1d8 + WIS mod HP.',
-  Dragon: 'Treat rolls of 9 or lower as 10 on INT/WIS checks and CON concentration saves.',
-};
-
+/**
+ * WildShapeTracker — handles Wild Shape resource (uses) and Beast Form only.
+ * Subclass-specific forms (Symbiotic Entity, Starry Form) are activated from
+ * their respective SubclassBlock components, which consume uses from here.
+ */
 export default function WildShapeTracker({ classFeature, editMode, onUpdate, character }) {
   const { maxUses, currentUses, active, rechargeOn } = classFeature;
-  const [showFormPicker, setShowFormPicker] = useState(false);
-  const level = character?.meta?.level || 1;
+  const [showBeastPicker, setShowBeastPicker] = useState(false);
 
-  const activeForm = classFeature.activeForm || null; // 'spores' | 'monster' | 'starry' | null
-  const starryConstellation = classFeature.starryConstellation || null;
+  const activeForm = classFeature.activeForm || null;
   const monsterForm = classFeature.monsterForm || null;
 
-  const activateForm = (formType, extra = {}) => {
+  const activateBeastForm = (beast) => {
     if (currentUses <= 0) return;
-    const updates = {
-      ...classFeature,
-      active: true,
-      currentUses: currentUses - 1,
-      activeForm: formType,
-      ...extra,
-    };
-
-    // Circle of Spores: auto-grant temp HP = 4 * druid level
-    if (formType === 'spores') {
-      updates.symbioticEntity = true;
-      // Set temp HP on the character's combat
-      if (character?.combat) {
-        const tempHp = 4 * level;
-        // Will be handled via onUpdate by parent
-        updates._grantTempHp = tempHp;
-      }
-    }
-
-    setShowFormPicker(false);
-    onUpdate({ classFeature: updates });
+    onUpdate({
+      classFeature: {
+        ...classFeature,
+        active: true,
+        currentUses: currentUses - 1,
+        activeForm: 'monster',
+        monsterForm: beast,
+        _beastTransform: beast,
+      },
+    });
+    setShowBeastPicker(false);
   };
 
   const dismissForm = () => {
@@ -51,7 +38,7 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
         symbioticEntity: false,
         starryConstellation: null,
         monsterForm: null,
-      }
+      },
     });
   };
 
@@ -59,14 +46,13 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
     if (active) {
       dismissForm();
     } else if (currentUses > 0) {
-      setShowFormPicker(true);
+      setShowBeastPicker(true);
     }
   };
 
-  const formColor = activeForm === 'spores' ? 'var(--dnd-class-druid)'
-    : activeForm === 'starry' ? 'var(--dnd-class-wizard)'
-    : activeForm === 'monster' ? 'var(--dnd-class-ranger)'
-    : 'var(--dnd-class-druid)';
+  // If a subclass form is active (spores/starry), show that status but let their
+  // blocks handle the details. Only show beast form effects here.
+  const isSubclassForm = active && (activeForm === 'spores' || activeForm === 'starry');
 
   return (
     <motion.div
@@ -80,7 +66,7 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
         {active ? (
           <span className="dnd-wildshape__status dnd-wildshape__status--active">
             {activeForm === 'spores' ? 'SYMBIOTIC ENTITY' :
-             activeForm === 'starry' ? `STARRY: ${starryConstellation || ''}` :
+             activeForm === 'starry' ? `STARRY FORM` :
              activeForm === 'monster' ? (monsterForm?.name || 'TRANSFORMED') :
              'ACTIVE'}
           </span>
@@ -89,81 +75,29 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
         )}
       </div>
 
-      {/* Form picker */}
-      {showFormPicker && !active && (
+      {/* Beast form picker */}
+      {showBeastPicker && !active && (
         <div className="dnd-wildshape__picker">
-          <p className="dnd-wildshape__picker-label">Choose form:</p>
-          <div className="dnd-wildshape__picker-btns">
-            <button className="dnd-wildshape__form-btn dnd-wildshape__form-btn--spores"
-              onClick={() => activateForm('spores')}>
-              Symbiotic Entity
-              <span className="dnd-wildshape__form-desc">+{4 * level} temp HP, +1d6 poison melee</span>
-            </button>
-            <button className="dnd-wildshape__form-btn dnd-wildshape__form-btn--monster"
-              onClick={() => setShowFormPicker('beast')}>
-              Beast Form
-              <span className="dnd-wildshape__form-desc">Transform into a creature</span>
-            </button>
-            <button className="dnd-wildshape__form-btn dnd-wildshape__form-btn--starry"
-              onClick={() => setShowFormPicker('starry')}>
-              Starry Form
-              <span className="dnd-wildshape__form-desc">Choose a constellation</span>
-            </button>
-          </div>
-          {showFormPicker === 'starry' && (
-            <div className="dnd-wildshape__starry-picker">
-              {Object.entries(STARRY_FORMS).map(([name, desc]) => (
-                <button key={name} className="dnd-wildshape__starry-btn"
-                  onClick={() => activateForm('starry', { starryConstellation: name })}>
-                  <strong>{name}</strong>
-                  <span>{desc}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          {showFormPicker === 'beast' && (
-            <BeastFormPicker
-              onSelect={(beast) => activateForm('monster', {
-                monsterForm: beast,
-                _beastTransform: beast,
-              })}
-              onCancel={() => setShowFormPicker(true)}
-            />
-          )}
-          <button className="dnd-wildshape__cancel" onClick={() => setShowFormPicker(false)}>Cancel</button>
+          <BeastFormPicker
+            onSelect={activateBeastForm}
+            onCancel={() => setShowBeastPicker(false)}
+          />
+          <button className="dnd-wildshape__cancel" onClick={() => setShowBeastPicker(false)}>Cancel</button>
         </div>
       )}
 
       {/* Toggle button (when not picking) */}
-      {!showFormPicker && (
+      {!showBeastPicker && (
         <button
           className={`dnd-wildshape__toggle ${active ? 'dnd-wildshape__toggle--end' : ''}`}
           onClick={handleToggle}
           disabled={!active && currentUses === 0}
         >
-          {active ? 'END WILD SHAPE' : 'WILD SHAPE'}
+          {active ? 'END WILD SHAPE' : 'BEAST FORM'}
         </button>
       )}
 
-      {/* Active form effects */}
-      {active && activeForm === 'spores' && (
-        <motion.div className="dnd-wildshape__effects"
-          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-          <p>Symbiotic Entity active</p>
-          <p>+1d6 poison damage on melee weapon attacks</p>
-          <p>Halo of Spores upgraded</p>
-          <p className="dnd-wildshape__auto-note">Temp HP: {4 * level} (4 x level {level})</p>
-        </motion.div>
-      )}
-
-      {active && activeForm === 'starry' && starryConstellation && (
-        <motion.div className="dnd-wildshape__effects"
-          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-          <p><strong>Starry Form: {starryConstellation}</strong></p>
-          <p>{STARRY_FORMS[starryConstellation]}</p>
-        </motion.div>
-      )}
-
+      {/* Beast form effects */}
       {active && activeForm === 'monster' && monsterForm && (
         <motion.div className="dnd-wildshape__effects"
           initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
@@ -177,7 +111,14 @@ export default function WildShapeTracker({ classFeature, editMode, onUpdate, cha
         </motion.div>
       )}
 
-      {rechargeOn && !active && !showFormPicker && (
+      {/* Subclass form note — details shown in SubclassBlock */}
+      {isSubclassForm && (
+        <p className="dnd-wildshape__auto-note" style={{ marginTop: '0.3rem' }}>
+          See subclass section below for details
+        </p>
+      )}
+
+      {rechargeOn && !active && !showBeastPicker && (
         <span className="dnd-wildshape__recharge">
           {rechargeOn === 'short' ? 'SHORT REST' : 'LONG REST'}
         </span>

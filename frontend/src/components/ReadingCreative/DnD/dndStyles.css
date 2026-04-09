@@ -3163,6 +3163,36 @@
 .dnd-stars__omen-badge--weal { background: rgba(58, 122, 58, 0.15); color: var(--dnd-positive); }
 .dnd-stars__omen-badge--woe { background: rgba(138, 42, 42, 0.15); color: var(--dnd-negative); }
 
+.dnd-stars__activate-btn {
+  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-wizard); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-wizard); cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
+}
+.dnd-stars__activate-btn:hover:not(:disabled) { background: var(--dnd-class-wizard); color: var(--dnd-bg); }
+.dnd-stars__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-stars__constellation-picker { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.3rem; }
+.dnd-stars__constellation-pick-btn {
+  display: flex; flex-direction: column; gap: 0.1rem; padding: 0.4rem;
+  border: 1px solid var(--dnd-border); border-radius: 0.3rem; background: var(--dnd-bg);
+  color: var(--dnd-text); cursor: pointer; font-family: inherit; font-size: 0.7rem; text-align: left;
+}
+.dnd-stars__constellation-pick-btn:hover { border-color: var(--dnd-class-wizard); background: var(--dnd-surface-hover); }
+.dnd-stars__constellation-pick-btn strong { color: var(--dnd-class-wizard); }
+.dnd-stars__cancel-pick {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer; font-family: inherit; font-size: 0.65rem;
+}
+
+.dnd-stars__active-form { margin-bottom: 0.3rem; }
+.dnd-stars__active-badge {
+  display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: var(--dnd-class-wizard); color: var(--dnd-bg);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  box-shadow: 0 0 8px rgba(42, 74, 136, 0.4); margin-bottom: 0.2rem;
+}
+
 /* ============================================
    CIRCLE OF SPORES SUBCLASS
    ============================================ */
@@ -3204,6 +3234,15 @@
 }
 
 .dnd-spores__spreading-note { font-size: 0.7rem; font-style: italic; color: var(--dnd-class-druid); margin: 0.2rem 0 0; }
+
+.dnd-spores__activate-btn {
+  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
+}
+.dnd-spores__activate-btn:hover:not(:disabled) { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ============================================
    STATS TAB (Abilities + Saves + Skills unified)
