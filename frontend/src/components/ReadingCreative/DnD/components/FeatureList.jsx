@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function FeatureList({ features, editMode, onUpdate }) {
+export default function FeatureList({ features, editMode, onUpdate, level }) {
   const [expanded, setExpanded] = useState({});
 
   const toggle = (i) => setExpanded(prev => ({ ...prev, [i]: !prev[i] }));
@@ -35,6 +35,11 @@ export default function FeatureList({ features, editMode, onUpdate }) {
       <h3 className="dnd-section-title">Features & Traits</h3>
       <div className="dnd-features__grid">
         {features.map((feat, i) => {
+          // In display mode, hide features that haven't unlocked yet
+          if (!editMode && feat.unlockLevel && level && feat.unlockLevel > level) {
+            return null;
+          }
+
           if (editMode) {
             return (
               <div key={i} className="dnd-features__card dnd-features__card--edit">
@@ -45,6 +50,10 @@ export default function FeatureList({ features, editMode, onUpdate }) {
                   onChange={e => handleChange(i, 'source', e.target.value)} />
                 <textarea className="dnd-field dnd-field--textarea" value={feat.desc} placeholder="Description"
                   onChange={e => handleChange(i, 'desc', e.target.value)} rows={3} />
+                <div className="dnd-features__edit-meta">
+                  <label>Unlock Lvl: <input type="number" className="dnd-field dnd-field--sm" value={feat.unlockLevel || ''}
+                    onChange={e => handleChange(i, 'unlockLevel', parseInt(e.target.value) || null)} min={1} max={20} placeholder="—" /></label>
+                </div>
               </div>
             );
           }

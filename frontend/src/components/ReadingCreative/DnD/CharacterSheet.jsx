@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Edit3, Eye, Check, Loader } from 'lucide-react';
 import StatBlock from './components/StatBlock';
+import StatusBar from './components/StatusBar';
 import AttackList from './components/AttackList';
 import SkillList from './components/SkillList';
 import SaveThrows from './components/SaveThrows';
 import FeatureList from './components/FeatureList';
 import ProficiencyTags from './components/ProficiencyTags';
 import InfoPanel from './components/InfoPanel';
+import EquipmentTab from './components/EquipmentTab';
 import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
 import useAutosave from './components/useAutosave';
-import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS } from './dndUtils';
+import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS } from './dndUtils';
 
 export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack }) {
   const [character, setCharacter] = useState(null);
@@ -239,6 +241,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       updates.spellcasting = sc;
     }
 
+    // Long rest: reduce exhaustion by 1 (if any), clear unconscious condition
+    if (character.exhaustionLevel > 0) {
+      updates.exhaustionLevel = character.exhaustionLevel - 1;
+    }
+    if (character.activeConditions?.length > 0) {
+      updates.activeConditions = character.activeConditions.filter(c => c !== 'Unconscious');
+    }
+
     setCharacter(prev => deepMerge(prev, updates));
   };
 
@@ -270,6 +280,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
   const tabs = [
     { id: 'combat', label: 'Combat' },
+    { id: 'equipment', label: 'Equipment' },
     { id: 'skills', label: 'Skills' },
     { id: 'features', label: 'Features' },
     ...(hasSpellcasting ? [{ id: 'spells', label: 'Spells' }] : []),
@@ -306,8 +317,13 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
                 </select>
                 <input type="number" className="dnd-field dnd-field--sm" value={level} min={1} max={20}
                   onChange={e => handleUpdate({ meta: { ...meta, level: parseInt(e.target.value) || 1 } })} />
-                <input className="dnd-field" value={meta.subclass || ''} placeholder="Subclass"
-                  onChange={e => handleUpdate({ meta: { ...meta, subclass: e.target.value } })} />
+                <select className="dnd-field" value={meta.subclass || ''}
+                  onChange={e => handleUpdate({ meta: { ...meta, subclass: e.target.value } })}>
+                  <option value="">-- Subclass --</option>
+                  {(SUBCLASS_LISTS[meta.className] || []).map(sc => (
+                    <option key={sc.name} value={sc.name}>{sc.name}{sc.implemented ? '' : ' *'}</option>
+                  ))}
+                </select>
               </div>
             ) : (
               <>
@@ -367,6 +383,9 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
       {/* Top section: 3-row stat block */}
       <StatBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
+
+      {/* Status bar: inspiration, conditions, exhaustion */}
+      <StatusBar character={character} onUpdate={handleUpdate} />
 
       {/* Tabs */}
       <div className="dnd-sheet__tabs">
@@ -441,6 +460,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           </div>
         )}
 
+        {tab === 'equipment' && (
+          <EquipmentTab character={character} editMode={editMode} onUpdate={handleUpdate} />
+        )}
+
         {tab === 'skills' && (
           <SkillList abilities={abilities}
             skillProficiencies={character.skillProficiencies || []}
@@ -449,8 +472,22 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         )}
 
         {tab === 'features' && (
-          <FeatureList features={character.features || []}
-            editMode={editMode} onUpdate={handleUpdate} />
+          <>
+            {meta.subclass && (() => {
+              const scList = SUBCLASS_LISTS[meta.className] || [];
+              const sc = scList.find(s => s.name === meta.subclass);
+              if (sc && !sc.implemented) {
+                return (
+                  <div className="dnd-subclass-notice">
+                    <strong>{meta.subclass}</strong> — Not yet implemented. Subclass features must be tracked manually in the list below.
+                  </div>
+                );
+              }
+              return null;
+            })()}
+            <FeatureList features={character.features || []}
+              editMode={editMode} onUpdate={handleUpdate} level={level} />
+          </>
         )}
 
         {tab === 'spells' && hasSpellcasting && (
