@@ -1,6 +1,7 @@
 import { abilityMod, formatMod, proficiencyBonus, SKILLS } from '../dndUtils';
 
-const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+// Interleaved for 2-column grid: left column STR/DEX/CON, right column INT/WIS/CHA
+const ABILITIES = ['STR', 'INT', 'DEX', 'WIS', 'CON', 'CHA'];
 const ABILITY_NAMES = {
   STR: 'Strength', DEX: 'Dexterity', CON: 'Constitution',
   INT: 'Intelligence', WIS: 'Wisdom', CHA: 'Charisma',

@@ -722,6 +722,7 @@
    PROFICIENCY TAGS (Combat tab)
    ============================================ */
 .dnd-prof-tags {
+  margin-top: 1rem;
   background: var(--dnd-surface);
   border: 1px solid var(--dnd-border);
   border-radius: 8px;
