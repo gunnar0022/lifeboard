@@ -1,0 +1,639 @@
+/* ============================================
+   RUNE KNIGHT SUBCLASS
+   ============================================ */
+.dnd-runeKnight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.dnd-runeKnight__section {
+  padding: 0.4rem 0;
+}
+
+.dnd-runeKnight__gm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.dnd-runeKnight__gm-toggle {
+  padding: 0.3rem 0.8rem;
+  border: 2px solid var(--dnd-class-fighter);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--dnd-class-fighter);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dnd-runeKnight__gm-toggle:hover:not(:disabled) {
+  background: var(--dnd-class-fighter);
+  color: var(--dnd-bg);
+}
+
+.dnd-runeKnight__gm-toggle--active {
+  background: var(--dnd-class-fighter);
+  color: var(--dnd-bg);
+  box-shadow: 0 0 12px rgba(58, 106, 136, 0.5);
+}
+
+.dnd-runeKnight__gm-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dnd-runeKnight__uses {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-runeKnight__gm-effects {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: var(--dnd-class-fighter);
+  font-weight: 600;
+  padding: 0.3rem 0;
+}
+
+.dnd-runeKnight__gm-effects span {
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  background: rgba(58, 106, 136, 0.12);
+}
+
+.dnd-runeKnight__subtitle {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dnd-accent);
+  margin: 0;
+}
+
+.dnd-runeKnight__rune-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.dnd-runeKnight__add-rune {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border: 1px dashed var(--dnd-border);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--dnd-text-dim);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dnd-runeKnight__add-rune:hover {
+  border-color: var(--dnd-accent);
+  color: var(--dnd-accent);
+}
+
+.dnd-runeKnight__rune-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.dnd-runeKnight__rune-option {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.dnd-runeKnight__rune-option:hover {
+  border-color: var(--dnd-class-fighter);
+  background: var(--dnd-surface-hover);
+}
+
+.dnd-runeKnight__rune {
+  padding: 0.4rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+  margin-bottom: 0.3rem;
+  transition: opacity 0.2s;
+}
+
+.dnd-runeKnight__rune--spent {
+  opacity: 0.5;
+}
+
+.dnd-runeKnight__rune-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dnd-runeKnight__rune-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--dnd-class-fighter);
+}
+
+.dnd-runeKnight__invoke {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--dnd-class-fighter);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--dnd-class-fighter);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.dnd-runeKnight__invoke--spent {
+  background: var(--dnd-class-fighter);
+  color: var(--dnd-bg);
+}
+
+.dnd-runeKnight__remove-rune {
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-dim);
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.dnd-runeKnight__rune-details {
+  margin-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dnd-runeKnight__rune-passive,
+.dnd-runeKnight__rune-invoke-desc {
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+  line-height: 1.4;
+}
+
+.dnd-runeKnight__rune-passive strong,
+.dnd-runeKnight__rune-invoke-desc strong {
+  color: var(--dnd-text);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dnd-runeKnight__rune-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-runeKnight__rune-lvl {
+  font-size: 0.6rem;
+  color: var(--dnd-accent);
+  margin-left: 0.3rem;
+}
+
+.dnd-runeKnight__locked-label {
+  width: 100%;
+  font-size: 0.65rem;
+  color: var(--dnd-text-dim);
+  font-style: italic;
+  padding: 0.2rem 0;
+}
+
+.dnd-runeKnight__empty {
+  font-size: 0.8rem;
+  color: var(--dnd-text-dim);
+  font-style: italic;
+  margin: 0;
+}
+
+.dnd-runeKnight__edit-row {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-runeKnight__edit-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dnd-runeKnight__desc {
+  font-size: 0.75rem;
+  color: var(--dnd-text-dim);
+  margin: 0 0 0.3rem;
+}
+
+.dnd-runeKnight__uses-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--dnd-text);
+}
+
+.dnd-runeKnight__uses-row button {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--dnd-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.7rem;
+}
+
+/* ============================================
+   ASSASSIN SUBCLASS
+   ============================================ */
+.dnd-assassin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dnd-assassin__feature {
+  padding: 0.4rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+}
+
+.dnd-assassin__feature-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.dnd-assassin__feature-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--dnd-class-rogue);
+}
+
+.dnd-assassin__feature-level {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  background: var(--dnd-surface);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dnd-assassin__feature-desc {
+  font-size: 0.75rem;
+  color: var(--dnd-text-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dnd-assassin__reminder {
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--dnd-class-rogue);
+  opacity: 0.8;
+}
+
+/* ============================================
+   PATH OF THE ANCESTRAL GUARDIAN SUBCLASS
+   ============================================ */
+.dnd-ancestral { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-ancestral__feature { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-ancestral__feature-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; }
+.dnd-ancestral__feature-name { font-weight: 700; font-size: 0.8rem; color: var(--dnd-class-barbarian); }
+.dnd-ancestral__feature-level {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-ancestral__feature-desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0; line-height: 1.5; }
+.dnd-ancestral__feature-desc strong { color: var(--dnd-class-barbarian); }
+.dnd-ancestral__req-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0 0; }
+
+.dnd-ancestral__active-note {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(160, 16, 16, 0.12); color: var(--dnd-class-barbarian);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+
+.dnd-ancestral__inactive-note {
+  font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0 0;
+}
+
+.dnd-ancestral__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); margin-top: 0.3rem; }
+.dnd-ancestral__use-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-class-barbarian); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-barbarian); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-ancestral__use-btn:hover:not(:disabled) { background: var(--dnd-class-barbarian); color: var(--dnd-bg); }
+.dnd-ancestral__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============================================
+   CIRCLE OF STARS SUBCLASS
+   ============================================ */
+.dnd-stars { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-stars__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-stars__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-wizard); margin: 0 0 0.2rem; }
+.dnd-stars__desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0 0 0.3rem; line-height: 1.5; }
+.dnd-stars__desc-sm { font-size: 0.7rem; color: var(--dnd-text-dim); margin: 0 0 0.3rem; line-height: 1.4; }
+.dnd-stars__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; }
+.dnd-stars__resource-label { color: var(--dnd-text-dim); font-weight: 600; }
+.dnd-stars__resource-count { font-weight: 700; color: var(--dnd-text); }
+.dnd-stars__use-btn, .dnd-stars__roll-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-class-wizard); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-wizard); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-stars__use-btn:hover:not(:disabled), .dnd-stars__roll-btn:hover { background: var(--dnd-class-wizard); color: var(--dnd-bg); }
+.dnd-stars__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-stars__constellation {
+  padding: 0.3rem 0.4rem; margin-bottom: 0.2rem; border-radius: 0.25rem;
+  border-left: 3px solid var(--dnd-border); font-size: 0.7rem; color: var(--dnd-text-dim);
+}
+.dnd-stars__constellation--active { border-left-color: var(--dnd-class-wizard); background: rgba(42, 74, 136, 0.08); }
+.dnd-stars__constellation-name { font-weight: 700; color: var(--dnd-text); display: block; margin-bottom: 0.1rem; }
+.dnd-stars__constellation-desc { line-height: 1.4; }
+.dnd-stars__upgrade-note { font-size: 0.65rem; font-style: italic; color: var(--dnd-class-wizard); margin: 0.2rem 0 0; }
+
+.dnd-stars__omen-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.dnd-stars__omen-badge { padding: 0.15rem 0.5rem; border-radius: 0.3rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.dnd-stars__omen-badge--weal { background: rgba(58, 122, 58, 0.15); color: var(--dnd-positive); }
+.dnd-stars__omen-badge--woe { background: rgba(138, 42, 42, 0.15); color: var(--dnd-negative); }
+
+.dnd-stars__activate-btn {
+  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-wizard); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-wizard); cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
+}
+.dnd-stars__activate-btn:hover:not(:disabled) { background: var(--dnd-class-wizard); color: var(--dnd-bg); }
+.dnd-stars__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-stars__constellation-picker { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.3rem; }
+.dnd-stars__constellation-pick-btn {
+  display: flex; flex-direction: column; gap: 0.1rem; padding: 0.4rem;
+  border: 1px solid var(--dnd-border); border-radius: 0.3rem; background: var(--dnd-bg);
+  color: var(--dnd-text); cursor: pointer; font-family: inherit; font-size: 0.7rem; text-align: left;
+}
+.dnd-stars__constellation-pick-btn:hover { border-color: var(--dnd-class-wizard); background: var(--dnd-surface-hover); }
+.dnd-stars__constellation-pick-btn strong { color: var(--dnd-class-wizard); }
+.dnd-stars__cancel-pick {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer; font-family: inherit; font-size: 0.65rem;
+}
+
+.dnd-stars__active-form { margin-bottom: 0.3rem; }
+.dnd-stars__active-badge {
+  display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: var(--dnd-class-wizard); color: var(--dnd-bg);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  box-shadow: 0 0 8px rgba(42, 74, 136, 0.4); margin-bottom: 0.2rem;
+}
+
+/* ============================================
+   CIRCLE OF SPORES SUBCLASS
+   ============================================ */
+.dnd-spores { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-spores__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-spores__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-druid); margin: 0 0 0.2rem; }
+.dnd-spores__desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0; line-height: 1.5; }
+.dnd-spores__desc-sm { font-size: 0.7rem; color: var(--dnd-text-dim); margin: 0 0 0.2rem; line-height: 1.4; }
+.dnd-spores__desc strong { color: var(--dnd-class-druid); }
+
+.dnd-spores__spell-table { display: flex; flex-direction: column; gap: 0.1rem; }
+.dnd-spores__spell-row { display: flex; gap: 0.5rem; font-size: 0.7rem; padding: 0.1rem 0; }
+.dnd-spores__spell-level { font-weight: 700; color: var(--dnd-class-druid); min-width: 2rem; }
+.dnd-spores__spell-names { color: var(--dnd-text-dim); }
+
+.dnd-spores__effect-list { margin: 0.2rem 0; padding-left: 1.2rem; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.6; }
+
+.dnd-spores__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); }
+.dnd-spores__use-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-spores__use-btn:hover:not(:disabled) { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-spores__toggle {
+  padding: 0.3rem 0.6rem; border: 2px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+}
+.dnd-spores__toggle:hover { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__toggle--active { background: var(--dnd-class-druid); color: var(--dnd-bg); box-shadow: 0 0 8px rgba(42, 106, 42, 0.4); }
+
+.dnd-spores__active-badge {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(42, 106, 42, 0.15); color: var(--dnd-class-druid);
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+
+.dnd-spores__spreading-note { font-size: 0.7rem; font-style: italic; color: var(--dnd-class-druid); margin: 0.2rem 0 0; }
+
+.dnd-spores__activate-btn {
+  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
+}
+.dnd-spores__activate-btn:hover:not(:disabled) { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============================================
+   STATS TAB (Abilities + Saves + Skills unified)
+   ============================================ */
+.dnd-stats-tab {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .dnd-stats-tab { grid-template-columns: 1fr; }
+}
+
+.dnd-stats-tab__ability-group {
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.4rem;
+  padding: 0.5rem;
+  background: var(--dnd-surface);
+}
+
+.dnd-stats-tab__ability-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--dnd-border);
+  margin-bottom: 0.4rem;
+}
+
+.dnd-stats-tab__ability-core {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dnd-stats-tab__ability-name {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dnd-accent);
+  min-width: 4rem;
+}
+
+.dnd-stats-tab__score {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--dnd-border);
+  min-width: 1.8rem;
+  text-align: center;
+}
+
+.dnd-stats-tab__score-input {
+  width: 2.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.1rem 0.2rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.25rem;
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  font-family: inherit;
+}
+
+.dnd-stats-tab__mod {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+}
+
+.dnd-stats-tab__save {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  transition: background 0.1s;
+}
+
+.dnd-stats-tab__save:hover { background: var(--dnd-surface-hover); }
+
+.dnd-stats-tab__save-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--dnd-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dnd-stats-tab__save-mod {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-stats-tab__save-mod--prof { color: var(--dnd-positive); }
+
+.dnd-stats-tab__prof-dot {
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+  cursor: pointer;
+}
+
+.dnd-stats-tab__prof-dot--active { color: var(--dnd-positive); }
+.dnd-stats-tab__prof-dot--expert { color: var(--dnd-accent); }
+
+.dnd-stats-tab__skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dnd-stats-tab__skill-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.2rem;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.dnd-stats-tab__skill-row:hover { background: var(--dnd-surface-hover); }
+
+.dnd-stats-tab__skill-mod {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dnd-text-dim);
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+.dnd-stats-tab__skill-mod--prof { color: var(--dnd-positive); }
+
+.dnd-stats-tab__skill-name {
+  font-size: 0.75rem;
+  color: var(--dnd-text);
+}
+
+.dnd-features__edit-meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+}
+
+.dnd-features__edit-meta label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dnd-features__edit-meta input {
+  width: 3rem;
+}
+
+.dnd-equipment__notes-text {
+  font-size: 0.8rem;
+  color: var(--dnd-text-dim);
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}

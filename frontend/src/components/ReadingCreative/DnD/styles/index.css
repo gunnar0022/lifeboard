@@ -1,0 +1,12 @@
+/* D&D Character Sheet Styles — split for editability */
+@import './theme.css';           /* Light/dark mode variables, shared fields */
+@import './navigation.css';      /* Selection screen, campaign cards, color picker */
+@import './sheet.css';           /* Sheet layout, header, tabs, campaign name */
+@import './statblock.css';       /* 3-row stat block (AC, HP, dice, death saves) */
+@import './combat.css';          /* Attacks, proficiency tags */
+@import './tabs-content.css';    /* Skills, saves, features, info panel, equipment */
+@import './class-features.css';  /* Rage, Wild Shape, Fighter, Cunning Action */
+@import './spellcasting.css';    /* Spells tab, slots, modals, concentration */
+@import './campaign-notes.css';  /* Campaign notes tab */
+@import './status-equipment.css'; /* Status bar, Equipment tab, Stats tab */
+@import './subclasses.css';      /* All subclass feature blocks */

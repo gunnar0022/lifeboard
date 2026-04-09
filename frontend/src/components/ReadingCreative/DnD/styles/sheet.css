@@ -1,0 +1,334 @@
+/* ============================================
+   CHARACTER SHEET
+   ============================================ */
+.dnd-sheet {
+  background: var(--dnd-bg);
+  padding: 1.5rem 2.5rem;
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dnd-sheet--loading {
+  display: flex; align-items: center; justify-content: center; min-height: 300px;
+}
+.dnd-sheet__spinner { animation: spin 1s linear infinite; color: var(--dnd-accent); }
+.dnd-sheet__spinner-sm { animation: spin 1s linear infinite; }
+
+/* Header */
+.dnd-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--dnd-border);
+  flex-wrap: wrap;
+}
+.dnd-sheet__back {
+  background: none; border: none; color: var(--dnd-text-dim);
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  font-family: inherit; font-size: 0.85rem; padding: 0.3rem 0;
+  white-space: nowrap;
+}
+.dnd-sheet__back:hover { color: var(--dnd-accent); }
+
+.dnd-sheet__header-center { flex: 1; min-width: 200px; }
+.dnd-sheet__name {
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 1.6rem;
+  color: var(--dnd-accent);
+  margin: 0;
+}
+.dnd-sheet__name-input {
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 1.6rem;
+  color: var(--dnd-accent);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--dnd-text-muted);
+  outline: none;
+  width: 100%;
+  padding: 0;
+}
+.dnd-sheet__name-input:focus { border-bottom-color: var(--dnd-accent); }
+
+.dnd-sheet__subtitle {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--dnd-text-dim);
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+.dnd-sheet__subtitle span:not(:last-child)::after {
+  content: '\00b7';
+  margin-left: 0.5rem;
+}
+.dnd-sheet__subtitle-edit {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.dnd-sheet__subtitle-edit .dnd-field { width: auto; min-width: 80px; flex: 1; }
+
+.dnd-sheet__meta-row {
+  display: flex; gap: 0.5rem; color: var(--dnd-text-faint); font-size: 0.8rem;
+  margin-top: 0.25rem; flex-wrap: wrap;
+}
+.dnd-sheet__meta-row span:not(:last-child)::after {
+  content: '\00b7'; margin-left: 0.5rem;
+}
+
+.dnd-sheet__header-right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;
+  white-space: nowrap;
+}
+.dnd-sheet__edit-toggle {
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim); padding: 0.3rem 0.6rem; border-radius: 4px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  font-family: inherit; font-size: 0.8rem;
+}
+.dnd-sheet__edit-toggle:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+
+.dnd-sheet__save-status {
+  font-size: 0.75rem; display: flex; align-items: center; gap: 3px;
+}
+.dnd-sheet__save-status--saved { color: var(--dnd-text-faint); }
+.dnd-sheet__save-status--saving { color: var(--dnd-accent); }
+.dnd-sheet__save-status--unsaved { color: #8a7a2a; }
+
+/* Tabs */
+.dnd-sheet__tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--dnd-border);
+  margin-bottom: 1rem;
+}
+.dnd-sheet__tab {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--dnd-text-dim); padding: 0.5rem 1rem; cursor: pointer;
+  font-family: inherit; font-size: 0.9rem; transition: all 0.2s;
+}
+.dnd-sheet__tab:hover { color: var(--dnd-text); }
+.dnd-sheet__tab--active {
+  color: var(--dnd-accent); border-bottom-color: var(--dnd-accent);
+}
+
+/* Tab content */
+.dnd-sheet__tab-content { margin-bottom: 1.5rem; }
+.dnd-sheet__combat-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .dnd-sheet__combat-2col { grid-template-columns: 1fr; }
+}
+.dnd-sheet__combat-col-left {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.dnd-sheet__combat-col-right {
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* Rest buttons */
+.dnd-sheet__rest {
+  display: flex; gap: 0.75rem; padding-top: 1rem;
+  border-top: 1px solid var(--dnd-border); margin-top: 1rem;
+}
+.dnd-sheet__rest-btn {
+  background: var(--dnd-short-rest-bg); border: 1px solid var(--dnd-short-rest-border);
+  color: var(--dnd-short-rest-text); padding: 0.5rem 1.25rem; border-radius: 6px;
+  cursor: pointer; font-family: inherit; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.dnd-sheet__rest-btn:hover {
+  filter: brightness(1.1);
+}
+.dnd-sheet__rest-btn--long {
+  background: var(--dnd-long-rest-bg);
+  border-color: var(--dnd-long-rest-border);
+  color: var(--dnd-long-rest-text);
+}
+
+/* ============================================
+   CAMPAIGN NAME IN SHEET HEADER
+   ============================================ */
+.dnd-sheet__campaign-name {
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 0.85rem;
+  color: var(--dnd-text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* Beast form banner */
+.dnd-sheet__beast-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--dnd-positive-bg);
+  border: 1px solid var(--dnd-positive-border);
+  border-radius: 6px;
+  color: var(--dnd-positive);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.dnd-sheet__beast-peek {
+  font-size: 0.75rem;
+  color: var(--dnd-text-muted);
+}
+
+/* Beast form combat overlay */
+.dnd-sheet__beast-combat {
+  margin-bottom: 1rem;
+}
+.dnd-sheet__beast-attacks,
+.dnd-sheet__beast-abilities {
+  margin-bottom: 0.75rem;
+}
+.dnd-sheet__beast-atk-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-class-druid);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  box-shadow: 0 0 8px rgba(42, 106, 42, var(--dnd-glow-opacity, 0.15));
+}
+.dnd-sheet__beast-atk-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.dnd-sheet__beast-ability-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-class-druid);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  line-height: 1.4;
+  box-shadow: 0 0 8px rgba(42, 106, 42, var(--dnd-glow-opacity, 0.15));
+}
+
+/* Beast form picker */
+.beast-picker {
+  margin-top: 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 0.6rem;
+  background: var(--dnd-bg);
+}
+.beast-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+.beast-picker__header h4 {
+  margin: 0;
+  font-family: 'Uncial Antiqua', serif;
+  color: var(--dnd-accent);
+  font-size: 0.85rem;
+}
+.beast-picker__close {
+  background: transparent; border: none; color: var(--dnd-text-muted);
+  cursor: pointer; padding: 0.1rem;
+}
+.beast-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.beast-picker__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--dnd-text);
+  text-align: left;
+  transition: border-color 0.15s;
+}
+.beast-picker__card:hover { border-color: var(--dnd-class-ranger); }
+.beast-picker__card-header { display: flex; justify-content: space-between; align-items: center; }
+.beast-picker__card-header strong { color: var(--dnd-accent); font-size: 0.85rem; }
+.beast-picker__cr { font-size: 0.7rem; color: var(--dnd-text-muted); }
+.beast-picker__card-stats {
+  display: flex; gap: 0.5rem; font-size: 0.7rem; color: var(--dnd-text-dim);
+}
+.beast-picker__delete {
+  position: absolute; top: 0.25rem; right: 0.25rem;
+  color: var(--dnd-text-faint); cursor: pointer; opacity: 0;
+  transition: opacity 0.15s;
+}
+.beast-picker__card:hover .beast-picker__delete { opacity: 1; }
+.beast-picker__delete:hover { color: var(--dnd-negative); }
+.beast-picker__empty {
+  font-size: 0.8rem; color: var(--dnd-text-faint); font-style: italic; padding: 0.5rem 0;
+}
+.beast-picker__create {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--dnd-border);
+}
+.beast-picker__create-row {
+  display: flex; gap: 0.4rem; align-items: center;
+}
+.beast-picker__create-row label {
+  font-size: 0.75rem; color: var(--dnd-text-dim);
+  display: flex; align-items: center; gap: 0.2rem;
+}
+.beast-picker__create-actions {
+  display: flex; gap: 0.4rem; justify-content: flex-end; margin-top: 0.25rem;
+}
+.beast-picker__save {
+  display: flex; align-items: center; gap: 0.2rem;
+  background: var(--dnd-accent); color: var(--dnd-bg); border: none;
+  padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 0.75rem; font-weight: 600;
+}
+.beast-picker__save:disabled { opacity: 0.4; }
+
+/* Beast card wrapper with edit/delete */
+.beast-picker__card-wrapper {
+  position: relative;
+}
+.beast-picker__card-actions {
+  position: absolute; top: 0.3rem; right: 0.3rem;
+  display: flex; gap: 0.2rem; opacity: 0; transition: opacity 0.15s;
+}
+.beast-picker__card-wrapper:hover .beast-picker__card-actions { opacity: 1; }
+.beast-picker__card-actions button {
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-muted); padding: 0.2rem; border-radius: 3px;
+  cursor: pointer; display: flex;
+}
+.beast-picker__card-actions button:hover { color: var(--dnd-accent); border-color: var(--dnd-accent); }
+.beast-picker__card-attacks {
+  display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.15rem;
+}
+.beast-picker__card-atk {
+  font-size: 0.65rem; color: var(--dnd-text-muted);
+  background: var(--dnd-bg); padding: 0.05rem 0.3rem; border-radius: 3px;
+}
+
+/* Beast form editor sections */
+.beast-picker__section-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--dnd-text-muted); margin-top: 0.5rem; margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--dnd-border); padding-bottom: 0.15rem;
+}
+.beast-picker__attack {
+  border: 1px solid var(--dnd-border); border-radius: 4px;
+  padding: 0.3rem; margin-bottom: 0.25rem;
+}
+.beast-picker__atk-remove {
+  background: transparent; border: none; color: var(--dnd-text-faint);
+  cursor: pointer; padding: 0.15rem; flex-shrink: 0;
+}
+.beast-picker__atk-remove:hover { color: var(--dnd-negative); }
+

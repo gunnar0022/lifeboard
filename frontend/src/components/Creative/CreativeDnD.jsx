@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import DnDSelectionScreen from '../ReadingCreative/DnD/DnDSelectionScreen';
 import CharacterSheet from '../ReadingCreative/DnD/CharacterSheet';
-import '../ReadingCreative/DnD/dndStyles.css';
+import '../ReadingCreative/DnD/styles/index.css';
 import './Creative.css';
 
 export default function CreativeDnD() {

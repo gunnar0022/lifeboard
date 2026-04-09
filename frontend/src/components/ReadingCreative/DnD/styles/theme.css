@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Uncial+Antiqua&display=swap');
+
+/* ============================================
+   DnD LIGHT MODE (parchment in daylight — default)
+   ============================================ */
+.dnd-root {
+  --dnd-bg:            #f4edd4;
+  --dnd-surface:       #efe6c8;
+  --dnd-surface-hover: #e8debb;
+  --dnd-border:        #c8b88a;
+  --dnd-border-strong: #a89870;
+
+  --dnd-text:          #2c2416;
+  --dnd-text-dim:      #5a4a32;
+  --dnd-text-muted:    #7a6a4e;
+  --dnd-text-faint:    #9a8a6e;
+  --dnd-accent:        #8a6a2e;
+  --dnd-accent-dim:    #6a5020;
+
+  --dnd-hp-healthy:    #6a8a3a;
+  --dnd-hp-wounded:    #b8860b;
+  --dnd-hp-critical:   #a82020;
+
+  --dnd-positive:      #3a7a3a;
+  --dnd-positive-bg:   #e8f0e0;
+  --dnd-positive-border: #a8c898;
+  --dnd-negative:      #8a2a2a;
+  --dnd-negative-bg:   #f4e0e0;
+  --dnd-negative-border: #c8a0a0;
+
+  --dnd-glow-opacity:  0.15;
+  --dnd-shadow-base:   rgba(80, 60, 30, 0.15);
+
+  --dnd-scrollbar-track: var(--dnd-bg);
+  --dnd-scrollbar-thumb: var(--dnd-border);
+
+  --dnd-pip-available:   var(--dnd-accent);
+  --dnd-pip-expended-bg: var(--dnd-surface);
+  --dnd-pip-expended-border: var(--dnd-border);
+
+  /* Class colors — light mode */
+  --dnd-class-barbarian:  #a01010;
+  --dnd-class-rogue:      #5a2878;
+  --dnd-class-fighter:    #3a6a88;
+  --dnd-class-wizard:     #2a4a88;
+  --dnd-class-warlock:    #6a3068;
+  --dnd-class-sorcerer:   #a86010;
+  --dnd-class-cleric:     #8a6a2e;
+  --dnd-class-druid:      #2a6a2a;
+  --dnd-class-paladin:    #7a7a1a;
+  --dnd-class-ranger:     #2a6a3a;
+  --dnd-class-bard:       #7a3a5a;
+  --dnd-class-monk:       #4a7a88;
+  --dnd-class-artificer:  #6a5a2a;
+
+  /* Coin colors — light mode */
+  --dnd-coin-cp:       #9a5a20;
+  --dnd-coin-cp-dim:   #c8a070;
+  --dnd-coin-sp:       #6a6a6a;
+  --dnd-coin-sp-dim:   #a0a0a0;
+  --dnd-coin-ep:       #4a6a7a;
+  --dnd-coin-ep-dim:   #8aaabb;
+  --dnd-coin-gp:       #8a6a2e;
+  --dnd-coin-gp-dim:   #c8b070;
+  --dnd-coin-pp:       #4a6a7a;
+  --dnd-coin-pp-dim:   #8a9aaa;
+
+  /* Rest buttons — light mode */
+  --dnd-short-rest-bg:     #e4eaf0;
+  --dnd-short-rest-border: #a0b8cc;
+  --dnd-short-rest-text:   #3a5a78;
+  --dnd-long-rest-bg:      #e4f0e4;
+  --dnd-long-rest-border:  #90c890;
+  --dnd-long-rest-text:    #2a6a2a;
+
+  font-family: 'Crimson Text', 'Palatino Linotype', serif;
+  color: var(--dnd-text);
+}
+
+/* ============================================
+   DnD DARK MODE (the existing grimoire aesthetic)
+   ============================================ */
+[data-theme="dark"] .dnd-root {
+  --dnd-bg:            #1a1410;
+  --dnd-surface:       #221c14;
+  --dnd-surface-hover: #2a2218;
+  --dnd-border:        #3a3228;
+  --dnd-border-strong: #5a4a3a;
+
+  --dnd-text:          #d4c5a9;
+  --dnd-text-dim:      #8a7a62;
+  --dnd-text-muted:    #6a5a4a;
+  --dnd-text-faint:    #5a4a3a;
+  --dnd-accent:        #c9a96e;
+  --dnd-accent-dim:    #8a7a4e;
+
+  --dnd-hp-healthy:    #4a7a4a;
+  --dnd-hp-wounded:    #8a7a2a;
+  --dnd-hp-critical:   #8b0000;
+
+  --dnd-positive:      #88cc88;
+  --dnd-positive-bg:   #1a2a1a;
+  --dnd-positive-border: #2a4a2a;
+  --dnd-negative:      #cc8888;
+  --dnd-negative-bg:   #3a1a1a;
+  --dnd-negative-border: #5a2a2a;
+
+  --dnd-glow-opacity:  0.3;
+  --dnd-shadow-base:   rgba(0, 0, 0, 0.4);
+
+  --dnd-scrollbar-track: var(--dnd-bg);
+  --dnd-scrollbar-thumb: var(--dnd-text-muted);
+
+  --dnd-pip-available:   var(--dnd-accent);
+  --dnd-pip-expended-bg: transparent;
+  --dnd-pip-expended-border: var(--dnd-text-muted);
+
+  /* Class colors — dark mode */
+  --dnd-class-barbarian:  #8b0000;
+  --dnd-class-rogue:      #7a3a9a;
+  --dnd-class-fighter:    #5a8aaa;
+  --dnd-class-wizard:     #3a6aaa;
+  --dnd-class-warlock:    #8a4a8a;
+  --dnd-class-sorcerer:   #cc7a20;
+  --dnd-class-cleric:     #c9a96e;
+  --dnd-class-druid:      #4a8a4a;
+  --dnd-class-paladin:    #aaaa4a;
+  --dnd-class-ranger:     #4a8a5a;
+  --dnd-class-bard:       #9a5a7a;
+  --dnd-class-monk:       #6a9aaa;
+  --dnd-class-artificer:  #8a7a4a;
+
+  /* Coin colors — dark mode */
+  --dnd-coin-cp:       #b87333;
+  --dnd-coin-cp-dim:   #7a4a22;
+  --dnd-coin-sp:       #a8a8a8;
+  --dnd-coin-sp-dim:   #6a6a6a;
+  --dnd-coin-ep:       #8a9aaa;
+  --dnd-coin-ep-dim:   #5a6a7a;
+  --dnd-coin-gp:       #c9a96e;
+  --dnd-coin-gp-dim:   #8a7a4e;
+  --dnd-coin-pp:       #b8c8d8;
+  --dnd-coin-pp-dim:   #7a8a9a;
+
+  /* Rest buttons — dark mode */
+  --dnd-short-rest-bg:     #1a1e22;
+  --dnd-short-rest-border: #2a3a4a;
+  --dnd-short-rest-text:   #7a9ab8;
+  --dnd-long-rest-bg:      #1a2218;
+  --dnd-long-rest-border:  #2a4a2a;
+  --dnd-long-rest-text:    #7ab878;
+}
+
+/* === Scrollbar === */
+.dnd-sheet::-webkit-scrollbar { width: 6px; }
+.dnd-sheet::-webkit-scrollbar-track { background: var(--dnd-scrollbar-track); }
+.dnd-sheet::-webkit-scrollbar-thumb { background: var(--dnd-scrollbar-thumb); border-radius: 3px; }
+
+/* === Shared field styles === */
+.dnd-field {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--dnd-text-muted);
+  color: var(--dnd-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.35rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dnd-field:focus { border-bottom: 1px solid var(--dnd-accent); }
+.dnd-field--sm { width: 60px; text-align: center; }
+.dnd-field--textarea { resize: vertical; min-height: 2rem; }
+.dnd-field option { background: var(--dnd-surface); color: var(--dnd-text); }
+
+.dnd-section-title {
+  font-family: 'Uncial Antiqua', serif;
+  color: var(--dnd-accent);
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.dnd-add-btn {
+  background: transparent;
+  border: 1px dashed var(--dnd-border);
+  color: var(--dnd-text-dim);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 0.5rem;
+}
+.dnd-add-btn:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }

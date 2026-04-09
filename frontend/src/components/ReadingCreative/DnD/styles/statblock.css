@@ -1,0 +1,138 @@
+/* ============================================
+   STAT BLOCK (unified 3-row top section)
+   ============================================ */
+.dnd-statblock {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.dnd-statblock__row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+/* Row 1: AC(1) HP(3) HitDice(1) Death(1) */
+.dnd-statblock__row:first-child {
+  grid-template-columns: 1fr 3fr 1fr 1fr;
+}
+@media (max-width: 700px) {
+  .dnd-statblock__row { grid-template-columns: repeat(3, 1fr); }
+  .dnd-statblock__row:first-child { grid-template-columns: 1fr 2fr; }
+}
+
+.dnd-statblock__cell {
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  border-radius: 8px; padding: 0.5rem;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; gap: 2px;
+  min-height: 100px;
+}
+.dnd-statblock__cell--hp { min-height: 100px; }
+.dnd-statblock__cell--sm { min-height: 80px; }
+
+.dnd-statblock__label {
+  font-size: 0.55rem; color: var(--dnd-text-muted);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.dnd-statblock__big {
+  font-size: 2rem; font-weight: 700; color: var(--dnd-text); line-height: 1;
+}
+.dnd-statblock__mid {
+  font-size: 1.4rem; font-weight: 700; color: var(--dnd-text); line-height: 1;
+}
+.dnd-statblock__mid--text {
+  font-size: 0.85rem; font-weight: 400;
+}
+.dnd-statblock__sub {
+  font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.2;
+}
+.dnd-statblock__score {
+  font-size: 0.8rem; color: var(--dnd-text-dim);
+}
+
+/* Inputs */
+.dnd-statblock__big-input {
+  width: 60px; text-align: center; background: transparent;
+  border: 1px dashed var(--dnd-text-muted); border-radius: 4px;
+  color: var(--dnd-text); font-size: 1.5rem; font-weight: 700; padding: 2px;
+  font-family: inherit;
+}
+.dnd-statblock__big-input--sm { width: 40px; font-size: 1.2rem; }
+.dnd-statblock__big-input:focus { border-color: var(--dnd-accent); outline: none; }
+.dnd-statblock__mid-input {
+  width: 70px; text-align: center; background: transparent;
+  border: 1px dashed var(--dnd-text-muted); border-radius: 4px;
+  color: var(--dnd-text); font-size: 1rem; padding: 2px;
+  font-family: inherit;
+}
+.dnd-statblock__mid-input:focus { border-color: var(--dnd-accent); outline: none; }
+.dnd-statblock__mid-input option { background: var(--dnd-surface); color: var(--dnd-text); }
+.dnd-statblock__score-input {
+  width: 40px; text-align: center; background: transparent;
+  border: 1px dashed var(--dnd-text-muted); border-radius: 4px;
+  color: var(--dnd-text); font-size: 0.85rem; padding: 2px;
+}
+.dnd-statblock__score-input:focus { border-color: var(--dnd-accent); outline: none; }
+.dnd-statblock__sub-input {
+  width: 100%; text-align: center; background: transparent;
+  border: none; border-bottom: 1px dashed var(--dnd-text-faint);
+  color: var(--dnd-text-dim); font-size: 0.65rem; padding: 1px;
+  font-family: inherit; outline: none;
+}
+.dnd-statblock__sub-input:focus { border-bottom-color: var(--dnd-accent); }
+
+/* HP specific */
+.dnd-statblock__hp-row {
+  display: flex; align-items: baseline; gap: 2px;
+}
+.dnd-statblock__hp-sep { color: var(--dnd-text-dim); font-size: 1.2rem; }
+.dnd-statblock__hp-max { font-size: 1.2rem; color: var(--dnd-text-dim); font-weight: 600; }
+.dnd-statblock__hp-bar {
+  position: relative;
+  width: 90%; height: 6px; background: var(--dnd-border);
+  border-radius: 3px; overflow: hidden; margin: 4px 0;
+}
+.dnd-statblock__hp-fill {
+  height: 100%; border-radius: 3px; transition: width 0.3s, background 0.3s;
+}
+.dnd-statblock__hp-temp-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  border-radius: 3px; background: rgba(220, 230, 245, 0.7);
+  transition: width 0.3s; pointer-events: none;
+}
+.dnd-statblock__hp-btns {
+  display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: center;
+}
+.dnd-statblock__hp-btns button {
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim); padding: 1px 6px; border-radius: 4px;
+  cursor: pointer; font-size: 0.7rem; font-family: inherit;
+}
+.dnd-statblock__hp-btns button:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-statblock__temp { font-size: 0.65rem; color: var(--dnd-text-faint); margin-left: 4px; }
+.dnd-statblock__temp-input {
+  width: 32px; text-align: center; background: transparent;
+  border: 1px dashed var(--dnd-text-muted); border-radius: 3px;
+  color: var(--dnd-text); font-size: 0.75rem; padding: 1px;
+}
+
+/* Hit Dice */
+.dnd-statblock__hd-edit { display: flex; align-items: center; gap: 2px; }
+.dnd-statblock__spend {
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim); padding: 1px 8px; border-radius: 4px;
+  cursor: pointer; font-size: 0.65rem; font-family: inherit; margin-top: 2px;
+}
+.dnd-statblock__spend:hover { border-color: var(--dnd-accent); }
+.dnd-statblock__spend:disabled { opacity: 0.4; cursor: default; }
+
+/* Death Saves */
+.dnd-statblock__death { display: flex; flex-direction: column; gap: 4px; }
+.dnd-statblock__death-row { display: flex; align-items: center; gap: 4px; }
+.dnd-statblock__death-lbl { font-size: 0.7rem; font-weight: 600; width: 12px; }
+.dnd-statblock__dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--dnd-border); background: transparent;
+  cursor: pointer; padding: 0;
+}
+.dnd-statblock__dot--success { background: #4a7a4a; border-color: #4a7a4a; }
+.dnd-statblock__dot--failure { background: #8b0000; border-color: #8b0000; }

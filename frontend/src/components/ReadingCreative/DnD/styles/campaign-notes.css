@@ -1,0 +1,211 @@
+/* ============================================
+   CAMPAIGN NOTES TAB
+   ============================================ */
+.dnd-notes-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Mini type tabs */
+.dnd-note-types {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--dnd-border);
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+.dnd-note-types__btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--dnd-text-dim);
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.dnd-note-types__btn:hover { color: var(--dnd-text); }
+.dnd-note-types__btn--active {
+  color: var(--dnd-accent);
+  border-bottom-color: var(--dnd-accent);
+}
+.dnd-note-types__icon { font-size: 0.9rem; }
+.dnd-note-types__count {
+  font-size: 0.65rem;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 8px;
+  padding: 0 0.3rem;
+  color: var(--dnd-text-muted);
+}
+
+/* Notes header */
+.dnd-notes-tab__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dnd-notes-tab__count {
+  font-size: 0.75rem;
+  color: var(--dnd-text-muted);
+  flex: 1;
+}
+.dnd-notes-tab__save-status {
+  font-size: 0.7rem;
+  color: var(--dnd-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.dnd-notes-tab__save-status--saving { color: var(--dnd-accent); }
+
+/* Notes list */
+.dnd-notes-tab__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.dnd-notes-tab__empty {
+  font-size: 0.85rem;
+  color: var(--dnd-text-faint);
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* Note card */
+.dnd-note-card {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.dnd-note-card:hover { border-color: var(--dnd-accent-dim); }
+.dnd-note-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+.dnd-note-card__title {
+  font-weight: 600;
+  color: var(--dnd-accent);
+  font-size: 0.9rem;
+}
+.dnd-note-card__body {
+  font-size: 0.85rem;
+  color: var(--dnd-text);
+  line-height: 1.4;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.dnd-note-card__delete {
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-faint);
+  cursor: pointer;
+  padding: 0.15rem;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  display: flex;
+  flex-shrink: 0;
+}
+.dnd-note-card:hover .dnd-note-card__delete { opacity: 1; }
+.dnd-note-card__delete:hover { color: var(--dnd-negative); }
+
+/* Note card editing */
+.dnd-note-card--editing {
+  cursor: default;
+  border-color: var(--dnd-accent-dim);
+}
+.dnd-note-card__edit-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.dnd-note-card__title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--dnd-text-muted);
+  color: var(--dnd-accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 0.15rem 0;
+  outline: none;
+}
+.dnd-note-card__title-input:focus { border-bottom-color: var(--dnd-accent); }
+.dnd-note-card__type-select {
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dnd-note-card__type-select option { background: var(--dnd-surface); }
+.dnd-note-card__done-btn {
+  background: transparent; border: 1px solid var(--dnd-accent-dim);
+  color: var(--dnd-accent); padding: 0.1rem 0.4rem; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.7rem;
+}
+.dnd-note-card__done-btn:hover { border-color: var(--dnd-accent); }
+.dnd-note-card__body-input {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--dnd-border);
+  color: var(--dnd-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1.4;
+  padding: 0.35rem;
+  border-radius: 4px;
+  outline: none;
+  resize: vertical;
+  min-height: 3rem;
+  box-sizing: border-box;
+}
+.dnd-note-card__body-input:focus { border-color: var(--dnd-accent-dim); }
+.dnd-note-card__body-input::placeholder { color: var(--dnd-text-faint); }
+
+/* Note card confirm delete */
+.dnd-note-card--confirm {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--dnd-text-dim);
+  opacity: 0.7;
+}
+.dnd-note-card__confirm-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+.dnd-note-card__confirm-btns button {
+  background: transparent;
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+.dnd-note-card__confirm-btns button:hover {
+  border-color: var(--dnd-accent);
+  color: var(--dnd-accent);
+}
+
