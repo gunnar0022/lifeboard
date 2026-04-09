@@ -154,7 +154,7 @@ export const SUBCLASS_LISTS = {
     { name: 'Samurai', implemented: false },
     { name: 'Echo Knight', implemented: false },
     { name: 'Psi Warrior', implemented: false },
-    { name: 'Rune Knight', implemented: false },
+    { name: 'Rune Knight', implemented: true },
     { name: 'Banneret (Purple Dragon Knight)', implemented: false },
   ],
   Rogue: [
@@ -188,8 +188,8 @@ export const SUBCLASS_LISTS = {
     { name: 'Circle of the Moon', implemented: false },
     { name: 'Circle of Dreams', implemented: false },
     { name: 'Circle of the Shepherd', implemented: false },
-    { name: 'Circle of Spores', implemented: false },
-    { name: 'Circle of Stars', implemented: false },
+    { name: 'Circle of Spores', implemented: true },
+    { name: 'Circle of Stars', implemented: true },
     { name: 'Circle of Wildfire', implemented: false },
   ],
   Cleric: [

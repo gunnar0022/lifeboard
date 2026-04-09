@@ -10,6 +10,7 @@ import ProficiencyTags from './components/ProficiencyTags';
 import InfoPanel from './components/InfoPanel';
 import EquipmentTab from './components/EquipmentTab';
 import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
+import SubclassBlock from './components/SubclassBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
 import useAutosave from './components/useAutosave';
@@ -174,6 +175,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.rechargeOn === 'short') {
         if ('currentUses' in cf) cf.currentUses = cf.maxUses || 0;
       }
+      // Rune Knight: rune invocations reset on short rest
+      if (cf.runeInvocations) {
+        const resetInvocations = {};
+        for (const key of Object.keys(cf.runeInvocations)) {
+          resetInvocations[key] = { usedCount: 0 };
+        }
+        cf.runeInvocations = resetInvocations;
+      }
       updates.classFeature = cf;
     }
 
@@ -221,6 +230,20 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       }
       if (cf.pactSlots) {
         cf.pactSlots = { ...cf.pactSlots, current: cf.pactSlots.max || 0 };
+      }
+      // Rune Knight: reset Giant's Might, rune invocations, Runic Shield
+      if (cf.giantsMight) {
+        cf.giantsMight = { ...cf.giantsMight, currentUses: cf.giantsMight.maxUses || 2, active: false };
+      }
+      if (cf.runeInvocations) {
+        const resetInvocations = {};
+        for (const key of Object.keys(cf.runeInvocations)) {
+          resetInvocations[key] = { usedCount: 0 };
+        }
+        cf.runeInvocations = resetInvocations;
+      }
+      if (cf.runicShield) {
+        cf.runicShield = { ...cf.runicShield, currentUses: cf.runicShield.maxUses || 1 };
       }
       updates.classFeature = cf;
     }
@@ -417,6 +440,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
+              <SubclassBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
               <ProficiencyTags proficiencies={character.proficiencies || {}}
                 meta={meta} editMode={editMode} onUpdate={handleUpdate} />
               <SaveThrows abilities={abilities} saveProficiencies={character.saveProficiencies || []}
@@ -472,22 +496,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         )}
 
         {tab === 'features' && (
-          <>
-            {meta.subclass && (() => {
-              const scList = SUBCLASS_LISTS[meta.className] || [];
-              const sc = scList.find(s => s.name === meta.subclass);
-              if (sc && !sc.implemented) {
-                return (
-                  <div className="dnd-subclass-notice">
-                    <strong>{meta.subclass}</strong> — Not yet implemented. Subclass features must be tracked manually in the list below.
-                  </div>
-                );
-              }
-              return null;
-            })()}
-            <FeatureList features={character.features || []}
-              editMode={editMode} onUpdate={handleUpdate} level={level} />
-          </>
+          <FeatureList features={character.features || []}
+            editMode={editMode} onUpdate={handleUpdate} level={level} />
         )}
 
         {tab === 'spells' && hasSpellcasting && (
@@ -497,8 +507,6 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         {tab === 'info' && (
           <InfoPanel
             customBoxes={character.customBoxes || []}
-            equipment={character.equipment || []}
-            coins={character.coins || {}}
             editMode={editMode} onUpdate={handleUpdate} />
         )}
 

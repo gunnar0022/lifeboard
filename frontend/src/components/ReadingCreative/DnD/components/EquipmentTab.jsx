@@ -64,11 +64,9 @@ export default function EquipmentTab({ character, editMode, onUpdate }) {
       <div className="dnd-equipment__section">
         <div className="dnd-equipment__section-header">
           <h3 className="dnd-equipment__section-title">Equipped</h3>
-          {editMode && (
-            <button className="dnd-equipment__add" onClick={addEquipped}>
-              <Plus size={14} /> Add
-            </button>
-          )}
+          <button className="dnd-equipment__add" onClick={addEquipped}>
+            <Plus size={14} /> Add
+          </button>
         </div>
 
         {equipped.length === 0 && (
@@ -215,6 +213,29 @@ export default function EquipmentTab({ character, editMode, onUpdate }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Coins */}
+      <div className="dnd-equipment__section">
+        <h3 className="dnd-equipment__section-title">Coins</h3>
+        <div className="dnd-coins">
+          {['CP', 'SP', 'EP', 'GP', 'PP'].map(type => (
+            <div key={type} className="dnd-coins__cell">
+              <span className="dnd-coins__label">{type}</span>
+              <div className="dnd-coins__value">
+                <button onClick={() => {
+                  const current = (character.coins || {})[type] || 0;
+                  onUpdate({ coins: { ...(character.coins || {}), [type]: Math.max(0, current - 1) } });
+                }}>-</button>
+                <span>{(character.coins || {})[type] || 0}</span>
+                <button onClick={() => {
+                  const current = (character.coins || {})[type] || 0;
+                  onUpdate({ coins: { ...(character.coins || {}), [type]: current + 1 } });
+                }}>+</button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
