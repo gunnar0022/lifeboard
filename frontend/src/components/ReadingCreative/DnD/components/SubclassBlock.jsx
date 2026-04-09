@@ -1,16 +1,14 @@
 import { SUBCLASS_LISTS } from '../dndUtils';
 import RuneKnightBlock from './ClassFeatures/RuneKnightBlock';
 import AssassinBlock from './ClassFeatures/AssassinBlock';
+import CircleOfStarsBlock from './ClassFeatures/CircleOfStarsBlock';
+import CircleOfSporesBlock from './ClassFeatures/CircleOfSporesBlock';
 
 /**
- * SubclassBlock — displays subclass info in the Combat tab.
- * Shows the selected subclass name and either its features or
- * an "unimplemented" notice.
- * Druid subclasses (Spores, Stars) are handled by WildShapeTracker in the
- * base ClassFeatureBlock — they don't render here to avoid duplication.
+ * SubclassBlock — displays subclass features in the Combat tab.
+ * Wild Shape resource tracking stays in ClassFeatureBlock (WildShapeTracker).
+ * Druid subclass features (spells, passives, trackers) render here separately.
  */
-const DRUID_HANDLED_SUBCLASSES = ['Circle of Spores', 'Circle of Stars'];
-
 export default function SubclassBlock({ character, editMode, onUpdate }) {
   const meta = character.meta || {};
   const subclass = meta.subclass;
@@ -18,22 +16,22 @@ export default function SubclassBlock({ character, editMode, onUpdate }) {
 
   if (!subclass) return null;
 
-  // Druid subclasses handled by WildShapeTracker — skip here
-  if (className === 'Druid' && DRUID_HANDLED_SUBCLASSES.includes(subclass)) {
-    return null;
-  }
-
   const scList = SUBCLASS_LISTS[className] || [];
   const sc = scList.find(s => s.name === subclass);
   const isImplemented = sc?.implemented;
 
-  // Render implemented subclass component
   const renderSubclassFeatures = () => {
     if (subclass === 'Rune Knight') {
       return <RuneKnightBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
     }
     if (subclass === 'Assassin') {
       return <AssassinBlock character={character} />;
+    }
+    if (subclass === 'Circle of Stars') {
+      return <CircleOfStarsBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
+    }
+    if (subclass === 'Circle of Spores') {
+      return <CircleOfSporesBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
     }
     return null;
   };

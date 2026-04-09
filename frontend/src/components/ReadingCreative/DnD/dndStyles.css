@@ -3131,6 +3131,81 @@
 }
 
 /* ============================================
+   CIRCLE OF STARS SUBCLASS
+   ============================================ */
+.dnd-stars { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-stars__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-stars__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-wizard); margin: 0 0 0.2rem; }
+.dnd-stars__desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0 0 0.3rem; line-height: 1.5; }
+.dnd-stars__desc-sm { font-size: 0.7rem; color: var(--dnd-text-dim); margin: 0 0 0.3rem; line-height: 1.4; }
+.dnd-stars__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; }
+.dnd-stars__resource-label { color: var(--dnd-text-dim); font-weight: 600; }
+.dnd-stars__resource-count { font-weight: 700; color: var(--dnd-text); }
+.dnd-stars__use-btn, .dnd-stars__roll-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-class-wizard); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-wizard); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-stars__use-btn:hover:not(:disabled), .dnd-stars__roll-btn:hover { background: var(--dnd-class-wizard); color: var(--dnd-bg); }
+.dnd-stars__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-stars__constellation {
+  padding: 0.3rem 0.4rem; margin-bottom: 0.2rem; border-radius: 0.25rem;
+  border-left: 3px solid var(--dnd-border); font-size: 0.7rem; color: var(--dnd-text-dim);
+}
+.dnd-stars__constellation--active { border-left-color: var(--dnd-class-wizard); background: rgba(42, 74, 136, 0.08); }
+.dnd-stars__constellation-name { font-weight: 700; color: var(--dnd-text); display: block; margin-bottom: 0.1rem; }
+.dnd-stars__constellation-desc { line-height: 1.4; }
+.dnd-stars__upgrade-note { font-size: 0.65rem; font-style: italic; color: var(--dnd-class-wizard); margin: 0.2rem 0 0; }
+
+.dnd-stars__omen-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.dnd-stars__omen-badge { padding: 0.15rem 0.5rem; border-radius: 0.3rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.dnd-stars__omen-badge--weal { background: rgba(58, 122, 58, 0.15); color: var(--dnd-positive); }
+.dnd-stars__omen-badge--woe { background: rgba(138, 42, 42, 0.15); color: var(--dnd-negative); }
+
+/* ============================================
+   CIRCLE OF SPORES SUBCLASS
+   ============================================ */
+.dnd-spores { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-spores__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-spores__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-druid); margin: 0 0 0.2rem; }
+.dnd-spores__desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0; line-height: 1.5; }
+.dnd-spores__desc-sm { font-size: 0.7rem; color: var(--dnd-text-dim); margin: 0 0 0.2rem; line-height: 1.4; }
+.dnd-spores__desc strong { color: var(--dnd-class-druid); }
+
+.dnd-spores__spell-table { display: flex; flex-direction: column; gap: 0.1rem; }
+.dnd-spores__spell-row { display: flex; gap: 0.5rem; font-size: 0.7rem; padding: 0.1rem 0; }
+.dnd-spores__spell-level { font-weight: 700; color: var(--dnd-class-druid); min-width: 2rem; }
+.dnd-spores__spell-names { color: var(--dnd-text-dim); }
+
+.dnd-spores__effect-list { margin: 0.2rem 0; padding-left: 1.2rem; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.6; }
+
+.dnd-spores__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); }
+.dnd-spores__use-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-spores__use-btn:hover:not(:disabled) { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-spores__toggle {
+  padding: 0.3rem 0.6rem; border: 2px solid var(--dnd-class-druid); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+}
+.dnd-spores__toggle:hover { background: var(--dnd-class-druid); color: var(--dnd-bg); }
+.dnd-spores__toggle--active { background: var(--dnd-class-druid); color: var(--dnd-bg); box-shadow: 0 0 8px rgba(42, 106, 42, 0.4); }
+
+.dnd-spores__active-badge {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(42, 106, 42, 0.15); color: var(--dnd-class-druid);
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+
+.dnd-spores__spreading-note { font-size: 0.7rem; font-style: italic; color: var(--dnd-class-druid); margin: 0.2rem 0 0; }
+
+/* ============================================
    STATS TAB (Abilities + Saves + Skills unified)
    ============================================ */
 .dnd-stats-tab {

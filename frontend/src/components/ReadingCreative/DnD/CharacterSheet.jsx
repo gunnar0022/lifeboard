@@ -244,6 +244,20 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.runicShield) {
         cf.runicShield = { ...cf.runicShield, currentUses: cf.runicShield.maxUses || 1 };
       }
+      // Circle of Stars: reset guiding bolt uses and cosmic omen
+      if ('guidingBoltUsed' in cf) {
+        cf.guidingBoltUsed = 0;
+      }
+      if (cf.cosmicOmen) {
+        cf.cosmicOmen = { type: null, usesRemaining: 0 };
+      }
+      // Circle of Spores: reset fungal infestation, spreading spores
+      if ('fungalInfestationUsed' in cf) {
+        cf.fungalInfestationUsed = 0;
+      }
+      if (cf.spreadingSporesActive) {
+        cf.spreadingSporesActive = false;
+      }
       updates.classFeature = cf;
     }
 
