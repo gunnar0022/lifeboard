@@ -90,9 +90,19 @@ async def send_failure_alert(error_msg: str):
 
 
 def _get_data_source():
-    """Get the best available data source: library client or direct scraper."""
+    """Get the best available data source: Playwright scraper or library."""
 
-    # Strategy 1: Try the garminconnect library
+    # Strategy 1: Playwright-backed scraper (headless browser — most reliable)
+    try:
+        from backend.garmin.scraper import GarminScraper
+        scraper = GarminScraper.from_env()
+        scraper.login()
+        logger.info("Using Playwright scraper")
+        return scraper, "playwright"
+    except Exception as e:
+        logger.info(f"Playwright scraper failed: {e}")
+
+    # Strategy 2: garminconnect library (may be rate-limited)
     try:
         from backend.garmin.client import GarminClient
         client = GarminClient.from_env()
@@ -102,23 +112,8 @@ def _get_data_source():
     except Exception as e:
         logger.info(f"Library login failed: {e}")
 
-    # Strategy 2: Direct browser cookie scraper
-    try:
-        from backend.garmin.scraper import GarminScraper
-        scraper = GarminScraper.from_file()
-        if scraper.test_connection():
-            logger.info("Using direct browser cookie scraper")
-            return scraper, "scraper"
-        else:
-            logger.warning("Scraper cookies appear invalid")
-    except Exception as e:
-        logger.info(f"Scraper not available: {e}")
-
     raise RuntimeError(
-        "No Garmin auth method available. Either:\n"
-        "  1. Wait for rate limit to clear and run again, OR\n"
-        "  2. Save browser cookies to data/.garmin_cookies\n"
-        "     (Log into connect.garmin.com, DevTools → copy cookie header value)"
+        "No Garmin auth method available. Check credentials and try again."
     )
 
 
