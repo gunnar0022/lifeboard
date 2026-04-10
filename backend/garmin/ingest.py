@@ -1,6 +1,6 @@
 """
 Garmin ingest script — pulls last 3 days from Garmin Connect and upserts into DB.
-Can be run standalone (python -m backend.garmin.ingest) or imported.
+Tries garminconnect library first, falls back to direct browser cookie scraper.
 """
 import asyncio
 import logging
@@ -11,11 +11,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load env before imports that need it
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
-from backend.garmin.client import GarminClient
 from backend.garmin.transform import transform_daily
 from backend.database import get_db
 
@@ -23,7 +21,6 @@ logger = logging.getLogger("lifeboard.garmin")
 
 
 async def upsert_daily_summary(row: dict):
-    """Upsert a transformed daily summary row into the database."""
     db = await get_db()
     try:
         columns = [
@@ -37,7 +34,6 @@ async def upsert_daily_summary(row: dict):
             "workout_count", "workout_total_seconds", "raw_json",
         ]
         values = [row.get(col) for col in columns]
-
         placeholders = ", ".join(["?"] * len(columns))
         col_list = ", ".join(columns)
         update_clause = ", ".join(f"{col} = excluded.{col}" for col in columns if col != "date")
@@ -56,7 +52,6 @@ async def upsert_daily_summary(row: dict):
 
 async def log_ingest(status: str, dates_updated: list = None,
                       error_message: str = None, duration_ms: int = 0):
-    """Log an ingest run to the tracking table."""
     db = await get_db()
     try:
         await db.execute(
@@ -69,7 +64,6 @@ async def log_ingest(status: str, dates_updated: list = None,
 
 
 async def send_failure_alert(error_msg: str):
-    """Send Telegram alert on ingest failure."""
     token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     chat_id = os.getenv("TELEGRAM_CHAT_ID", "")
     if not token or not chat_id:
@@ -79,8 +73,6 @@ async def send_failure_alert(error_msg: str):
         bot = Bot(token=token)
         from datetime import datetime
         now = datetime.now().strftime("%Y-%m-%d %H:%M")
-
-        # Get last successful run
         db = await get_db()
         try:
             cursor = await db.execute(
@@ -91,25 +83,51 @@ async def send_failure_alert(error_msg: str):
         finally:
             await db.close()
 
-        msg = (
-            f"⚠️ Garmin ingest failed\n"
-            f"Time: {now}\n"
-            f"Error: {error_msg[:200]}\n"
-            f"Last successful run: {last_success}"
-        )
+        msg = f"⚠️ Garmin ingest failed\nTime: {now}\nError: {error_msg[:200]}\nLast successful run: {last_success}"
         await bot.send_message(chat_id=chat_id, text=msg)
     except Exception as e:
         logger.error(f"Failed to send Telegram alert: {e}")
 
 
+def _get_data_source():
+    """Get the best available data source: library client or direct scraper."""
+
+    # Strategy 1: Try the garminconnect library
+    try:
+        from backend.garmin.client import GarminClient
+        client = GarminClient.from_env()
+        client.login()
+        logger.info("Using garminconnect library")
+        return client, "library"
+    except Exception as e:
+        logger.info(f"Library login failed: {e}")
+
+    # Strategy 2: Direct browser cookie scraper
+    try:
+        from backend.garmin.scraper import GarminScraper
+        scraper = GarminScraper.from_file()
+        if scraper.test_connection():
+            logger.info("Using direct browser cookie scraper")
+            return scraper, "scraper"
+        else:
+            logger.warning("Scraper cookies appear invalid")
+    except Exception as e:
+        logger.info(f"Scraper not available: {e}")
+
+    raise RuntimeError(
+        "No Garmin auth method available. Either:\n"
+        "  1. Wait for rate limit to clear and run again, OR\n"
+        "  2. Save browser cookies to data/.garmin_cookies\n"
+        "     (Log into connect.garmin.com, DevTools → copy cookie header value)"
+    )
+
+
 async def run_ingest():
-    """Main ingest function — pulls last 3 days from Garmin Connect."""
     start = time.monotonic()
     logger.info("Starting Garmin ingest...")
 
     try:
-        client = GarminClient.from_env()
-        client.login()
+        source, source_type = _get_data_source()
 
         today = date.today()
         dates = [today, today - timedelta(days=1), today - timedelta(days=2)]
@@ -119,22 +137,28 @@ async def run_ingest():
             date_str = d.isoformat()
             logger.info(f"Fetching Garmin data for {date_str}...")
 
-            stats = client.get_stats(date_str)
-            body_battery = client.get_body_battery(date_str)
-            sleep = client.get_sleep_data(date_str)
-            hrv = client.get_hrv_data(date_str)
-            activities = client.get_activities_by_date(date_str)
-            stress = client.get_stress_data(date_str)
+            stats = source.get_stats(date_str)
+            body_battery_raw = source.get_body_battery(date_str)
+            sleep = source.get_sleep_data(date_str)
+            hrv = source.get_hrv_data(date_str)
+            activities = source.get_activities_by_date(date_str)
+            stress = source.get_stress_data(date_str)
+
+            # body_battery might be a list (library) or dict (scraper)
+            body_battery = body_battery_raw if isinstance(body_battery_raw, list) else []
 
             row = transform_daily(date_str, stats, body_battery, sleep, hrv, activities, stress)
             await upsert_daily_summary(row)
             updated.append(date_str)
             logger.info(f"  Upserted {date_str}: steps={row.get('steps')}, bb_max={row.get('body_battery_max')}, sleep={row.get('sleep_score')}")
 
+        if hasattr(source, 'close'):
+            source.close()
+
         duration_ms = int((time.monotonic() - start) * 1000)
         await log_ingest(status="success", dates_updated=updated, duration_ms=duration_ms)
-        logger.info(f"Garmin ingest complete: {len(updated)} days updated in {duration_ms}ms")
-        return {"ok": True, "dates": updated, "duration_ms": duration_ms}
+        logger.info(f"Garmin ingest complete ({source_type}): {len(updated)} days in {duration_ms}ms")
+        return {"ok": True, "dates": updated, "duration_ms": duration_ms, "source": source_type}
 
     except Exception as e:
         duration_ms = int((time.monotonic() - start) * 1000)
@@ -145,7 +169,6 @@ async def run_ingest():
         raise
 
 
-# CLI entry point
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
     asyncio.run(run_ingest())
