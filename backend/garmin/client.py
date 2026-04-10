@@ -1,11 +1,12 @@
 """
 Garmin Connect client with session caching.
 Wraps the garminconnect library to handle auth, session persistence,
-and graceful retries.
+and graceful retries. Uses a single login strategy to avoid rate limiting.
 """
 import json
 import logging
 import os
+import time
 from pathlib import Path
 
 from garminconnect import Garmin
@@ -35,28 +36,41 @@ class GarminClient:
         """Login to Garmin Connect, using cached session if available."""
         self.api = Garmin(self.email, self.password)
 
-        # Try resuming cached session
+        # Try resuming cached session first — this avoids login entirely
         if SESSION_CACHE_PATH.exists():
             try:
                 session_data = json.loads(SESSION_CACHE_PATH.read_text())
                 self.api.garth.loads(session_data)
-                # Test the session
-                self.api.display_name
+                # Verify the session still works
+                _ = self.api.display_name
                 logger.info("Garmin session resumed from cache")
                 return
             except Exception as e:
                 logger.info(f"Cached session expired, re-authenticating: {e}")
+                SESSION_CACHE_PATH.unlink(missing_ok=True)
 
-        # Full login
-        self.api.login()
-        self._save_session()
-        logger.info("Garmin login successful, session cached")
+        # Single login attempt — the library tries up to 4 strategies internally.
+        # If we get rate-limited, we wait and DON'T retry immediately.
+        try:
+            self.api.login()
+            self._save_session()
+            logger.info("Garmin login successful, session cached")
+        except Exception as e:
+            error_str = str(e).lower()
+            if "429" in error_str or "rate limit" in error_str or "too many" in error_str:
+                logger.error(
+                    "Garmin login rate-limited (429). "
+                    "Wait at least 1 hour before retrying. "
+                    "Do NOT run the script again until the cooldown passes."
+                )
+            raise
 
     def _save_session(self):
         """Save the auth session for reuse."""
         try:
             session_data = self.api.garth.dumps()
             SESSION_CACHE_PATH.write_text(session_data)
+            logger.info(f"Session cached to {SESSION_CACHE_PATH}")
         except Exception as e:
             logger.warning(f"Failed to cache Garmin session: {e}")
 
