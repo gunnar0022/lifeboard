@@ -1,225 +1,134 @@
 """
-Garmin Connect scraper using Playwright for authentication.
-Launches a real headless browser to log in, then uses the
-authenticated session cookies for API calls.
+Garmin Connect scraper using browser session cookies.
+Reads cookies from data/.garmin_cookies (pasted from browser DevTools).
+The session cookie lasts ~3 months; JWT_WEB refreshes are handled
+by the Garmin API itself via set-cookie headers.
 
-Session state is persisted to disk so the browser only needs
-to fully log in once — subsequent runs restore the session.
+Setup:
+1. Log into connect.garmin.com in your browser
+2. DevTools → Network → click any request → copy cookie header value
+3. Save to data/.garmin_cookies
+4. Also save the connect-csrf-token header value to data/.garmin_csrf
 """
 import json
 import logging
 import os
-import time
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 import httpx
 
 logger = logging.getLogger("lifeboard.garmin")
 
-SESSION_DIR = Path(__file__).parent.parent.parent / "data" / ".garmin_browser_session"
-COOKIE_CACHE = Path(__file__).parent.parent.parent / "data" / ".garmin_cached_cookies.json"
+COOKIE_PATH = Path(__file__).parent.parent.parent / "data" / ".garmin_cookies"
+CSRF_PATH = Path(__file__).parent.parent.parent / "data" / ".garmin_csrf"
 BASE_URL = "https://connect.garmin.com"
 
 
-def _playwright_login(email: str, password: str) -> dict:
-    """
-    Use Playwright to log into Garmin Connect and capture session cookies.
-    Returns a dict of cookies keyed by name.
-    Runs synchronously — call from a thread if inside an async context.
-    """
-    from playwright.sync_api import sync_playwright
-
-    SESSION_DIR.mkdir(parents=True, exist_ok=True)
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(
-            storage_state=str(SESSION_DIR / "state.json") if (SESSION_DIR / "state.json").exists() else None,
-            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-        )
-
-        page = context.new_page()
-
-        # Try loading the app — if session is valid, it won't redirect to login
-        page.goto(f"{BASE_URL}/modern/", wait_until="networkidle", timeout=30000)
-        time.sleep(2)
-
-        current_url = page.url
-        logger.info(f"Initial page URL: {current_url}")
-
-        # Check if we need to log in
-        if "signin" in current_url or "sso.garmin.com" in current_url:
-            logger.info("Session expired, performing fresh login...")
-
-            # Navigate to SSO login
-            if "sso.garmin.com" not in current_url:
-                page.goto("https://sso.garmin.com/portal/sso/en-US/sign-in?clientId=GarminConnect&service=https://connect.garmin.com/modern/", wait_until="networkidle", timeout=30000)
-
-            time.sleep(2)
-
-            # Fill login form
-            try:
-                # Wait for form to fully load
-                time.sleep(3)
-
-                email_field = page.locator('input[name="email"], input[type="email"], #email')
-                if email_field.count() > 0:
-                    email_field.first.click()
-                    time.sleep(0.5)
-                    email_field.first.fill(email)
-                    logger.info("Filled email field")
-
-                time.sleep(1)
-
-                password_field = page.locator('input[name="password"], input[type="password"], #password')
-                if password_field.count() > 0:
-                    password_field.first.click()
-                    time.sleep(0.5)
-                    password_field.first.fill(password)
-                    logger.info("Filled password field")
-
-                time.sleep(1)
-
-                # Check "Remember Me" if present
-                remember = page.locator('input[name="rememberme"], #rememberme, input[type="checkbox"]')
-                if remember.count() > 0:
-                    try:
-                        remember.first.check()
-                        logger.info("Checked Remember Me")
-                    except Exception:
-                        pass
-
-                time.sleep(1)
-
-                # Click sign-in button
-                submit = page.locator('button[type="submit"], #login-btn-signin, button:has-text("Sign In")')
-                if submit.count() > 0:
-                    submit.first.click()
-                    logger.info("Clicked sign-in button")
-
-                # Wait for redirect back to connect — longer timeout
-                page.wait_for_url("**/connect.garmin.com/**", timeout=45000)
-                time.sleep(3)
-                logger.info(f"Login successful, redirected to: {page.url}")
-
-            except Exception as e:
-                logger.error(f"Login form interaction failed: {e}")
-                # Take screenshot for debugging
-                try:
-                    page.screenshot(path=str(SESSION_DIR / "login_error.png"))
-                    logger.info("Screenshot saved to login_error.png")
-                except Exception:
-                    pass
-                browser.close()
-                raise RuntimeError(f"Garmin login failed: {e}")
-
-        else:
-            logger.info("Existing session is valid")
-
-        # Save session state for next run
-        context.storage_state(path=str(SESSION_DIR / "state.json"))
-        logger.info("Session state saved")
-
-        # Extract cookies
-        cookies = context.cookies()
-        cookie_dict = {}
-        for c in cookies:
-            if "garmin.com" in c.get("domain", ""):
-                cookie_dict[c["name"]] = c["value"]
-
-        # Save cookies to cache file
-        COOKIE_CACHE.write_text(json.dumps(cookie_dict))
-        logger.info(f"Captured {len(cookie_dict)} Garmin cookies")
-
-        browser.close()
-        return cookie_dict
-
-
 class GarminScraper:
-    """Garmin Connect scraper with Playwright-backed authentication."""
+    """Direct HTTP scraper for Garmin Connect using browser cookies."""
 
     def __init__(self):
         self.cookies = None
-        self.cookie_string = None
+        self.csrf_token = None
         self.client = None
+        self._jwt_refreshed = False
 
     @classmethod
     def from_env(cls) -> "GarminScraper":
         return cls()
 
     def login(self):
-        """Authenticate via Playwright and set up HTTP client."""
-        import asyncio
-        email = os.getenv("GARMIN_EMAIL", "")
-        password = os.getenv("GARMIN_PASSWORD", "")
-        if not email or not password:
-            raise ValueError("GARMIN_EMAIL and GARMIN_PASSWORD must be set")
+        """Load cookies from file and verify they work."""
+        if not COOKIE_PATH.exists():
+            raise FileNotFoundError(
+                f"Cookie file not found at {COOKIE_PATH}. "
+                "Log into connect.garmin.com, copy cookies from DevTools."
+            )
 
-        # Try cached cookies first
-        if COOKIE_CACHE.exists():
-            try:
-                cached = json.loads(COOKIE_CACHE.read_text())
-                self.cookies = cached
-                self._build_client()
-                if self._test_session():
-                    logger.info("Using cached Playwright cookies")
-                    return
-                logger.info("Cached cookies expired, re-authenticating...")
-            except Exception:
-                pass
-
-        # Playwright sync API can't run inside an asyncio loop.
-        # Run it in a thread to avoid conflicts.
-        import concurrent.futures
-        with concurrent.futures.ThreadPoolExecutor() as pool:
-            future = pool.submit(_playwright_login, email, password)
-            self.cookies = future.result(timeout=60)
+        self.cookies = COOKIE_PATH.read_text().strip()
+        if CSRF_PATH.exists():
+            self.csrf_token = CSRF_PATH.read_text().strip()
 
         self._build_client()
 
+        # Test the session
         if not self._test_session():
-            raise RuntimeError("Playwright login succeeded but API calls fail")
+            raise RuntimeError(
+                "Garmin cookies are expired or invalid. "
+                "Refresh by logging into connect.garmin.com and copying new cookies."
+            )
+
+        logger.info("Garmin cookie session verified")
 
     def _build_client(self):
-        """Build the httpx client with current cookies."""
-        self.cookie_string = "; ".join(f"{k}={v}" for k, v in self.cookies.items())
-        self.client = httpx.Client(
-            headers={
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Cookie": self.cookie_string,
-                "NK": "NT",
-                "x-app-ver": "5.23.0.33a",
-                "x-requested-with": "XMLHttpRequest",
-                "Referer": f"{BASE_URL}/modern/",
-                "Origin": BASE_URL,
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-            },
-            timeout=15,
-            follow_redirects=True,
-        )
+        headers = {
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Cookie": self.cookies,
+            "NK": "NT",
+            "x-app-ver": "5.23.0.33a",
+            "x-requested-with": "XMLHttpRequest",
+            "Referer": f"{BASE_URL}/modern/",
+            "Origin": BASE_URL,
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+        }
+        if self.csrf_token:
+            headers["connect-csrf-token"] = self.csrf_token
+        self.client = httpx.Client(headers=headers, timeout=15, follow_redirects=True)
 
     def _test_session(self) -> bool:
-        """Quick test if the current cookies work."""
         try:
             resp = self.client.get(
                 f"{BASE_URL}/gc-api/usersummary-service/usersummary/daily",
                 params={"calendarDate": date.today().isoformat()},
             )
-            return resp.status_code == 200 and resp.text != "{}" and len(resp.text) > 10
+            if resp.status_code == 200 and resp.text != "{}" and len(resp.text) > 10:
+                # Update cookies if server sent new ones (JWT_WEB refresh)
+                self._capture_response_cookies(resp)
+                return True
+            return False
         except Exception:
             return False
+
+    def _capture_response_cookies(self, resp):
+        """Capture any set-cookie headers to keep session fresh."""
+        for header in resp.headers.get_list("set-cookie"):
+            name = header.split("=")[0]
+            if name in ("JWT_WEB", "SESSIONID", "session"):
+                value = header.split(";")[0]
+                # Update the cookie string
+                if f"{name}=" in self.cookies:
+                    # Replace existing
+                    import re
+                    self.cookies = re.sub(
+                        f"{name}=[^;]+",
+                        value,
+                        self.cookies,
+                    )
+                else:
+                    self.cookies += f"; {value}"
+                self._jwt_refreshed = True
+
+        # Persist updated cookies if any were refreshed
+        if self._jwt_refreshed:
+            COOKIE_PATH.write_text(self.cookies)
+            self._jwt_refreshed = False
+            # Rebuild client with new cookies
+            self._build_client()
 
     def _get(self, path: str, params: dict = None) -> dict | list | None:
         try:
             resp = self.client.get(f"{BASE_URL}/gc-api{path}", params=params)
+            self._capture_response_cookies(resp)
             if resp.status_code == 200 and resp.text and resp.text != "{}":
                 return resp.json()
             if resp.status_code == 204:
                 return None
+            if resp.status_code in (401, 403):
+                logger.warning(f"gc-api {path}: HTTP {resp.status_code} — cookies may need refresh")
         except Exception as e:
             logger.warning(f"gc-api {path} failed: {e}")
         return None

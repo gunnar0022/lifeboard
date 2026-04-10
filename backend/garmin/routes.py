@@ -100,7 +100,13 @@ async def garmin_status():
 
 @router.post("/ingest")
 async def trigger_ingest():
-    """Manually trigger a Garmin data ingest."""
+    """Manually trigger a Garmin data ingest. Disabled until session is established."""
+    # Safety: don't allow API-triggered ingests until we have a valid session
+    from pathlib import Path
+    session_file = Path(__file__).parent.parent.parent / "data" / ".garmin_browser_session" / "state.json"
+    if not session_file.exists():
+        return {"ok": False, "error": "No Garmin session established yet. Run the ingest manually first."}
+
     from backend.garmin.ingest import run_ingest
     try:
         result = await run_ingest()
