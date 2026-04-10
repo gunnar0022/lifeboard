@@ -15,7 +15,7 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
 
   switch (type) {
     case 'rage':
-      return <RageTracker classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
+      return <RageTracker classFeature={cf} editMode={editMode} onUpdate={handleUpdate} level={level} />;
     case 'wild_shape':
       return <WildShapeTracker classFeature={cf} editMode={editMode} onUpdate={handleUpdate} character={character} />;
     case 'cunning_action':

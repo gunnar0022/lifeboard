@@ -1,13 +1,59 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-export default function RageTracker({ classFeature, editMode, onUpdate }) {
-  const { maxUses, currentUses, active, bonusDamage, resistances, extraWhileActive } = classFeature;
+// Barbarian rage scaling by level
+function ragesForLevel(level) {
+  if (level >= 20) return Infinity;
+  if (level >= 17) return 6;
+  if (level >= 12) return 5;
+  if (level >= 6) return 4;
+  if (level >= 3) return 3;
+  return 2;
+}
+
+function rageDamageForLevel(level) {
+  if (level >= 16) return 4;
+  if (level >= 9) return 3;
+  return 2;
+}
+
+export default function RageTracker({ classFeature, editMode, onUpdate, level = 1 }) {
+  const { currentUses, active, resistances, extraWhileActive } = classFeature;
+  const prevLevelRef = useRef(level);
+
+  // Auto-scale max uses and bonus damage based on level
+  const maxUses = ragesForLevel(level);
+  const bonusDamage = rageDamageForLevel(level);
+  const isUnlimited = level >= 20;
+
+  // When level changes, update stored values and grant extra uses if max increased
+  useEffect(() => {
+    const prevLevel = prevLevelRef.current;
+    prevLevelRef.current = level;
+    if (prevLevel === level) return;
+
+    const prevMax = ragesForLevel(prevLevel);
+    const newMax = ragesForLevel(level);
+    const newDamage = rageDamageForLevel(level);
+    const updates = { ...classFeature, maxUses: newMax === Infinity ? 999 : newMax, bonusDamage: newDamage };
+
+    if (newMax > prevMax && newMax !== Infinity) {
+      updates.currentUses = Math.min(currentUses + (newMax - prevMax), newMax);
+    }
+    onUpdate({ classFeature: updates });
+  }, [level]);
 
   const toggleRage = () => {
     if (active) {
       onUpdate({ classFeature: { ...classFeature, active: false } });
-    } else if (currentUses > 0) {
-      onUpdate({ classFeature: { ...classFeature, active: true, currentUses: currentUses - 1 } });
+    } else if (isUnlimited || currentUses > 0) {
+      onUpdate({
+        classFeature: {
+          ...classFeature,
+          active: true,
+          currentUses: isUnlimited ? currentUses : currentUses - 1,
+        },
+      });
     }
   };
 
@@ -21,14 +67,16 @@ export default function RageTracker({ classFeature, editMode, onUpdate }) {
         {active ? (
           <span className="dnd-rage__status dnd-rage__status--active">ACTIVE</span>
         ) : (
-          <span className="dnd-rage__uses">{currentUses} of {maxUses}</span>
+          <span className="dnd-rage__uses">
+            {isUnlimited ? '∞' : `${currentUses} of ${maxUses}`}
+          </span>
         )}
       </div>
 
       <button
         className={`dnd-rage__toggle ${active ? 'dnd-rage__toggle--end' : ''}`}
         onClick={toggleRage}
-        disabled={!active && currentUses === 0}
+        disabled={!active && !isUnlimited && currentUses === 0}
       >
         {active ? 'END RAGE' : 'RAGE'}
       </button>
@@ -48,14 +96,10 @@ export default function RageTracker({ classFeature, editMode, onUpdate }) {
       {editMode && (
         <div className="dnd-rage__edit">
           <div className="dnd-rage__edit-row">
-            <label>Max Uses</label>
-            <input type="number" className="dnd-field dnd-field--sm" value={maxUses}
-              onChange={e => onUpdate({ classFeature: { ...classFeature, maxUses: parseInt(e.target.value) || 1 } })} />
+            <label>Rages (Lvl {level}): {isUnlimited ? 'Unlimited' : maxUses}</label>
           </div>
           <div className="dnd-rage__edit-row">
-            <label>Bonus Damage</label>
-            <input type="number" className="dnd-field dnd-field--sm" value={bonusDamage}
-              onChange={e => onUpdate({ classFeature: { ...classFeature, bonusDamage: parseInt(e.target.value) || 0 } })} />
+            <label>Rage Damage (Lvl {level}): +{bonusDamage}</label>
           </div>
           <div className="dnd-rage__edit-row">
             <label>Resistances</label>
