@@ -221,7 +221,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     // Reset all resources
     if (character.classFeature) {
       const cf = { ...character.classFeature };
-      if ('currentUses' in cf) cf.currentUses = cf.maxUses || 0;
+      // For Barbarian rage, calculate max from level (not stored value)
+      if (cf.type === 'rage') {
+        const rageMax = level >= 20 ? 999 : level >= 17 ? 6 : level >= 12 ? 5 : level >= 6 ? 4 : level >= 3 ? 3 : 2;
+        cf.currentUses = rageMax;
+        cf.maxUses = rageMax;
+      } else if ('currentUses' in cf) {
+        cf.currentUses = cf.maxUses || 0;
+      }
       if ('currentPoints' in cf) cf.currentPoints = cf.maxPoints || 0;
       if ('active' in cf) cf.active = false;
       if (cf.type === 'action_surge') {
