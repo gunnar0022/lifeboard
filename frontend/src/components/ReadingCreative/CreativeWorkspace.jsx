@@ -610,7 +610,7 @@ export default function CreativeWorkspace({ onBack }) {
                   className="workspace__editor"
                   value={fileContents[activeTab] || ''}
                   onChange={e => handleContentChange(activeTab, e.target.value)}
-                  spellCheck={false}
+                  spellCheck={true}
                 />
               )}
               {(viewMode === 'preview' || viewMode === 'split') && (
