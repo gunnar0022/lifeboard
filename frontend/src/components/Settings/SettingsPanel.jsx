@@ -298,6 +298,42 @@ export default function SettingsPanel({ onThemeChange, onPanelVisibilityChange, 
             onChange={e => handleCheckinChange(e.target.value)}
           />
         </div>
+        <div className="settings__row">
+          <div>
+            <span className="settings__label">Morning briefing</span>
+            <span className="settings__hint-inline">Daily 07:00 summary via Telegram</span>
+          </div>
+          {(() => {
+            const enabled = local.morning_briefing_enabled !== false;
+            return (
+              <button
+                className={`settings__toggle ${enabled ? 'settings__toggle--on' : ''}`}
+                onClick={() => update('morning_briefing_enabled', !enabled)}
+              >
+                <span className="settings__toggle-thumb" />
+                <span className="settings__toggle-label">{enabled ? 'ON' : 'OFF'}</span>
+              </button>
+            );
+          })()}
+        </div>
+        <div className="settings__row">
+          <div>
+            <span className="settings__label">Evening check-in enabled</span>
+            <span className="settings__hint-inline">Turn off to skip the Telegram check-in prompt</span>
+          </div>
+          {(() => {
+            const enabled = local.evening_checkin_enabled !== false;
+            return (
+              <button
+                className={`settings__toggle ${enabled ? 'settings__toggle--on' : ''}`}
+                onClick={() => update('evening_checkin_enabled', !enabled)}
+              >
+                <span className="settings__toggle-thumb" />
+                <span className="settings__toggle-label">{enabled ? 'ON' : 'OFF'}</span>
+              </button>
+            );
+          })()}
+        </div>
       </section>
 
       {/* Data */}

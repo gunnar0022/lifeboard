@@ -61,6 +61,9 @@ async def _evening_checkin_loop():
             logger.info(f"Next evening check-in in {wait_seconds / 3600:.1f} hours")
             await asyncio.sleep(wait_seconds)
 
+            if not get_config().get("evening_checkin_enabled", True):
+                continue
+
             # Check if we already have mood/energy for today (skip if so)
             today_str = get_today().isoformat()
             summary = await queries.get_daily_summary(today_str)

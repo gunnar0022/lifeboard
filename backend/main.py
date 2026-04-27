@@ -488,6 +488,8 @@ async def get_settings():
         "timezone": config.get("timezone", "Asia/Tokyo"),
         "weather_location": config.get("weather_location", "oyama"),
         "evening_checkin_time": checkin_time,
+        "morning_briefing_enabled": config.get("morning_briefing_enabled", True),
+        "evening_checkin_enabled": config.get("evening_checkin_enabled", True),
     }
 
 
@@ -500,7 +502,7 @@ async def update_settings(body: dict):
     config = get_config()
     updated = False
 
-    for key in ("theme", "panels", "pay_cycle_day"):
+    for key in ("theme", "panels", "pay_cycle_day", "morning_briefing_enabled", "evening_checkin_enabled"):
         if key in body:
             config[key] = body[key]
             updated = True

@@ -390,6 +390,8 @@ async def _briefing_loop():
             wait = (target - now).total_seconds()
             logger.info(f"Next morning briefing in {wait / 3600:.1f}h")
             await asyncio.sleep(wait)
+            if not get_config().get("morning_briefing_enabled", True):
+                continue
             await send_morning_briefing()
         except asyncio.CancelledError:
             break
