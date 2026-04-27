@@ -14,29 +14,34 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
-from backend.garmin.transform import transform_daily
+from backend.garmin.transform import transform_daily, extract_sleep_levels
 from backend.database import get_db
 
 logger = logging.getLogger("lifeboard.garmin")
 
 
+SUMMARY_COLUMNS = [
+    "date", "body_battery_max", "body_battery_min", "body_battery_charged",
+    "body_battery_drained", "hrv_last_night_avg", "hrv_status",
+    "resting_heart_rate", "stress_avg", "stress_max",
+    "sleep_duration_seconds", "sleep_score", "sleep_deep_seconds",
+    "sleep_light_seconds", "sleep_rem_seconds", "sleep_awake_seconds",
+    "bedtime_iso", "wake_iso", "awake_count", "avg_sleep_stress",
+    "avg_respiration", "avg_spo2", "lowest_spo2", "nap_seconds",
+    "unmeasurable_seconds", "sleep_score_feedback", "sleep_score_insight",
+    "steps", "steps_goal", "distance_meters", "floors_climbed",
+    "active_calories", "total_calories", "active_minutes",
+    "workout_count", "workout_total_seconds", "raw_json",
+]
+
+
 async def upsert_daily_summary(row: dict):
     db = await get_db()
     try:
-        columns = [
-            "date", "body_battery_max", "body_battery_min", "body_battery_charged",
-            "body_battery_drained", "hrv_last_night_avg", "hrv_status",
-            "resting_heart_rate", "stress_avg", "stress_max",
-            "sleep_duration_seconds", "sleep_score", "sleep_deep_seconds",
-            "sleep_light_seconds", "sleep_rem_seconds", "sleep_awake_seconds",
-            "steps", "steps_goal", "distance_meters", "floors_climbed",
-            "active_calories", "total_calories", "active_minutes",
-            "workout_count", "workout_total_seconds", "raw_json",
-        ]
-        values = [row.get(col) for col in columns]
-        placeholders = ", ".join(["?"] * len(columns))
-        col_list = ", ".join(columns)
-        update_clause = ", ".join(f"{col} = excluded.{col}" for col in columns if col != "date")
+        values = [row.get(col) for col in SUMMARY_COLUMNS]
+        placeholders = ", ".join(["?"] * len(SUMMARY_COLUMNS))
+        col_list = ", ".join(SUMMARY_COLUMNS)
+        update_clause = ", ".join(f"{col} = excluded.{col}" for col in SUMMARY_COLUMNS if col != "date")
 
         await db.execute(
             f"""INSERT INTO garmin_daily_summary ({col_list})
@@ -44,6 +49,22 @@ async def upsert_daily_summary(row: dict):
                 ON CONFLICT(date) DO UPDATE SET {update_clause},
                 ingested_at = strftime('%Y-%m-%dT%H:%M:%S', 'now')""",
             values,
+        )
+        await db.commit()
+    finally:
+        await db.close()
+
+
+async def upsert_sleep_levels(date_str: str, segments: list[dict]):
+    """Replace hypnogram rows for the given date."""
+    if not segments:
+        return
+    db = await get_db()
+    try:
+        await db.execute("DELETE FROM garmin_sleep_levels WHERE date = ?", (date_str,))
+        await db.executemany(
+            "INSERT INTO garmin_sleep_levels (date, seq, start_ts, end_ts, stage) VALUES (?, ?, ?, ?, ?)",
+            [(date_str, s["seq"], s["start_ts"], s["end_ts"], s["stage"]) for s in segments],
         )
         await db.commit()
     finally:
@@ -144,8 +165,11 @@ async def run_ingest():
 
             row = transform_daily(date_str, stats, body_battery, sleep, hrv, activities, stress)
             await upsert_daily_summary(row)
+            segments = extract_sleep_levels(sleep)
+            if segments:
+                await upsert_sleep_levels(date_str, segments)
             updated.append(date_str)
-            logger.info(f"  Upserted {date_str}: steps={row.get('steps')}, bb_max={row.get('body_battery_max')}, sleep={row.get('sleep_score')}")
+            logger.info(f"  Upserted {date_str}: steps={row.get('steps')}, bb_max={row.get('body_battery_max')}, sleep={row.get('sleep_score')}, segments={len(segments)}")
 
         if hasattr(source, 'close'):
             source.close()

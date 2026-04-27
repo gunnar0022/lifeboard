@@ -1,251 +1,510 @@
-.garmin-tile {
+/* ──────────────── Garmin Tile (rewrite) ──────────────── */
+
+.gt {
   padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
-.garmin-tile__header {
+.gt__header {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
 }
 
-.garmin-tile__range-btns {
+.gt__range-btns {
   margin-left: auto;
   display: flex;
-  gap: 4px;
+  gap: 2px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px;
 }
 
-.garmin-tile__range-btn {
-  padding: 2px 8px;
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
+.gt__range-btn {
+  padding: 3px 9px;
+  border: none;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
+  border-radius: calc(var(--radius-sm) - 2px);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.12s;
 }
 
-.garmin-tile__range-btn--active {
-  background: color-mix(in srgb, #F59E0B 12%, transparent);
-  color: #F59E0B;
-  border-color: #F59E0B;
+.gt__range-btn:hover {
+  color: var(--text-primary);
 }
 
-.garmin-tile__loading {
+.gt__range-btn--active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.gt__loading {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.garmin-tile__empty {
+.gt__empty {
   text-align: center;
   padding: var(--space-xl);
   color: var(--text-muted);
 }
 
-.garmin-tile__empty p {
+.gt__empty p {
   margin: var(--space-sm) 0;
   font-size: 0.875rem;
 }
 
-.garmin-tile__sync-btn {
-  padding: 6px 16px;
-  border: 1px solid #F59E0B;
+.gt__sync-btn {
+  padding: 6px 14px;
+  background: color-mix(in srgb, #818CF8 12%, transparent);
+  color: #818CF8;
+  border: 1px solid #818CF8;
   border-radius: var(--radius-sm);
-  background: transparent;
-  color: #F59E0B;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
 }
 
-.garmin-tile__sync-btn:hover {
-  background: #F59E0B;
-  color: white;
-}
-
-/* Hero: Body Battery */
-.garmin-tile__hero {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-md);
-}
-
-.garmin-tile__bb-main {
+/* ── Last-night hero ── */
+.gt-hero {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, #1E3A8A 8%, transparent),
+    color-mix(in srgb, #A78BFA 5%, transparent));
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.garmin-tile__bb-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.garmin-tile__bb-value {
-  font-size: 2.5rem;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  color: #F59E0B;
-  line-height: 1;
-}
-
-.garmin-tile__bb-yesterday {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* Stats strip */
-.garmin-tile__stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
 }
 
-.garmin-tile__stat {
+.gt-hero__top {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-  color: var(--text-muted);
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
 }
 
-.garmin-tile__stat-value {
-  font-size: 1rem;
-  font-weight: 700;
-  font-family: var(--font-mono);
+.gt-hero__times {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
   color: var(--text-primary);
 }
 
-.garmin-tile__stat-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.gt-hero__times strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.05rem;
 }
 
-.garmin-tile__stat-pct {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.garmin-tile__stat-sub {
-  font-size: 0.625rem;
+.gt-hero__arrow {
   color: var(--text-muted);
+  margin: 0 4px;
 }
 
-/* Sleep score dots */
-.garmin-tile__dots {
-  display: flex;
-  gap: 3px;
-}
-
-.garmin-tile__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--border-medium);
-}
-
-.garmin-tile__dot--filled {
-  background: #818CF8;
-}
-
-/* Workouts */
-.garmin-tile__workouts {
+.gt-hero__score {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  padding: var(--space-xs) 0;
 }
 
-/* Multi-day charts */
-.garmin-tile__chart-section {
-  margin-bottom: var(--space-md);
+.gt-hero__duration {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
-.garmin-tile__chart-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  display: block;
-  margin-bottom: var(--space-xs);
+.gt-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.garmin-tile__mini-charts {
+.gt-score--excellent { background: color-mix(in srgb, #10B981 18%, transparent); color: #10B981; }
+.gt-score--good      { background: color-mix(in srgb, #3B82F6 18%, transparent); color: #3B82F6; }
+.gt-score--fair      { background: color-mix(in srgb, #F59E0B 18%, transparent); color: #F59E0B; }
+.gt-score--poor      { background: color-mix(in srgb, #EF4444 18%, transparent); color: #EF4444; }
+.gt-score--na        { background: var(--bg-subtle); color: var(--text-muted); }
+
+/* Hypnogram */
+.gt-hypno {
+  margin-top: 4px;
+}
+
+.gt-hypno__bar {
+  position: relative;
+  height: 32px;
+  background: var(--bg-subtle);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gt-hypno__seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.gt-hypno__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-hero__stages {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-sm);
+  gap: 8px;
 }
 
-@media (max-width: 600px) {
-  .garmin-tile__mini-charts {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.garmin-tile__mini-chart {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-xs);
-  border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-}
-
-.garmin-tile__mini-label {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.garmin-tile__mini-latest {
-  font-size: 0.8rem;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-  text-align: center;
-}
-
-/* Footer */
-.garmin-tile__footer {
+.gt-hero__stage {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding-top: var(--space-sm);
+  gap: 6px;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.gt-hero__stage-label {
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+.gt-hero__stage-val {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-hero__stage-pct {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  margin-left: auto;
+}
+
+.gt-hero__quals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
   border-top: 1px solid var(--border-light);
-  margin-top: var(--space-sm);
+  padding-top: 8px;
 }
 
-.garmin-tile__sync-time {
-  font-size: 0.6875rem;
+.gt-hero__quals span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gt-hero__insight {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* ── Key-stats grid ── */
+.gt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 8px;
+}
+
+.gt-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gt-stat__head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gt-stat__label {
+  font-weight: 600;
+}
+
+.gt-stat__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.gt-stat__sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-delta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-delta--good { background: color-mix(in srgb, #10B981 14%, transparent); color: #10B981; }
+.gt-delta--bad  { background: color-mix(in srgb, #EF4444 14%, transparent); color: #EF4444; }
+.gt-delta--flat { background: var(--bg-subtle); color: var(--text-muted); }
+
+/* ── Charts ── */
+.gt-chart {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+}
+
+.gt-chart__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.gt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.gt-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gt-legend__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.gt-schedule-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.gt-schedule-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gt-schedule-meta strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-schedule-meta em {
+  font-style: normal;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+/* ── Sparkline grid ── */
+.gt-sparks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.gt-spark {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.gt-spark__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.7rem;
+}
+
+.gt-spark__label {
   color: var(--text-muted);
 }
 
-.garmin-tile__warn {
-  color: var(--color-alert);
+.gt-spark__last {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
-.garmin-tile__stale-dot {
+/* ── Comparison table ── */
+.gt-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gt-section__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gt-cmp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.gt-cmp__group {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.gt-cmp__group-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 10px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.gt-cmp__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.gt-cmp__table th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.gt-cmp__table th:not(:first-child) {
+  text-align: right;
+}
+
+.gt-cmp__table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border-light);
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-cmp__table tr:last-child td {
+  border-bottom: none;
+}
+
+.gt-cmp__table td:not(:first-child) {
+  text-align: right;
+}
+
+.gt-cmp__metric {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.gt-cmp__prior {
+  color: var(--text-muted);
+}
+
+.gt-cmp__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gt-cmp__delta--good { color: #10B981; }
+.gt-cmp__delta--bad  { color: #EF4444; }
+.gt-cmp__delta--flat { color: var(--text-muted); }
+
+/* ── Footer ── */
+.gt__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  padding-top: 4px;
+  border-top: 1px solid var(--border-light);
+  margin-top: 4px;
+}
+
+.gt__footer .gt__sync-time {
+  margin-left: auto;
+}
+
+.gt__warn { color: #F59E0B; }
+
+.gt__stale-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
   background: #F59E0B;
+  border-radius: 50%;
+  display: inline-block;
 }

@@ -486,6 +486,17 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
             sleep_light_seconds     INTEGER,
             sleep_rem_seconds       INTEGER,
             sleep_awake_seconds     INTEGER,
+            bedtime_iso             TEXT,
+            wake_iso                TEXT,
+            awake_count             INTEGER,
+            avg_sleep_stress        REAL,
+            avg_respiration         REAL,
+            avg_spo2                REAL,
+            lowest_spo2             INTEGER,
+            nap_seconds             INTEGER,
+            unmeasurable_seconds    INTEGER,
+            sleep_score_feedback    TEXT,
+            sleep_score_insight     TEXT,
             steps                   INTEGER,
             steps_goal              INTEGER,
             distance_meters         REAL,
@@ -501,6 +512,17 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
 
         CREATE INDEX IF NOT EXISTS idx_garmin_daily_date ON garmin_daily_summary(date);
 
+        CREATE TABLE IF NOT EXISTS garmin_sleep_levels (
+            date            TEXT NOT NULL,
+            seq             INTEGER NOT NULL,
+            start_ts        INTEGER NOT NULL,
+            end_ts          INTEGER NOT NULL,
+            stage           TEXT NOT NULL,
+            PRIMARY KEY (date, seq)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_garmin_sleep_levels_date ON garmin_sleep_levels(date);
+
         CREATE TABLE IF NOT EXISTS garmin_ingest_log (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
             run_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
@@ -512,6 +534,26 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
 
         CREATE INDEX IF NOT EXISTS idx_garmin_ingest_run ON garmin_ingest_log(run_at);
     """)
+
+    # Migrate: add new sleep columns to existing DBs
+    new_cols = [
+        ("bedtime_iso",          "TEXT"),
+        ("wake_iso",             "TEXT"),
+        ("awake_count",          "INTEGER"),
+        ("avg_sleep_stress",     "REAL"),
+        ("avg_respiration",      "REAL"),
+        ("avg_spo2",             "REAL"),
+        ("lowest_spo2",          "INTEGER"),
+        ("nap_seconds",          "INTEGER"),
+        ("unmeasurable_seconds", "INTEGER"),
+        ("sleep_score_feedback", "TEXT"),
+        ("sleep_score_insight",  "TEXT"),
+    ]
+    for col, typ in new_cols:
+        try:
+            await db.execute(f"ALTER TABLE garmin_daily_summary ADD COLUMN {col} {typ}")
+        except Exception:
+            pass  # column already exists
 
 
 async def _create_system_tables(db: aiosqlite.Connection):
