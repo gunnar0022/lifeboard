@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useApi } from '../../../hooks/useApi';
+import useLocalStorageState from '../../../hooks/useLocalStorageState';
 import CampaignCard from './CampaignCard';
 import CampaignCreateEdit from './CampaignCreateEdit';
 import CharacterList from './CharacterList';
@@ -9,7 +10,8 @@ import { CLASS_COLORS } from './dndUtils';
 export default function DnDSelectionScreen({ onSelectCharacter }) {
   const { data: campaigns, refetch: refetchCampaigns } = useApi('/api/dnd/campaigns');
   const { data: characters, refetch: refetchCharacters } = useApi('/api/dnd/characters');
-  const [selectedCampaign, setSelectedCampaign] = useState(null); // null = not chosen yet, 'skip' = no campaign
+  // Persisted so returning to the picker remembers the chosen campaign context.
+  const [selectedCampaign, setSelectedCampaign] = useLocalStorageState('lifeboard-dnd-campaign', null); // null = not chosen yet, 'skip' = no campaign
   const [creating, setCreating] = useState(false);
 
   const campaignChosen = selectedCampaign !== null;

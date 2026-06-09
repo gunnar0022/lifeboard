@@ -19,11 +19,13 @@ import CreativeDnD from './components/Creative/CreativeDnD';
 import { NAV_CONFIG, getDefaultSubTab, migrateSettings } from './config/navigation';
 import { useApi, RefreshContext } from './hooks/useApi';
 import { useWebSocket } from './hooks/useWebSocket';
+import useLocalStorageState from './hooks/useLocalStorageState';
 import './App.css';
 
 export default function App() {
-  const [activePanel, setActivePanel] = useState('home');
-  const [activeSubTab, setActiveSubTab] = useState(null);
+  // Persisted so a refresh / tab-discard reopens the same section instead of Home.
+  const [activePanel, setActivePanel] = useLocalStorageState('lifeboard-active-panel', 'home');
+  const [activeSubTab, setActiveSubTab] = useLocalStorageState('lifeboard-active-subtab', null);
   const [previousPanel, setPreviousPanel] = useState('home');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

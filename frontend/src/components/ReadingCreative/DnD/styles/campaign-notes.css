@@ -56,6 +56,17 @@
   color: var(--dnd-text-muted);
   flex: 1;
 }
+.dnd-notes-tab__sort {
+  font-family: inherit;
+  font-size: 0.7rem;
+  color: var(--dnd-text);
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+}
+.dnd-notes-tab__sort:hover { border-color: var(--dnd-accent); }
 .dnd-notes-tab__save-status {
   font-size: 0.7rem;
   color: var(--dnd-text-muted);

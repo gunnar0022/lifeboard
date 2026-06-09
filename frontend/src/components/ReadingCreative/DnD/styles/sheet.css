@@ -111,6 +111,53 @@
   color: var(--dnd-accent); border-bottom-color: var(--dnd-accent);
 }
 
+/* Edit-mode tab manager */
+.dnd-tab-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem;
+  border: 1px dashed var(--dnd-border);
+  border-radius: 0.4rem;
+  background: var(--dnd-surface);
+}
+.dnd-tab-manager__label {
+  font-size: 0.7rem;
+  color: var(--dnd-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.dnd-tab-manager__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.dnd-tab-manager__item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.3rem;
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  font-size: 0.8rem;
+  cursor: grab;
+  user-select: none;
+}
+.dnd-tab-manager__item:hover { border-color: var(--dnd-accent); }
+.dnd-tab-manager__item--off {
+  opacity: 0.5;
+  color: var(--dnd-text-dim);
+}
+.dnd-tab-manager__item--blocked {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.dnd-tab-manager__grip { color: var(--dnd-text-dim); opacity: 0.5; flex-shrink: 0; }
+.dnd-tab-manager__name { font-weight: 600; }
+
 /* Tab content */
 .dnd-sheet__tab-content { margin-bottom: 1.5rem; }
 .dnd-sheet__combat-2col {

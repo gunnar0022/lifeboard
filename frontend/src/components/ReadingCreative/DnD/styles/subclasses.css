@@ -484,7 +484,7 @@
 .dnd-stats-tab__ability-group {
   border: 1px solid var(--dnd-border);
   border-radius: 0.4rem;
-  padding: 0.5rem;
+  padding: 0.65rem;
   background: var(--dnd-surface);
 }
 
@@ -505,27 +505,27 @@
 
 .dnd-stats-tab__ability-name {
   font-family: 'Crimson Text', serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--dnd-accent);
-  min-width: 4rem;
+  min-width: 4.5rem;
 }
 
 .dnd-stats-tab__score {
-  font-size: 0.9rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--dnd-text);
   background: var(--dnd-bg);
-  padding: 0.1rem 0.4rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid var(--dnd-border);
-  min-width: 1.8rem;
+  min-width: 2.1rem;
   text-align: center;
 }
 
 .dnd-stats-tab__score-input {
-  width: 2.5rem;
-  font-size: 0.85rem;
+  width: 3rem;
+  font-size: 1.25rem;
   font-weight: 700;
   text-align: center;
   padding: 0.1rem 0.2rem;
@@ -537,7 +537,7 @@
 }
 
 .dnd-stats-tab__mod {
-  font-size: 1rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--dnd-text);
 }
@@ -555,7 +555,7 @@
 .dnd-stats-tab__save:hover { background: var(--dnd-surface-hover); }
 
 .dnd-stats-tab__save-label {
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--dnd-text-dim);
   text-transform: uppercase;
@@ -563,7 +563,7 @@
 }
 
 .dnd-stats-tab__save-mod {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--dnd-text-dim);
 }
@@ -571,7 +571,7 @@
 .dnd-stats-tab__save-mod--prof { color: var(--dnd-positive); }
 
 .dnd-stats-tab__prof-dot {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--dnd-text-dim);
   cursor: pointer;
 }
@@ -588,8 +588,8 @@
 .dnd-stats-tab__skill-row {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.15rem 0.2rem;
+  gap: 0.5rem;
+  padding: 0.2rem 0.2rem;
   border-radius: 0.2rem;
   cursor: pointer;
   transition: background 0.1s;
@@ -598,17 +598,17 @@
 .dnd-stats-tab__skill-row:hover { background: var(--dnd-surface-hover); }
 
 .dnd-stats-tab__skill-mod {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--dnd-text-dim);
-  min-width: 1.5rem;
+  min-width: 1.7rem;
   text-align: right;
 }
 
 .dnd-stats-tab__skill-mod--prof { color: var(--dnd-positive); }
 
 .dnd-stats-tab__skill-name {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   color: var(--dnd-text);
 }
 

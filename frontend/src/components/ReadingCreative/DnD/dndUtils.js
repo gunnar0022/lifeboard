@@ -292,7 +292,7 @@ export const NEW_CHARACTER_DATA = {
   attacks: [],
   features: [],
   classFeature: null,
-  equipment: [],
+  items: [],
   coins: { CP: 0, SP: 0, EP: 0, GP: 0, PP: 0 },
   customBoxes: [
     { title: 'Personality', fields: [
@@ -304,6 +304,45 @@ export const NEW_CHARACTER_DATA = {
   ],
   spellcasting: null,
 };
+
+// ---- Character sheet tab registry -------------------------------------
+// The single source of truth for which tabs exist. New features become a new
+// entry here and slot into the per-character tab config automatically.
+export const TAB_REGISTRY = [
+  { id: 'combat', label: 'Combat' },
+  { id: 'equipment', label: 'Equipment' },
+  { id: 'stats', label: 'Stats' },
+  { id: 'features', label: 'Features' },
+  { id: 'spells', label: 'Spells' },
+  { id: 'info', label: 'Info' },
+  { id: 'notes', label: 'Notes', requiresCampaign: true },
+];
+
+// Whether a tab should be enabled by default for a given character.
+function defaultTabEnabled(tabId, character, hasCampaign) {
+  if (tabId === 'spells') return !!character?.spellcasting;
+  if (tabId === 'notes') return hasCampaign;
+  return true;
+}
+
+// Build the initial ordered tab config from the registry.
+export function defaultTabsConfig(character, hasCampaign) {
+  return TAB_REGISTRY.map(t => ({ id: t.id, enabled: defaultTabEnabled(t.id, character, hasCampaign) }));
+}
+
+// Reconcile a stored config against the current registry: drop unknown tabs,
+// append registry tabs added since the character was created. Returns a new
+// array, or the same reference if nothing changed.
+export function reconcileTabsConfig(config, character, hasCampaign) {
+  if (!Array.isArray(config)) return defaultTabsConfig(character, hasCampaign);
+  const known = new Set(config.map(t => t.id));
+  const valid = config.filter(t => TAB_REGISTRY.some(r => r.id === t.id));
+  const missing = TAB_REGISTRY
+    .filter(r => !known.has(r.id))
+    .map(r => ({ id: r.id, enabled: defaultTabEnabled(r.id, character, hasCampaign) }));
+  if (valid.length === config.length && missing.length === 0) return config;
+  return [...valid, ...missing];
+}
 
 // Spellcasting defaults by class (null = non-caster)
 const _scPrepared = (ability) => ({

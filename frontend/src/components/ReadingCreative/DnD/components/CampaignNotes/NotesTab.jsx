@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Loader, Check } from 'lucide-react';
 import { useApi, apiPost, apiPut, apiDelete } from '../../../../../hooks/useApi';
+import useLocalStorageState from '../../../../../hooks/useLocalStorageState';
 import NoteTypeBar from './NoteTypeBar';
 import NoteCard from './NoteCard';
 
@@ -9,6 +10,7 @@ export default function NotesTab({ campaignId }) {
   const [activeType, setActiveType] = useState('character');
   const [newNoteId, setNewNoteId] = useState(null);
   const [saveStatus, setSaveStatus] = useState('saved');
+  const [sortBy, setSortBy] = useLocalStorageState('lifeboard-dnd-notes-sort', 'created'); // 'created' | 'alpha'
 
   // Count notes by type
   const counts = {};
@@ -16,8 +18,22 @@ export default function NotesTab({ campaignId }) {
     counts[n.type] = (counts[n.type] || 0) + 1;
   });
 
-  // Filter by active type
-  const filteredNotes = (allNotes || []).filter(n => n.type === activeType);
+  // Filter by active type, then sort
+  const filteredNotes = (allNotes || [])
+    .filter(n => n.type === activeType)
+    .slice()
+    .sort((a, b) => {
+      if (sortBy === 'alpha') {
+        const ta = (a.title || '').trim().toLowerCase();
+        const tb = (b.title || '').trim().toLowerCase();
+        // Untitled notes sort last
+        if (!ta && tb) return 1;
+        if (ta && !tb) return -1;
+        return ta.localeCompare(tb);
+      }
+      // 'created' — DB insertion order via autoincrement id (oldest first)
+      return (a.id || 0) - (b.id || 0);
+    });
 
   const handleAddNote = useCallback(async () => {
     try {
@@ -76,6 +92,15 @@ export default function NotesTab({ campaignId }) {
         <span className="dnd-notes-tab__count">
           {filteredNotes.length} {filteredNotes.length === 1 ? 'entry' : 'entries'}
         </span>
+        <select
+          className="dnd-notes-tab__sort"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          title="Sort notes"
+        >
+          <option value="created">Time created</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
         <span className={`dnd-notes-tab__save-status dnd-notes-tab__save-status--${saveStatus}`}>
           {saveStatus === 'saving' && <><Loader size={10} className="dnd-sheet__spinner-sm" /> Saving...</>}
           {saveStatus === 'saved' && <><Check size={10} /> Saved</>}

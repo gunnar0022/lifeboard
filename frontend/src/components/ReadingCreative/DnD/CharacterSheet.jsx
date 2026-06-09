@@ -12,15 +12,18 @@ import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
 import SubclassBlock from './components/SubclassBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
+import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
-import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS } from './dndUtils';
+import useLocalStorageState from '../../../hooks/useLocalStorageState';
+import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig } from './dndUtils';
 
-export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack }) {
+export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack, onEditModeChange }) {
   const [character, setCharacter] = useState(null);
   const [campaignName, setCampaignName] = useState('');
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(initialEditMode || false);
-  const [tab, setTab] = useState('combat');
+  // Active tab persists per-character so a refresh reopens the same tab.
+  const [tab, setTab] = useLocalStorageState(`lifeboard-dnd-tab-${characterId}`, 'combat');
   const prevClassRef = useRef(null);
 
   const saveStatus = useAutosave(character, characterId);
@@ -29,8 +32,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     (async () => {
       try {
         const res = await fetch(`/api/dnd/characters/${characterId}`);
+        if (!res.ok) throw new Error(`Character ${characterId} not found`);
         const data = await res.json();
         const charData = data.data;
+        if (!charData) throw new Error(`Character ${characterId} has no data`);
         // Migrate old personality format to customBoxes
         if (charData.personality && !charData.customBoxes) {
           const p = charData.personality;
@@ -47,10 +52,33 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
             });
           }
         }
+        // Migrate split equipment lists -> single unified items array
+        if (!charData.items && (charData.equippedItems || charData.carriedItems)) {
+          const norm = (it, isEquipped) => ({
+            id: it.id || Date.now() + Math.floor(Math.random() * 100000),
+            name: it.name || '',
+            quantity: it.quantity || 1,
+            equipped: isEquipped,
+            slot: it.slot || 'other',
+            notes: it.notes || '',
+          });
+          charData.items = [
+            ...(charData.equippedItems || []).map(it => norm(it, true)),
+            ...(charData.carriedItems || []).map(it => norm(it, false)),
+          ];
+          delete charData.equippedItems;
+          delete charData.carriedItems;
+        }
+        // Seed / reconcile per-character tab configuration against the registry
+        charData.tabsConfig = reconcileTabsConfig(charData.tabsConfig, charData, !!campaignId);
         setCharacter(charData);
         prevClassRef.current = charData?.meta?.className || '';
       } catch (e) {
         console.error('Failed to load character:', e);
+        // Stale persisted reference — drop back to the picker instead of a dead screen.
+        setLoading(false);
+        onBack?.();
+        return;
       } finally {
         setLoading(false);
       }
@@ -142,10 +170,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (defaults) {
         setCharacter(prev => ({ ...prev, classFeature: { ...defaults } }));
       }
-      // Auto-seed spellcasting defaults for caster classes
+      // Auto-seed spellcasting defaults for caster classes + enable the Spells tab
       const scDefaults = SPELLCASTING_DEFAULTS[currentClass];
       if (scDefaults && !character.spellcasting) {
-        setCharacter(prev => ({ ...prev, spellcasting: { ...scDefaults } }));
+        setCharacter(prev => ({
+          ...prev,
+          spellcasting: { ...scDefaults },
+          tabsConfig: (prev.tabsConfig || []).map(t => t.id === 'spells' ? { ...t, enabled: true } : t),
+        }));
       } else if (!scDefaults) {
         // Non-caster class: clear spellcasting if it was auto-seeded
         // (don't clear if user manually enabled it)
@@ -325,15 +357,31 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
   const hasCampaign = !!campaignId;
 
-  const tabs = [
-    { id: 'combat', label: 'Combat' },
-    { id: 'equipment', label: 'Equipment' },
-    { id: 'stats', label: 'Stats' },
-    { id: 'features', label: 'Features' },
-    ...(hasSpellcasting ? [{ id: 'spells', label: 'Spells' }] : []),
-    { id: 'info', label: 'Info' },
-    ...(hasCampaign ? [{ id: 'notes', label: 'Notes' }] : []),
-  ];
+  // Visible tabs derive from the per-character config, resolved against the registry.
+  const tabRegistryMap = Object.fromEntries(TAB_REGISTRY.map(t => [t.id, t]));
+  const tabsConfig = character.tabsConfig || [];
+  const tabs = tabsConfig
+    .filter(t => t.enabled)
+    .map(t => tabRegistryMap[t.id])
+    .filter(reg => reg && (!reg.requiresCampaign || hasCampaign));
+  // Fall back to the first visible tab if the persisted tab is now hidden.
+  const activeTab = tabs.some(t => t.id === tab) ? tab : (tabs[0]?.id || 'combat');
+
+  // Persist tab config changes; enabling Spells seeds spellcasting defaults.
+  const handleTabsConfigChange = (newConfig) => {
+    const wasSpells = (character.tabsConfig || []).find(t => t.id === 'spells')?.enabled;
+    const nowSpells = newConfig.find(t => t.id === 'spells')?.enabled;
+    const updates = { tabsConfig: newConfig };
+    if (nowSpells && !wasSpells && !character.spellcasting) {
+      const scDefaults = SPELLCASTING_DEFAULTS[meta.className];
+      updates.spellcasting = scDefaults ? { ...scDefaults } : {
+        ability: 'WIS', type: 'prepared', slots: { '1': { max: 2, expended: 0 } },
+        cantrips: [], preparedSpells: [], knownSpells: [],
+        spellOrder: { cantrips: [], prepared: [], known: [] }, concentratingOn: null,
+      };
+    }
+    handleUpdate(updates);
+  };
 
   return (
     <div className="dnd-sheet">
@@ -404,7 +452,11 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           {campaignName && (
             <span className="dnd-sheet__campaign-name">{campaignName}</span>
           )}
-          <button className="dnd-sheet__edit-toggle" onClick={() => setEditMode(!editMode)}>
+          <button className="dnd-sheet__edit-toggle" onClick={() => {
+            const next = !editMode;
+            setEditMode(next);
+            onEditModeChange?.(next);
+          }}>
             {editMode ? <><Eye size={14} /> View</> : <><Edit3 size={14} /> Edit</>}
           </button>
           <span className={`dnd-sheet__save-status dnd-sheet__save-status--${saveStatus}`}>
@@ -434,33 +486,26 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       {/* Status bar: inspiration, conditions, exhaustion */}
       <StatusBar character={character} onUpdate={handleUpdate} />
 
+      {/* Edit-mode tab manager */}
+      {editMode && (
+        <TabManager config={tabsConfig} onChange={handleTabsConfigChange} hasCampaign={hasCampaign} />
+      )}
+
       {/* Tabs */}
       <div className="dnd-sheet__tabs">
         {tabs.map(t => (
           <button key={t.id}
-            className={`dnd-sheet__tab ${tab === t.id ? 'dnd-sheet__tab--active' : ''}`}
+            className={`dnd-sheet__tab ${activeTab === t.id ? 'dnd-sheet__tab--active' : ''}`}
             onClick={() => setTab(t.id)}
           >
             {t.label}
           </button>
         ))}
-        {editMode && !hasSpellcasting && (
-          <button className="dnd-sheet__tab dnd-sheet__tab--enable-spell"
-            onClick={() => {
-              const scDefaults = SPELLCASTING_DEFAULTS[meta.className];
-              const fallback = { ability: 'WIS', type: 'prepared', slots: { '1': { max: 2, expended: 0 } }, cantrips: [], preparedSpells: [], knownSpells: [], spellOrder: { cantrips: [], prepared: [], known: [] }, concentratingOn: null };
-              handleUpdate({ spellcasting: scDefaults || fallback });
-            }}
-            title="Enable spellcasting for this character"
-          >
-            + Spells
-          </button>
-        )}
       </div>
 
       {/* Tab content */}
       <div className="dnd-sheet__tab-content">
-        {tab === 'combat' && (
+        {activeTab === 'combat' && (
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
@@ -506,30 +551,30 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           </div>
         )}
 
-        {tab === 'equipment' && (
+        {activeTab === 'equipment' && (
           <EquipmentTab character={character} editMode={editMode} onUpdate={handleUpdate} />
         )}
 
-        {tab === 'stats' && (
+        {activeTab === 'stats' && (
           <StatsTab character={character} editMode={editMode} onUpdate={handleUpdate} />
         )}
 
-        {tab === 'features' && (
+        {activeTab === 'features' && (
           <FeatureList features={character.features || []}
             editMode={editMode} onUpdate={handleUpdate} level={level} />
         )}
 
-        {tab === 'spells' && hasSpellcasting && (
+        {activeTab === 'spells' && hasSpellcasting && (
           <SpellsTab character={character} editMode={editMode} onUpdate={handleUpdate} />
         )}
 
-        {tab === 'info' && (
+        {activeTab === 'info' && (
           <InfoPanel
             customBoxes={character.customBoxes || []}
             editMode={editMode} onUpdate={handleUpdate} />
         )}
 
-        {tab === 'notes' && hasCampaign && (
+        {activeTab === 'notes' && hasCampaign && (
           <NotesTab campaignId={campaignId} />
         )}
       </div>

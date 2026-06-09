@@ -359,6 +359,96 @@
   font-size: 0.8rem;
 }
 
+/* Inline quantity stepper (view + edit mode) */
+.dnd-equipment__qty {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.dnd-equipment__qty-btn {
+  background: none;
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.dnd-equipment__qty-btn:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+
+.dnd-equipment__qty-num {
+  width: 38px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  border-radius: 3px;
+  padding: 0.1rem 0.15rem;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+
+.dnd-equipment__qty-num::-webkit-outer-spin-button,
+.dnd-equipment__qty-num::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Inline equip / unequip toggle */
+.dnd-equipment__equip-toggle {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--dnd-border);
+  background: transparent;
+  color: var(--dnd-text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dnd-equipment__equip-toggle:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+
+.dnd-equipment__equip-toggle--on {
+  background: var(--dnd-positive);
+  border-color: var(--dnd-positive);
+  color: var(--dnd-bg);
+}
+
+/* Direct-entry coin input (overrides the +/- only layout) */
+.dnd-coins__input {
+  width: 56px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  border-radius: 3px;
+  padding: 0.15rem 0.2rem;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+
+.dnd-coins__input::-webkit-outer-spin-button,
+.dnd-coins__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Subclass unimplemented notice */
 .dnd-subclass-notice {
   padding: 0.5rem 0.8rem;
