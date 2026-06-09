@@ -12,8 +12,7 @@ import ProjectsPanel from './components/Projects/ProjectsPanel';
 import OrganizerCalendar from './components/Organizer/OrganizerCalendar';
 import OrganizerTasksBills from './components/Organizer/OrganizerTasksBills';
 import OrganizerDocuments from './components/Organizer/OrganizerDocuments';
-import HealthTab from './components/HealthFitness/HealthTab';
-import FitnessTab from './components/HealthFitness/FitnessTab';
+import HealthDashboard from './components/HealthDashboard';
 import CreativeWorkspaceTab from './components/Creative/CreativeWorkspaceTab';
 import CreativeReading from './components/Creative/CreativeReading';
 import CreativeDnD from './components/Creative/CreativeDnD';
@@ -129,8 +128,8 @@ export default function App() {
 
     // --- Health & Fitness ---
     if (activePanel === 'health_fitness') {
-      if (activeSubTab === 'fitness') return <FitnessTab key="fitness" />;
-      return <HealthTab key="health" />;
+      const view = activeSubTab === 'garmin' ? 'garmin' : 'tracker';
+      return <HealthDashboard key="health-dashboard" view={view} />;
     }
 
     // --- Money ---

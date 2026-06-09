@@ -371,6 +371,47 @@ async def get_latest_measurement() -> dict | None:
         await db.close()
 
 
+async def get_measurement(measurement_id: int) -> dict | None:
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall(
+            "SELECT * FROM health_measurements WHERE id = ?", [measurement_id]
+        )
+        return dict(rows[0]) if rows else None
+    finally:
+        await db.close()
+
+
+async def edit_measurement(measurement_id: int, **fields) -> dict | None:
+    db = await get_db()
+    try:
+        allowed = {"date", "weight_g", "notes"}
+        updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+        if not updates:
+            return await get_measurement(measurement_id)
+        set_clause = ", ".join(f"{k} = ?" for k in updates)
+        params = list(updates.values()) + [measurement_id]
+        await db.execute(
+            f"UPDATE health_measurements SET {set_clause} WHERE id = ?", params
+        )
+        await db.commit()
+        return await get_measurement(measurement_id)
+    finally:
+        await db.close()
+
+
+async def delete_measurement(measurement_id: int) -> bool:
+    db = await get_db()
+    try:
+        await db.execute(
+            "DELETE FROM health_measurements WHERE id = ?", [measurement_id]
+        )
+        await db.commit()
+        return True
+    finally:
+        await db.close()
+
+
 # (Medical Documents and Health Files removed — now in unified backend/documents.py)
 
 # ──────────────────────── Nutrition Foods ────────────────────────

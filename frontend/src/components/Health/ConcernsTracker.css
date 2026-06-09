@@ -207,3 +207,113 @@
 .concerns-tracker__resolved-toggle:hover {
   color: var(--text-secondary);
 }
+
+/* --- Create / edit forms & toolbar --- */
+.concerns-tracker__header--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.concerns-tracker__empty {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-md) 0;
+}
+
+.concern-item__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.concern-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.concern-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.concern-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.concern-btn--primary {
+  background: var(--color-health-body);
+  border-color: var(--color-health-body);
+  color: #fff;
+}
+
+.concern-btn--primary:hover:not(:disabled) {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.concern-btn--success {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
+}
+
+.concern-btn--success:hover:not(:disabled) {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.concern-btn--danger:hover:not(:disabled) {
+  color: var(--color-alert);
+  border-color: var(--color-alert);
+}
+
+.concern-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin: var(--space-sm) 0;
+}
+
+.concern-edit--create {
+  margin-bottom: var(--space-md);
+}
+
+.concern-edit__input,
+.concern-edit__textarea {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.concern-edit__input:focus,
+.concern-edit__textarea:focus {
+  outline: none;
+  border-color: var(--color-health-body);
+}
+
+.concern-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}

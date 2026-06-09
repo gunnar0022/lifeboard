@@ -70,6 +70,30 @@ class MeasurementCreate(BaseModel):
     date: Optional[str] = None
     notes: Optional[str] = None
 
+
+class MeasurementUpdate(BaseModel):
+    weight_g: Optional[int] = None
+    date: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class ConcernCreate(BaseModel):
+    title: str
+    description: str = ""
+
+
+class ConcernUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
+class ConcernResolve(BaseModel):
+    resolution_summary: str = ""
+
+
+class ConcernLogCreate(BaseModel):
+    content: str
+
 class FoodCreate(BaseModel):
     name: str
     calories: int = 0
@@ -248,6 +272,34 @@ async def add_measurement(body: MeasurementCreate):
     return result
 
 
+@router.put("/measurements/{measurement_id}")
+async def edit_measurement(measurement_id: int, body: MeasurementUpdate):
+    existing = await queries.get_measurement(measurement_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Measurement not found")
+    result = await queries.edit_measurement(
+        measurement_id, **body.model_dump(exclude_none=True)
+    )
+    # Keep profile weight in sync with the most recent measurement
+    latest = await queries.get_latest_measurement()
+    if latest and latest.get("weight_g"):
+        await queries.upsert_profile(weight_g=latest["weight_g"])
+    return result
+
+
+@router.delete("/measurements/{measurement_id}")
+async def delete_measurement(measurement_id: int):
+    existing = await queries.get_measurement(measurement_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Measurement not found")
+    await queries.delete_measurement(measurement_id)
+    # Re-sync profile weight to whatever the latest remaining measurement is
+    latest = await queries.get_latest_measurement()
+    if latest and latest.get("weight_g"):
+        await queries.upsert_profile(weight_g=latest["weight_g"])
+    return {"ok": True}
+
+
 # --- Heatmap & Recent ---
 
 @router.get("/heatmap")
@@ -318,3 +370,54 @@ async def get_concerns():
     """Get health concerns for the dashboard."""
     from backend.agents.fleet.queries import get_concerns_for_dashboard
     return await get_concerns_for_dashboard()
+
+
+@router.post("/concerns")
+async def create_concern(body: ConcernCreate):
+    from backend.agents.fleet.queries import create_concern as _create
+    if not body.title.strip():
+        raise HTTPException(status_code=400, detail="Title is required")
+    return await _create(title=body.title.strip(), description=body.description or "")
+
+
+@router.put("/concerns/{concern_id}")
+async def update_concern(concern_id: int, body: ConcernUpdate):
+    from backend.agents.fleet.queries import get_concern, update_concern as _update
+    if not await get_concern(concern_id):
+        raise HTTPException(status_code=404, detail="Concern not found")
+    return await _update(concern_id, **body.model_dump(exclude_none=True))
+
+
+@router.post("/concerns/{concern_id}/resolve")
+async def resolve_concern(concern_id: int, body: ConcernResolve):
+    from backend.agents.fleet.queries import get_concern, resolve_concern as _resolve
+    if not await get_concern(concern_id):
+        raise HTTPException(status_code=404, detail="Concern not found")
+    return await _resolve(concern_id, body.resolution_summary or "")
+
+
+@router.post("/concerns/{concern_id}/reactivate")
+async def reactivate_concern(concern_id: int):
+    from backend.agents.fleet.queries import get_concern, reactivate_concern as _reactivate
+    if not await get_concern(concern_id):
+        raise HTTPException(status_code=404, detail="Concern not found")
+    return await _reactivate(concern_id)
+
+
+@router.post("/concerns/{concern_id}/logs")
+async def add_concern_log(concern_id: int, body: ConcernLogCreate):
+    from backend.agents.fleet.queries import get_concern, add_concern_log as _add_log
+    if not await get_concern(concern_id):
+        raise HTTPException(status_code=404, detail="Concern not found")
+    if not body.content.strip():
+        raise HTTPException(status_code=400, detail="Log content is required")
+    return await _add_log(concern_id, source="user_log", content=body.content.strip())
+
+
+@router.delete("/concerns/{concern_id}")
+async def delete_concern(concern_id: int):
+    from backend.agents.fleet.queries import get_concern, delete_concern as _delete
+    if not await get_concern(concern_id):
+        raise HTTPException(status_code=404, detail="Concern not found")
+    await _delete(concern_id)
+    return {"ok": True}

@@ -257,6 +257,14 @@
   text-align: right;
 }
 
+/* Exercise mode */
+.meal-entry__exercise-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
 /* Submit button */
 .meal-entry__submit {
   display: flex;

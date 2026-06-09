@@ -21,8 +21,8 @@ export const NAV_CONFIG = {
     icon: 'heart-pulse',
     accent: '#F59E0B',
     subtabs: {
-      health: { label: 'Health' },
-      fitness: { label: 'Fitness' },
+      tracker: { label: 'Tracker' },
+      garmin: { label: 'Garmin' },
     },
   },
   money: {
@@ -114,7 +114,7 @@ export function migrateSettings(oldPanels) {
   // Map old agent IDs to new structure
   const mapping = {
     life_manager: { parent: 'organizer', subtabs: ['calendar', 'tasks_bills', 'documents'] },
-    health_body: { parent: 'health_fitness', subtabs: ['health', 'fitness'] },
+    health_body: { parent: 'health_fitness', subtabs: ['tracker', 'garmin'] },
     finance: { parent: 'money', subtabs: ['finance'] },
     investing: { parent: 'money', subtabs: ['investing'] },
     reading_creative: { parent: 'creative', subtabs: ['workspace', 'reading', 'dnd'] },

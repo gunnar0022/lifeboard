@@ -481,6 +481,47 @@ async def get_settings():
         if key not in raw_panels:
             raw_panels[key] = default_val
 
+    # Default Health dashboard layout — first-run curated subset
+    default_dashboard = {
+        "range_days": 14,
+        "widgets": [
+            {"id": "sleep.last_night",            "enabled": True,  "label": None},
+            {"id": "sleep.stages_trend",          "enabled": True,  "label": None},
+            {"id": "sleep.schedule_consistency",  "enabled": True,  "label": None},
+            {"id": "sleep.score_trend",           "enabled": True,  "label": None},
+            {"id": "sleep.stress_trend",          "enabled": False, "label": None},
+            {"id": "body.key_stats",              "enabled": True,  "label": None},
+            {"id": "body.rhr_trend",              "enabled": False, "label": None},
+            {"id": "body.steps_trend",            "enabled": False, "label": None},
+            {"id": "body.body_battery_trend",     "enabled": False, "label": None},
+            {"id": "body.stress_trend",           "enabled": False, "label": None},
+            {"id": "compare.period",              "enabled": True,  "label": None},
+            {"id": "health.profile",              "enabled": True,  "label": None},
+            {"id": "health.calorie_heatmap",      "enabled": True,  "label": None},
+            {"id": "health.recent_detail",        "enabled": True,  "label": None},
+            {"id": "health.meal_entry",           "enabled": False, "label": None},
+            {"id": "health.food_database",        "enabled": False, "label": None},
+            {"id": "health.concerns",             "enabled": False, "label": None},
+            {"id": "fitness.weight_trend",        "enabled": True,  "label": None},
+            {"id": "system.garmin_sync",          "enabled": False, "label": None},
+        ],
+    }
+    stored_dashboard = config.get("health_dashboard")
+    if isinstance(stored_dashboard, dict):
+        # Merge: keep user's order/labels/enabled; append any new widgets the
+        # registry knows about that the stored config doesn't yet have.
+        stored_ids = {w.get("id") for w in stored_dashboard.get("widgets", []) if isinstance(w, dict)}
+        merged_widgets = [w for w in stored_dashboard.get("widgets", []) if isinstance(w, dict) and w.get("id")]
+        for w in default_dashboard["widgets"]:
+            if w["id"] not in stored_ids:
+                merged_widgets.append({**w, "enabled": False})  # new widgets default off
+        dashboard = {
+            "range_days": stored_dashboard.get("range_days", default_dashboard["range_days"]),
+            "widgets": merged_widgets,
+        }
+    else:
+        dashboard = default_dashboard
+
     return {
         "theme": config.get("theme", "dark"),
         "panels": raw_panels,
@@ -490,6 +531,7 @@ async def get_settings():
         "evening_checkin_time": checkin_time,
         "morning_briefing_enabled": config.get("morning_briefing_enabled", True),
         "evening_checkin_enabled": config.get("evening_checkin_enabled", True),
+        "health_dashboard": dashboard,
     }
 
 
@@ -502,7 +544,8 @@ async def update_settings(body: dict):
     config = get_config()
     updated = False
 
-    for key in ("theme", "panels", "pay_cycle_day", "morning_briefing_enabled", "evening_checkin_enabled"):
+    for key in ("theme", "panels", "pay_cycle_day", "morning_briefing_enabled",
+                "evening_checkin_enabled", "health_dashboard"):
         if key in body:
             config[key] = body[key]
             updated = True

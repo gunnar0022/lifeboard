@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Utensils, Plus, Check, ChevronDown, ChevronRight, X, Minus } from 'lucide-react';
+import { Utensils, Plus, Check, ChevronDown, ChevronRight, X, Minus, Dumbbell } from 'lucide-react';
 import { useApi, apiPost } from '../../hooks/useApi';
 import './MealEntry.css';
 
@@ -18,6 +18,11 @@ export default function MealEntry({ onSuccess }) {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+
+  // Exercise mode
+  const [exDescription, setExDescription] = useState('');
+  const [exDuration, setExDuration] = useState('');
+  const [exCalories, setExCalories] = useState('');
 
   // Shared
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -87,6 +92,29 @@ export default function MealEntry({ onSuccess }) {
     });
   };
 
+  const handleExerciseSubmit = async () => {
+    if (!exDescription.trim()) return;
+    setSaving(true);
+    try {
+      await apiPost('/api/health_body/exercises', {
+        description: exDescription.trim(),
+        duration_minutes: parseInt(exDuration) || 0,
+        estimated_calories: parseInt(exCalories) || 0,
+        date,
+      });
+      setExDescription('');
+      setExDuration('');
+      setExCalories('');
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 1500);
+      onSuccess?.();
+    } catch (e) {
+      console.error('Failed to log exercise:', e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const submitMeal = async (meal) => {
     setSaving(true);
     try {
@@ -112,7 +140,7 @@ export default function MealEntry({ onSuccess }) {
     <div className="meal-entry card">
       <button className="meal-entry__toggle" onClick={() => setOpen(!open)}>
         <Utensils size={16} />
-        <span className="chart-title" style={{ margin: 0 }}>Log Meal</span>
+        <span className="chart-title" style={{ margin: 0 }}>Log Meal or Exercise</span>
         {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </button>
 
@@ -137,6 +165,12 @@ export default function MealEntry({ onSuccess }) {
                 onClick={() => setMode('manual')}
               >
                 Manual Entry
+              </button>
+              <button
+                className={`meal-entry__mode-tab ${mode === 'exercise' ? 'meal-entry__mode-tab--active' : ''}`}
+                onClick={() => setMode('exercise')}
+              >
+                Exercise
               </button>
             </div>
 
@@ -246,6 +280,36 @@ export default function MealEntry({ onSuccess }) {
                   disabled={saving || !description.trim() || !calories}
                 >
                   {success ? <><Check size={14} /> Logged</> : <><Plus size={14} /> Log Meal</>}
+                </button>
+              </div>
+            )}
+
+            {mode === 'exercise' && (
+              <div className="meal-entry__manual-mode">
+                <input
+                  type="text"
+                  value={exDescription}
+                  onChange={(e) => setExDescription(e.target.value)}
+                  placeholder="What exercise? (e.g. Run, Gym)"
+                  className="meal-entry__manual-desc"
+                />
+                <div className="meal-entry__exercise-fields">
+                  <div className="meal-entry__macro-field">
+                    <label>Duration</label>
+                    <input type="number" value={exDuration} onChange={(e) => setExDuration(e.target.value)} placeholder="min" />
+                  </div>
+                  <div className="meal-entry__macro-field">
+                    <label>Calories</label>
+                    <input type="number" value={exCalories} onChange={(e) => setExCalories(e.target.value)} placeholder="kcal" />
+                  </div>
+                </div>
+
+                <button
+                  className="meal-entry__submit"
+                  onClick={handleExerciseSubmit}
+                  disabled={saving || !exDescription.trim()}
+                >
+                  {success ? <><Check size={14} /> Logged</> : <><Dumbbell size={14} /> Log Exercise</>}
                 </button>
               </div>
             )}

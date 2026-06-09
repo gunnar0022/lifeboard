@@ -138,6 +138,63 @@
   color: var(--color-alert);
 }
 
+.food-db__edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.food-db__item:hover .food-db__edit-btn {
+  opacity: 1;
+}
+
+.food-db__edit-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--color-health);
+}
+
+.food-db__item--editing {
+  flex-wrap: wrap;
+  gap: 6px;
+  background: var(--bg-secondary);
+}
+
+.food-db__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.food-db__icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.food-db__icon-btn--save {
+  background: var(--color-health);
+  border-color: var(--color-health);
+  color: #fff;
+}
+
 .food-db__empty {
   text-align: center;
   padding: var(--space-md);

@@ -136,6 +136,20 @@ async def resolve_concern(concern_id: int, resolution_summary: str) -> dict | No
         await db.close()
 
 
+async def delete_concern(concern_id: int) -> bool:
+    """Permanently delete a concern and its logs."""
+    db = await get_db()
+    try:
+        await db.execute(
+            "DELETE FROM fleet_concern_logs WHERE concern_id = ?", (concern_id,)
+        )
+        await db.execute("DELETE FROM fleet_concerns WHERE id = ?", (concern_id,))
+        await db.commit()
+        return True
+    finally:
+        await db.close()
+
+
 async def reactivate_concern(concern_id: int) -> dict | None:
     db = await get_db()
     try:

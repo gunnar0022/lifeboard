@@ -47,6 +47,106 @@
   background: var(--border-primary);
 }
 
+.profile-card__edit {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-medium, var(--border-primary));
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.profile-card__edit:hover {
+  color: var(--color-health-body);
+  border-color: var(--color-health-body);
+}
+
+.profile-card__hint {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+.profile-card__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-sm);
+}
+
+.profile-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-card__field span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.profile-card__field input,
+.profile-card__field select {
+  padding: 6px 8px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle, var(--bg-card));
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.profile-card__field input:focus,
+.profile-card__field select:focus {
+  border-color: var(--color-health-body);
+}
+
+.profile-card__form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.profile-card__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-medium, var(--border-primary));
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.profile-card__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-card__btn--save {
+  background: var(--color-health-body);
+  border-color: var(--color-health-body);
+  color: #fff;
+}
+
+.profile-card__btn--cancel:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
 @media (max-width: 600px) {
   .profile-card__stats {
     gap: var(--space-sm);

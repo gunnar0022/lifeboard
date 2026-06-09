@@ -190,3 +190,181 @@
 .recent-detail__delete-btn:disabled {
   opacity: 0.3;
 }
+
+/* Section title add-link */
+.recent-detail__add-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--color-health-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.recent-detail__add-link:hover {
+  background: color-mix(in srgb, var(--color-health-body) 12%, transparent);
+}
+
+/* Edit button (mirrors delete button) */
+.recent-detail__edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.recent-detail__item:hover .recent-detail__edit-btn {
+  opacity: 1;
+}
+
+.recent-detail__edit-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--color-health-body);
+}
+
+/* Inline edit / add rows */
+.recent-detail__edit-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 0;
+  flex-wrap: wrap;
+}
+
+.recent-detail__edit-row--add {
+  padding: 6px;
+  margin-top: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.recent-detail__edit-desc {
+  flex: 1;
+  min-width: 120px;
+  padding: 5px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.recent-detail__edit-num {
+  width: 56px;
+  padding: 5px 6px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.recent-detail__edit-desc:focus,
+.recent-detail__edit-num:focus {
+  outline: none;
+  border-color: var(--color-health-body);
+}
+
+.recent-detail__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.recent-detail__icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recent-detail__icon-btn--save {
+  background: var(--color-health-body);
+  border-color: var(--color-health-body);
+  color: #fff;
+}
+
+/* Mood & energy editor */
+.recent-detail__section--me {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.recent-detail__me-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.recent-detail__me-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.recent-detail__me-label svg {
+  color: var(--color-health-body);
+}
+
+.recent-detail__me-scale {
+  display: flex;
+  gap: 3px;
+}
+
+.recent-detail__me-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.recent-detail__me-dot:hover:not(:disabled) {
+  border-color: var(--color-health-body);
+  color: var(--color-health-body);
+}
+
+.recent-detail__me-dot--active {
+  background: var(--color-health-body);
+  border-color: var(--color-health-body);
+  color: #fff;
+}
+
+.recent-detail__me-dot:disabled {
+  cursor: not-allowed;
+}
