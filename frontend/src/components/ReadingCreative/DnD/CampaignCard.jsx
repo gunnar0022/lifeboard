@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Edit3, Trash2, Check, X } from 'lucide-react';
 import { apiPut, apiDelete } from '../../../hooks/useApi';
 import ColorPicker from './ColorPicker';
+import DeleteConfirm from './DeleteConfirm';
 
 function textColor(hex) {
   // Simple luminance check for contrast
@@ -33,18 +34,6 @@ export default function CampaignCard({ campaign, isSelected, onSelect, onRefresh
     onRefresh();
   };
 
-  if (confirming) {
-    return (
-      <div className="dnd-campaign-card dnd-campaign-card--confirm" style={{ background: color, color: fg }}>
-        <span>Delete this campaign and all its notes?</span>
-        <div className="dnd-campaign-card__confirm-btns">
-          <button onClick={handleDelete} style={{ color: fg }}>Yes</button>
-          <button onClick={() => setConfirming(false)} style={{ color: fg }}>No</button>
-        </div>
-      </div>
-    );
-  }
-
   if (editing) {
     return (
       <div className="dnd-campaign-card dnd-campaign-card--editing" style={{ background: color, color: fg }}>
@@ -66,10 +55,13 @@ export default function CampaignCard({ campaign, isSelected, onSelect, onRefresh
   }
 
   return (
-    <button
+    <div
       className={`dnd-campaign-card ${isSelected ? 'dnd-campaign-card--selected' : ''}`}
       style={{ background: color, color: fg, borderColor: isSelected ? fg : color }}
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(campaign.id)}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(campaign.id); } }}
     >
       <span className="dnd-campaign-card__name">{campaign.name}</span>
       {isSelected && <span className="dnd-campaign-card__dot">&#x25CF;</span>}
@@ -81,6 +73,16 @@ export default function CampaignCard({ campaign, isSelected, onSelect, onRefresh
           <Trash2 size={12} />
         </button>
       </div>
-    </button>
+
+      {confirming && (
+        <DeleteConfirm
+          itemType="campaign"
+          name={campaign.name}
+          warning="All of its notes will be deleted too."
+          onConfirm={handleDelete}
+          onCancel={() => setConfirming(false)}
+        />
+      )}
+    </div>
   );
 }

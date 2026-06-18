@@ -63,6 +63,109 @@
 .dnd-list__card-delete--confirm { color: #8b0000; animation: dnd-pulse 0.5s infinite; }
 
 /* ============================================
+   DELETE CONFIRMATION MODAL (characters + campaigns)
+   ============================================ */
+.dnd-delete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+.dnd-delete-modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-top: 4px solid #8b0000;
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  color: var(--dnd-text);
+}
+.dnd-delete-modal__icon {
+  display: flex;
+  justify-content: center;
+  color: #b53030;
+  margin-bottom: 0.6rem;
+}
+.dnd-delete-modal__title {
+  font-family: 'Crimson Text', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--dnd-text);
+}
+.dnd-delete-modal__body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--dnd-text-dim);
+  margin: 0 0 1rem;
+}
+.dnd-delete-modal__body strong {
+  color: var(--dnd-text);
+  font-family: 'Courier New', monospace;
+}
+.dnd-delete-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.4rem;
+  text-align: center;
+}
+.dnd-delete-modal__input:focus {
+  outline: none;
+  border-color: #b53030;
+}
+.dnd-delete-modal__btns {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+.dnd-delete-modal__btn {
+  flex: 1;
+  max-width: 160px;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dnd-text);
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+.dnd-delete-modal__btn:hover:not(:disabled) { border-color: var(--dnd-accent); }
+.dnd-delete-modal__btn--danger {
+  background: #8b0000;
+  border-color: #8b0000;
+  color: #f4edd4;
+}
+.dnd-delete-modal__btn--danger:hover:not(:disabled) {
+  background: #a31515;
+  border-color: #a31515;
+}
+.dnd-delete-modal__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ============================================
    CHARACTER SHEET
    ============================================ */
 .dnd-sheet {

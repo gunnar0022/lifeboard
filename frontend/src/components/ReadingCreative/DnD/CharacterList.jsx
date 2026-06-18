@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2 } from 'lucide-react';
 import { CLASS_COLORS, NEW_CHARACTER_DATA } from './dndUtils';
+import DeleteConfirm from './DeleteConfirm';
 
 export default function CharacterList({ characters, onSelect, onRefresh }) {
-  const [deleting, setDeleting] = useState(null);
+  const [confirmChar, setConfirmChar] = useState(null);
 
   const createCharacter = async () => {
     try {
@@ -20,21 +21,11 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
     }
   };
 
-  const deleteCharacter = async (id, e) => {
-    e.stopPropagation();
-    if (deleting === id) {
-      // Confirmed
-      try {
-        await fetch(`/api/dnd/characters/${id}`, { method: 'DELETE' });
-        onRefresh();
-      } catch (e) {
-        console.error('Failed to delete:', e);
-      }
-      setDeleting(null);
-    } else {
-      setDeleting(id);
-      setTimeout(() => setDeleting(null), 3000);
-    }
+  const deleteCharacter = async () => {
+    if (!confirmChar) return;
+    await fetch(`/api/dnd/characters/${confirmChar.id}`, { method: 'DELETE' });
+    setConfirmChar(null);
+    onRefresh();
   };
 
   return (
@@ -59,10 +50,13 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
           const updated = char.updated_at ? new Date(char.updated_at).toLocaleDateString() : '';
 
           return (
-            <motion.button
+            <motion.div
               key={char.id}
               className="dnd-list__card"
+              role="button"
+              tabIndex={0}
               onClick={() => onSelect(char.id, false)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(char.id, false); } }}
               whileHover={{ y: -4 }}
               whileTap={{ scale: 0.97 }}
               style={{ borderLeftColor: classColor }}
@@ -75,16 +69,25 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
                 <span className="dnd-list__card-updated">{updated}</span>
               </div>
               <button
-                className={`dnd-list__card-delete ${deleting === char.id ? 'dnd-list__card-delete--confirm' : ''}`}
-                onClick={e => deleteCharacter(char.id, e)}
-                title={deleting === char.id ? 'Click again to confirm' : 'Delete'}
+                className="dnd-list__card-delete"
+                onClick={e => { e.stopPropagation(); setConfirmChar(char); }}
+                title="Delete character"
               >
                 <Trash2 size={14} />
               </button>
-            </motion.button>
+            </motion.div>
           );
         })}
       </div>
+
+      {confirmChar && (
+        <DeleteConfirm
+          itemType="character"
+          name={confirmChar.name}
+          onConfirm={deleteCharacter}
+          onCancel={() => setConfirmChar(null)}
+        />
+      )}
     </div>
   );
 }
