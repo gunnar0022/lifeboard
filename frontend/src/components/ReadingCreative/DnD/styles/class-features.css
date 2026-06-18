@@ -184,6 +184,31 @@
   display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem;
   justify-content: center;
 }
+
+/* Racial trait tracker (e.g. Goliath Stone's Endurance) */
+.dnd-racial { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+.dnd-racial__resource {
+  flex: 1; background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  border-radius: 8px; padding: 0.75rem; text-align: center;
+  border-top: 3px solid #6b7a52;
+}
+.dnd-racial__title {
+  font-family: 'Uncial Antiqua', serif; color: #6b7a52;
+  font-size: 0.8rem; letter-spacing: 0.1em; margin: 0 0 0.3rem;
+}
+.dnd-racial__uses { font-size: 1.2rem; font-weight: 700; }
+.dnd-racial__use-btn {
+  margin-top: 0.4rem; padding: 0.3rem 0.8rem;
+  background: rgba(107,122,82,0.15); border: 1px solid #6b7a52;
+  color: #8a9a68; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 0.8rem;
+}
+.dnd-racial__use-btn:hover { background: rgba(107,122,82,0.3); }
+.dnd-racial__use-btn:disabled { opacity: 0.3; cursor: default; }
+.dnd-racial__recharge {
+  display: block; font-size: 0.65rem; color: var(--dnd-text-faint);
+  margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
 .dnd-fighter__edit label { font-size: 0.7rem; color: var(--dnd-text-muted); }
 
 /* Generic Resource */

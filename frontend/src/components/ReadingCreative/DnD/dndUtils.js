@@ -97,8 +97,10 @@ export const CLASS_FEATURE_DEFAULTS = {
   },
   Fighter: {
     type: 'action_surge',
+    fightingStyle: '',
     actionSurge: { maxUses: 1, currentUses: 1, rechargeOn: 'short' },
     secondWind: { maxUses: 1, currentUses: 1, rechargeOn: 'short', healDice: '1d10' },
+    indomitable: { maxUses: 0, currentUses: 0, rechargeOn: 'long' },
   },
   Wizard: {
     type: 'spell_slots',

@@ -1,114 +1,72 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { proficiencyBonus } from '../../dndUtils';
+import { RUNE_LIST, maxRuneInvocations, giantsMightDie, giantsMightSize } from '../../classProgression';
 
-const RUNE_LIST = [
-  {
-    name: 'Cloud Rune',
-    minLevel: 3,
-    passive: 'ADV on Sleight of Hand and Deception checks.',
-    invoke: 'Reaction: when you or a creature within 30ft is hit by an attack, choose a different creature within 30ft (other than the attacker) to become the target instead, using the same roll. Works regardless of range.',
-  },
-  {
-    name: 'Fire Rune',
-    minLevel: 3,
-    passive: 'Proficiency bonus doubled for ability checks using tool proficiency.',
-    invoke: 'On weapon hit: extra 2d6 fire damage + target must succeed STR save or be restrained for 1 min (2d6 fire at start of each turn, repeat save at end of turn).',
-  },
-  {
-    name: 'Frost Rune',
-    minLevel: 3,
-    passive: 'ADV on Animal Handling and Intimidation checks.',
-    invoke: 'Bonus action: +2 to all STR and CON ability checks and saving throws for 10 minutes.',
-  },
-  {
-    name: 'Stone Rune',
-    minLevel: 3,
-    passive: 'ADV on Insight checks. Darkvision 120ft.',
-    invoke: 'Reaction: when a creature ends its turn within 30ft, force WIS save. On fail: charmed for 1 min (speed 0, incapacitated, dreamy stupor). Repeat save at end of each turn.',
-  },
-  {
-    name: 'Hill Rune',
-    minLevel: 7,
-    passive: 'ADV on saves against poison. Resistance to poison damage.',
-    invoke: 'Bonus action: resistance to bludgeoning, piercing, and slashing damage for 1 minute.',
-  },
-  {
-    name: 'Storm Rune',
-    minLevel: 7,
-    passive: 'ADV on Arcana checks. Can\'t be surprised while not incapacitated.',
-    invoke: 'Bonus action: prophetic state for 1 min. Use reaction to give ADV or DISADV to any attack roll, save, or ability check made by a creature within 60ft.',
-  },
-];
-
-// Rune Knight: number of runes known by level
-function maxRunesKnown(level) {
-  if (level >= 15) return 5;
-  if (level >= 7) return 4;
-  return 2; // 3rd level
-}
-
+/**
+ * Rune Knight — Combat tab tracker only. Full feature descriptions and the
+ * rune *selection* (build choice) live in the Features tab; this block keeps
+ * the active resources you manage in a fight: Giant's Might uses, per-rune
+ * invocation counters, and Runic Shield uses. Uses scale with proficiency bonus.
+ */
 export default function RuneKnightBlock({ character, editMode, onUpdate }) {
   const cf = character.classFeature || {};
   const level = character.meta?.level || 3;
+  const pb = proficiencyBonus(level);
+  const prevPbRef = useRef(null);
 
-  // Giant's Might
-  const giantsMight = cf.giantsMight || { maxUses: 2, currentUses: 2, active: false };
-  const gmDamageDie = level >= 18 ? 'd10' : level >= 10 ? 'd8' : 'd6';
-  const gmSize = level >= 18 ? 'Huge' : 'Large';
-
-  // Runes
+  const giantsMight = cf.giantsMight || { maxUses: pb, currentUses: pb, active: false };
+  const runicShield = cf.runicShield || { maxUses: pb, currentUses: pb };
   const knownRunes = cf.knownRunes || [];
-  const runeInvocations = cf.runeInvocations || {}; // {runeName: {used: bool}}
-  const maxInvocationsPerRune = level >= 15 ? 2 : 1;
-
-  // Runic Shield (7th level)
-  const runicShield = cf.runicShield || { maxUses: 0, currentUses: 0 };
+  const runeInvocations = cf.runeInvocations || {};
+  const maxInvocationsPerRune = maxRuneInvocations(level);
   const hasRunicShield = level >= 7;
 
-  const [showRunePicker, setShowRunePicker] = useState(false);
+  // Keep Giant's Might / Runic Shield max equal to proficiency bonus; grant the
+  // new use(s) when PB increases on level-up. Runs only when PB changes.
+  useEffect(() => {
+    const prev = prevPbRef.current;
+    prevPbRef.current = pb;
+    const gm = cf.giantsMight;
+    const rs = cf.runicShield;
+    const updates = {};
+    const grew = prev !== null && pb > prev;
+
+    if (!gm || gm.maxUses !== pb) {
+      updates.giantsMight = {
+        active: gm?.active || false,
+        maxUses: pb,
+        currentUses: gm ? (grew ? Math.min((gm.currentUses || 0) + (pb - (gm.maxUses || 0)), pb) : Math.min(gm.currentUses ?? pb, pb)) : pb,
+      };
+    }
+    if (!rs || rs.maxUses !== pb) {
+      updates.runicShield = {
+        maxUses: pb,
+        currentUses: rs ? (grew ? Math.min((rs.currentUses || 0) + (pb - (rs.maxUses || 0)), pb) : Math.min(rs.currentUses ?? pb, pb)) : pb,
+      };
+    }
+    if (Object.keys(updates).length) onUpdate({ classFeature: { ...cf, ...updates } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pb]);
 
   const toggleGiantsMight = () => {
-    const updated = { ...cf, giantsMight: { ...giantsMight, active: !giantsMight.active } };
+    const next = { ...giantsMight, active: !giantsMight.active };
     if (!giantsMight.active && giantsMight.currentUses > 0) {
-      updated.giantsMight.currentUses = giantsMight.currentUses - 1;
+      next.currentUses = giantsMight.currentUses - 1;
     }
-    onUpdate({ classFeature: updated });
+    onUpdate({ classFeature: { ...cf, giantsMight: next } });
   };
 
   const toggleRuneInvocation = (runeName) => {
     const current = runeInvocations[runeName] || { usedCount: 0 };
     const newCount = current.usedCount >= maxInvocationsPerRune ? 0 : current.usedCount + 1;
     onUpdate({
-      classFeature: {
-        ...cf,
-        runeInvocations: {
-          ...runeInvocations,
-          [runeName]: { usedCount: newCount },
-        },
-      },
+      classFeature: { ...cf, runeInvocations: { ...runeInvocations, [runeName]: { usedCount: newCount } } },
     });
   };
 
-  const addRune = (runeName) => {
-    if (knownRunes.includes(runeName)) return;
-    onUpdate({
-      classFeature: {
-        ...cf,
-        knownRunes: [...knownRunes, runeName],
-      },
-    });
-    setShowRunePicker(false);
-  };
-
-  const removeRune = (runeName) => {
-    const newInvocations = { ...runeInvocations };
-    delete newInvocations[runeName];
-    onUpdate({
-      classFeature: {
-        ...cf,
-        knownRunes: knownRunes.filter(r => r !== runeName),
-        runeInvocations: newInvocations,
-      },
-    });
+  const useRunicShield = () => {
+    if (runicShield.currentUses <= 0) return;
+    onUpdate({ classFeature: { ...cf, runicShield: { ...runicShield, currentUses: runicShield.currentUses - 1 } } });
   };
 
   return (
@@ -121,68 +79,34 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
             onClick={toggleGiantsMight}
             disabled={!giantsMight.active && giantsMight.currentUses <= 0}
           >
-            {giantsMight.active ? 'END GIANT\'S MIGHT' : 'GIANT\'S MIGHT'}
+            {giantsMight.active ? "END GIANT'S MIGHT" : "GIANT'S MIGHT"}
           </button>
-          <span className="dnd-runeKnight__uses">
-            {giantsMight.currentUses}/{giantsMight.maxUses}
-          </span>
+          <span className="dnd-runeKnight__uses">{giantsMight.currentUses}/{giantsMight.maxUses}</span>
         </div>
         {giantsMight.active && (
           <div className="dnd-runeKnight__gm-effects">
-            <span>Become {gmSize}</span>
-            <span>+1{gmDamageDie} damage (once/turn)</span>
-            <span>ADV on STR checks & saves</span>
-          </div>
-        )}
-        {editMode && (
-          <div className="dnd-runeKnight__edit-row">
-            <label>Max uses: <input type="number" className="dnd-field dnd-field--sm"
-              value={giantsMight.maxUses} min={1}
-              onChange={e => onUpdate({ classFeature: { ...cf, giantsMight: { ...giantsMight, maxUses: parseInt(e.target.value) || 1 } } })} />
-            </label>
+            <span>Become {giantsMightSize(level)}</span>
+            <span>+1{giantsMightDie(level)} dmg (1/turn)</span>
+            <span>ADV on STR checks &amp; saves</span>
           </div>
         )}
       </div>
 
-      {/* Runes */}
+      {/* Rune invocations (selection lives in the Features tab) */}
       <div className="dnd-runeKnight__section">
         <div className="dnd-runeKnight__rune-header">
-          <h4 className="dnd-runeKnight__subtitle">Rune Carver</h4>
-          <span className="dnd-runeKnight__rune-count">{knownRunes.length}/{maxRunesKnown(level)} runes</span>
-          {knownRunes.length < maxRunesKnown(level) && (
-            <button className="dnd-runeKnight__add-rune" onClick={() => setShowRunePicker(!showRunePicker)}>
-              + Rune
-            </button>
-          )}
+          <h4 className="dnd-runeKnight__subtitle">Runes</h4>
+          {maxInvocationsPerRune > 1 && <span className="dnd-runeKnight__rune-count">2 invocations each</span>}
         </div>
 
-        {showRunePicker && (
-          <div className="dnd-runeKnight__rune-picker">
-            {RUNE_LIST
-              .filter(r => !knownRunes.includes(r.name) && r.minLevel <= level)
-              .map(rune => (
-                <button key={rune.name} className="dnd-runeKnight__rune-option" onClick={() => addRune(rune.name)} title={rune.passive}>
-                  {rune.name}
-                  {rune.minLevel > 3 && <span className="dnd-runeKnight__rune-lvl">Lvl {rune.minLevel}+</span>}
-                </button>
-              ))}
-            {RUNE_LIST.filter(r => !knownRunes.includes(r.name) && r.minLevel > level).length > 0 && (
-              <div className="dnd-runeKnight__locked-label">
-                Locked ({RUNE_LIST.filter(r => r.minLevel > level).map(r => r.name).join(', ')} — requires level {RUNE_LIST.find(r => r.minLevel > level)?.minLevel}+)
-              </div>
-            )}
-          </div>
-        )}
-
         {knownRunes.length === 0 && (
-          <p className="dnd-runeKnight__empty">No runes inscribed. Click + Rune to add.</p>
+          <p className="dnd-runeKnight__empty">No runes inscribed — choose runes in the Features tab.</p>
         )}
 
         {knownRunes.map(runeName => {
           const rune = RUNE_LIST.find(r => r.name === runeName);
           const invocation = runeInvocations[runeName] || { usedCount: 0 };
           const allUsed = invocation.usedCount >= maxInvocationsPerRune;
-
           return (
             <div key={runeName} className={`dnd-runeKnight__rune ${allUsed ? 'dnd-runeKnight__rune--spent' : ''}`}>
               <div className="dnd-runeKnight__rune-row">
@@ -194,18 +118,8 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
                 >
                   {invocation.usedCount}/{maxInvocationsPerRune}
                 </button>
-                {editMode && (
-                  <button className="dnd-runeKnight__remove-rune" onClick={() => removeRune(runeName)}>X</button>
-                )}
               </div>
-              <div className="dnd-runeKnight__rune-details">
-                <div className="dnd-runeKnight__rune-passive">
-                  <strong>Passive:</strong> {rune?.passive || ''}
-                </div>
-                <div className="dnd-runeKnight__rune-invoke-desc">
-                  <strong>Invoke:</strong> {rune?.invoke || ''}
-                </div>
-              </div>
+              {rune?.invoke && <p className="dnd-runeKnight__rune-invoke-label">{rune.invoke}</p>}
             </div>
           );
         })}
@@ -214,14 +128,13 @@ export default function RuneKnightBlock({ character, editMode, onUpdate }) {
       {/* Runic Shield (7th level) */}
       {hasRunicShield && (
         <div className="dnd-runeKnight__section">
-          <h4 className="dnd-runeKnight__subtitle">Runic Shield</h4>
-          <p className="dnd-runeKnight__desc">Reaction: force reroll on attack against creature within 60ft.</p>
+          <div className="dnd-runeKnight__rune-header">
+            <h4 className="dnd-runeKnight__subtitle">Runic Shield</h4>
+            <span className="dnd-runeKnight__uses">{runicShield.currentUses}/{runicShield.maxUses}</span>
+          </div>
           <div className="dnd-runeKnight__uses-row">
-            <span>Uses: {runicShield.currentUses}/{runicShield.maxUses || (level >= 7 ? Math.max(1, Math.floor(level / 7)) : 0)}</span>
-            <button onClick={() => {
-              const max = runicShield.maxUses || Math.max(1, Math.floor(level / 7));
-              onUpdate({ classFeature: { ...cf, runicShield: { ...runicShield, currentUses: Math.max(0, runicShield.currentUses - 1) } } });
-            }}>Use</button>
+            <span className="dnd-runeKnight__rune-invoke-label">Reaction: force an attacker within 60ft to reroll.</span>
+            <button className="dnd-runeKnight__shield-use" onClick={useRunicShield} disabled={runicShield.currentUses <= 0}>Use</button>
           </div>
         </div>
       )}

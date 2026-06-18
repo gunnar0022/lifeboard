@@ -9,6 +9,7 @@ import ProficiencyTags from './components/ProficiencyTags';
 import InfoPanel from './components/InfoPanel';
 import EquipmentTab from './components/EquipmentTab';
 import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
+import RacialBlock from './components/ClassFeatures/RacialBlock';
 import SubclassBlock from './components/SubclassBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
@@ -16,6 +17,7 @@ import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
 import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig } from './dndUtils';
+import { RACES } from './classProgression';
 
 export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack, onEditModeChange }) {
   const [character, setCharacter] = useState(null);
@@ -267,6 +269,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         cf.actionSurge = { ...cf.actionSurge, currentUses: cf.actionSurge?.maxUses || 1 };
         cf.secondWind = { ...cf.secondWind, currentUses: cf.secondWind?.maxUses || 1 };
       }
+      // Fighter: Indomitable recharges on long rest
+      if (cf.indomitable) {
+        cf.indomitable = { ...cf.indomitable, currentUses: cf.indomitable.maxUses || 0 };
+      }
       if (cf.layOnHands) {
         cf.layOnHands = { ...cf.layOnHands, currentPool: cf.layOnHands.maxPool || 0 };
       }
@@ -318,6 +324,13 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         sc.pactSlots = { ...sc.pactSlots, current: sc.pactSlots.max || 0 };
       }
       updates.spellcasting = sc;
+    }
+
+    // Long rest: racial use-limited traits (Goliath Stone's Endurance)
+    if (character.racialFeature?.stoneEndurance) {
+      const se = character.racialFeature.stoneEndurance;
+      const max = se.maxUses || proficiencyBonus(character.meta?.level || 1);
+      updates.racialFeature = { ...character.racialFeature, stoneEndurance: { ...se, currentUses: max } };
     }
 
     // Long rest: reduce exhaustion by 1 (if any), clear unconscious condition
@@ -403,8 +416,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <div className="dnd-sheet__subtitle">
             {editMode ? (
               <div className="dnd-sheet__subtitle-edit">
-                <input className="dnd-field" value={meta.race || ''} placeholder="Race"
-                  onChange={e => handleUpdate({ meta: { ...meta, race: e.target.value } })} />
+                <select className="dnd-field" value={meta.race || ''}
+                  onChange={e => handleUpdate({ meta: { ...meta, race: e.target.value } })}>
+                  <option value="">-- Race --</option>
+                  {RACES.map(r => <option key={r} value={r}>{r}</option>)}
+                  {meta.race && !RACES.includes(meta.race) && (
+                    <option value={meta.race}>{meta.race}</option>
+                  )}
+                </select>
                 <select className="dnd-field" value={meta.className || ''}
                   onChange={e => handleUpdate({ meta: { ...meta, className: e.target.value } })}>
                   <option value="">-- Class --</option>
@@ -509,6 +528,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
+              <RacialBlock character={character} onUpdate={handleUpdate} />
               <SubclassBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
             </div>
             <div className="dnd-sheet__combat-col-right">
@@ -561,7 +581,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
         {activeTab === 'features' && (
           <FeatureList features={character.features || []}
-            editMode={editMode} onUpdate={handleUpdate} level={level} />
+            editMode={editMode} onUpdate={handleUpdate} level={level}
+            className={meta.className} subclass={meta.subclass}
+            classFeature={character.classFeature}
+            race={meta.race} racialFeature={character.racialFeature} />
         )}
 
         {activeTab === 'spells' && hasSpellcasting && (

@@ -91,6 +91,103 @@
   cursor: pointer; font-size: 0.75rem; padding: 0; font-family: inherit;
 }
 
+/* 2x2 zone layout: Racial | Other (top), Class | Subclass (bottom) */
+.dnd-features__zones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .dnd-features__zones { grid-template-columns: 1fr; }
+}
+.dnd-features__zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  background: var(--dnd-bg);
+}
+.dnd-features__zone-title {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dnd-accent);
+  margin: 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--dnd-border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Auto progression cards + level badge */
+.dnd-features__card--auto { border-left: 3px solid var(--dnd-accent); }
+.dnd-features__header { flex-wrap: wrap; }
+.dnd-features__name { flex: 1; }
+.dnd-features__level {
+  font-size: 0.6rem; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+  background: var(--dnd-accent); color: var(--dnd-bg);
+  text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
+}
+.dnd-features__empty-note {
+  font-size: 0.8rem; font-style: italic; color: var(--dnd-text-faint); margin: 0;
+}
+
+/* Inline build-choice controls (Fighting Style, Rune Carver) */
+.dnd-feature-choice {
+  margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px dashed var(--dnd-border);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.dnd-feature-choice__select { width: 100%; }
+.dnd-feature-choice__toggle { display: flex; gap: 0; border: 1px solid var(--dnd-border); border-radius: 5px; overflow: hidden; }
+.dnd-feature-choice__toggle-btn {
+  flex: 1; background: var(--dnd-bg); border: none; color: var(--dnd-text-dim);
+  padding: 0.3rem 0.5rem; cursor: pointer; font-family: inherit; font-size: 0.78rem; font-weight: 600;
+}
+.dnd-feature-choice__toggle-btn + .dnd-feature-choice__toggle-btn { border-left: 1px solid var(--dnd-border); }
+.dnd-feature-choice__toggle-btn--active { background: var(--dnd-accent); color: var(--dnd-bg); }
+.dnd-feature-choice__asi { display: flex; gap: 0.4rem; }
+.dnd-feature-choice__asi select { flex: 1; min-width: 0; }
+.dnd-feature-choice__detail {
+  font-size: 0.8rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0;
+}
+.dnd-feature-choice__rune-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+}
+.dnd-feature-choice__count { font-size: 0.75rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-feature-choice__add {
+  background: none; border: 1px dashed var(--dnd-border); color: var(--dnd-text-dim);
+  border-radius: 4px; padding: 0.15rem 0.5rem; cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-feature-choice__add:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-feature-choice__picker { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.dnd-feature-choice__pick {
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border); color: var(--dnd-text);
+  border-radius: 4px; padding: 0.25rem 0.55rem; cursor: pointer;
+  font-family: inherit; font-size: 0.78rem;
+}
+.dnd-feature-choice__pick:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-feature-choice__pick-lvl { font-size: 0.62rem; color: var(--dnd-text-faint); }
+.dnd-feature-choice__empty { font-size: 0.78rem; font-style: italic; color: var(--dnd-text-faint); margin: 0; }
+.dnd-feature-choice__rune {
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+  border-radius: 5px; padding: 0.4rem 0.55rem;
+}
+.dnd-feature-choice__rune-top { display: flex; align-items: center; justify-content: space-between; }
+.dnd-feature-choice__rune-name { font-weight: 700; color: var(--dnd-text); font-size: 0.85rem; }
+.dnd-feature-choice__remove {
+  background: none; border: none; color: var(--dnd-text-faint); cursor: pointer;
+  font-size: 1rem; line-height: 1; padding: 0 0.2rem;
+}
+.dnd-feature-choice__remove:hover { color: #8b0000; }
+.dnd-feature-choice__rune-line {
+  font-size: 0.76rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.25rem 0 0;
+}
+.dnd-feature-choice__locked { font-size: 0.72rem; font-style: italic; color: var(--dnd-text-faint); margin: 0; }
+
 /* ============================================
    EQUIPMENT & COINS
    ============================================ */
