@@ -479,6 +479,50 @@
   gap: 0.8rem;
 }
 
+/* Edit-mode point-buy / racial / ASI build panel */
+.dnd-build {
+  border: 1px solid var(--dnd-border);
+  border-radius: 0.5rem;
+  background: var(--dnd-surface);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+.dnd-build__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.dnd-build__title {
+  font-family: 'Crimson Text', serif; font-weight: 700;
+  color: var(--dnd-accent); text-transform: uppercase; letter-spacing: 0.05em;
+  font-size: 0.95rem;
+}
+.dnd-build__points { font-size: 0.8rem; font-weight: 700; color: var(--dnd-text-dim); }
+.dnd-build__points--over { color: #b53030; }
+.dnd-build__table { width: 100%; border-collapse: collapse; }
+.dnd-build__table th {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--dnd-text-faint); font-weight: 600; padding: 0.2rem; text-align: center;
+}
+.dnd-build__table td { padding: 0.2rem; text-align: center; }
+.dnd-build__ab { font-weight: 700; color: var(--dnd-accent); font-size: 0.85rem; }
+.dnd-build__total { font-weight: 700; font-size: 1.05rem; color: var(--dnd-text); }
+.dnd-build__stepper {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+}
+.dnd-build__stepper button {
+  width: 20px; height: 20px; border: 1px solid var(--dnd-border);
+  background: var(--dnd-bg); color: var(--dnd-text); border-radius: 3px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; padding: 0;
+}
+.dnd-build__stepper button:hover:not(:disabled) { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-build__stepper button:disabled { opacity: 0.3; cursor: default; }
+.dnd-build__value { min-width: 2.2rem; font-weight: 700; font-size: 0.9rem; }
+.dnd-build__cost { font-style: normal; font-size: 0.62rem; color: var(--dnd-text-faint); margin-left: 0.15rem; }
+.dnd-build__hint {
+  font-size: 0.68rem; color: var(--dnd-text-faint); margin: 0.5rem 0 0; line-height: 1.4;
+}
+
 @media (max-width: 600px) {
   .dnd-stats-tab { grid-template-columns: 1fr; }
 }
