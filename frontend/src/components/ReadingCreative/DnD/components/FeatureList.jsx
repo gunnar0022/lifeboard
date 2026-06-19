@@ -243,6 +243,26 @@ function ToolChoice({ racialFeature, onUpdate, options }) {
   );
 }
 
+// ── Inline build-choice: Half-Elf Versatility (one of several traits) ──
+function VersatilityChoice({ racialFeature, onUpdate, options }) {
+  const rf = racialFeature || {};
+  const sel = rf.versatility || '';
+  const opt = (options || []).find(o => o.name === sel);
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={sel}
+        onChange={e => onUpdate({ racialFeature: { ...rf, versatility: e.target.value } })}
+      >
+        <option value="">— Choose a versatility trait —</option>
+        {(options || []).map(o => <option key={o.name} value={o.name}>{o.name}</option>)}
+      </select>
+      {opt && <p className="dnd-feature-choice__detail">{opt.desc}</p>}
+    </div>
+  );
+}
+
 // ── Inline build-choice: chosen cantrip (free text) ────────────────────
 function CantripChoice({ racialFeature, onUpdate }) {
   const rf = racialFeature || {};
@@ -299,6 +319,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'versatility') return <VersatilityChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     return null;

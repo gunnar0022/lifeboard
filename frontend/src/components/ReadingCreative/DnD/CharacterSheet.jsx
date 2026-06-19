@@ -339,6 +339,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         rf.stoneEndurance = { ...rf.stoneEndurance, currentUses: max };
       }
       if (rf.breathWeaponUsed) rf.breathWeaponUsed = false;
+      if (rf.relentlessEnduranceUsed) rf.relentlessEnduranceUsed = false;
       updates.racialFeature = rf;
     }
 

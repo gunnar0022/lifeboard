@@ -86,6 +86,23 @@ export default function RacialBlock({ character, onUpdate }) {
     );
   }
 
+  if (race === 'Half-Orc') {
+    const used = rf.relentlessEnduranceUsed || false;
+    const toggle = () => onUpdate({ racialFeature: { ...rf, relentlessEnduranceUsed: !used } });
+    return (
+      <div className="dnd-racial">
+        <div className="dnd-racial__resource">
+          <h4 className="dnd-racial__title">RELENTLESS ENDURANCE</h4>
+          <div className="dnd-racial__uses">{used ? 'Used' : 'Ready'}</div>
+          <button className="dnd-racial__use-btn" onClick={toggle}>
+            {used ? 'Reset' : 'Drop to 1 HP'}
+          </button>
+          <span className="dnd-racial__recharge">Long Rest</span>
+        </div>
+      </div>
+    );
+  }
+
   if (race === 'Tabaxi') {
     const used = rf.felineAgilityUsed || false;
     const toggle = () => onUpdate({ racialFeature: { ...rf, felineAgilityUsed: !used } });
