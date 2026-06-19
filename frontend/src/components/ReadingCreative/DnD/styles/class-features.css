@@ -149,6 +149,12 @@
   font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
 }
 .dnd-cunning__sub { font-size: 0.7rem; color: var(--dnd-text-faint); }
+.dnd-cunning__extras {
+  margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--dnd-border);
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.dnd-cunning__extra { font-size: 0.78rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-cunning__extra strong { color: #9a66cc; }
 
 /* Fighter Resources */
 .dnd-fighter {

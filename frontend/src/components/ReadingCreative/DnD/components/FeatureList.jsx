@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown } from '../classProgression';
+import { SKILLS } from '../dndUtils';
+
+const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
 
 const sourceColors = {
   Barbarian: 'var(--dnd-class-barbarian)', Rogue: 'var(--dnd-class-rogue)',
@@ -104,6 +107,31 @@ function RuneChoice({ classFeature, onUpdate, level }) {
 }
 
 const ASI_ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+
+// ── Inline build-choice: Expertise (two doubled proficiencies) ─────────
+function ExpertiseChoice({ featId, classFeature, onUpdate }) {
+  const cf = classFeature || {};
+  const all = cf.expertiseChoices || {};
+  const choice = all[featId] || { a: '', b: '' };
+  const set = (next) => onUpdate({ classFeature: { ...cf, expertiseChoices: { ...all, [featId]: next } } });
+
+  const renderSelect = (key, label) => (
+    <select className="dnd-field" value={choice[key] || ''}
+      onChange={e => set({ ...choice, [key]: e.target.value })}>
+      <option value="">{label}</option>
+      {EXPERTISE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__asi">
+        {renderSelect('a', 'Proficiency 1…')}
+        {renderSelect('b', 'Proficiency 2…')}
+      </div>
+    </div>
+  );
+}
 
 // ── Inline build-choice: ASI vs Feat (per Ability Score Improvement) ────
 function ASIChoice({ featId, classFeature, onUpdate }) {
@@ -213,6 +241,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     return null;
   };
 

@@ -1,4 +1,4 @@
-export default function CunningActionPanel({ classFeature, editMode, onUpdate }) {
+export default function CunningActionPanel({ classFeature, level = 1, editMode, onUpdate }) {
   const sneakDamage = classFeature?.sneakAttackDamage || '1d6';
 
   return (
@@ -27,6 +27,21 @@ export default function CunningActionPanel({ classFeature, editMode, onUpdate })
         </div>
         <span className="dnd-cunning__sub">Bonus Action</span>
       </div>
+
+      {(level >= 3 || level >= 5) && (
+        <div className="dnd-cunning__extras">
+          {level >= 3 && (
+            <div className="dnd-cunning__extra">
+              <strong>Steady Aim</strong> — BA: advantage on your next attack this turn (speed becomes 0).
+            </div>
+          )}
+          {level >= 5 && (
+            <div className="dnd-cunning__extra">
+              <strong>Uncanny Dodge</strong> — Reaction: halve the damage of one attack you can see.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
