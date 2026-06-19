@@ -93,11 +93,85 @@ export function giantsMightSize(level) {
 }
 
 // ── Races ──────────────────────────────────────────────────────────────
-export const RACES = ['Goliath', 'Tabaxi', 'Uma'];
+export const RACES = ['Dragonborn', 'Dwarf', 'Elf', 'Goliath', 'Tabaxi', 'Uma'];
+
+// Dragonborn draconic ancestry → breath weapon damage type, area, save, resistance.
+export const DRAGON_ANCESTRY = {
+  Black:  { damage: 'Acid', area: '5×30 ft line', save: 'DEX' },
+  Blue:   { damage: 'Lightning', area: '5×30 ft line', save: 'DEX' },
+  Brass:  { damage: 'Fire', area: '5×30 ft line', save: 'DEX' },
+  Bronze: { damage: 'Lightning', area: '5×30 ft line', save: 'DEX' },
+  Copper: { damage: 'Acid', area: '5×30 ft line', save: 'DEX' },
+  Gold:   { damage: 'Fire', area: '15 ft cone', save: 'DEX' },
+  Green:  { damage: 'Poison', area: '15 ft cone', save: 'CON' },
+  Red:    { damage: 'Fire', area: '15 ft cone', save: 'DEX' },
+  Silver: { damage: 'Cold', area: '15 ft cone', save: 'CON' },
+  White:  { damage: 'Cold', area: '15 ft cone', save: 'CON' },
+};
+export const DRAGON_COLORS = Object.keys(DRAGON_ANCESTRY);
+
+/** Dragonborn breath weapon damage dice by level. */
+export function breathWeaponDice(level) {
+  if (level >= 16) return '5d6';
+  if (level >= 11) return '4d6';
+  if (level >= 6) return '3d6';
+  return '2d6';
+}
 
 // Racial traits. No level gating (granted at character creation). A trait may
 // carry combat:true (Combat-tab tracker) or a choice ('language' | 'skill').
 export const RACE_PROGRESSION = {
+  Dragonborn: {
+    traits: [
+      { id: 'drb-physiology', name: 'Physiology', source: 'Dragonborn',
+        desc: 'Medium Humanoid. Walking speed 30 ft.' },
+      { id: 'drb-ancestry', name: 'Draconic Ancestry', source: 'Dragonborn', choice: 'dragon',
+        desc: 'You are distantly related to a particular kind of dragon. Choose a dragon type; it determines your breath weapon\'s damage type, area, and saving throw, and the damage type you resist.' },
+      { id: 'drb-breath', name: 'Breath Weapon', source: 'Dragonborn', combat: true,
+        desc: 'As an action, you exhale destructive energy in an area determined by your ancestry. Each creature in the area makes a saving throw (DC = 8 + your Constitution modifier + your proficiency bonus), taking 2d6 damage on a failed save and half as much on a success. The damage increases to 3d6 at 6th level, 4d6 at 11th, and 5d6 at 16th. Once you use it, you can\'t use it again until you finish a short or long rest.' },
+      { id: 'drb-resistance', name: 'Damage Resistance', source: 'Dragonborn',
+        desc: 'You have resistance to the damage type associated with your draconic ancestry.' },
+      { id: 'drb-languages', name: 'Languages', source: 'Dragonborn',
+        desc: 'You can speak, read, and write Common and Draconic.' },
+    ],
+  },
+  Dwarf: {
+    subraces: ['Hill Dwarf', 'Mountain Dwarf'],
+    traits: [
+      { id: 'dwa-physiology', name: 'Physiology', source: 'Dwarf',
+        desc: 'Medium Humanoid. Walking speed 25 ft, which is not reduced by wearing heavy armor.' },
+      { id: 'dwa-darkvision', name: 'Darkvision', source: 'Dwarf',
+        desc: 'You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light (shades of gray only).' },
+      { id: 'dwa-resilience', name: 'Dwarven Resilience', source: 'Dwarf',
+        desc: 'You have advantage on saving throws against poison, and you have resistance against poison damage.' },
+      { id: 'dwa-combat-training', name: 'Dwarven Combat Training', source: 'Dwarf',
+        desc: 'You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.' },
+      { id: 'dwa-tool-prof', name: 'Tool Proficiency', source: 'Dwarf', choice: 'tool',
+        options: ["Smith's Tools", "Brewer's Supplies", "Mason's Tools"],
+        desc: 'You gain proficiency with the artisan\'s tools of your choice: smith\'s tools, brewer\'s supplies, or mason\'s tools.' },
+      { id: 'dwa-stonecunning', name: 'Stonecunning', source: 'Dwarf',
+        desc: 'Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check.' },
+      { id: 'dwa-languages', name: 'Languages', source: 'Dwarf',
+        desc: 'You can speak, read, and write Common and Dwarvish.' },
+    ],
+  },
+  Elf: {
+    subraces: ['Dark Elf', 'High Elf', 'Wood Elf'],
+    traits: [
+      { id: 'elf-physiology', name: 'Physiology', source: 'Elf',
+        desc: 'Medium Humanoid. Walking speed 30 ft.' },
+      { id: 'elf-darkvision', name: 'Darkvision', source: 'Elf',
+        desc: 'You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light (shades of gray only).' },
+      { id: 'elf-fey-ancestry', name: 'Fey Ancestry', source: 'Elf',
+        desc: 'You have advantage on saving throws against being charmed, and magic can\'t put you to sleep.' },
+      { id: 'elf-trance', name: 'Trance', source: 'Elf',
+        desc: 'Elves don\'t sleep. Instead they meditate deeply, remaining semiconscious, for 4 hours a day, gaining the same benefit a human does from 8 hours of sleep.' },
+      { id: 'elf-keen-senses', name: 'Keen Senses', source: 'Elf',
+        desc: 'You have proficiency in the Perception skill.' },
+      { id: 'elf-languages', name: 'Languages', source: 'Elf',
+        desc: 'You can speak, read, and write Common and Elven.' },
+    ],
+  },
   Goliath: {
     traits: [
       { id: 'gol-physiology', name: 'Physiology', source: 'Goliath',
@@ -145,9 +219,71 @@ export const RACE_PROGRESSION = {
   },
 };
 
-/** Racial traits for a race (no level gating). */
-export function getRaceFeatures(race) {
-  return RACE_PROGRESSION[race]?.traits || [];
+// Subrace traits (chosen via the subrace selector when a race has subraces).
+export const SUBRACE_PROGRESSION = {
+  'Hill Dwarf': {
+    race: 'Dwarf',
+    traits: [
+      { id: 'dwa-hill-toughness', name: 'Dwarven Toughness', source: 'Hill Dwarf',
+        desc: 'Your hit point maximum increases by 1, and it increases by 1 again every time you gain a level.' },
+    ],
+  },
+  'Mountain Dwarf': {
+    race: 'Dwarf',
+    traits: [
+      { id: 'dwa-mtn-armor', name: 'Dwarven Armor Training', source: 'Mountain Dwarf',
+        desc: 'You have proficiency with light and medium armor.' },
+    ],
+  },
+  'Dark Elf': {
+    race: 'Elf',
+    traits: [
+      { id: 'elf-drow-darkvision', name: 'Superior Darkvision', source: 'Dark Elf',
+        desc: 'Your darkvision has a range of 120 feet, instead of 60.' },
+      { id: 'elf-drow-sunlight', name: 'Sunlight Sensitivity', source: 'Dark Elf',
+        desc: 'You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight.' },
+      { id: 'elf-drow-magic', name: 'Drow Magic', source: 'Dark Elf',
+        desc: 'You know the Dancing Lights cantrip. At 3rd level you can cast Faerie Fire once per long rest; at 5th level you can cast Darkness once per long rest. Charisma is your spellcasting ability for these spells.' },
+      { id: 'elf-drow-weapons', name: 'Drow Weapon Training', source: 'Dark Elf',
+        desc: 'You have proficiency with rapiers, shortswords, and hand crossbows.' },
+    ],
+  },
+  'High Elf': {
+    race: 'Elf',
+    traits: [
+      { id: 'elf-high-cantrip', name: 'Cantrip', source: 'High Elf', choice: 'cantrip',
+        desc: 'You know one cantrip of your choice from the Wizard spell list. Intelligence is your spellcasting ability for it.' },
+      { id: 'elf-high-weapons', name: 'Elf Weapon Training', source: 'High Elf',
+        desc: 'You have proficiency with the longsword, shortsword, shortbow, and longbow.' },
+      { id: 'elf-high-language', name: 'Extra Language', source: 'High Elf', choice: 'language',
+        desc: 'You can speak, read, and write one extra language of your choice.' },
+    ],
+  },
+  'Wood Elf': {
+    race: 'Elf',
+    traits: [
+      { id: 'elf-wood-weapons', name: 'Elf Weapon Training', source: 'Wood Elf',
+        desc: 'You have proficiency with the longsword, shortsword, shortbow, and longbow.' },
+      { id: 'elf-wood-fleet', name: 'Fleet of Foot', source: 'Wood Elf',
+        desc: 'Your base walking speed increases to 35 feet.' },
+      { id: 'elf-wood-mask', name: 'Mask of the Wild', source: 'Wood Elf',
+        desc: 'You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena.' },
+    ],
+  },
+};
+
+/** Subrace names available for a race (empty if none). */
+export function getSubraces(race) {
+  return RACE_PROGRESSION[race]?.subraces || [];
+}
+
+/** Racial traits for a race + chosen subrace (no level gating). */
+export function getRaceFeatures(race, subrace) {
+  const base = RACE_PROGRESSION[race]?.traits || [];
+  const sub = (subrace && SUBRACE_PROGRESSION[subrace]?.race === race)
+    ? SUBRACE_PROGRESSION[subrace].traits
+    : [];
+  return [...base, ...sub];
 }
 
 // ── Base class progression ─────────────────────────────────────────────

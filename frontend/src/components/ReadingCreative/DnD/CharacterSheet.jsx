@@ -17,7 +17,7 @@ import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
 import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig } from './dndUtils';
-import { RACES } from './classProgression';
+import { RACES, getSubraces } from './classProgression';
 
 export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack, onEditModeChange }) {
   const [character, setCharacter] = useState(null);
@@ -231,6 +231,11 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       };
     }
 
+    // Dragonborn Breath Weapon recharges on a short or long rest
+    if (character.racialFeature?.breathWeaponUsed) {
+      updates.racialFeature = { ...character.racialFeature, breathWeaponUsed: false };
+    }
+
     setCharacter(prev => deepMerge(prev, updates));
   };
 
@@ -326,11 +331,15 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       updates.spellcasting = sc;
     }
 
-    // Long rest: racial use-limited traits (Goliath Stone's Endurance)
-    if (character.racialFeature?.stoneEndurance) {
-      const se = character.racialFeature.stoneEndurance;
-      const max = se.maxUses || proficiencyBonus(character.meta?.level || 1);
-      updates.racialFeature = { ...character.racialFeature, stoneEndurance: { ...se, currentUses: max } };
+    // Long rest: racial use-limited traits (Stone's Endurance, Breath Weapon)
+    if (character.racialFeature) {
+      const rf = { ...character.racialFeature };
+      if (rf.stoneEndurance) {
+        const max = rf.stoneEndurance.maxUses || proficiencyBonus(character.meta?.level || 1);
+        rf.stoneEndurance = { ...rf.stoneEndurance, currentUses: max };
+      }
+      if (rf.breathWeaponUsed) rf.breathWeaponUsed = false;
+      updates.racialFeature = rf;
     }
 
     // Long rest: reduce exhaustion by 1 (if any), clear unconscious condition
@@ -417,13 +426,20 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
             {editMode ? (
               <div className="dnd-sheet__subtitle-edit">
                 <select className="dnd-field" value={meta.race || ''}
-                  onChange={e => handleUpdate({ meta: { ...meta, race: e.target.value } })}>
+                  onChange={e => handleUpdate({ meta: { ...meta, race: e.target.value, subrace: '' } })}>
                   <option value="">-- Race --</option>
                   {RACES.map(r => <option key={r} value={r}>{r}</option>)}
                   {meta.race && !RACES.includes(meta.race) && (
                     <option value={meta.race}>{meta.race}</option>
                   )}
                 </select>
+                {getSubraces(meta.race).length > 0 && (
+                  <select className="dnd-field" value={meta.subrace || ''}
+                    onChange={e => handleUpdate({ meta: { ...meta, subrace: e.target.value } })}>
+                    <option value="">-- Subrace --</option>
+                    {getSubraces(meta.race).map(sr => <option key={sr} value={sr}>{sr}</option>)}
+                  </select>
+                )}
                 <select className="dnd-field" value={meta.className || ''}
                   onChange={e => handleUpdate({ meta: { ...meta, className: e.target.value } })}>
                   <option value="">-- Class --</option>
@@ -584,7 +600,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
             editMode={editMode} onUpdate={handleUpdate} level={level}
             className={meta.className} subclass={meta.subclass}
             classFeature={character.classFeature}
-            race={meta.race} racialFeature={character.racialFeature} />
+            race={meta.race} subrace={meta.subrace} racialFeature={character.racialFeature} />
         )}
 
         {activeTab === 'spells' && hasSpellcasting && (

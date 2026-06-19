@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS } from '../classProgression';
 import { SKILLS } from '../dndUtils';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
@@ -202,6 +202,62 @@ function LanguageChoice({ racialFeature, onUpdate }) {
   );
 }
 
+// ── Inline build-choice: Draconic Ancestry (dragon color) ──────────────
+function DragonChoice({ racialFeature, onUpdate }) {
+  const rf = racialFeature || {};
+  const color = rf.dragonAncestry || '';
+  const a = DRAGON_ANCESTRY[color];
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={color}
+        onChange={e => onUpdate({ racialFeature: { ...rf, dragonAncestry: e.target.value } })}
+      >
+        <option value="">— Choose a dragon —</option>
+        {DRAGON_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+      </select>
+      {a && (
+        <p className="dnd-feature-choice__detail">
+          {color} dragon: <strong>{a.damage}</strong> damage · {a.area} ({a.save} save) · resist {a.damage}.
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ── Inline build-choice: generic single-option (e.g. artisan's tools) ──
+function ToolChoice({ racialFeature, onUpdate, options }) {
+  const rf = racialFeature || {};
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={rf.tool || ''}
+        onChange={e => onUpdate({ racialFeature: { ...rf, tool: e.target.value } })}
+      >
+        <option value="">— Choose tools —</option>
+        {(options || []).map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+// ── Inline build-choice: chosen cantrip (free text) ────────────────────
+function CantripChoice({ racialFeature, onUpdate }) {
+  const rf = racialFeature || {};
+  return (
+    <div className="dnd-feature-choice">
+      <input
+        className="dnd-field dnd-feature-choice__select"
+        value={rf.cantrip || ''}
+        placeholder="Your chosen wizard cantrip (e.g. Fire Bolt, Minor Illusion…)"
+        onChange={e => onUpdate({ racialFeature: { ...rf, cantrip: e.target.value } })}
+      />
+    </div>
+  );
+}
+
 // ── Inline build-choice: racial skill proficiency ──────────────────────
 function SkillChoice({ racialFeature, onUpdate, options }) {
   const rf = racialFeature || {};
@@ -219,13 +275,13 @@ function SkillChoice({ racialFeature, onUpdate, options }) {
   );
 }
 
-export default function FeatureList({ features, editMode, onUpdate, level, className, subclass, classFeature, race, racialFeature }) {
+export default function FeatureList({ features, editMode, onUpdate, level, className, subclass, classFeature, race, subrace, racialFeature }) {
   const [expanded, setExpanded] = useState({});
   const toggle = (key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
 
   const classFeatures = getClassFeatures(className, level);
   const subclassFeatures = getSubclassFeatures(subclass, level);
-  const raceFeatures = getRaceFeatures(race);
+  const raceFeatures = getRaceFeatures(race, subrace);
 
   // ── Manual feature CRUD (homebrew / racial / custom) ──
   const handleChange = (index, field, value) => {
@@ -240,6 +296,9 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'runes') return <RuneChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
     if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+    if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+    if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     return null;
@@ -342,7 +401,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
 
         {/* Bottom-left: Racial */}
         <section className="dnd-features__zone">
-          <h3 className="dnd-features__zone-title">{race || 'Racial'}</h3>
+          <h3 className="dnd-features__zone-title">{race ? (subrace ? `${race} · ${subrace}` : race) : 'Racial'}</h3>
           <div className="dnd-features__grid">
             {raceFeatures.map(renderAutoCard)}
             {raceFeatures.length === 0 && (

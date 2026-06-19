@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { proficiencyBonus } from '../../dndUtils';
+import { proficiencyBonus, abilityMod } from '../../dndUtils';
+import { DRAGON_ANCESTRY, breathWeaponDice } from '../../classProgression';
 
 /**
  * Combat-tab tracker for use-limited racial traits. Currently only Goliath's
@@ -52,6 +53,34 @@ export default function RacialBlock({ character, onUpdate }) {
             Reduce dmg (d12 + CON)
           </button>
           <span className="dnd-racial__recharge">Long Rest</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (race === 'Dragonborn') {
+    const color = rf.dragonAncestry;
+    const a = color ? DRAGON_ANCESTRY[color] : null;
+    const dice = breathWeaponDice(level);
+    const dc = 8 + abilityMod(character.abilities?.CON || 10) + pb;
+    const used = rf.breathWeaponUsed || false;
+    const toggle = () => onUpdate({ racialFeature: { ...rf, breathWeaponUsed: !used } });
+    return (
+      <div className="dnd-racial">
+        <div className="dnd-racial__resource">
+          <h4 className="dnd-racial__title">BREATH WEAPON</h4>
+          {a ? (
+            <>
+              <div className="dnd-racial__uses">{used ? 'Used' : `${dice} ${a.damage}`}</div>
+              <p className="dnd-racial__note">{a.area} · {a.save} save · DC {dc}</p>
+              <button className="dnd-racial__use-btn" onClick={toggle}>
+                {used ? 'Reset' : 'Exhale'}
+              </button>
+              <span className="dnd-racial__recharge">Short or Long Rest</span>
+            </>
+          ) : (
+            <p className="dnd-racial__note">Choose a draconic ancestry in the Features tab.</p>
+          )}
         </div>
       </div>
     );
