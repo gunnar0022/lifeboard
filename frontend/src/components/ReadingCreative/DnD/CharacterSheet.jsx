@@ -340,6 +340,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       }
       if (rf.breathWeaponUsed) rf.breathWeaponUsed = false;
       if (rf.relentlessEnduranceUsed) rf.relentlessEnduranceUsed = false;
+      if (rf.spellUses) rf.spellUses = {};
+      if (rf.spellCounts) rf.spellCounts = {};
       updates.racialFeature = rf;
     }
 

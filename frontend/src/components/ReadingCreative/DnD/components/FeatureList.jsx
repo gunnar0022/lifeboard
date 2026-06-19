@@ -263,6 +263,25 @@ function VersatilityChoice({ racialFeature, onUpdate, options }) {
   );
 }
 
+// ── Inline build-choice: racial spellcasting ability (INT/WIS/CHA) ─────
+function SpellAbilityChoice({ racialFeature, onUpdate }) {
+  const rf = racialFeature || {};
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={rf.spellAbility || ''}
+        onChange={e => onUpdate({ racialFeature: { ...rf, spellAbility: e.target.value } })}
+      >
+        <option value="">— Spellcasting ability —</option>
+        <option value="INT">Intelligence</option>
+        <option value="WIS">Wisdom</option>
+        <option value="CHA">Charisma</option>
+      </select>
+    </div>
+  );
+}
+
 // ── Inline build-choice: chosen cantrip (free text) ────────────────────
 function CantripChoice({ racialFeature, onUpdate }) {
   const rf = racialFeature || {};
@@ -320,6 +339,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'versatility') return <VersatilityChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+    if (feat.choice === 'spellAbility') return <SpellAbilityChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     return null;

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { proficiencyBonus, abilityMod } from '../../dndUtils';
-import { DRAGON_ANCESTRY, breathWeaponDice } from '../../classProgression';
+import { DRAGON_ANCESTRY, breathWeaponDice, getRacialSpells } from '../../classProgression';
 
 /**
  * Combat-tab tracker for use-limited racial traits. Currently only Goliath's
@@ -10,6 +10,7 @@ import { DRAGON_ANCESTRY, breathWeaponDice } from '../../classProgression';
  */
 export default function RacialBlock({ character, onUpdate }) {
   const race = character.meta?.race;
+  const subrace = character.meta?.subrace;
   const level = character.meta?.level || 1;
   const pb = proficiencyBonus(level);
   const rf = character.racialFeature || {};
@@ -116,6 +117,45 @@ export default function RacialBlock({ character, onUpdate }) {
           </button>
           <span className="dnd-racial__recharge">Resets when you move 0 ft</span>
         </div>
+      </div>
+    );
+  }
+
+  // Generic level-gated racial spells (Fairy, Tiefling bloodlines, Genasi variants)
+  const spells = getRacialSpells(race, subrace, level);
+  if (spells.length > 0) {
+    const spellUses = rf.spellUses || {};
+    const spellCounts = rf.spellCounts || {};
+    const toggleUse = (name) => onUpdate({ racialFeature: { ...rf, spellUses: { ...spellUses, [name]: !spellUses[name] } } });
+    const usePb = (name) => {
+      const cur = spellCounts[name] ?? pb;
+      if (cur <= 0) return;
+      onUpdate({ racialFeature: { ...rf, spellCounts: { ...spellCounts, [name]: cur - 1 } } });
+    };
+    return (
+      <div className="dnd-racial">
+        {spells.map(sp => {
+          if (sp.uses === 'pb') {
+            const cur = spellCounts[sp.name] ?? pb;
+            return (
+              <div key={sp.name} className="dnd-racial__resource">
+                <h4 className="dnd-racial__title">{sp.name}</h4>
+                <div className="dnd-racial__uses">{cur} / {pb}</div>
+                <button className="dnd-racial__use-btn" onClick={() => usePb(sp.name)} disabled={cur <= 0}>Cast</button>
+                <span className="dnd-racial__recharge">Long Rest</span>
+              </div>
+            );
+          }
+          const used = !!spellUses[sp.name];
+          return (
+            <div key={sp.name} className="dnd-racial__resource">
+              <h4 className="dnd-racial__title">{sp.name}</h4>
+              <div className="dnd-racial__uses">{used ? 'Used' : 'Ready'}</div>
+              <button className="dnd-racial__use-btn" onClick={() => toggleUse(sp.name)}>{used ? 'Reset' : 'Cast'}</button>
+              <span className="dnd-racial__recharge">Long Rest</span>
+            </div>
+          );
+        })}
       </div>
     );
   }
