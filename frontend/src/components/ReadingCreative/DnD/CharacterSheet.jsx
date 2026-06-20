@@ -235,6 +235,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       }
       // Monk: ki recharges on a short or long rest.
       if (cf.type === 'ki_points') cf.currentPoints = cf.maxPoints || 0;
+      // Sorcerer: Sorcerous Restoration (20th) regains 4 sorcery points on a short rest.
+      if (cf.type === 'sorcery_points' && (character.meta?.level || 1) >= 20) {
+        cf.currentPoints = Math.min(cf.maxPoints || 0, (cf.currentPoints || 0) + 4);
+      }
       // Paladin: Channel Divinity recharges on a short or long rest.
       if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
       updates.classFeature = cf;
@@ -326,6 +330,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.divineSense) cf.divineSense = { ...cf.divineSense, current: cf.divineSense.max || 0 };
       if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
       if (cf.cleansingTouch) cf.cleansingTouch = { ...cf.cleansingTouch, current: cf.cleansingTouch.max || 0 };
+      // Ranger: Favored Foe, Nature's Veil, Tireless recharge on long rest
+      if (cf.favoredFoe) cf.favoredFoe = { ...cf.favoredFoe, current: cf.favoredFoe.max || 0 };
+      if (cf.naturesVeil) cf.naturesVeil = { ...cf.naturesVeil, current: cf.naturesVeil.max || 0 };
+      if (cf.tireless) cf.tireless = { ...cf.tireless, current: cf.tireless.max || 0 };
       // Archfey: short-or-long-rest abilities also recharge on a long rest
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;

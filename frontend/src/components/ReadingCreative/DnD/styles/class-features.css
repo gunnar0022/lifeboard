@@ -364,3 +364,13 @@
   background: color-mix(in srgb, var(--dnd-class-monk) 22%, transparent);
   color: var(--dnd-class-monk);
 }
+
+/* ── Ranger favored enemy/terrain refs ── */
+.dnd-ranger__refs { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.dnd-ranger__ref { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; }
+.dnd-ranger__ref span {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dnd-text-faint);
+}

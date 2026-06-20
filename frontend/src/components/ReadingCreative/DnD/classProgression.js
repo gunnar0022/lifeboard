@@ -737,7 +737,7 @@ export const CLASS_PROGRESSION = {
     { id: 'wiz-arcane-recovery', name: 'Arcane Recovery', level: 1, source: 'Wizard', combat: true,
       desc: 'Once per day when you finish a short rest, recover expended spell slots with a combined level up to half your wizard level (rounded up); none can be 6th level or higher. Track it on the Combat tab; recover the actual slots on the Spells tab.' },
     { id: 'wiz-arcane-tradition', name: 'Arcane Tradition', level: 2, source: 'Wizard',
-      desc: 'You choose an Arcane Tradition (subclass), shaping your practice of magic. Set it in the sheet header; its features appear in the Subclass column and on the Combat tab.' },
+      desc: 'Your Arcane Tradition shapes your practice of magic, granting features at 2nd, 6th, 10th, and 14th level.' },
     { id: 'wiz-cantrip-formulas', name: 'Cantrip Formulas (Optional)', level: 3, source: 'Wizard',
       desc: 'After a long rest, you can replace one wizard cantrip you know with another from the wizard spell list.' },
     { id: 'wiz-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Wizard', choice: 'asi',
@@ -756,7 +756,7 @@ export const CLASS_PROGRESSION = {
 
   Warlock: [
     { id: 'wl-patron', name: 'Otherworldly Patron', level: 1, source: 'Warlock',
-      desc: 'You strike a bargain with an otherworldly being (your subclass). Set it in the sheet header; its features appear in the Subclass column and on the Combat tab.' },
+      desc: 'Your pact with an otherworldly patron grants features at 1st, 6th, 10th, and 14th level.' },
     { id: 'wl-pact-magic', name: 'Pact Magic', level: 1, source: 'Warlock',
       desc: 'You cast warlock spells using Charisma. All of your pact slots are the same level and you regain them on a short or long rest. Manage cantrips, known spells, and pact slots on the Spells tab.' },
     { id: 'wl-invocations', name: 'Eldritch Invocations', level: 2, source: 'Warlock', choice: 'invocations',
@@ -791,7 +791,7 @@ export const CLASS_PROGRESSION = {
     { id: 'brd-magical-inspiration', name: 'Magical Inspiration (Optional)', level: 2, source: 'Bard',
       desc: 'A creature with your Bardic Inspiration die that casts a healing or damaging spell can roll the die and add it to the HP regained or damage of one target.' },
     { id: 'brd-college', name: 'Bard College', level: 3, source: 'Bard',
-      desc: 'You join a Bard College (subclass), gaining features at 3rd, 6th, and 14th level. Set it in the sheet header.' },
+      desc: 'Your Bard College grants features at 3rd, 6th, and 14th level.' },
     { id: 'brd-expertise-3', name: 'Expertise', level: 3, source: 'Bard', choice: 'expertise',
       desc: 'Choose two skill proficiencies; your proficiency bonus is doubled for ability checks using them.' },
     { id: 'brd-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Bard', choice: 'asi',
@@ -824,7 +824,7 @@ export const CLASS_PROGRESSION = {
     { id: 'clr-spellcasting', name: 'Spellcasting', level: 1, source: 'Cleric',
       desc: 'You cast cleric spells using Wisdom (save DC = 8 + proficiency bonus + WIS modifier; attack = proficiency bonus + WIS modifier). You prepare WIS modifier + cleric level spells from the cleric list after a long rest, and can cast a prepared spell with the ritual tag as a ritual. Manage prepared spells and slots on the Spells tab.' },
     { id: 'clr-divine-domain', name: 'Divine Domain', level: 1, source: 'Cleric',
-      desc: 'Choose a Divine Domain (subclass) shaped by your deity. It grants domain spells (always prepared, not counting against your limit — pin them as Always Prepared on the Spells tab) and features at 1st, 2nd, 6th, 8th, and 17th level. Set it in the sheet header.' },
+      desc: 'Your Divine Domain grants domain spells (always prepared, not counting against your limit — pin them as Always Prepared on the Spells tab) and features at 1st, 2nd, 6th, 8th, and 17th level.' },
     { id: 'clr-channel-divinity', name: 'Channel Divinity', level: 2, source: 'Cleric', combat: true,
       desc: 'Channel divine energy to fuel effects — Turn Undead plus domain options. Once per short or long rest at 2nd level, twice at 6th, three times at 18th. Track uses on the Combat tab. Turn Undead (action): undead within 30 ft that can see/hear you make a WIS save or flee for 1 minute.' },
     { id: 'clr-harness-divine-power', name: 'Harness Divine Power (Optional)', level: 2, source: 'Cleric', combat: true,
@@ -859,7 +859,7 @@ export const CLASS_PROGRESSION = {
     { id: 'mnk-dedicated-weapon', name: 'Dedicated Weapon (Optional)', level: 2, source: 'Monk',
       desc: 'After a short or long rest, you can focus your ki on one simple/martial weapon (no heavy or special property) you are proficient with to count it as a monk weapon until you use this feature again.' },
     { id: 'mnk-tradition', name: 'Monastic Tradition', level: 3, source: 'Monk',
-      desc: 'You commit to a Monastic Tradition (subclass), gaining features at 3rd, 6th, 11th, and 17th level. Set it in the sheet header.' },
+      desc: 'Your Monastic Tradition grants features at 3rd, 6th, 11th, and 17th level.' },
     { id: 'mnk-deflect-missiles', name: 'Deflect Missiles', level: 3, source: 'Monk', combat: true,
       desc: 'Reaction when hit by a ranged weapon attack: reduce the damage by 1d10 + DEX modifier + monk level. If you reduce it to 0 and can catch the missile, you can spend 1 ki to throw it back (range 20/60) as part of the reaction.' },
     { id: 'mnk-ki-fueled-attack', name: 'Ki-Fueled Attack (Optional)', level: 3, source: 'Monk',
@@ -918,7 +918,7 @@ export const CLASS_PROGRESSION = {
     { id: 'pal-divine-health', name: 'Divine Health', level: 3, source: 'Paladin',
       desc: 'The divine magic flowing through you makes you immune to disease.' },
     { id: 'pal-sacred-oath', name: 'Sacred Oath', level: 3, source: 'Paladin',
-      desc: 'You swear a Sacred Oath (subclass), gaining oath spells (always prepared, not counting against your limit — pin them as Always Prepared on the Spells tab), a Channel Divinity, and features at 3rd, 7th, 15th, and 20th level. Set it in the sheet header.' },
+      desc: 'Your Sacred Oath grants oath spells (always prepared, not counting against your limit — pin them as Always Prepared on the Spells tab), a Channel Divinity, and features at 3rd, 7th, 15th, and 20th level.' },
     { id: 'pal-channel-divinity', name: 'Channel Divinity', level: 3, source: 'Paladin', combat: true,
       desc: 'Your oath grants Channel Divinity options. Use one, then finish a short or long rest to use it again. Save DC equals your paladin spell save DC.' },
     { id: 'pal-harness-divine-power', name: 'Harness Divine Power (Optional)', level: 3, source: 'Paladin', combat: true,
@@ -945,6 +945,72 @@ export const CLASS_PROGRESSION = {
       desc: 'The range of your Aura of Protection and Aura of Courage increases to 30 feet.' },
     { id: 'pal-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Paladin', choice: 'asi',
       desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+  ],
+
+  Sorcerer: [
+    { id: 'sor-spellcasting', name: 'Spellcasting', level: 1, source: 'Sorcerer',
+      desc: 'Innate arcane magic fuels your spells. You cast using Charisma (save DC = 8 + proficiency bonus + CHA modifier; attack = proficiency bonus + CHA modifier). You know a set number of spells (Spells Known) and can swap one each level. Manage spells and slots on the Spells tab.' },
+    { id: 'sor-font', name: 'Font of Magic', level: 2, source: 'Sorcerer', combat: true,
+      desc: 'You gain sorcery points equal to your sorcerer level (regained on a long rest). Flexible Casting lets you convert sorcery points into spell slots (and slots back into points) as a bonus action. Track sorcery points on the Combat tab.' },
+    { id: 'sor-metamagic', name: 'Metamagic', level: 3, source: 'Sorcerer', choice: 'metamagic',
+      desc: 'You can twist your spells by spending sorcery points. You know two Metamagic options, gaining another at 10th and 17th level. You can use only one Metamagic option per spell (unless an option says otherwise).' },
+    { id: 'sor-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Sorcerer', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Sorcerous Versatility (optional): instead swap a Metamagic option or replace a cantrip.' },
+    { id: 'sor-magical-guidance', name: 'Magical Guidance (Optional)', level: 5, source: 'Sorcerer',
+      desc: 'When you fail an ability check, you can spend 1 sorcery point to reroll the d20 and use the new roll.' },
+    { id: 'sor-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Sorcerer', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Sorcerous Versatility (optional): instead swap a Metamagic option or replace a cantrip.' },
+    { id: 'sor-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Sorcerer', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Sorcerous Versatility (optional): instead swap a Metamagic option or replace a cantrip.' },
+    { id: 'sor-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Sorcerer', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Sorcerous Versatility (optional): instead swap a Metamagic option or replace a cantrip.' },
+    { id: 'sor-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Sorcerer', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Sorcerous Versatility (optional): instead swap a Metamagic option or replace a cantrip.' },
+    { id: 'sor-restoration', name: 'Sorcerous Restoration', level: 20, source: 'Sorcerer',
+      desc: 'You regain 4 expended sorcery points whenever you finish a short rest.' },
+  ],
+
+  Ranger: [
+    { id: 'rng-favored-enemy', name: 'Favored Enemy', level: 1, source: 'Ranger',
+      desc: 'Choose a favored enemy type. You have advantage on Survival checks to track them and Intelligence checks to recall lore about them, and learn a related language. Choose additional favored enemies at 6th and 14th level. (Favored Foe is the optional replacement.)' },
+    { id: 'rng-favored-foe', name: 'Favored Foe (Optional)', level: 1, source: 'Ranger', combat: true,
+      desc: 'Replaces Favored Enemy. When you hit a creature, mark it as your favored enemy (concentration, 1 min). The first time each turn you damage it, add 1d4 (1d6 at 6th, 1d8 at 14th). Uses equal to your proficiency bonus, regained on a long rest. Track it on the Combat tab.' },
+    { id: 'rng-natural-explorer', name: 'Natural Explorer', level: 1, source: 'Ranger',
+      desc: 'Choose a favored terrain; your proficiency bonus is doubled for INT/WIS checks tied to it, plus travel benefits (no difficult terrain, can\'t get lost, alert while busy, extra foraging, detailed tracking). Choose more terrains at 6th and 10th level. (Deft Explorer is the optional replacement.)' },
+    { id: 'rng-deft-explorer', name: 'Deft Explorer (Optional)', level: 1, source: 'Ranger', combat: true,
+      desc: 'Replaces Natural Explorer. Canny: double proficiency on one skill and learn 2 languages. Roving (6th): +5 speed plus climb and swim speeds. Tireless (10th): action to gain 1d8 + WIS temp HP (uses equal to proficiency bonus, long rest), and short rests reduce exhaustion by 1.' },
+    { id: 'rng-fighting-style', name: 'Fighting Style', level: 2, source: 'Ranger', choice: 'fighting-style',
+      desc: 'Adopt a fighting style as your specialty. (Druidic Warrior grants two druid cantrips cast with Wisdom.)' },
+    { id: 'rng-spellcasting', name: 'Spellcasting', level: 2, source: 'Ranger',
+      desc: 'You draw on nature\'s magic to cast ranger spells using Wisdom (save DC = 8 + proficiency bonus + WIS modifier; attack = proficiency bonus + WIS modifier). As a half caster you know a set number of spells (Spells Known) and can swap one each level. Manage spells and slots on the Spells tab.' },
+    { id: 'rng-primeval-awareness', name: 'Primeval Awareness', level: 3, source: 'Ranger',
+      desc: 'Action: expend a ranger spell slot to sense whether aberrations, celestials, dragons, elementals, fey, fiends, or undead are within 1 mile (6 miles in favored terrain) for 1 min per slot level. (Primal Awareness is the optional replacement, granting always-known spells.)' },
+    { id: 'rng-ranger-conclave', name: 'Ranger Conclave', level: 3, source: 'Ranger',
+      desc: 'Your Ranger Conclave grants features at 3rd, 7th, 11th, and 15th level.' },
+    { id: 'rng-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Ranger', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+    { id: 'rng-extra-attack', name: 'Extra Attack', level: 5, source: 'Ranger',
+      desc: 'You can attack twice whenever you take the Attack action on your turn.' },
+    { id: 'rng-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Ranger', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+    { id: 'rng-lands-stride', name: "Land's Stride", level: 8, source: 'Ranger',
+      desc: 'Nonmagical difficult terrain costs no extra movement, and you pass through nonmagical plants unharmed. You have advantage on saves against plants that magically impede movement.' },
+    { id: 'rng-hide-plain-sight', name: 'Hide in Plain Sight', level: 10, source: 'Ranger',
+      desc: 'Spend 1 minute making camouflage to gain +10 to Stealth while pressed against a solid surface and not moving or acting. (Nature\'s Veil is the optional replacement.)' },
+    { id: 'rng-natures-veil', name: "Nature's Veil (Optional)", level: 10, source: 'Ranger', combat: true,
+      desc: 'Replaces Hide in Plain Sight. Bonus action: become invisible until the start of your next turn. Uses equal to your proficiency bonus, regained on a long rest.' },
+    { id: 'rng-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Ranger', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+    { id: 'rng-vanish', name: 'Vanish', level: 14, source: 'Ranger',
+      desc: 'You can Hide as a bonus action, and can\'t be tracked by nonmagical means unless you choose to leave a trail.' },
+    { id: 'rng-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Ranger', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+    { id: 'rng-feral-senses', name: 'Feral Senses', level: 18, source: 'Ranger',
+      desc: 'No disadvantage attacking creatures you can\'t see, and you sense invisible creatures within 30 ft (unless hidden or you\'re blinded/deafened).' },
+    { id: 'rng-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Ranger', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Martial Versatility (optional): instead replace a fighting style with another.' },
+    { id: 'rng-foe-slayer', name: 'Foe Slayer', level: 20, source: 'Ranger',
+      desc: 'Once per turn, add your Wisdom modifier to the attack or damage roll of an attack against your favored enemy (before or after the roll).' },
   ],
 };
 
@@ -1037,6 +1103,57 @@ export function unarmoredMovement(level) {
 /** Lay on Hands pool (5 × paladin level). */
 export function layOnHandsPool(level) {
   return (level || 1) * 5;
+}
+
+// ── Sorcerer helpers ───────────────────────────────────────────────────
+/** Sorcery points by sorcerer level (none until 2nd). */
+export function sorceryPoints(level) {
+  return (level || 1) >= 2 ? level : 0;
+}
+/** Cantrips known by sorcerer level (display-only cap). */
+export function sorcererCantripsKnown(level) {
+  if (level >= 10) return 6;
+  if (level >= 4) return 5;
+  return 4;
+}
+/** Spells known by sorcerer level (display-only cap). */
+export function sorcererSpellsKnown(level) {
+  const table = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15];
+  return table[Math.max(1, Math.min(20, level || 1)) - 1];
+}
+/** Metamagic options known by sorcerer level. */
+export function metamagicKnown(level) {
+  if (level >= 17) return 4;
+  if (level >= 10) return 3;
+  if (level >= 3) return 2;
+  return 0;
+}
+
+export const METAMAGIC_OPTIONS = [
+  { name: 'Careful Spell', cost: '1 SP', desc: 'Protect up to your CHA modifier creatures from a save-based spell (they auto-succeed).' },
+  { name: 'Distant Spell', cost: '1 SP', desc: 'Double a spell\'s range (5 ft+), or make a touch spell reach 30 ft.' },
+  { name: 'Empowered Spell', cost: '1 SP', desc: 'Reroll up to your CHA modifier damage dice. Stacks with one other Metamagic.' },
+  { name: 'Extended Spell', cost: '1 SP', desc: 'Double a spell\'s duration (1 min+), to a max of 24 hours.' },
+  { name: 'Heightened Spell', cost: '3 SP', desc: 'One target has disadvantage on its first save against the spell.' },
+  { name: 'Quickened Spell', cost: '2 SP', desc: 'Change a 1-action casting time to a bonus action.' },
+  { name: 'Seeking Spell', cost: '2 SP', desc: 'Reroll a missed spell attack roll; use the new roll.' },
+  { name: 'Subtle Spell', cost: '1 SP', desc: 'Cast without somatic or verbal components.' },
+  { name: 'Transmuted Spell', cost: '1 SP', desc: 'Change a spell\'s damage type among acid, cold, fire, lightning, poison, thunder.' },
+  { name: 'Twinned Spell', cost: 'spell level SP', desc: 'Target a second creature with a single-target, non-self spell (1 SP for a cantrip).' },
+];
+
+// ── Ranger helpers ─────────────────────────────────────────────────────
+/** Favored Foe bonus damage die by ranger level. */
+export function favoredFoeDie(level) {
+  if (level >= 14) return 'd8';
+  if (level >= 6) return 'd6';
+  return 'd4';
+}
+/** Spells known by ranger level (none until 2nd). */
+export function rangerSpellsKnown(level) {
+  if ((level || 1) < 2) return 0;
+  const table = [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11];
+  return table[Math.max(1, Math.min(20, level)) - 1];
 }
 
 // ── Warlock scaling helpers ────────────────────────────────────────────

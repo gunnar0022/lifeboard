@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown } from '../classProgression';
 import { SKILLS } from '../dndUtils';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
@@ -156,6 +156,55 @@ function InvocationsChoice({ classFeature, onUpdate, level }) {
             onChange={e => update(i, 'desc', e.target.value)} />
         </div>
       ))}
+    </div>
+  );
+}
+
+// ── Inline build-choice: Sorcerer Metamagic (capped pick from a fixed list) ──
+function MetamagicChoice({ classFeature, onUpdate, level }) {
+  const cf = classFeature || {};
+  const known = cf.metamagic || [];
+  const max = metamagicKnown(level);
+  const [picking, setPicking] = useState(false);
+
+  const add = (name) => {
+    if (known.includes(name) || known.length >= max) return;
+    onUpdate({ classFeature: { ...cf, metamagic: [...known, name] } });
+    setPicking(false);
+  };
+  const remove = (name) => onUpdate({ classFeature: { ...cf, metamagic: known.filter(m => m !== name) } });
+  const available = METAMAGIC_OPTIONS.filter(o => !known.includes(o.name));
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__rune-head">
+        <span className="dnd-feature-choice__count">{known.length}/{max} metamagic known</span>
+        {known.length < max && available.length > 0 && (
+          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Metamagic</button>
+        )}
+      </div>
+      {picking && (
+        <div className="dnd-feature-choice__picker">
+          {available.map(o => (
+            <button key={o.name} className="dnd-feature-choice__pick" onClick={() => add(o.name)} title={o.desc}>
+              {o.name}<span className="dnd-feature-choice__pick-lvl"> {o.cost}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      {known.length === 0 && <p className="dnd-feature-choice__empty">No Metamagic chosen yet — click + Metamagic.</p>}
+      {known.map(name => {
+        const o = METAMAGIC_OPTIONS.find(x => x.name === name);
+        return (
+          <div key={name} className="dnd-feature-choice__rune">
+            <div className="dnd-feature-choice__rune-top">
+              <span className="dnd-feature-choice__rune-name">{name} <span className="dnd-feature-choice__count">{o?.cost}</span></span>
+              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove">×</button>
+            </div>
+            <p className="dnd-feature-choice__rune-line">{o?.desc}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -398,6 +447,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+    if (feat.choice === 'metamagic') return <MetamagicChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
     return null;
   };
 

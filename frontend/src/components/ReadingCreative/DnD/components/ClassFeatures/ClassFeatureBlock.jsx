@@ -8,6 +8,8 @@ import BardBlock from './BardBlock';
 import ClericBlock from './ClericBlock';
 import MonkBlock from './MonkBlock';
 import PaladinBlock from './PaladinBlock';
+import SorcererBlock from './SorcererBlock';
+import RangerBlock from './RangerBlock';
 import GenericResourceDisplay from './GenericResourceDisplay';
 
 export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
@@ -40,6 +42,10 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
       return <MonkBlock character={character} onUpdate={handleUpdate} />;
     case 'divine_smite':
       return <PaladinBlock character={character} onUpdate={handleUpdate} />;
+    case 'sorcery_points':
+      return <SorcererBlock character={character} onUpdate={handleUpdate} />;
+    case 'ranger_spells':
+      return <RangerBlock character={character} onUpdate={handleUpdate} />;
     default:
       return <GenericResourceDisplay classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
   }

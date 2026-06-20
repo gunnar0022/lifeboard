@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { abilityMod, proficiencyBonus, normalizeSpellcasting, CLASS_CASTER_PROFILE } from '../../dndUtils';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
-import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, bardSpellsKnown } from '../../classProgression';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown } from '../../classProgression';
 import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
@@ -63,11 +63,12 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
   // Cantrips-known cap is display-only (per-class table; Wizard supplied).
   const CANTRIP_CAPS = {
     Wizard: wizardCantripsKnown, Warlock: warlockCantripsKnown, Druid: druidCantripsKnown,
-    Bard: bardCantripsKnown, Cleric: clericCantripsKnown,
+    Bard: bardCantripsKnown, Cleric: clericCantripsKnown, Sorcerer: sorcererCantripsKnown,
   };
   const cantripCap = CANTRIP_CAPS[meta.className] ? CANTRIP_CAPS[meta.className](classLevel) : null;
   // Known-spell cap (display-only) for "known" casters that have one.
-  const knownCap = meta.className === 'Bard' ? bardSpellsKnown(classLevel) : null;
+  const KNOWN_CAPS = { Bard: bardSpellsKnown, Sorcerer: sorcererSpellsKnown, Ranger: rangerSpellsKnown };
+  const knownCap = KNOWN_CAPS[meta.className] ? KNOWN_CAPS[meta.className](classLevel) : null;
   const alwaysSet = useMemo(() => new Set(sc.alwaysPrepared || []), [sc.alwaysPrepared]);
   const preparedCount = (sc.prepared || []).filter(id => !alwaysSet.has(id)).length;
   const preparedFull = preparedCount >= preparedCap;
