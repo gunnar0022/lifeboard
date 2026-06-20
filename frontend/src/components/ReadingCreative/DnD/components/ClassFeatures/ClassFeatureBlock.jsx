@@ -6,6 +6,8 @@ import WizardBlock from './WizardBlock';
 import WarlockBlock from './WarlockBlock';
 import BardBlock from './BardBlock';
 import ClericBlock from './ClericBlock';
+import MonkBlock from './MonkBlock';
+import PaladinBlock from './PaladinBlock';
 import GenericResourceDisplay from './GenericResourceDisplay';
 
 export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
@@ -34,6 +36,10 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
       return <BardBlock character={character} onUpdate={handleUpdate} />;
     case 'channel_divinity':
       return <ClericBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
+    case 'ki_points':
+      return <MonkBlock character={character} onUpdate={handleUpdate} />;
+    case 'divine_smite':
+      return <PaladinBlock character={character} onUpdate={handleUpdate} />;
     default:
       return <GenericResourceDisplay classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
   }

@@ -233,6 +233,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.type === 'bardic_inspiration' && (character.meta?.level || 1) >= 5) {
         cf.currentUses = cf.maxUses || 0;
       }
+      // Monk: ki recharges on a short or long rest.
+      if (cf.type === 'ki_points') cf.currentPoints = cf.maxPoints || 0;
+      // Paladin: Channel Divinity recharges on a short or long rest.
+      if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
       updates.classFeature = cf;
     }
 
@@ -314,10 +318,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.talisman) {
         cf.talisman = { ...cf.talisman, current: cf.talisman.max || 0 };
       }
-      // Cleric Harness Divine Power pool recharges on long rest
+      // Cleric / Paladin Harness Divine Power pool recharges on long rest
       if (cf.harnessDivinePower) {
         cf.harnessDivinePower = { ...cf.harnessDivinePower, current: cf.harnessDivinePower.max || 0 };
       }
+      // Paladin: Divine Sense, Channel Divinity, Cleansing Touch recharge on long rest
+      if (cf.divineSense) cf.divineSense = { ...cf.divineSense, current: cf.divineSense.max || 0 };
+      if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
+      if (cf.cleansingTouch) cf.cleansingTouch = { ...cf.cleansingTouch, current: cf.cleansingTouch.max || 0 };
       // Archfey: short-or-long-rest abilities also recharge on a long rest
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
