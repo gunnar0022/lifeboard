@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { abilityMod, proficiencyBonus, normalizeSpellcasting, CLASS_CASTER_PROFILE } from '../../dndUtils';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
-import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown } from '../../classProgression';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, bardSpellsKnown } from '../../classProgression';
 import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
@@ -61,9 +61,13 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
     : classLevel;
   const preparedCap = Math.max(1, abilMod + prepLevel);
   // Cantrips-known cap is display-only (per-class table; Wizard supplied).
-  const cantripCap = meta.className === 'Wizard' ? wizardCantripsKnown(classLevel)
-    : meta.className === 'Warlock' ? warlockCantripsKnown(classLevel)
-    : meta.className === 'Druid' ? druidCantripsKnown(classLevel) : null;
+  const CANTRIP_CAPS = {
+    Wizard: wizardCantripsKnown, Warlock: warlockCantripsKnown, Druid: druidCantripsKnown,
+    Bard: bardCantripsKnown, Cleric: clericCantripsKnown,
+  };
+  const cantripCap = CANTRIP_CAPS[meta.className] ? CANTRIP_CAPS[meta.className](classLevel) : null;
+  // Known-spell cap (display-only) for "known" casters that have one.
+  const knownCap = meta.className === 'Bard' ? bardSpellsKnown(classLevel) : null;
   const alwaysSet = useMemo(() => new Set(sc.alwaysPrepared || []), [sc.alwaysPrepared]);
   const preparedCount = (sc.prepared || []).filter(id => !alwaysSet.has(id)).length;
   const preparedFull = preparedCount >= preparedCap;
@@ -310,7 +314,8 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
       {isCaster && (
         <SpellZone
           title={isPrepared ? 'Spellbook' : 'Spells'}
-          subtitle={isPrepared ? 'known but not prepared' : undefined}
+          subtitle={isPrepared ? 'known but not prepared'
+            : knownCap != null ? `${(sc.known || []).length}/${knownCap} known` : undefined}
           spellIds={sc.known}
           spellCache={spellCache}
           concentratingOn={sc.concentratingOn}

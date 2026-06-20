@@ -229,6 +229,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
       if ('darkDeliriumUsed' in cf) cf.darkDeliriumUsed = false;
+      // Bard: Font of Inspiration (5th+) recharges Bardic Inspiration on a short rest.
+      if (cf.type === 'bardic_inspiration' && (character.meta?.level || 1) >= 5) {
+        cf.currentUses = cf.maxUses || 0;
+      }
       updates.classFeature = cf;
     }
 
@@ -309,6 +313,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       // Warlock Pact of the Talisman recharges on long rest
       if (cf.talisman) {
         cf.talisman = { ...cf.talisman, current: cf.talisman.max || 0 };
+      }
+      // Cleric Harness Divine Power pool recharges on long rest
+      if (cf.harnessDivinePower) {
+        cf.harnessDivinePower = { ...cf.harnessDivinePower, current: cf.harnessDivinePower.max || 0 };
       }
       // Archfey: short-or-long-rest abilities also recharge on a long rest
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;

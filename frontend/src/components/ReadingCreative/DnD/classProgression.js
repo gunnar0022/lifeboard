@@ -778,6 +778,74 @@ export const CLASS_PROGRESSION = {
     { id: 'wl-eldritch-master', name: 'Eldritch Master', level: 20, source: 'Warlock',
       desc: 'Spend 1 minute entreating your patron to regain all expended Pact Magic slots. Once you do, you must finish a long rest before using it again.' },
   ],
+
+  Bard: [
+    { id: 'brd-spellcasting', name: 'Spellcasting', level: 1, source: 'Bard',
+      desc: 'You cast bard spells using Charisma (save DC = 8 + proficiency bonus + CHA modifier; attack = proficiency bonus + CHA modifier). You know a set number of spells (Spells Known) and can swap one each level. Any bard spell you know with the ritual tag can be cast as a ritual. Manage spells and slots on the Spells tab.' },
+    { id: 'brd-bardic-inspiration', name: 'Bardic Inspiration', level: 1, source: 'Bard', combat: true,
+      desc: 'Bonus action: give a creature within 60 ft a Bardic Inspiration die (d6, rising to d8 at 5th, d10 at 10th, d12 at 15th) to add to one ability check, attack, or save within 10 min. Uses equal to your Charisma modifier (min 1), regained on a long rest (or a short rest from 5th level). Track it on the Combat tab.' },
+    { id: 'brd-jack', name: 'Jack of All Trades', level: 2, source: 'Bard',
+      desc: 'Add half your proficiency bonus (rounded down) to any ability check that doesn\'t already include your proficiency bonus.' },
+    { id: 'brd-song-of-rest', name: 'Song of Rest', level: 2, source: 'Bard',
+      desc: 'During a short rest, allies who spend Hit Dice to heal regain an extra 1d6 HP (1d8 at 9th, 1d10 at 13th, 1d12 at 17th).' },
+    { id: 'brd-magical-inspiration', name: 'Magical Inspiration (Optional)', level: 2, source: 'Bard',
+      desc: 'A creature with your Bardic Inspiration die that casts a healing or damaging spell can roll the die and add it to the HP regained or damage of one target.' },
+    { id: 'brd-college', name: 'Bard College', level: 3, source: 'Bard',
+      desc: 'You join a Bard College (subclass), gaining features at 3rd, 6th, and 14th level. Set it in the sheet header.' },
+    { id: 'brd-expertise-3', name: 'Expertise', level: 3, source: 'Bard', choice: 'expertise',
+      desc: 'Choose two skill proficiencies; your proficiency bonus is doubled for ability checks using them.' },
+    { id: 'brd-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Bard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Bardic Versatility (optional): instead swap an Expertise skill or replace a cantrip.' },
+    { id: 'brd-font', name: 'Font of Inspiration', level: 5, source: 'Bard',
+      desc: 'You regain all expended uses of Bardic Inspiration on a short or long rest.' },
+    { id: 'brd-countercharm', name: 'Countercharm', level: 6, source: 'Bard', combat: true,
+      desc: 'Action: until the end of your next turn, you and friendly creatures within 30 ft who can hear you have advantage on saves against being frightened or charmed.' },
+    { id: 'brd-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Bard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Bardic Versatility (optional): instead swap an Expertise skill or replace a cantrip.' },
+    { id: 'brd-expertise-10', name: 'Expertise', level: 10, source: 'Bard', choice: 'expertise',
+      desc: 'Choose two more skill proficiencies to gain the Expertise benefit.' },
+    { id: 'brd-magical-secrets-10', name: 'Magical Secrets', level: 10, source: 'Bard',
+      desc: 'Choose two spells from any class (of a level you can cast, or cantrips). They count as bard spells and against your Spells Known. Two more at 14th and again at 18th.' },
+    { id: 'brd-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Bard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Bardic Versatility (optional): instead swap an Expertise skill or replace a cantrip.' },
+    { id: 'brd-magical-secrets-14', name: 'Magical Secrets', level: 14, source: 'Bard',
+      desc: 'Learn two more spells from any class (count against Spells Known).' },
+    { id: 'brd-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Bard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Bardic Versatility (optional): instead swap an Expertise skill or replace a cantrip.' },
+    { id: 'brd-magical-secrets-18', name: 'Magical Secrets', level: 18, source: 'Bard',
+      desc: 'Learn two more spells from any class (count against Spells Known).' },
+    { id: 'brd-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Bard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Bardic Versatility (optional): instead swap an Expertise skill or replace a cantrip.' },
+    { id: 'brd-superior-inspiration', name: 'Superior Inspiration', level: 20, source: 'Bard', combat: true,
+      desc: 'When you roll initiative with no uses of Bardic Inspiration left, you regain one use.' },
+  ],
+
+  Cleric: [
+    { id: 'clr-spellcasting', name: 'Spellcasting', level: 1, source: 'Cleric',
+      desc: 'You cast cleric spells using Wisdom (save DC = 8 + proficiency bonus + WIS modifier; attack = proficiency bonus + WIS modifier). You prepare WIS modifier + cleric level spells from the cleric list after a long rest, and can cast a prepared spell with the ritual tag as a ritual. Manage prepared spells and slots on the Spells tab.' },
+    { id: 'clr-divine-domain', name: 'Divine Domain', level: 1, source: 'Cleric',
+      desc: 'Choose a Divine Domain (subclass) shaped by your deity. It grants domain spells (always prepared, not counting against your limit — pin them as Always Prepared on the Spells tab) and features at 1st, 2nd, 6th, 8th, and 17th level. Set it in the sheet header.' },
+    { id: 'clr-channel-divinity', name: 'Channel Divinity', level: 2, source: 'Cleric', combat: true,
+      desc: 'Channel divine energy to fuel effects — Turn Undead plus domain options. Once per short or long rest at 2nd level, twice at 6th, three times at 18th. Track uses on the Combat tab. Turn Undead (action): undead within 30 ft that can see/hear you make a WIS save or flee for 1 minute.' },
+    { id: 'clr-harness-divine-power', name: 'Harness Divine Power (Optional)', level: 2, source: 'Cleric', combat: true,
+      desc: 'Bonus action: expend a Channel Divinity use to regain one spell slot (level ≤ half your proficiency bonus, rounded up). Usable once per long rest at 2nd level, twice at 6th, three times at 18th.' },
+    { id: 'clr-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Cleric', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one cleric cantrip.' },
+    { id: 'clr-destroy-undead', name: 'Destroy Undead', level: 5, source: 'Cleric', combat: true,
+      desc: 'When an undead fails its save against Turn Undead, it is instantly destroyed if its CR is at or below your threshold: CR 1/2 at 5th, 1 at 8th, 2 at 11th, 3 at 14th, 4 at 17th.' },
+    { id: 'clr-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Cleric', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one cleric cantrip.' },
+    { id: 'clr-blessed-strikes', name: 'Blessed Strikes (Optional)', level: 8, source: 'Cleric',
+      desc: 'When a creature takes damage from one of your cantrips or weapon attacks, deal an extra 1d8 radiant damage to it. Once per turn. (Replaces a domain\'s Divine Strike or Potent Spellcasting.)' },
+    { id: 'clr-divine-intervention', name: 'Divine Intervention', level: 10, source: 'Cleric', combat: true,
+      desc: 'Action: roll percentile dice; if you roll ≤ your cleric level, your deity intervenes (DM chooses an appropriate cleric/domain effect). On success you can\'t use it for 7 days; otherwise retry after a long rest. At 20th level it succeeds automatically.' },
+    { id: 'clr-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Cleric', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one cleric cantrip.' },
+    { id: 'clr-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Cleric', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one cleric cantrip.' },
+    { id: 'clr-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Cleric', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one cleric cantrip.' },
+  ],
 };
 
 /** Cantrips known by druid level (display-only cap). */
@@ -785,6 +853,62 @@ export function druidCantripsKnown(level) {
   if (level >= 10) return 4;
   if (level >= 4) return 3;
   return 2;
+}
+
+// ── Bard helpers ───────────────────────────────────────────────────────
+/** Bardic Inspiration die by bard level. */
+export function bardicInspirationDie(level) {
+  if (level >= 15) return 'd12';
+  if (level >= 10) return 'd10';
+  if (level >= 5) return 'd8';
+  return 'd6';
+}
+/** Song of Rest die by bard level. */
+export function songOfRestDie(level) {
+  if (level >= 17) return 'd12';
+  if (level >= 13) return 'd10';
+  if (level >= 9) return 'd8';
+  return 'd6';
+}
+/** Cantrips known by bard level (display-only cap). */
+export function bardCantripsKnown(level) {
+  if (level >= 10) return 4;
+  if (level >= 4) return 3;
+  return 2;
+}
+/** Spells known by bard level (display-only cap). */
+export function bardSpellsKnown(level) {
+  const table = [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22];
+  return table[Math.max(1, Math.min(20, level || 1)) - 1];
+}
+
+// ── Cleric helpers ─────────────────────────────────────────────────────
+/** Cantrips known by cleric level (display-only cap). */
+export function clericCantripsKnown(level) {
+  if (level >= 10) return 5;
+  if (level >= 4) return 4;
+  return 3;
+}
+/** Channel Divinity uses per short/long rest by cleric level. */
+export function channelDivinityUses(level) {
+  if (level >= 18) return 3;
+  if (level >= 6) return 2;
+  return 1;
+}
+/** Harness Divine Power uses per long rest by cleric level. */
+export function harnessDivinePowerUses(level) {
+  if (level >= 18) return 3;
+  if (level >= 6) return 2;
+  return 1;
+}
+/** Destroy Undead CR threshold by cleric level (null below 5th). */
+export function destroyUndeadCR(level) {
+  if (level >= 17) return '4';
+  if (level >= 14) return '3';
+  if (level >= 11) return '2';
+  if (level >= 8) return '1';
+  if (level >= 5) return '1/2';
+  return null;
 }
 
 // ── Warlock scaling helpers ────────────────────────────────────────────

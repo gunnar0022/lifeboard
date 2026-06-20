@@ -4,6 +4,8 @@ import CunningActionPanel from './CunningActionPanel';
 import FighterResources from './FighterResources';
 import WizardBlock from './WizardBlock';
 import WarlockBlock from './WarlockBlock';
+import BardBlock from './BardBlock';
+import ClericBlock from './ClericBlock';
 import GenericResourceDisplay from './GenericResourceDisplay';
 
 export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
@@ -28,6 +30,10 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
       return <WizardBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
     case 'pact_magic':
       return <WarlockBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
+    case 'bardic_inspiration':
+      return <BardBlock character={character} onUpdate={handleUpdate} />;
+    case 'channel_divinity':
+      return <ClericBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
     default:
       return <GenericResourceDisplay classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
   }
