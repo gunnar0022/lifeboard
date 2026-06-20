@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown } from '../classProgression';
 import { SKILLS } from '../dndUtils';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
@@ -19,6 +19,8 @@ const sourceColors = {
   'Path of the Ancestral Guardian': 'var(--dnd-class-barbarian)',
   'Circle of Stars': 'var(--dnd-class-druid)',
   'Circle of Spores': 'var(--dnd-class-druid)',
+  'War Magic': 'var(--dnd-class-wizard)',
+  'The Archfey': 'var(--dnd-class-warlock)',
 };
 
 // ── Inline build-choice: Fighting Style ────────────────────────────────
@@ -102,6 +104,58 @@ function RuneChoice({ classFeature, onUpdate, level }) {
           Available later: {locked.map(r => `${r.name} (Lvl ${r.minLevel})`).join(', ')}
         </p>
       )}
+    </div>
+  );
+}
+
+// ── Inline build-choice: Warlock Pact Boon (dropdown) ──────────────────
+function PactBoonChoice({ classFeature, onUpdate }) {
+  const cf = classFeature || {};
+  const selected = cf.pactBoon || '';
+  const boon = PACT_BOONS.find(b => b.name === selected);
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={selected}
+        onChange={e => onUpdate({ classFeature: { ...cf, pactBoon: e.target.value } })}
+      >
+        <option value="">— Choose a Pact Boon —</option>
+        {PACT_BOONS.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
+      </select>
+      {boon && <p className="dnd-feature-choice__detail">{boon.desc}</p>}
+    </div>
+  );
+}
+
+// ── Inline build-choice: Eldritch Invocations (capped manual list) ──────
+function InvocationsChoice({ classFeature, onUpdate, level }) {
+  const cf = classFeature || {};
+  const list = cf.invocations || [];
+  const max = invocationsKnown(level);
+  const setList = (next) => onUpdate({ classFeature: { ...cf, invocations: next } });
+  const add = () => { if (list.length < max) setList([...list, { name: '', desc: '' }]); };
+  const update = (i, field, value) => setList(list.map((v, idx) => idx === i ? { ...v, [field]: value } : v));
+  const remove = (i) => setList(list.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__rune-head">
+        <span className="dnd-feature-choice__count">{list.length}/{max} invocations known</span>
+        {list.length < max && <button className="dnd-feature-choice__add" onClick={add}>+ Invocation</button>}
+      </div>
+      {list.length === 0 && <p className="dnd-feature-choice__empty">None chosen yet — click + Invocation.</p>}
+      {list.map((inv, i) => (
+        <div key={i} className="dnd-feature-choice__rune">
+          <div className="dnd-feature-choice__rune-top">
+            <input className="dnd-field dnd-feature-choice__select" value={inv.name} placeholder="Invocation name (e.g. Agonizing Blast)"
+              onChange={e => update(i, 'name', e.target.value)} />
+            <button className="dnd-feature-choice__remove" onClick={() => remove(i)} title="Remove">×</button>
+          </div>
+          <textarea className="dnd-field dnd-field--textarea" rows={2} value={inv.desc} placeholder="Effect"
+            onChange={e => update(i, 'desc', e.target.value)} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -342,6 +396,8 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'spellAbility') return <SpellAbilityChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
     return null;
   };
 

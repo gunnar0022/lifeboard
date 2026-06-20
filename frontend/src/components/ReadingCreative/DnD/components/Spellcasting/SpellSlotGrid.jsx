@@ -1,177 +1,160 @@
 import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
-import { CLASS_COLORS } from '../../dndUtils';
+import { classColor as resolveClassColor } from '../../dndUtils';
 
 const LEVEL_LABELS = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
 const RECHARGE_OPTIONS = ['Long Rest', 'Short Rest', 'Dawn', 'Custom'];
 
-export default function SpellSlotGrid({ slots, specialSlots, className, editMode, onUpdate, onUpdateSpecial }) {
-  const classColor = CLASS_COLORS[className] || 'var(--dnd-accent)';
-  const [addingType, setAddingType] = useState(null); // null | 'standard' | 'special'
-  const [newSpecial, setNewSpecial] = useState({ source_label: '', charges: 1, recharge_condition: 'Long Rest', spell_name: '' });
+/**
+ * Standard spell slots are DERIVED from class + level (maxSlots) — the base
+ * numbers can't be hand-edited, they just recompute on level-up. Pips remain
+ * clickable to expend/recover (the cast picker also expends them). Bonus slots
+ * from items/feats live in the editable "Extra Sources" column.
+ */
+export default function SpellSlotGrid({
+  maxSlots, slotsExpended, extraSlots, className, editMode,
+  onExpendSlot, onUpdateExtra,
+}) {
+  const color = resolveClassColor(className);
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState({ label: '', level: 1, max: 1, recharge: 'Long Rest' });
 
-  const togglePip = (lvl, pipIndex) => {
-    const slot = slots[lvl];
-    const isAvailable = pipIndex >= slot.expended;
-    if (isAvailable) {
-      onUpdate({ [lvl]: { ...slot, expended: pipIndex + 1 } });
-    } else {
-      onUpdate({ [lvl]: { ...slot, expended: pipIndex } });
-    }
+  const levels = Object.keys(maxSlots || {})
+    .map(Number)
+    .filter(l => maxSlots[String(l)] > 0)
+    .sort((a, b) => a - b);
+
+  const extras = extraSlots || [];
+
+  const toggleBasePip = (lvl, pipIndex) => {
+    const expended = slotsExpended?.[String(lvl)] || 0;
+    const next = pipIndex >= expended ? pipIndex + 1 : pipIndex;
+    onExpendSlot(lvl, next);
   };
 
-  const adjustMax = (lvl, delta) => {
-    const slot = slots[lvl];
-    const newMax = Math.max(0, (slot.max || 0) + delta);
-    onUpdate({ [lvl]: { ...slot, max: newMax, expended: Math.min(slot.expended, newMax) } });
+  const toggleExtraPip = (idx, pipIndex) => {
+    const updated = extras.map((e, i) => {
+      if (i !== idx) return e;
+      const next = pipIndex >= (e.expended || 0) ? pipIndex + 1 : pipIndex;
+      return { ...e, expended: next };
+    });
+    onUpdateExtra(updated);
   };
 
-  const removeLevel = (lvl) => {
-    onUpdate({ [lvl]: { max: 0, expended: 0 } });
+  const addExtra = () => {
+    if (!draft.label.trim()) return;
+    onUpdateExtra([...extras, {
+      id: `x-${Date.now()}`,
+      label: draft.label.trim(),
+      level: draft.level,
+      max: draft.max,
+      expended: 0,
+      recharge: draft.recharge,
+    }]);
+    setDraft({ label: '', level: 1, max: 1, recharge: 'Long Rest' });
+    setAdding(false);
   };
 
-  const addLevel = () => {
-    for (let i = 1; i <= 9; i++) {
-      const k = String(i);
-      if (!slots[k] || slots[k].max === 0) {
-        onUpdate({ [k]: { max: 1, expended: 0 } });
-        return;
-      }
-    }
-  };
+  const removeExtra = (idx) => onUpdateExtra(extras.filter((_, i) => i !== idx));
 
-  const handleAddSpecial = () => {
-    if (!newSpecial.source_label.trim()) return;
-    const updated = [...(specialSlots || []), {
-      source_label: newSpecial.source_label.trim(),
-      charges: newSpecial.charges,
-      charges_used: 0,
-      recharge_condition: newSpecial.recharge_condition,
-      spell_name: newSpecial.spell_name.trim() || null,
-    }];
-    onUpdateSpecial(updated);
-    setNewSpecial({ source_label: '', charges: 1, recharge_condition: 'Long Rest', spell_name: '' });
-    setAddingType(null);
-  };
-
-  const toggleSpecialPip = (idx, pipIdx) => {
-    const updated = [...(specialSlots || [])];
-    const s = { ...updated[idx] };
-    const isAvailable = pipIdx >= s.charges_used;
-    s.charges_used = isAvailable ? pipIdx + 1 : pipIdx;
-    updated[idx] = s;
-    onUpdateSpecial(updated);
-  };
-
-  const removeSpecial = (idx) => {
-    onUpdateSpecial((specialSlots || []).filter((_, i) => i !== idx));
-  };
-
-  const levels = Object.entries(slots || {})
-    .filter(([, s]) => s.max > 0)
-    .sort(([a], [b]) => Number(a) - Number(b));
-
-  const specials = specialSlots || [];
-
-  if (levels.length === 0 && specials.length === 0 && !editMode) return null;
+  if (levels.length === 0 && extras.length === 0 && !editMode) return null;
 
   return (
     <div className="spell-slots">
       <div className="spell-slots__two-col">
-        {/* Left: Standard slots */}
+        {/* Derived standard slots */}
         <div className="spell-slots__standard">
           <h3 className="dnd-section-title">Spell Slots</h3>
-          <div className="spell-slots__grid">
-            {levels.map(([lvl, slot]) => (
-              <div key={lvl} className="spell-slots__row">
-                <span className="spell-slots__label">{LEVEL_LABELS[Number(lvl)] || `${lvl}th`}</span>
-                <div className="spell-slots__pips">
-                  {Array.from({ length: slot.max }, (_, i) => {
-                    const isAvailable = i >= slot.expended;
-                    return (
-                      <button key={i}
-                        className={`spell-slots__pip ${isAvailable ? 'spell-slots__pip--available' : 'spell-slots__pip--expended'}`}
-                        style={isAvailable ? { background: classColor, borderColor: classColor } : {}}
-                        onClick={() => togglePip(lvl, i)}
-                        title={isAvailable ? 'Expend slot' : 'Recover slot'}
-                      />
-                    );
-                  })}
-                </div>
-                {editMode && (
-                  <div className="spell-slots__edit">
-                    <button className="spell-slots__adj" onClick={() => adjustMax(lvl, -1)}>-</button>
-                    <button className="spell-slots__adj" onClick={() => adjustMax(lvl, 1)}>+</button>
-                    <button className="spell-slots__adj spell-slots__adj--remove" onClick={() => removeLevel(lvl)} title="Remove level">
-                      <X size={10} />
-                    </button>
+          {levels.length === 0 ? (
+            <div className="spell-slots__none">No slots at this level yet.</div>
+          ) : (
+            <div className="spell-slots__grid">
+              {levels.map((lvl) => {
+                const max = maxSlots[String(lvl)];
+                const expended = slotsExpended?.[String(lvl)] || 0;
+                return (
+                  <div key={lvl} className="spell-slots__row">
+                    <span className="spell-slots__label">{LEVEL_LABELS[lvl] || `${lvl}th`}</span>
+                    <div className="spell-slots__pips">
+                      {Array.from({ length: max }, (_, i) => {
+                        const available = i >= expended;
+                        return (
+                          <button key={i}
+                            className={`spell-slots__pip ${available ? 'spell-slots__pip--available' : 'spell-slots__pip--expended'}`}
+                            style={available ? { background: color, borderColor: color } : {}}
+                            onClick={() => toggleBasePip(lvl, i)}
+                            title={available ? 'Expend slot' : 'Recover slot'}
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className="spell-slots__count">{max - expended}/{max}</span>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Right: Special / racial slots */}
-        {(specials.length > 0 || editMode) && (
+        {/* Editable bonus sources (items / feats) */}
+        {(extras.length > 0 || editMode) && (
           <div className="spell-slots__special">
-            <h3 className="dnd-section-title">Special Sources</h3>
-            {specials.map((s, idx) => (
-              <div key={idx} className="spell-slots__special-row">
+            <h3 className="dnd-section-title">Extra Sources</h3>
+            {extras.map((s, idx) => (
+              <div key={s.id || idx} className="spell-slots__special-row">
                 <div className="spell-slots__special-info">
-                  <span className="spell-slots__special-label">{s.source_label}</span>
-                  {s.spell_name && <span className="spell-slots__special-spell">{s.spell_name}</span>}
-                  <span className="spell-slots__special-recharge">{s.recharge_condition}</span>
+                  <span className="spell-slots__special-label">{s.label}</span>
+                  <span className="spell-slots__special-recharge">
+                    {LEVEL_LABELS[s.level] || `${s.level}th`} · {s.recharge}
+                  </span>
                 </div>
                 <div className="spell-slots__pips">
-                  {Array.from({ length: s.charges }, (_, i) => {
-                    const isAvailable = i >= (s.charges_used || 0);
+                  {Array.from({ length: s.max }, (_, i) => {
+                    const available = i >= (s.expended || 0);
                     return (
                       <button key={i}
-                        className={`spell-slots__pip ${isAvailable ? 'spell-slots__pip--available' : 'spell-slots__pip--expended'}`}
-                        style={isAvailable ? { background: 'var(--dnd-accent)', borderColor: 'var(--dnd-accent)' } : {}}
-                        onClick={() => toggleSpecialPip(idx, i)}
+                        className={`spell-slots__pip ${available ? 'spell-slots__pip--available' : 'spell-slots__pip--expended'}`}
+                        style={available ? { background: 'var(--dnd-accent)', borderColor: 'var(--dnd-accent)' } : {}}
+                        onClick={() => toggleExtraPip(idx, i)}
                       />
                     );
                   })}
                 </div>
                 {editMode && (
-                  <button className="spell-slots__adj spell-slots__adj--remove" onClick={() => removeSpecial(idx)}>
+                  <button className="spell-slots__adj spell-slots__adj--remove" onClick={() => removeExtra(idx)}>
                     <X size={10} />
                   </button>
                 )}
               </div>
             ))}
+            {extras.length === 0 && !adding && (
+              <div className="spell-slots__none">None — items or feats granting bonus slots go here.</div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Add buttons */}
       {editMode && (
         <div className="spell-slots__add-row">
-          {addingType === null && (
-            <>
-              <button className="dnd-add-btn" onClick={addLevel}><Plus size={12} /> Slot Level</button>
-              <button className="dnd-add-btn" onClick={() => setAddingType('special')}><Plus size={12} /> Special Source</button>
-            </>
-          )}
-          {addingType === 'special' && (
+          {!adding ? (
+            <button className="dnd-add-btn" onClick={() => setAdding(true)}><Plus size={12} /> Bonus Slot Source</button>
+          ) : (
             <div className="spell-slots__add-special">
-              <input className="dnd-field" value={newSpecial.source_label} placeholder="Source (e.g., Drow Magic)"
-                onChange={e => setNewSpecial({ ...newSpecial, source_label: e.target.value })} />
-              <input className="dnd-field" value={newSpecial.spell_name} placeholder="Spell name (optional)"
-                onChange={e => setNewSpecial({ ...newSpecial, spell_name: e.target.value })} />
+              <input className="dnd-field" value={draft.label} placeholder="Source (e.g., Ring of Spell Storing)"
+                onChange={e => setDraft({ ...draft, label: e.target.value })} />
               <div className="spell-slots__add-special-row">
-                <label>Charges: <input type="number" className="dnd-field dnd-field--sm" min={1} value={newSpecial.charges}
-                  onChange={e => setNewSpecial({ ...newSpecial, charges: parseInt(e.target.value) || 1 })} /></label>
-                <select className="dnd-field" value={newSpecial.recharge_condition}
-                  onChange={e => setNewSpecial({ ...newSpecial, recharge_condition: e.target.value })}>
+                <label>Slot level: <input type="number" className="dnd-field dnd-field--sm" min={1} max={9} value={draft.level}
+                  onChange={e => setDraft({ ...draft, level: parseInt(e.target.value) || 1 })} /></label>
+                <label>Slots: <input type="number" className="dnd-field dnd-field--sm" min={1} value={draft.max}
+                  onChange={e => setDraft({ ...draft, max: parseInt(e.target.value) || 1 })} /></label>
+                <select className="dnd-field" value={draft.recharge}
+                  onChange={e => setDraft({ ...draft, recharge: e.target.value })}>
                   {RECHARGE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
               </div>
               <div className="spell-slots__add-special-row">
-                <button className="dnd-add-btn" onClick={handleAddSpecial}>Add</button>
-                <button className="dnd-add-btn" onClick={() => setAddingType(null)}>Cancel</button>
+                <button className="dnd-add-btn" onClick={addExtra}>Add</button>
+                <button className="dnd-add-btn" onClick={() => setAdding(false)}>Cancel</button>
               </div>
             </div>
           )}

@@ -254,3 +254,84 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ── Wizard / War Magic combat trackers ── */
+.dnd-wizard-block__note {
+  font-size: 0.72rem;
+  color: var(--dnd-text-faint);
+  margin: 0.35rem 0 0;
+  line-height: 1.4;
+}
+
+.dnd-warmagic { display: flex; flex-direction: column; gap: 0.6rem; }
+.dnd-warmagic__section {
+  border: 1px solid var(--dnd-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  background: var(--dnd-bg);
+}
+.dnd-warmagic__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dnd-warmagic__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--dnd-class-wizard);
+}
+.dnd-warmagic__uses { font-size: 0.78rem; font-variant-numeric: tabular-nums; color: var(--dnd-text-muted); }
+.dnd-warmagic__pips { display: flex; gap: 0.3rem; margin: 0.45rem 0; }
+.dnd-warmagic__pip {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 1px solid var(--dnd-class-wizard);
+  background: transparent;
+  transition: background 0.15s ease, box-shadow 0.2s ease;
+}
+.dnd-warmagic__pip--full {
+  background: var(--dnd-class-wizard);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--dnd-class-wizard) 55%, transparent);
+}
+.dnd-warmagic__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.dnd-warmagic__note { font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-warmagic__btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
+.dnd-warmagic__btn {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-surface);
+  color: var(--dnd-text);
+  cursor: pointer;
+}
+.dnd-warmagic__btn--spend { border-color: var(--dnd-class-wizard); color: var(--dnd-class-wizard); font-weight: 600; }
+.dnd-warmagic__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dnd-warmagic__reminders { display: flex; flex-direction: column; gap: 0.35rem; }
+.dnd-warmagic__reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--dnd-text-dim);
+  line-height: 1.4;
+  padding: 0.35rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--dnd-border);
+}
+.dnd-warmagic__reminder svg { flex-shrink: 0; margin-top: 0.1rem; color: var(--dnd-class-wizard); }
+.dnd-warmagic__reminder--active {
+  border-color: var(--dnd-class-wizard);
+  background: color-mix(in srgb, var(--dnd-class-wizard) 10%, transparent);
+  color: var(--dnd-text);
+}
+
+.dnd-archfey__spent { opacity: 0.6; }

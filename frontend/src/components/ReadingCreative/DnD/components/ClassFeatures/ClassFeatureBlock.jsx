@@ -2,6 +2,8 @@ import RageTracker from './RageTracker';
 import WildShapeTracker from './WildShapeTracker';
 import CunningActionPanel from './CunningActionPanel';
 import FighterResources from './FighterResources';
+import WizardBlock from './WizardBlock';
+import WarlockBlock from './WarlockBlock';
 import GenericResourceDisplay from './GenericResourceDisplay';
 
 export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
@@ -22,6 +24,10 @@ export default function ClassFeatureBlock({ character, onUpdate, editMode }) {
       return <CunningActionPanel classFeature={cf} level={level} editMode={editMode} onUpdate={handleUpdate} />;
     case 'action_surge':
       return <FighterResources classFeature={cf} level={level} editMode={editMode} onUpdate={handleUpdate} />;
+    case 'spell_slots':
+      return <WizardBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
+    case 'pact_magic':
+      return <WarlockBlock classFeature={cf} level={level} onUpdate={handleUpdate} />;
     default:
       return <GenericResourceDisplay classFeature={cf} editMode={editMode} onUpdate={handleUpdate} />;
   }

@@ -8,7 +8,6 @@ export default function GenericResourceDisplay({ classFeature, editMode, onUpdat
   const hasUses = 'maxUses' in classFeature && 'currentUses' in classFeature;
   const hasPoints = 'maxPoints' in classFeature && 'currentPoints' in classFeature;
   const hasPool = classFeature.layOnHands;
-  const hasPactSlots = classFeature.pactSlots;
 
   const useOne = () => {
     if (hasUses && classFeature.currentUses > 0) {
@@ -46,12 +45,6 @@ export default function GenericResourceDisplay({ classFeature, editMode, onUpdat
       {hasPool && (
         <div className="dnd-generic-resource__row">
           <span>Lay on Hands: {classFeature.layOnHands.currentPool} / {classFeature.layOnHands.maxPool}</span>
-        </div>
-      )}
-
-      {hasPactSlots && (
-        <div className="dnd-generic-resource__row">
-          <span>Pact Slots: {classFeature.pactSlots.current} / {classFeature.pactSlots.max} (Level {classFeature.pactSlots.slotLevel})</span>
         </div>
       )}
 

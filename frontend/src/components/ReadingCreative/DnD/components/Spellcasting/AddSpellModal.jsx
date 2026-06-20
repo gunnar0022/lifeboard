@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Search, Plus } from 'lucide-react';
+import { SCALING_KINDS } from '../../spellSlots';
 
 const SPELL_TYPE_OPTIONS = ['damage', 'healing', 'buff', 'debuff', 'utility', 'control'];
 const SAVE_OPTIONS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
@@ -17,7 +18,8 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
     name: '', level: isCantrip ? 0 : 1, casting_time: '1 action', range: '',
     aoe: '', duration: 'Instantaneous', concentration: false, ritual: false,
     components: '', spell_type: 'utility', damage: '', save_type: '',
-    save_effect: '', description: '', upcast: '', source: 'PHB',
+    save_effect: '', description: '', upcast: '', scaling_kind: '',
+    scaling_per_level: '', source: 'PHB',
   });
 
   useEffect(() => {
@@ -192,7 +194,20 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
 
             <div className="spell-modal__form-field spell-modal__form-field--full">
               <label>At Higher Levels</label>
-              <input className="dnd-field" value={newSpell.upcast} onChange={e => updateNew({ upcast: e.target.value })} placeholder="Optional" />
+              <input className="dnd-field" value={newSpell.upcast} onChange={e => updateNew({ upcast: e.target.value })} placeholder="Optional text" />
+            </div>
+
+            <div className="spell-modal__form-row">
+              <div className="spell-modal__form-field">
+                <label>Scales by</label>
+                <select className="dnd-field" value={newSpell.scaling_kind} onChange={e => updateNew({ scaling_kind: e.target.value })}>
+                  {SCALING_KINDS.map(k => <option key={k.id} value={k.id}>{k.label}</option>)}
+                </select>
+              </div>
+              <div className="spell-modal__form-field">
+                <label>Per slot level</label>
+                <input className="dnd-field" value={newSpell.scaling_per_level} onChange={e => updateNew({ scaling_per_level: e.target.value })} placeholder="e.g. 1d6 or 1" />
+              </div>
             </div>
 
             <div className="spell-modal__form-actions">

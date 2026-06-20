@@ -168,8 +168,9 @@ async def create_spell(body: dict):
         await db.execute(
             """INSERT INTO dnd_spells
                (name, level, casting_time, range, aoe, duration, concentration, ritual,
-                components, spell_type, damage, save_type, save_effect, description, upcast, source)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                components, spell_type, damage, save_type, save_effect, description, upcast,
+                scaling_kind, scaling_per_level, source)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 name, level,
                 body.get("casting_time", "1 action"),
@@ -185,6 +186,8 @@ async def create_spell(body: dict):
                 body.get("save_effect"),
                 body.get("description", ""),
                 body.get("upcast"),
+                body.get("scaling_kind") or None,
+                body.get("scaling_per_level") or None,
                 body.get("source", "PHB"),
             ),
         )
@@ -207,7 +210,8 @@ async def update_spell(spell_id: int, body: dict):
             """UPDATE dnd_spells SET
                name=?, level=?, casting_time=?, range=?, aoe=?, duration=?,
                concentration=?, ritual=?, components=?, spell_type=?, damage=?,
-               save_type=?, save_effect=?, description=?, upcast=?, source=?
+               save_type=?, save_effect=?, description=?, upcast=?,
+               scaling_kind=?, scaling_per_level=?, source=?
                WHERE id=?""",
             (
                 body.get("name", ""), body.get("level", 0),
@@ -217,7 +221,9 @@ async def update_spell(spell_id: int, body: dict):
                 1 if body.get("ritual") else 0,
                 body.get("components", ""), body.get("spell_type", "utility"),
                 body.get("damage"), body.get("save_type"), body.get("save_effect"),
-                body.get("description", ""), body.get("upcast"), body.get("source", "PHB"),
+                body.get("description", ""), body.get("upcast"),
+                body.get("scaling_kind") or None, body.get("scaling_per_level") or None,
+                body.get("source", "PHB"),
                 spell_id,
             ),
         )

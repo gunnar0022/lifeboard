@@ -1,4 +1,8 @@
+import { Biohazard } from 'lucide-react';
 import { abilityMod, proficiencyBonus } from '../../dndUtils';
+import FormActivationPanel from './FormActivationPanel';
+
+const SPORE_COLOR = '#6fae3f';
 
 const CIRCLE_SPELLS = [
   { level: 3, spells: 'Blindness/Deafness, Gentle Repose' },
@@ -49,6 +53,10 @@ export default function CircleOfSporesBlock({ character, editMode, onUpdate }) {
     });
   };
 
+  const endSymbiotic = () => {
+    onUpdate({ classFeature: { ...cf, active: false, activeForm: null, symbioticEntity: false, spreadingSporesActive: false } });
+  };
+
   const useFungalInfestation = () => {
     if (fungalUsed >= fungalMax) return;
     onUpdate({ classFeature: { ...cf, fungalInfestationUsed: fungalUsed + 1 } });
@@ -60,31 +68,24 @@ export default function CircleOfSporesBlock({ character, editMode, onUpdate }) {
 
   return (
     <div className="dnd-spores">
-      {/* Symbiotic Entity activation */}
-      <div className="dnd-spores__section">
-        <h4 className="dnd-spores__subtitle">Symbiotic Entity</h4>
-        {!isSymbiotic && (
-          <button
-            className="dnd-spores__activate-btn"
-            onClick={activateSymbiotic}
-            disabled={!canActivate}
-            title={!canActivate ? (cf.active ? 'Already in a form' : 'No Wild Shape uses remaining') : 'Expend Wild Shape to activate'}
-          >
-            ACTIVATE SYMBIOTIC ENTITY
-          </button>
-        )}
-        {isSymbiotic && (
-          <div className="dnd-spores__active-badge">SYMBIOTIC ENTITY ACTIVE</div>
-        )}
-        <p className="dnd-spores__desc-sm">
-          Expend Wild Shape. Gain {4 * level} temp HP (4 × level). While active:
-        </p>
-        <ul className="dnd-spores__effect-list">
-          <li>Halo of Spores damage dice doubled</li>
-          <li>+1d6 necrotic on melee weapon attacks</li>
-        </ul>
-        <p className="dnd-spores__desc-sm">Lasts 10 min, or until temp HP depleted.</p>
-      </div>
+      {/* Symbiotic Entity activation — hero transform panel */}
+      <FormActivationPanel
+        color={SPORE_COLOR}
+        icon={<Biohazard size={15} />}
+        title="Symbiotic Entity"
+        idleLabel={`ACTIVATE · +${4 * level} TEMP HP`}
+        endLabel="END SYMBIOTIC ENTITY"
+        activeLabel="SYMBIOTIC ENTITY"
+        active={isSymbiotic}
+        canActivate={canActivate}
+        disabledReason={cf.active ? 'Already in a form' : 'No Wild Shape uses remaining'}
+        onActivate={activateSymbiotic}
+        onEnd={endSymbiotic}
+      >
+        <p className="dnd-form-panel__effect-line">Gained <strong>{4 * level}</strong> temp HP (4 × level). Lasts 10 min or until depleted.</p>
+        <p className="dnd-form-panel__effect-line">Halo of Spores damage dice doubled.</p>
+        <p className="dnd-form-panel__effect-line">+1d6 necrotic on melee weapon hits.</p>
+      </FormActivationPanel>
 
       {/* Halo of Spores */}
       <div className="dnd-spores__section">

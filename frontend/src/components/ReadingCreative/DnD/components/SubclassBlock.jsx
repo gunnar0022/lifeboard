@@ -4,6 +4,8 @@ import AssassinBlock from './ClassFeatures/AssassinBlock';
 import CircleOfStarsBlock from './ClassFeatures/CircleOfStarsBlock';
 import CircleOfSporesBlock from './ClassFeatures/CircleOfSporesBlock';
 import AncestralGuardianBlock from './ClassFeatures/AncestralGuardianBlock';
+import WarMagicBlock from './ClassFeatures/WarMagicBlock';
+import ArchfeyBlock from './ClassFeatures/ArchfeyBlock';
 
 /**
  * SubclassBlock — displays subclass features in the Combat tab.
@@ -36,6 +38,12 @@ export default function SubclassBlock({ character, editMode, onUpdate }) {
     }
     if (subclass === 'Path of the Ancestral Guardian') {
       return <AncestralGuardianBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
+    }
+    if (subclass === 'War Magic') {
+      return <WarMagicBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
+    }
+    if (subclass === 'The Archfey') {
+      return <ArchfeyBlock character={character} editMode={editMode} onUpdate={onUpdate} />;
     }
     return null;
   };

@@ -77,38 +77,6 @@
 }
 
 /* --- Concentration confirm --- */
-.spell-confirm-conc {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid #8a7a2a;
-  border-radius: 6px;
-  background: rgba(138, 122, 42, 0.1);
-  font-size: 0.85rem;
-}
-.spell-confirm-conc__yes {
-  background: var(--dnd-accent);
-  color: var(--dnd-bg);
-  border: none;
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.spell-confirm-conc__no {
-  background: transparent;
-  border: 1px solid var(--dnd-text-muted);
-  color: var(--dnd-text-dim);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8rem;
-}
-
 /* --- Spell Slot Grid --- */
 .spell-slots {
   background: var(--dnd-surface);
@@ -157,10 +125,6 @@
   border-color: var(--dnd-pip-expended-border);
   background: var(--dnd-pip-expended-bg);
 }
-.spell-slots__edit {
-  display: flex;
-  gap: 0.25rem;
-}
 .spell-slots__adj {
   background: transparent;
   border: 1px solid var(--dnd-border);
@@ -204,11 +168,6 @@
   font-size: 0.8rem;
   color: var(--dnd-accent);
   font-weight: 600;
-}
-.spell-slots__special-spell {
-  font-size: 0.7rem;
-  color: var(--dnd-text-dim);
-  font-style: italic;
 }
 .spell-slots__special-recharge {
   font-size: 0.6rem;
@@ -263,18 +222,6 @@
   color: var(--dnd-text-dim);
   margin-left: auto;
 }
-.spell-pact__edit {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--dnd-text-dim);
-}
-.spell-pact__edit label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
 
 /* --- Spell Zone --- */
 .spell-zone {
@@ -312,15 +259,6 @@
   padding-bottom: 0.2rem;
   margin: 0.75rem 0 0.4rem;
 }
-.spell-zone__item {
-  transition: opacity 0.15s;
-}
-.spell-zone__item--dragging {
-  opacity: 0.4;
-}
-.spell-zone__item--drag-over {
-  border-top: 2px solid var(--dnd-accent);
-}
 .spell-zone__empty {
   font-size: 0.8rem;
   color: var(--dnd-text-faint);
@@ -349,16 +287,6 @@
 }
 .spell-row__compact:hover {
   background: rgba(201, 169, 110, 0.04);
-}
-.spell-row__drag {
-  cursor: grab;
-  color: var(--dnd-text-faint);
-  font-size: 1.1rem;
-  line-height: 1;
-  user-select: none;
-}
-.spell-row__drag:active {
-  cursor: grabbing;
 }
 .spell-row__conc-badge {
   font-size: 0.55rem;
@@ -717,14 +645,6 @@
   font-size: 0.85rem;
   color: var(--dnd-text-dim);
 }
-.spells-tab__type-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.spells-tab__type-label .dnd-field {
-  width: auto;
-}
 
 /* --- Responsive --- */
 @media (max-width: 700px) {
@@ -736,3 +656,346 @@
   }
 }
 
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Spells rework — derived slots, cast picker, granted spells
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Slot counts + empty hints */
+.spell-slots__count {
+  font-size: 0.7rem;
+  color: var(--dnd-text-faint);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+.spell-slots__none {
+  font-size: 0.72rem;
+  color: var(--dnd-text-faint);
+  font-style: italic;
+  padding: 0.2rem 0;
+}
+
+/* Pip cast feedback — a quick flare when a slot is spent */
+.spell-slots__pip {
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.spell-slots__pip--available:hover { transform: scale(1.18); }
+.spell-slots__pip--expended:active { transform: scale(0.85); }
+@keyframes pip-spend {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); filter: brightness(1.6); }
+  100% { transform: scale(1); }
+}
+.spell-pact__pip { box-shadow: 0 0 6px transparent; }
+
+/* Compact-row quick actions */
+.spell-row__quick {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+.spell-row__cast-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.18rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--dnd-accent);
+  background: var(--dnd-surface);
+  color: var(--dnd-accent);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+.spell-row__cast-btn:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, currentColor 35%, transparent);
+}
+.spell-row__cast-btn:active { transform: scale(0.94); }
+
+.spell-row__scale-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.1rem;
+  opacity: 0.85;
+}
+.spell-row__source-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.32rem;
+  border-radius: 4px;
+  background: var(--dnd-bg);
+  color: var(--dnd-text-muted);
+  border: 1px solid var(--dnd-border);
+}
+.spell-row__pin { flex-shrink: 0; }
+
+.spell-row__move-btn,
+.spell-row__pin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 5px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-surface);
+  color: var(--dnd-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.spell-row__move-btn:hover:not(:disabled),
+.spell-row__pin-btn:hover { border-color: var(--dnd-accent); background: var(--dnd-bg); }
+.spell-row__move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.spell-row__edit-grid--scaling {
+  grid-template-columns: 1fr 1.4fr;
+  margin-top: 0.35rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--dnd-border);
+}
+
+.spells-tab__derived-note {
+  font-size: 0.72rem;
+  color: var(--dnd-text-faint);
+  font-style: italic;
+}
+
+/* ── Cast / upcast modal ── */
+.cast-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: cast-fade 0.15s ease;
+}
+@keyframes cast-fade { from { opacity: 0; } to { opacity: 1; } }
+.cast-modal {
+  width: min(440px, 92vw);
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: cast-rise 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cast-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.cast-modal__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--dnd-border);
+}
+.cast-modal__title { font-size: 0.98rem; font-weight: 700; margin: 0; color: var(--dnd-text); }
+.cast-modal__base-level {
+  font-size: 0.72rem;
+  color: var(--dnd-text-muted);
+  margin-left: 0.2rem;
+}
+.cast-modal__close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--dnd-text-muted);
+  cursor: pointer;
+  display: flex;
+}
+.cast-modal__close:hover { color: var(--dnd-text); }
+
+.cast-modal__section { padding: 0.7rem 0.85rem 0.3rem; }
+.cast-modal__label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dnd-text-faint);
+}
+.cast-modal__sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.cast-source {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 7px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  cursor: pointer;
+  min-width: 84px;
+  transition: border-color 0.12s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+.cast-source:hover { transform: translateY(-1px); }
+.cast-source--active { background: var(--dnd-surface); }
+.cast-source__main { font-size: 0.78rem; font-weight: 600; }
+.cast-source__sub { font-size: 0.66rem; color: var(--dnd-text-faint); font-variant-numeric: tabular-nums; }
+.cast-modal__no-slots {
+  font-size: 0.78rem;
+  color: var(--dnd-negative);
+  padding: 0.4rem 0;
+}
+
+.cast-modal__preview {
+  margin: 0.5rem 0.85rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 9px;
+  background: var(--dnd-bg);
+}
+.cast-modal__preview-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.cast-modal__cast-at { font-size: 0.82rem; font-weight: 700; }
+.cast-modal__steps { font-size: 0.68rem; color: var(--dnd-text-muted); }
+.cast-modal__computed {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+}
+.cast-modal__computed strong { font-variant-numeric: tabular-nums; }
+.cast-modal__from { font-size: 0.7rem; color: var(--dnd-text-faint); font-weight: 400; }
+.cast-modal__upcast-text { font-size: 0.78rem; color: var(--dnd-text-dim); margin-top: 0.3rem; line-height: 1.4; }
+.cast-modal__upcast-text--muted { color: var(--dnd-text-faint); font-style: italic; }
+
+.cast-modal__conc-warn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0.85rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--dnd-negative) 12%, transparent);
+  color: var(--dnd-negative);
+  font-size: 0.76rem;
+}
+
+.cast-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem 0.85rem;
+}
+.cast-modal__cancel {
+  padding: 0.4rem 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  cursor: pointer;
+}
+.cast-modal__cast {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  border-radius: 7px;
+  border: 1px solid var(--dnd-accent);
+  background: var(--dnd-accent);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.cast-modal__cast:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-accent) 50%, transparent); }
+.cast-modal__cast:active:not(:disabled) { transform: scale(0.96); }
+.cast-modal__cast:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Granted spells ── */
+.granted-spells { margin-top: 1rem; }
+.granted-row {
+  border: 1px solid var(--dnd-border);
+  border-left: 3px solid var(--dnd-accent);
+  border-radius: 8px;
+  background: var(--dnd-surface);
+  margin-bottom: 0.45rem;
+  overflow: hidden;
+}
+.granted-row__main {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.65rem;
+}
+.granted-row__info { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
+.granted-row__source {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.granted-row__name { font-size: 0.85rem; font-weight: 600; color: var(--dnd-text); }
+.granted-row__cast-at { font-size: 0.66rem; color: var(--dnd-text-faint); }
+.granted-row__uses { margin-left: auto; }
+.granted-row__atwill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--dnd-text-muted);
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--dnd-border);
+  border-radius: 4px;
+}
+.granted-row__expand {
+  background: none;
+  border: none;
+  color: var(--dnd-text-muted);
+  cursor: pointer;
+  display: flex;
+}
+.granted-row__detail { padding: 0 0.65rem 0.6rem; border-top: 1px solid var(--dnd-border); }
+.granted-row__config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.granted-row__config label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.68rem;
+  color: var(--dnd-text-muted);
+}
+.granted-row__check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.3rem !important;
+  align-self: flex-end;
+}
+
+.spell-zone__subtitle--over { color: var(--dnd-negative); font-weight: 600; }
+
+.spells-tab__no-caster {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px dashed var(--dnd-border);
+  border-radius: 8px;
+  background: var(--dnd-bg);
+  color: var(--dnd-text-dim);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.spells-tab__no-caster svg { flex-shrink: 0; color: var(--dnd-text-muted); }

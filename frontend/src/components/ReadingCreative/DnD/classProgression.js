@@ -703,7 +703,141 @@ export const CLASS_PROGRESSION = {
     { id: 'barb-primal-champion', name: 'Primal Champion', level: 20, source: 'Barbarian',
       desc: 'You embody the power of the wilds: your Strength and Constitution scores increase by 4, and your maximum for those scores becomes 24.' },
   ],
+
+  Druid: [
+    { id: 'dru-druidic', name: 'Druidic', level: 1, source: 'Druid',
+      desc: 'You know Druidic, the secret language of druids. You can speak it and leave hidden messages; those who know it spot such messages automatically, others need a DC 15 Wisdom (Perception) check and magic to decipher.' },
+    { id: 'dru-spellcasting', name: 'Spellcasting', level: 1, source: 'Druid',
+      desc: 'You cast druid spells using Wisdom (save DC = 8 + proficiency bonus + WIS modifier; attack = proficiency bonus + WIS modifier). You prepare WIS modifier + druid level spells from the druid list after a long rest, and can cast a prepared spell with the ritual tag as a ritual. Manage cantrips, prepared spells, and slots on the Spells tab.' },
+    { id: 'dru-wild-shape', name: 'Wild Shape', level: 2, source: 'Druid', combat: true,
+      desc: 'Action: transform into a beast you have seen (CR by level — 1/4 at 2nd, 1/2 at 4th, 1 at 8th; movement limits ease as you level). Twice per short or long rest. Lasts hours equal to half your druid level; revert as a bonus action or when you drop to 0 HP. Track it on the Combat tab.' },
+    { id: 'dru-wild-companion', name: 'Wild Companion (Optional)', level: 2, source: 'Druid',
+      desc: 'Action: expend a use of Wild Shape to cast Find Familiar without material components. The familiar is a fey and lasts hours equal to half your druid level.' },
+    { id: 'dru-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Druid', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one druid cantrip you know with another.' },
+    { id: 'dru-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Druid', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one druid cantrip you know with another.' },
+    { id: 'dru-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Druid', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one druid cantrip you know with another.' },
+    { id: 'dru-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Druid', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one druid cantrip you know with another.' },
+    { id: 'dru-timeless-body', name: 'Timeless Body', level: 18, source: 'Druid',
+      desc: 'Primal magic slows your aging: for every 10 years that pass, your body ages only 1 year.' },
+    { id: 'dru-beast-spells', name: 'Beast Spells', level: 18, source: 'Druid',
+      desc: 'You can cast druid spells while in a Wild Shape form, performing somatic and verbal components, though you can\'t provide material components.' },
+    { id: 'dru-archdruid', name: 'Archdruid', level: 20, source: 'Druid',
+      desc: 'You can use Wild Shape an unlimited number of times. You also ignore the verbal and somatic components of your druid spells, and any material components without a cost, in both your normal and beast shapes.' },
+    { id: 'dru-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Druid', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Cantrip Versatility (optional): instead replace one druid cantrip you know with another.' },
+  ],
+
+  Wizard: [
+    { id: 'wiz-spellcasting', name: 'Spellcasting', level: 1, source: 'Wizard',
+      desc: 'You cast wizard spells using Intelligence (spell save DC = 8 + proficiency bonus + INT modifier; attack = proficiency bonus + INT modifier). Manage your spellbook, prepared spells, slots, and casting on the Spells tab. You prepare INT modifier + wizard level spells from your spellbook after a long rest, and can cast any spell you know with the ritual tag as a ritual without preparing it.' },
+    { id: 'wiz-arcane-recovery', name: 'Arcane Recovery', level: 1, source: 'Wizard', combat: true,
+      desc: 'Once per day when you finish a short rest, recover expended spell slots with a combined level up to half your wizard level (rounded up); none can be 6th level or higher. Track it on the Combat tab; recover the actual slots on the Spells tab.' },
+    { id: 'wiz-arcane-tradition', name: 'Arcane Tradition', level: 2, source: 'Wizard',
+      desc: 'You choose an Arcane Tradition (subclass), shaping your practice of magic. Set it in the sheet header; its features appear in the Subclass column and on the Combat tab.' },
+    { id: 'wiz-cantrip-formulas', name: 'Cantrip Formulas (Optional)', level: 3, source: 'Wizard',
+      desc: 'After a long rest, you can replace one wizard cantrip you know with another from the wizard spell list.' },
+    { id: 'wiz-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Wizard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two ability scores by 1 (max 20) — or take a feat instead.' },
+    { id: 'wiz-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Wizard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two ability scores by 1 (max 20) — or take a feat instead.' },
+    { id: 'wiz-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Wizard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two ability scores by 1 (max 20) — or take a feat instead.' },
+    { id: 'wiz-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Wizard', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two ability scores by 1 (max 20) — or take a feat instead.' },
+    { id: 'wiz-spell-mastery', name: 'Spell Mastery', level: 18, source: 'Wizard',
+      desc: 'Choose a 1st-level and a 2nd-level wizard spell in your spellbook. While prepared, you can cast them at their lowest level without expending a slot. Add them as Granted Spells (at-will) on the Spells tab to track.' },
+    { id: 'wiz-signature-spells', name: 'Signature Spells', level: 20, source: 'Wizard',
+      desc: 'Choose two 3rd-level wizard spells as signature spells. They are always prepared, don\'t count against your prepared limit, and you can cast each once at 3rd level without a slot, regaining that use on a short or long rest. Pin them as Always Prepared and add a Granted use on the Spells tab.' },
+  ],
+
+  Warlock: [
+    { id: 'wl-patron', name: 'Otherworldly Patron', level: 1, source: 'Warlock',
+      desc: 'You strike a bargain with an otherworldly being (your subclass). Set it in the sheet header; its features appear in the Subclass column and on the Combat tab.' },
+    { id: 'wl-pact-magic', name: 'Pact Magic', level: 1, source: 'Warlock',
+      desc: 'You cast warlock spells using Charisma. All of your pact slots are the same level and you regain them on a short or long rest. Manage cantrips, known spells, and pact slots on the Spells tab.' },
+    { id: 'wl-invocations', name: 'Eldritch Invocations', level: 2, source: 'Warlock', choice: 'invocations',
+      desc: 'You learn fragments of forbidden knowledge that grant an array of magical abilities. You know a number of invocations that grows with your level; you can replace one when you gain a warlock level.' },
+    { id: 'wl-pact-boon', name: 'Pact Boon', level: 3, source: 'Warlock', choice: 'pact-boon',
+      desc: 'Your patron bestows a gift for your service. Choose one Pact Boon below.' },
+    { id: 'wl-asi-4', name: 'Ability Score Improvement', level: 4, source: 'Warlock', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Eldritch Versatility (optional): instead swap a cantrip, your Pact Boon, or (12th+) a Mystic Arcanum spell.' },
+    { id: 'wl-asi-8', name: 'Ability Score Improvement', level: 8, source: 'Warlock', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Eldritch Versatility (optional): instead swap a cantrip, your Pact Boon, or (12th+) a Mystic Arcanum spell.' },
+    { id: 'wl-asi-12', name: 'Ability Score Improvement', level: 12, source: 'Warlock', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Eldritch Versatility (optional): instead swap a cantrip, your Pact Boon, or a Mystic Arcanum spell.' },
+    { id: 'wl-asi-16', name: 'Ability Score Improvement', level: 16, source: 'Warlock', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Eldritch Versatility (optional): instead swap a cantrip, your Pact Boon, or a Mystic Arcanum spell.' },
+    { id: 'wl-asi-19', name: 'Ability Score Improvement', level: 19, source: 'Warlock', choice: 'asi',
+      desc: 'Increase one ability score by 2, or two by 1 (max 20) — or take a feat. Eldritch Versatility (optional): instead swap a cantrip, your Pact Boon, or a Mystic Arcanum spell.' },
+    { id: 'wl-mystic-arcanum', name: 'Mystic Arcanum', level: 11, source: 'Warlock',
+      desc: 'Your patron grants higher-level secrets: a 6th-level spell at 11th, 7th at 13th, 8th at 15th, and 9th at 17th. You can cast each once without a slot, regaining all uses on a long rest. Add each as a Granted Spell (once / long rest) on the Spells tab.' },
+    { id: 'wl-eldritch-master', name: 'Eldritch Master', level: 20, source: 'Warlock',
+      desc: 'Spend 1 minute entreating your patron to regain all expended Pact Magic slots. Once you do, you must finish a long rest before using it again.' },
+  ],
 };
+
+/** Cantrips known by druid level (display-only cap). */
+export function druidCantripsKnown(level) {
+  if (level >= 10) return 4;
+  if (level >= 4) return 3;
+  return 2;
+}
+
+// ── Warlock scaling helpers ────────────────────────────────────────────
+/** Cantrips known by warlock level (display-only cap). */
+export function warlockCantripsKnown(level) {
+  if (level >= 10) return 4;
+  if (level >= 4) return 3;
+  return 2;
+}
+/** Eldritch Invocations known by warlock level. */
+export function invocationsKnown(level) {
+  const l = level || 1;
+  if (l >= 18) return 8;
+  if (l >= 15) return 7;
+  if (l >= 12) return 6;
+  if (l >= 9) return 5;
+  if (l >= 7) return 4;
+  if (l >= 5) return 3;
+  if (l >= 2) return 2;
+  return 0;
+}
+/** Mystic Arcanum spell levels unlocked by warlock level. */
+export function mysticArcanumLevels(level) {
+  return [{ lvl: 6, at: 11 }, { lvl: 7, at: 13 }, { lvl: 8, at: 15 }, { lvl: 9, at: 17 }]
+    .filter(a => (level || 1) >= a.at)
+    .map(a => a.lvl);
+}
+
+// ── Warlock Pact Boons (Pact Boon choice) ──────────────────────────────
+export const PACT_BOONS = [
+  { name: 'Pact of the Blade', desc: 'Action: create a magical pact weapon in your empty hand (choose its form each time); you are proficient with it. It counts as magical, and you can bond a magic weapon to it via a 1-hour ritual.' },
+  { name: 'Pact of the Chain', desc: 'You learn find familiar and can cast it as a ritual; it can take special forms (imp, pseudodragon, quasit, sprite). When you take the Attack action you can forgo an attack to let your familiar attack with its reaction.' },
+  { name: 'Pact of the Tome', desc: 'You gain a Book of Shadows holding three cantrips from any class’s list, castable at will and not counting against cantrips known.' },
+  { name: 'Pact of the Talisman', desc: 'You gain a talisman: when the wearer fails an ability check, they can add a d4. Usable a number of times equal to your proficiency bonus, restored on a long rest.' },
+  { name: 'Pact of the Star Chain (UA)', desc: 'Prerequisite: Seeker patron. You know augury and can cast it as a ritual. You can also gain advantage on an Intelligence check once per short or long rest.' },
+];
+
+// ── Wizard scaling helpers ─────────────────────────────────────────────
+/** Combined slot-levels recoverable with Arcane Recovery (half level, round up). */
+export function arcaneRecoveryMax(level) {
+  return Math.max(1, Math.ceil((level || 1) / 2));
+}
+/** Cantrips known by wizard level (display-only cap). */
+export function wizardCantripsKnown(level) {
+  if (level >= 10) return 5;
+  if (level >= 4) return 4;
+  return 3;
+}
+/** Power Surge bonus force damage (War Magic). */
+export function powerSurgeDamage(level) {
+  return Math.floor((level || 1) / 2);
+}
+/** Spirit-Shield-style scaling not needed here; War Magic uses half level for Deflecting Shroud too. */
 
 // ── Subclass progression ───────────────────────────────────────────────
 export const SUBCLASS_PROGRESSION = {
@@ -790,6 +924,36 @@ export const SUBCLASS_PROGRESSION = {
         desc: 'While Symbiotic Entity is active, you can use a bonus action to hurl spores up to 30 feet into a 10-foot cube for 1 minute, dealing your Halo damage to creatures that enter or start their turn there. While active, you can\'t use your Halo of Spores reaction.' },
       { id: 'csp-fungal-body', name: 'Fungal Body', level: 14, source: 'Circle of Spores',
         desc: 'You are immune to being blinded, deafened, frightened, and poisoned. Critical hits against you count as normal hits, unless you are incapacitated.' },
+    ],
+  },
+
+  'War Magic': {
+    className: 'Wizard',
+    features: [
+      { id: 'wm-arcane-deflection', name: 'Arcane Deflection', level: 2, source: 'War Magic', combat: true,
+        desc: 'Reaction when hit by an attack or you fail a save: gain +2 AC against that attack, or +4 to that save. Until the end of your next turn you can then cast only cantrips. At 14th level, this also arcs force damage (see Deflecting Shroud).' },
+      { id: 'wm-tactical-wit', name: 'Tactical Wit', level: 2, source: 'War Magic', combat: true,
+        desc: 'Add your Intelligence modifier to your initiative rolls.' },
+      { id: 'wm-power-surge', name: 'Power Surge', level: 6, source: 'War Magic', combat: true,
+        desc: 'Store power surges up to your Intelligence modifier (min 1). Resets to one on a long rest; gain one when you end a spell with Dispel Magic or Counterspell, and one if you end a short rest with none. Once per turn when you deal damage with a wizard spell, spend a surge to deal extra force damage equal to half your wizard level.' },
+      { id: 'wm-durable-magic', name: 'Durable Magic', level: 10, source: 'War Magic', combat: true,
+        desc: 'While you maintain concentration on a spell, you have a +2 bonus to AC and all saving throws.' },
+      { id: 'wm-deflecting-shroud', name: 'Deflecting Shroud', level: 14, source: 'War Magic', combat: true,
+        desc: 'When you use Arcane Deflection, magical energy arcs to up to three creatures of your choice within 60 feet, each taking force damage equal to half your wizard level.' },
+    ],
+  },
+
+  'The Archfey': {
+    className: 'Warlock',
+    features: [
+      { id: 'af-fey-presence', name: 'Fey Presence', level: 1, source: 'The Archfey', combat: true,
+        desc: 'Action: each creature in a 10-foot cube from you makes a Wisdom save (your warlock save DC) or is charmed or frightened (your choice) until the end of your next turn. Once per short or long rest.' },
+      { id: 'af-misty-escape', name: 'Misty Escape', level: 6, source: 'The Archfey', combat: true,
+        desc: 'Reaction when you take damage: turn invisible and teleport up to 60 feet to a space you can see. Invisible until the start of your next turn or until you attack or cast a spell. Once per short or long rest.' },
+      { id: 'af-beguiling-defenses', name: 'Beguiling Defenses', level: 10, source: 'The Archfey',
+        desc: 'You are immune to being charmed. When a creature tries to charm you, you can use your reaction to force a Wisdom save or charm it for 1 minute (ending if it takes damage).' },
+      { id: 'af-dark-delirium', name: 'Dark Delirium', level: 14, source: 'The Archfey', combat: true,
+        desc: 'Action: a creature within 60 feet makes a Wisdom save or is charmed or frightened by you for 1 minute (as if you concentrate), trapped in an illusory realm; ends early if it takes damage. Once per short or long rest.' },
     ],
   },
 };

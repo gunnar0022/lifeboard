@@ -1,374 +1,372 @@
-import { useState, useEffect, useCallback } from 'react';
-import { abilityMod, proficiencyBonus, CLASS_COLORS } from '../../dndUtils';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { abilityMod, proficiencyBonus, normalizeSpellcasting, CLASS_CASTER_PROFILE } from '../../dndUtils';
+import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown } from '../../classProgression';
+import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
 import SpellSlotGrid from './SpellSlotGrid';
 import PactSlotDisplay from './PactSlotDisplay';
 import CantripsSection from './CantripsSection';
 import SpellZone from './SpellZone';
+import GrantedSpells, { grantedMaxUses } from './GrantedSpells';
 import AddSpellModal from './AddSpellModal';
+import CastModal from './CastModal';
+
+const ORD = ['Cantrip', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+const ord = (n) => ORD[n] || `${n}th`;
 
 export default function SpellsTab({ character, editMode, onUpdate }) {
-  const sc = character.spellcasting;
   const meta = character.meta || {};
   const abilities = character.abilities || {};
-  const [spellCache, setSpellCache] = useState({});
-  const [addModal, setAddModal] = useState(null); // null | 'cantrip' | 'prepared' | 'known'
-  const [confirmConc, setConfirmConc] = useState(null); // { newId, currentName }
+  const level = meta.level || 1;
 
-  // Fetch all spell data on mount and when spell lists change
-  const allSpellIds = [
-    ...(sc.cantrips || []),
-    ...(sc.preparedSpells || []),
-    ...(sc.knownSpells || []),
-  ].filter(id => typeof id === 'number');
+  // Normalize once per render so old-shape saves keep working.
+  const sc = useMemo(
+    () => normalizeSpellcasting(character.spellcasting, meta.className),
+    [character.spellcasting, meta.className]
+  );
+
+  const [spellCache, setSpellCache] = useState({});
+  const [addModal, setAddModal] = useState(null);   // null | 'cantrip' | 'prepared' | 'known' | 'granted'
+  const [castState, setCastState] = useState(null);  // { spell, grantedEntry }
+
+  const writeSc = useCallback((patch) => {
+    onUpdate({ spellcasting: { ...sc, ...patch } });
+  }, [sc, onUpdate]);
+
+  // ── Class-authoritative handshake ──
+  // The main slot area follows rigid class rules: caster type, preparation
+  // style, and slot counts all come from the class profile (not stored data),
+  // so switching class instantly grants/revokes the right slots.
+  const profile = CLASS_CASTER_PROFILE[meta.className] || null;
+  const isCaster = !!profile;
+  const casterType = profile?.casterType || null;
+
+  const classLevel = sc.classLevel ?? level;
+  const sources = useMemo(
+    () => (isCaster ? [{ casterType, classLevel }] : []),
+    [isCaster, casterType, classLevel]
+  );
+  const maxSlots = useMemo(() => maxSlotsForSources(sources), [sources]);
+  const pactInfo = casterType === 'pact' ? pactSlotsForLevel(classLevel) : { count: 0, slotLevel: 0 };
+
+  const abilMod = abilityMod(abilities[sc.ability] || 10);
+  const profBonus = proficiencyBonus(level);
+  const isPrepared = profile?.preparation === 'prepared';
+
+  // Prepared cap scales with spellcasting level by caster type.
+  const prepLevel = casterType === 'full' ? classLevel
+    : (casterType === 'half' || casterType === 'artificer') ? Math.floor(classLevel / 2)
+    : classLevel;
+  const preparedCap = Math.max(1, abilMod + prepLevel);
+  // Cantrips-known cap is display-only (per-class table; Wizard supplied).
+  const cantripCap = meta.className === 'Wizard' ? wizardCantripsKnown(classLevel)
+    : meta.className === 'Warlock' ? warlockCantripsKnown(classLevel)
+    : meta.className === 'Druid' ? druidCantripsKnown(classLevel) : null;
+  const alwaysSet = useMemo(() => new Set(sc.alwaysPrepared || []), [sc.alwaysPrepared]);
+  const preparedCount = (sc.prepared || []).filter(id => !alwaysSet.has(id)).length;
+  const preparedFull = preparedCount >= preparedCap;
+
+  // ── Spell cache ──
+  const allSpellIds = useMemo(() => {
+    const grantedIds = (sc.grantedSpells || []).map(g => g.spellId);
+    return [...(sc.cantrips || []), ...(sc.prepared || []), ...(sc.known || []), ...grantedIds]
+      .filter(id => typeof id === 'number');
+  }, [sc.cantrips, sc.prepared, sc.known, sc.grantedSpells]);
 
   useEffect(() => {
-    if (allSpellIds.length === 0) return;
     const uncached = allSpellIds.filter(id => !spellCache[id]);
     if (uncached.length === 0) return;
-
     fetch('/api/dnd/spells/batch', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: allSpellIds }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: uncached }),
     })
       .then(r => r.json())
-      .then(spells => {
-        const cache = {};
-        spells.forEach(s => { cache[s.id] = s; });
-        setSpellCache(prev => ({ ...prev, ...cache }));
-      })
+      .then(spells => setSpellCache(prev => {
+        const next = { ...prev };
+        spells.forEach(s => { next[s.id] = s; });
+        return next;
+      }))
       .catch(e => console.error('Batch spell fetch failed:', e));
-  }, [JSON.stringify(allSpellIds)]);
+  }, [JSON.stringify(allSpellIds)]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isPreparedCaster = sc.type === 'prepared';
-  const isPactMagic = sc.type === 'pact_magic';
-  const level = meta.level || 1;
-  const abilMod = abilityMod(abilities[sc.ability] || 10);
-  const preparedCap = Math.max(1, abilMod + level);
+  const concentratedSpell = sc.concentratingOn ? spellCache[sc.concentratingOn] : null;
 
-  // Concentration handling
-  const concentratingOn = sc.concentratingOn;
-  const concentratedSpell = concentratingOn ? spellCache[concentratingOn] : null;
-
+  // ── Concentration ──
   const handleConcentrate = useCallback((spellId) => {
-    if (concentratingOn === spellId) {
-      // Drop concentration
-      onUpdate({ spellcasting: { ...sc, concentratingOn: null } });
-      return;
-    }
-    if (concentratingOn && concentratingOn !== spellId) {
-      const currentName = spellCache[concentratingOn]?.name || 'current spell';
-      setConfirmConc({ newId: spellId, currentName });
-      return;
-    }
-    onUpdate({ spellcasting: { ...sc, concentratingOn: spellId } });
-  }, [concentratingOn, sc, spellCache, onUpdate]);
+    writeSc({ concentratingOn: sc.concentratingOn === spellId ? null : spellId });
+  }, [sc.concentratingOn, writeSc]);
 
-  const confirmConcentration = () => {
-    if (confirmConc) {
-      onUpdate({ spellcasting: { ...sc, concentratingOn: confirmConc.newId } });
-      setConfirmConc(null);
-    }
-  };
+  const dropConcentration = useCallback(() => writeSc({ concentratingOn: null }), [writeSc]);
 
-  const dropConcentration = () => {
-    onUpdate({ spellcasting: { ...sc, concentratingOn: null } });
-  };
+  // ── Slot tracking ──
+  const handleExpendSlot = useCallback((lvl, expended) => {
+    writeSc({ slotsExpended: { ...sc.slotsExpended, [String(lvl)]: expended } });
+  }, [sc.slotsExpended, writeSc]);
 
-  // Slot updates
-  const handleSlotUpdate = useCallback((slotUpdates) => {
-    onUpdate({ spellcasting: { ...sc, slots: { ...sc.slots, ...slotUpdates } } });
-  }, [sc, onUpdate]);
+  const handleUpdateExtra = useCallback((extraSlots) => writeSc({ extraSlots }), [writeSc]);
+  const handleExpendPact = useCallback((expended) => writeSc({ pact: { ...sc.pact, expended } }), [sc.pact, writeSc]);
 
-  const handlePactUpdate = useCallback((pactUpdates) => {
-    onUpdate({ spellcasting: { ...sc, pactSlots: { ...sc.pactSlots, ...pactUpdates } } });
-  }, [sc, onUpdate]);
+  // ── Cast picker ──
+  const buildSources = useCallback((spell, grantedEntry) => {
+    const out = [];
+    const spellLevel = spell.level || 0;
 
-  // Reorder handlers
-  const handleCantripReorder = useCallback((newOrder) => {
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        cantrips: newOrder,
-        spellOrder: { ...sc.spellOrder, cantrips: newOrder },
+    if (grantedEntry) {
+      const max = grantedMaxUses(grantedEntry, profBonus);
+      const atWill = grantedEntry.useType === 'at_will';
+      const remaining = atWill ? null : max - (grantedEntry.used || 0);
+      if (atWill || remaining > 0) {
+        out.push({
+          key: 'granted', type: 'granted', grantedId: grantedEntry.id,
+          castLevel: grantedEntry.castLevel ?? spellLevel,
+          label: grantedEntry.source || 'Granted use', remaining,
+        });
       }
-    });
-  }, [sc, onUpdate]);
+      if (!grantedEntry.canUseSlots) return out; // locked to its own resource
+    }
 
-  const handlePreparedReorder = useCallback((newOrder) => {
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        preparedSpells: newOrder,
-        spellOrder: { ...sc.spellOrder, prepared: newOrder },
+    if (casterType === 'pact' && pactInfo.slotLevel >= spellLevel) {
+      const remaining = pactInfo.count - (sc.pact?.expended || 0);
+      if (remaining > 0) {
+        out.push({ key: 'pact', type: 'pact', castLevel: pactInfo.slotLevel,
+          label: `Pact slot (${ord(pactInfo.slotLevel)})`, remaining });
       }
-    });
-  }, [sc, onUpdate]);
+    }
 
-  const handleKnownReorder = useCallback((newOrder) => {
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        knownSpells: newOrder,
-        spellOrder: { ...sc.spellOrder, known: newOrder },
-      }
+    Object.entries(maxSlots).forEach(([lvl, max]) => {
+      const L = Number(lvl);
+      if (L < spellLevel) return;
+      const remaining = max - (sc.slotsExpended?.[lvl] || 0);
+      if (remaining > 0) out.push({ key: `slot-${L}`, type: 'slot', level: L, castLevel: L,
+        label: `${ord(L)} slot`, remaining });
     });
-  }, [sc, onUpdate]);
 
-  // Move between zones
+    (sc.extraSlots || []).forEach((e) => {
+      if (e.level < spellLevel) return;
+      const remaining = e.max - (e.expended || 0);
+      if (remaining > 0) out.push({ key: `extra-${e.id}`, type: 'extra', extraId: e.id, level: e.level,
+        castLevel: e.level, label: e.label, remaining });
+    });
+
+    return out;
+  }, [sc, casterType, maxSlots, pactInfo, profBonus]);
+
+  const openCast = useCallback((spell, grantedEntry) => {
+    setCastState({ spell, grantedEntry: grantedEntry || null });
+  }, []);
+
+  const applyCast = useCallback(({ source, isConcentration }) => {
+    if (!castState) return;
+    const spell = castState.spell;
+    const patch = {};
+
+    if (source.type === 'slot') {
+      patch.slotsExpended = { ...sc.slotsExpended, [String(source.level)]: (sc.slotsExpended?.[String(source.level)] || 0) + 1 };
+    } else if (source.type === 'pact') {
+      patch.pact = { ...sc.pact, expended: (sc.pact?.expended || 0) + 1 };
+    } else if (source.type === 'extra') {
+      patch.extraSlots = (sc.extraSlots || []).map(e => e.id === source.extraId ? { ...e, expended: (e.expended || 0) + 1 } : e);
+    } else if (source.type === 'granted') {
+      patch.grantedSpells = (sc.grantedSpells || []).map(g =>
+        g.id === source.grantedId && g.useType !== 'at_will' ? { ...g, used: (g.used || 0) + 1 } : g);
+    }
+
+    if (isConcentration) patch.concentratingOn = spell.id; // auto-drops the prior one
+
+    writeSc(patch);
+  }, [castState, sc, writeSc]);
+
+  // ── Spell list mutations ──
   const moveToPrepared = useCallback((spellId) => {
-    const newKnown = (sc.knownSpells || []).filter(id => id !== spellId);
-    const newPrepared = [...(sc.preparedSpells || []), spellId];
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        preparedSpells: newPrepared,
-        knownSpells: newKnown,
-        spellOrder: {
-          ...sc.spellOrder,
-          prepared: [...(sc.spellOrder?.prepared || []), spellId],
-          known: (sc.spellOrder?.known || []).filter(id => id !== spellId),
-        },
-      }
+    if (preparedFull) return;
+    writeSc({
+      prepared: [...(sc.prepared || []), spellId],
+      known: (sc.known || []).filter(id => id !== spellId),
     });
-  }, [sc, onUpdate]);
+  }, [sc.prepared, sc.known, preparedFull, writeSc]);
 
   const moveToKnown = useCallback((spellId) => {
-    const newPrepared = (sc.preparedSpells || []).filter(id => id !== spellId);
-    const newKnown = [...(sc.knownSpells || []), spellId];
-    // If unprepping the concentrated spell, drop concentration
-    const newConc = sc.concentratingOn === spellId ? null : sc.concentratingOn;
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        preparedSpells: newPrepared,
-        knownSpells: newKnown,
-        concentratingOn: newConc,
-        spellOrder: {
-          ...sc.spellOrder,
-          prepared: (sc.spellOrder?.prepared || []).filter(id => id !== spellId),
-          known: [...(sc.spellOrder?.known || []), spellId],
-        },
-      }
+    writeSc({
+      prepared: (sc.prepared || []).filter(id => id !== spellId),
+      known: [...(sc.known || []), spellId],
+      alwaysPrepared: (sc.alwaysPrepared || []).filter(id => id !== spellId),
+      concentratingOn: sc.concentratingOn === spellId ? null : sc.concentratingOn,
     });
-  }, [sc, onUpdate]);
+  }, [sc, writeSc]);
 
-  // Remove spell from character
-  const handleRemoveCantrip = useCallback((spellId) => {
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        cantrips: (sc.cantrips || []).filter(id => id !== spellId),
-        spellOrder: {
-          ...sc.spellOrder,
-          cantrips: (sc.spellOrder?.cantrips || []).filter(id => id !== spellId),
-        },
-      }
-    });
-  }, [sc, onUpdate]);
+  const toggleAlwaysPrepared = useCallback((spellId) => {
+    const set = new Set(sc.alwaysPrepared || []);
+    set.has(spellId) ? set.delete(spellId) : set.add(spellId);
+    writeSc({ alwaysPrepared: [...set] });
+  }, [sc.alwaysPrepared, writeSc]);
 
-  const handleRemovePrepared = useCallback((spellId) => {
-    const newConc = sc.concentratingOn === spellId ? null : sc.concentratingOn;
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        preparedSpells: (sc.preparedSpells || []).filter(id => id !== spellId),
-        concentratingOn: newConc,
-        spellOrder: {
-          ...sc.spellOrder,
-          prepared: (sc.spellOrder?.prepared || []).filter(id => id !== spellId),
-        },
-      }
-    });
-  }, [sc, onUpdate]);
+  const removeFrom = useCallback((key, spellId) => {
+    const patch = { [key]: (sc[key] || []).filter(id => id !== spellId) };
+    if (key === 'prepared') {
+      patch.alwaysPrepared = (sc.alwaysPrepared || []).filter(id => id !== spellId);
+      if (sc.concentratingOn === spellId) patch.concentratingOn = null;
+    }
+    writeSc(patch);
+  }, [sc, writeSc]);
 
-  const handleRemoveKnown = useCallback((spellId) => {
-    onUpdate({
-      spellcasting: {
-        ...sc,
-        knownSpells: (sc.knownSpells || []).filter(id => id !== spellId),
-        spellOrder: {
-          ...sc.spellOrder,
-          known: (sc.spellOrder?.known || []).filter(id => id !== spellId),
-        },
-      }
-    });
-  }, [sc, onUpdate]);
-
-  // Add spell handlers
   const handleAddSpell = useCallback((spellId, zone) => {
-    if (zone === 'cantrip') {
-      if ((sc.cantrips || []).includes(spellId)) return;
-      onUpdate({
-        spellcasting: {
-          ...sc,
-          cantrips: [...(sc.cantrips || []), spellId],
-          spellOrder: {
-            ...sc.spellOrder,
-            cantrips: [...(sc.spellOrder?.cantrips || []), spellId],
-          },
-        }
-      });
-    } else if (zone === 'prepared') {
-      if ((sc.preparedSpells || []).includes(spellId)) return;
-      onUpdate({
-        spellcasting: {
-          ...sc,
-          preparedSpells: [...(sc.preparedSpells || []), spellId],
-          spellOrder: {
-            ...sc.spellOrder,
-            prepared: [...(sc.spellOrder?.prepared || []), spellId],
-          },
-        }
+    if (zone === 'granted') {
+      if ((sc.grantedSpells || []).some(g => g.spellId === spellId)) return;
+      writeSc({
+        grantedSpells: [...(sc.grantedSpells || []), {
+          id: `g-${Date.now()}`, spellId, source: '', useType: 'per_long_rest',
+          max: 1, used: 0, castLevel: null, canUseSlots: true,
+        }],
       });
     } else {
-      if ((sc.knownSpells || []).includes(spellId)) return;
-      onUpdate({
-        spellcasting: {
-          ...sc,
-          knownSpells: [...(sc.knownSpells || []), spellId],
-          spellOrder: {
-            ...sc.spellOrder,
-            known: [...(sc.spellOrder?.known || []), spellId],
-          },
-        }
-      });
+      const key = zone === 'cantrip' ? 'cantrips' : zone === 'prepared' ? 'prepared' : 'known';
+      if ((sc[key] || []).includes(spellId)) return;
+      writeSc({ [key]: [...(sc[key] || []), spellId] });
     }
-    // Refresh cache for the new spell
-    fetch(`/api/dnd/spells/${spellId}`).then(r => r.json()).then(spell => {
-      setSpellCache(prev => ({ ...prev, [spell.id]: spell }));
-    }).catch(() => {});
-  }, [sc, onUpdate]);
+    fetch(`/api/dnd/spells/${spellId}`).then(r => r.json())
+      .then(spell => setSpellCache(prev => ({ ...prev, [spell.id]: spell }))).catch(() => {});
+  }, [sc, writeSc]);
 
-  // Edit spell in library
   const handleEditSpell = useCallback(async (spellData) => {
     try {
       await fetch(`/api/dnd/spells/${spellData.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(spellData),
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(spellData),
       });
-      // Refresh cache
       setSpellCache(prev => ({ ...prev, [spellData.id]: spellData }));
-    } catch (e) {
-      console.error('Failed to update spell:', e);
-    }
+    } catch (e) { console.error('Failed to update spell:', e); }
   }, []);
-
-  const preparedCount = (sc.preparedSpells || []).length;
 
   return (
     <div className="spells-tab">
       <SpellcastingHeader spellcasting={sc} abilities={abilities} level={level} editMode={editMode} onUpdate={onUpdate} />
 
       {concentratedSpell && (
-        <ConcentrationBanner
-          spellName={concentratedSpell.name}
-          className={meta.className}
-          onDrop={dropConcentration}
-        />
+        <ConcentrationBanner spellName={concentratedSpell.name} className={meta.className} onDrop={dropConcentration} />
       )}
 
-      {/* Concentration confirm dialog */}
-      {confirmConc && (
-        <div className="spell-confirm-conc">
-          <span>Drop concentration on <strong>{confirmConc.currentName}</strong>?</span>
-          <button className="spell-confirm-conc__yes" onClick={confirmConcentration}>Confirm</button>
-          <button className="spell-confirm-conc__no" onClick={() => setConfirmConc(null)}>Cancel</button>
+      {/* Non-caster classes have NO class spell slots — only the granted area
+          (items / feats / racial) below remains available. */}
+      {!isCaster && (
+        <div className="spells-tab__no-caster">
+          <AlertTriangle size={15} />
+          <span><strong>{meta.className || 'This class'}</strong> has no class spellcasting — spell slots are unavailable. Spells from items, feats, or racial traits still appear under <strong>Granted Spells</strong>.</span>
         </div>
       )}
 
-      {/* Slots */}
-      {isPactMagic ? (
-        <PactSlotDisplay pactSlots={sc.pactSlots || { max: 1, current: 1, level: 1 }} editMode={editMode} onUpdate={handlePactUpdate} />
+      {/* Class-derived slots */}
+      {isCaster && (casterType === 'pact' ? (
+        <>
+          <PactSlotDisplay pactInfo={pactInfo} expended={sc.pact?.expended} onExpend={handleExpendPact} />
+          {((sc.extraSlots || []).length > 0 || editMode) && (
+            <SpellSlotGrid maxSlots={{}} slotsExpended={{}} extraSlots={sc.extraSlots} className={meta.className}
+              editMode={editMode} onExpendSlot={handleExpendSlot} onUpdateExtra={handleUpdateExtra} />
+          )}
+        </>
       ) : (
-        <SpellSlotGrid
-          slots={sc.slots || {}} specialSlots={sc.specialSlots || []}
-          className={meta.className} editMode={editMode}
-          onUpdate={handleSlotUpdate}
-          onUpdateSpecial={(specialSlots) => onUpdate({ spellcasting: { ...sc, specialSlots } })}
+        <SpellSlotGrid maxSlots={maxSlots} slotsExpended={sc.slotsExpended} extraSlots={sc.extraSlots}
+          className={meta.className} editMode={editMode} onExpendSlot={handleExpendSlot} onUpdateExtra={handleUpdateExtra} />
+      ))}
+
+      {/* Cantrips */}
+      {isCaster && (
+        <CantripsSection
+          cantripIds={sc.cantrips}
+          cap={cantripCap}
+          spellCache={spellCache}
+          className={meta.className}
+          editMode={editMode}
+          onRemove={(id) => removeFrom('cantrips', id)}
+          onEditSpell={handleEditSpell}
+          onAddCantrip={() => setAddModal('cantrip')}
+          onCast={openCast}
         />
       )}
 
-      {/* Cantrips */}
-      <CantripsSection
-        cantripIds={sc.cantrips || []}
-        spellOrder={sc.spellOrder?.cantrips}
-        spellCache={spellCache}
-        className={meta.className}
-        editMode={editMode}
-        onReorder={handleCantripReorder}
-        onRemove={handleRemoveCantrip}
-        onEditSpell={handleEditSpell}
-        onAddCantrip={() => setAddModal('cantrip')}
-        concentratingOn={concentratingOn}
-        onConcentrate={handleConcentrate}
-      />
-
-      {/* Prepared zone (for prepared casters) */}
-      {isPreparedCaster && (
+      {/* Prepared zone */}
+      {isCaster && isPrepared && (
         <SpellZone
           title="Prepared Spells"
-          subtitle={`${preparedCount}/${preparedCap}`}
-          spellIds={sc.preparedSpells || []}
-          spellOrder={sc.spellOrder?.prepared}
+          subtitle={`${preparedCount}/${preparedCap} prepared`}
+          spellIds={sc.prepared}
           spellCache={spellCache}
-          concentratingOn={concentratingOn}
+          concentratingOn={sc.concentratingOn}
           className={meta.className}
           editMode={editMode}
-          onReorder={handlePreparedReorder}
           onConcentrate={handleConcentrate}
-          onRemove={handleRemovePrepared}
+          onRemove={(id) => removeFrom('prepared', id)}
           onEditSpell={handleEditSpell}
-          onMoveTo={moveToKnown}
-          onReceiveDrop={moveToPrepared}
-          moveLabel="Move to Known"
+          onCast={openCast}
+          onMove={moveToKnown}
+          moveLabel="Unprepare"
+          alwaysPrepared={sc.alwaysPrepared}
+          onToggleAlwaysPrepared={toggleAlwaysPrepared}
           onAddSpell={() => setAddModal('prepared')}
         />
       )}
 
-      {/* Known zone */}
-      <SpellZone
-        title={isPreparedCaster ? 'Known Spells' : 'Spells'}
-        subtitle={isPreparedCaster ? 'available but not prepared today' : undefined}
-        spellIds={sc.knownSpells || []}
-        spellOrder={sc.spellOrder?.known}
+      {/* Known / accessible zone */}
+      {isCaster && (
+        <SpellZone
+          title={isPrepared ? 'Spellbook' : 'Spells'}
+          subtitle={isPrepared ? 'known but not prepared' : undefined}
+          spellIds={sc.known}
+          spellCache={spellCache}
+          concentratingOn={sc.concentratingOn}
+          className={meta.className}
+          editMode={editMode}
+          onConcentrate={handleConcentrate}
+          onRemove={(id) => removeFrom('known', id)}
+          onEditSpell={handleEditSpell}
+          onCast={isPrepared ? undefined : openCast}
+          onMove={isPrepared ? moveToPrepared : undefined}
+          moveLabel={isPrepared ? (preparedFull ? 'Prepared full' : 'Prepare') : undefined}
+          moveDisabled={isPrepared ? preparedFull : false}
+          onAddSpell={() => setAddModal('known')}
+        />
+      )}
+
+      {/* Granted spells */}
+      <GrantedSpells
+        grantedSpells={sc.grantedSpells}
         spellCache={spellCache}
-        concentratingOn={concentratingOn}
         className={meta.className}
+        profBonus={profBonus}
         editMode={editMode}
-        onReorder={handleKnownReorder}
-        onConcentrate={handleConcentrate}
-        onRemove={handleRemoveKnown}
-        onEditSpell={handleEditSpell}
-        onMoveTo={isPreparedCaster ? moveToPrepared : undefined}
-        onReceiveDrop={isPreparedCaster ? moveToKnown : undefined}
-        moveLabel={isPreparedCaster ? 'Move to Prepared' : undefined}
-        onAddSpell={() => setAddModal('known')}
+        onCast={openCast}
+        onUpdate={(grantedSpells) => writeSc({ grantedSpells })}
+        onRemove={(id) => writeSc({ grantedSpells: (sc.grantedSpells || []).filter(g => g.id !== id) })}
+        onAddGranted={editMode ? () => setAddModal('granted') : undefined}
       />
 
-      {/* Edit mode: spellcasting type toggle and enable/disable */}
       {editMode && (
         <div className="spells-tab__edit-controls">
-          <label className="spells-tab__type-label">
-            Casting Type:
-            <select className="dnd-field" value={sc.type} onChange={e => onUpdate({ spellcasting: { ...sc, type: e.target.value } })}>
-              <option value="prepared">Prepared</option>
-              <option value="known">Known</option>
-              <option value="pact_magic">Pact Magic</option>
-            </select>
-          </label>
+          <span className="spells-tab__derived-note">
+            {isCaster
+              ? `Slots, caster type (${casterType}), and ${profile.preparation} access are set by the class: ${meta.className} ${classLevel}. Edit these by changing class/level.`
+              : `${meta.className || 'This class'} grants no spellcasting. Add item/feat/racial spells under Granted Spells.`}
+          </span>
         </div>
       )}
 
-      {/* Add Spell Modal */}
       {addModal && (
         <AddSpellModal
           isCantrip={addModal === 'cantrip'}
           onAdd={(spellId) => handleAddSpell(spellId, addModal)}
           onClose={() => setAddModal(null)}
+        />
+      )}
+
+      {castState && (
+        <CastModal
+          spell={castState.spell}
+          sources={buildSources(castState.spell, castState.grantedEntry)}
+          charLevel={level}
+          className={meta.className}
+          concentratingOnName={concentratedSpell?.name}
+          onCast={applyCast}
+          onClose={() => setCastState(null)}
         />
       )}
     </div>

@@ -1,88 +1,80 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, X, Zap, Edit3, Trash2, Save } from 'lucide-react';
-import { CLASS_COLORS } from '../../dndUtils';
+import { ChevronDown, ChevronUp, X, Zap, Edit3, Trash2, Save, Sparkles, ArrowLeftRight, Pin, PinOff } from 'lucide-react';
+import { classColor as resolveClassColor } from '../../dndUtils';
+import { SCALING_KINDS } from '../../spellSlots';
 
-const SPELL_TYPES = ['damage', 'healing', 'buff', 'debuff', 'utility', 'control'];
 const SAVE_OPTS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
-export default function SpellRow({ spell, isConcentrating, className, onConcentrate, onRemove, onEditSpell, editMode, dragHandleProps }) {
+export default function SpellRow({
+  spell, isConcentrating, className, onConcentrate, onRemove, onEditSpell, editMode,
+  onCast, onMove, moveLabel, moveDisabled, isAlwaysPrepared, onToggleAlwaysPrepared,
+  badge,
+}) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState(null);
-  const classColor = CLASS_COLORS[className] || 'var(--dnd-accent)';
+  const color = resolveClassColor(className);
 
   if (!spell) return null;
 
   const concBadge = !!spell.concentration;
   const isActive = isConcentrating;
+  const scales = !!spell.scaling_kind || !!spell.upcast;
 
-  const startEdit = () => {
-    setEditForm({ ...spell });
-    setEditing(true);
-    setExpanded(true);
-  };
-
+  const startEdit = () => { setEditForm({ ...spell }); setEditing(true); setExpanded(true); };
+  const cancelEdit = () => { setEditing(false); setEditForm(null); };
   const saveEdit = () => {
     if (onEditSpell && editForm) {
-      // Auto-flag concentration if duration contains the word
-      if (editForm.duration && /concentration/i.test(editForm.duration)) {
-        editForm.concentration = 1;
-      }
+      if (editForm.duration && /concentration/i.test(editForm.duration)) editForm.concentration = 1;
       onEditSpell(editForm);
     }
-    setEditing(false);
-    setEditForm(null);
+    setEditing(false); setEditForm(null);
   };
-
-  const cancelEdit = () => {
-    setEditing(false);
-    setEditForm(null);
-  };
-
   const handleDeleteSpell = () => {
-    if (onEditSpell) {
-      // Delete from library
-      fetch(`/api/dnd/spells/${spell.id}`, { method: 'DELETE' }).catch(() => {});
-      if (onRemove) onRemove(spell.id);
-    }
+    fetch(`/api/dnd/spells/${spell.id}`, { method: 'DELETE' }).catch(() => {});
+    if (onRemove) onRemove(spell.id);
   };
 
   return (
     <div className={`spell-row ${isActive ? 'spell-row--concentrating' : ''}`}
-      style={isActive ? { borderColor: classColor, boxShadow: `0 0 8px ${classColor}33` } : {}}>
+      style={isActive ? { borderColor: color, boxShadow: `0 0 8px ${color}33` } : {}}>
       <div className="spell-row__compact" onClick={() => !editing && setExpanded(!expanded)}>
-        {dragHandleProps && (
-          <span className="spell-row__drag" {...dragHandleProps} onClick={e => e.stopPropagation()}>&#x2261;</span>
-        )}
-
         {concBadge && (
           <span className={`spell-row__conc-badge ${isActive ? 'spell-row__conc-badge--active' : ''}`}
-            style={isActive ? { background: classColor, borderColor: classColor } : {}}>
+            style={isActive ? { background: color, borderColor: color } : {}}>
             {isActive ? 'ACTIVE' : 'CONC'}
           </span>
         )}
+        {badge && <span className="spell-row__source-badge">{badge}</span>}
+        {isAlwaysPrepared && <Pin size={11} className="spell-row__pin" style={{ color }} />}
 
         <span className="spell-row__name">{spell.name}</span>
 
-        {spell.damage && (
-          <span className="spell-row__damage">{spell.damage}</span>
+        {scales && (
+          <span className="spell-row__scale-badge" title="Scales when upcast" style={{ color }}>
+            <Sparkles size={11} />
+          </span>
         )}
 
+        {spell.damage && <span className="spell-row__damage">{spell.damage}</span>}
         <span className="spell-row__range">{spell.range}</span>
-
         {spell.casting_time && spell.casting_time !== '1 action' && (
           <span className="spell-row__tag">{spell.casting_time}</span>
         )}
-
-        {spell.save_type && (
-          <span className="spell-row__tag">{spell.save_type} save</span>
-        )}
-
+        {spell.save_type && <span className="spell-row__tag">{spell.save_type} save</span>}
         {spell.ritual ? <span className="spell-row__tag spell-row__tag--ritual">Ritual</span> : null}
 
-        <span className="spell-row__toggle">
-          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </span>
+        <div className="spell-row__quick">
+          {onCast && !editMode && (
+            <button className="spell-row__cast-btn" style={{ borderColor: color, color }}
+              onClick={(e) => { e.stopPropagation(); onCast(spell); }} title="Cast spell">
+              <Zap size={12} /> Cast
+            </button>
+          )}
+          <span className="spell-row__toggle">
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </span>
+        </div>
       </div>
 
       {expanded && !editing && (
@@ -93,27 +85,34 @@ export default function SpellRow({ spell, isConcentrating, className, onConcentr
             <div><strong>Duration:</strong> {spell.duration}{spell.concentration ? ' (concentration)' : ''}</div>
             <div><strong>Components:</strong> {spell.components}</div>
             {spell.save_type && (
-              <div><strong>Save:</strong> {spell.save_type}{spell.save_effect ? ` \u00B7 ${spell.save_effect}` : ''}</div>
+              <div><strong>Save:</strong> {spell.save_type}{spell.save_effect ? ` · ${spell.save_effect}` : ''}</div>
             )}
           </div>
 
           {spell.upcast && (
-            <div className="spell-row__upcast">
-              <strong>At Higher Levels:</strong> {spell.upcast}
-            </div>
+            <div className="spell-row__upcast"><strong>At Higher Levels:</strong> {spell.upcast}</div>
           )}
 
           <p className="spell-row__desc">{spell.description}</p>
 
           <div className="spell-row__actions">
+            {onMove && (
+              <button className="spell-row__move-btn" disabled={moveDisabled}
+                title={moveDisabled ? 'Prepared list is full' : moveLabel}
+                onClick={(e) => { e.stopPropagation(); !moveDisabled && onMove(spell.id); }}>
+                <ArrowLeftRight size={12} /> {moveLabel}
+              </button>
+            )}
+            {onToggleAlwaysPrepared && (
+              <button className="spell-row__pin-btn" onClick={(e) => { e.stopPropagation(); onToggleAlwaysPrepared(spell.id); }}>
+                {isAlwaysPrepared ? <><PinOff size={12} /> Unpin</> : <><Pin size={12} /> Always Prepared</>}
+              </button>
+            )}
             {spell.concentration && (
-              <button
-                className={`spell-row__concentrate-btn ${isActive ? 'spell-row__concentrate-btn--active' : ''}`}
-                style={isActive ? { borderColor: classColor, color: classColor } : {}}
-                onClick={(e) => { e.stopPropagation(); onConcentrate && onConcentrate(spell.id); }}
-              >
-                <Zap size={12} />
-                {isActive ? 'Drop Concentration' : 'Concentrate'}
+              <button className={`spell-row__concentrate-btn ${isActive ? 'spell-row__concentrate-btn--active' : ''}`}
+                style={isActive ? { borderColor: color, color } : {}}
+                onClick={(e) => { e.stopPropagation(); onConcentrate && onConcentrate(spell.id); }}>
+                <Zap size={12} /> {isActive ? 'Drop Concentration' : 'Concentrate'}
               </button>
             )}
             <button className="spell-row__edit-btn" onClick={(e) => { e.stopPropagation(); startEdit(); }}>
@@ -175,8 +174,24 @@ export default function SpellRow({ spell, isConcentrating, className, onConcentr
               onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
           </div>
           <div className="spell-row__edit-field">
-            <label>Upcast</label>
+            <label>Upcast (text)</label>
             <input className="dnd-field" value={editForm.upcast || ''} onChange={e => setEditForm({ ...editForm, upcast: e.target.value })} />
+          </div>
+          {/* Structured scaling — drives the computed upcast preview */}
+          <div className="spell-row__edit-grid spell-row__edit-grid--scaling">
+            <div className="spell-row__edit-field">
+              <label>Scales by</label>
+              <select className="dnd-field" value={editForm.scaling_kind || ''}
+                onChange={e => setEditForm({ ...editForm, scaling_kind: e.target.value })}>
+                {SCALING_KINDS.map(k => <option key={k.id} value={k.id}>{k.label}</option>)}
+              </select>
+            </div>
+            <div className="spell-row__edit-field">
+              <label>Per slot level (e.g. 1d6, 1)</label>
+              <input className="dnd-field" value={editForm.scaling_per_level || ''}
+                placeholder="1d6"
+                onChange={e => setEditForm({ ...editForm, scaling_per_level: e.target.value })} />
+            </div>
           </div>
           <div className="spell-row__edit-row-actions">
             <label className="spell-row__edit-check">

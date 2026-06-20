@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { abilityMod, formatMod, proficiencyBonus } from '../../dndUtils';
+import { Stars } from 'lucide-react';
+import { proficiencyBonus } from '../../dndUtils';
+import FormActivationPanel from './FormActivationPanel';
+
+const STAR_COLOR = '#8b7cf0';
 
 const CONSTELLATIONS = {
   Archer: {
@@ -48,6 +52,11 @@ export default function CircleOfStarsBlock({ character, editMode, onUpdate }) {
     setShowPicker(false);
   };
 
+  const endStarryForm = () => {
+    onUpdate({ classFeature: { ...cf, active: false, activeForm: null, starryConstellation: null } });
+    setShowPicker(false);
+  };
+
   const useGuidingBolt = () => {
     if (guidingBoltUsed >= guidingBoltMax) return;
     onUpdate({ classFeature: { ...cf, guidingBoltUsed: guidingBoltUsed + 1 } });
@@ -68,38 +77,38 @@ export default function CircleOfStarsBlock({ character, editMode, onUpdate }) {
 
   return (
     <div className="dnd-stars">
-      {/* Starry Form activation */}
-      <div className="dnd-stars__section">
-        <h4 className="dnd-stars__subtitle">Starry Form</h4>
-        {!isInStarryForm && !showPicker && (
-          <button
-            className="dnd-stars__activate-btn"
-            onClick={() => setShowPicker(true)}
-            disabled={!canActivate}
-            title={!canActivate ? (cf.active ? 'Already in a form' : 'No Wild Shape uses remaining') : 'Expend Wild Shape to enter Starry Form'}
-          >
-            ENTER STARRY FORM
-          </button>
-        )}
-        {showPicker && (
-          <div className="dnd-stars__constellation-picker">
+      {/* Starry Form activation — hero transform panel */}
+      <FormActivationPanel
+        color={STAR_COLOR}
+        icon={<Stars size={15} />}
+        title="Starry Form"
+        idleLabel="ENTER STARRY FORM"
+        endLabel="END STARRY FORM"
+        activeLabel={activeConstellation ? `STARRY · ${activeConstellation.toUpperCase()}` : 'STARRY FORM'}
+        active={isInStarryForm}
+        canActivate={canActivate}
+        disabledReason={cf.active ? 'Already in a form' : 'No Wild Shape uses remaining'}
+        isPicking={showPicker}
+        onActivate={() => setShowPicker(true)}
+        onEnd={endStarryForm}
+        picker={(
+          <div className="dnd-form-panel__picker">
+            <span className="dnd-form-panel__picker-label">Choose a constellation</span>
             {Object.entries(CONSTELLATIONS).map(([name, data]) => (
-              <button key={name} className="dnd-stars__constellation-pick-btn" onClick={() => activateStarryForm(name)}>
+              <button key={name} className="dnd-form-panel__pick" style={{ '--form-color': STAR_COLOR }}
+                onClick={() => activateStarryForm(name)}>
                 <strong>{name}</strong>
                 <span>{isUpgraded ? data.upgraded : data.base}</span>
               </button>
             ))}
-            <button className="dnd-stars__cancel-pick" onClick={() => setShowPicker(false)}>Cancel</button>
+            <button className="dnd-form-panel__cancel" onClick={() => setShowPicker(false)}>Cancel</button>
           </div>
         )}
-        {isInStarryForm && (
-          <div className="dnd-stars__active-form">
-            <span className="dnd-stars__active-badge">STARRY FORM: {activeConstellation}</span>
-            <p className="dnd-stars__desc-sm">Sheds bright light 10ft, dim 10ft. Lasts 10 min.</p>
-            {isUpgraded && <p className="dnd-stars__upgrade-note">Can change constellation at start of each turn.</p>}
-          </div>
-        )}
-      </div>
+      >
+        <p className="dnd-form-panel__effect-line"><strong>{activeConstellation}</strong> — {isUpgraded ? CONSTELLATIONS[activeConstellation]?.upgraded : CONSTELLATIONS[activeConstellation]?.base}</p>
+        <p className="dnd-form-panel__effect-line">Sheds bright light 10 ft, dim 10 ft. Lasts 10 min.</p>
+        {isUpgraded && <p className="dnd-form-panel__effect-line">Can change constellation at the start of each turn.</p>}
+      </FormActivationPanel>
 
       {/* Constellation reference */}
       <div className="dnd-stars__section">

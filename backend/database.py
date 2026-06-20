@@ -406,6 +406,8 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             save_effect TEXT DEFAULT NULL,
             description TEXT NOT NULL DEFAULT '',
             upcast TEXT DEFAULT NULL,
+            scaling_kind TEXT DEFAULT NULL,
+            scaling_per_level TEXT DEFAULT NULL,
             source TEXT NOT NULL DEFAULT 'PHB',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(name, level)
@@ -534,6 +536,13 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
 
         CREATE INDEX IF NOT EXISTS idx_garmin_ingest_run ON garmin_ingest_log(run_at);
     """)
+
+    # Migrate: add structured upcast/cantrip scaling columns to dnd_spells
+    for col in ("scaling_kind", "scaling_per_level"):
+        try:
+            await db.execute(f"ALTER TABLE dnd_spells ADD COLUMN {col} TEXT DEFAULT NULL")
+        except Exception:
+            pass  # column already exists
 
     # Migrate: add new sleep columns to existing DBs
     new_cols = [

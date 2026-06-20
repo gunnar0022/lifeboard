@@ -382,42 +382,11 @@
 .dnd-stars__constellation--active { border-left-color: var(--dnd-class-wizard); background: rgba(42, 74, 136, 0.08); }
 .dnd-stars__constellation-name { font-weight: 700; color: var(--dnd-text); display: block; margin-bottom: 0.1rem; }
 .dnd-stars__constellation-desc { line-height: 1.4; }
-.dnd-stars__upgrade-note { font-size: 0.65rem; font-style: italic; color: var(--dnd-class-wizard); margin: 0.2rem 0 0; }
 
 .dnd-stars__omen-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
 .dnd-stars__omen-badge { padding: 0.15rem 0.5rem; border-radius: 0.3rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 .dnd-stars__omen-badge--weal { background: rgba(58, 122, 58, 0.15); color: var(--dnd-positive); }
 .dnd-stars__omen-badge--woe { background: rgba(138, 42, 42, 0.15); color: var(--dnd-negative); }
-
-.dnd-stars__activate-btn {
-  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-wizard); border-radius: 0.3rem;
-  background: transparent; color: var(--dnd-class-wizard); cursor: pointer;
-  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
-}
-.dnd-stars__activate-btn:hover:not(:disabled) { background: var(--dnd-class-wizard); color: var(--dnd-bg); }
-.dnd-stars__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.dnd-stars__constellation-picker { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.3rem; }
-.dnd-stars__constellation-pick-btn {
-  display: flex; flex-direction: column; gap: 0.1rem; padding: 0.4rem;
-  border: 1px solid var(--dnd-border); border-radius: 0.3rem; background: var(--dnd-bg);
-  color: var(--dnd-text); cursor: pointer; font-family: inherit; font-size: 0.7rem; text-align: left;
-}
-.dnd-stars__constellation-pick-btn:hover { border-color: var(--dnd-class-wizard); background: var(--dnd-surface-hover); }
-.dnd-stars__constellation-pick-btn strong { color: var(--dnd-class-wizard); }
-.dnd-stars__cancel-pick {
-  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
-  background: transparent; color: var(--dnd-text-dim); cursor: pointer; font-family: inherit; font-size: 0.65rem;
-}
-
-.dnd-stars__active-form { margin-bottom: 0.3rem; }
-.dnd-stars__active-badge {
-  display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
-  background: var(--dnd-class-wizard); color: var(--dnd-bg);
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-  box-shadow: 0 0 8px rgba(42, 74, 136, 0.4); margin-bottom: 0.2rem;
-}
 
 /* ============================================
    CIRCLE OF SPORES SUBCLASS
@@ -433,8 +402,6 @@
 .dnd-spores__spell-row { display: flex; gap: 0.5rem; font-size: 0.7rem; padding: 0.1rem 0; }
 .dnd-spores__spell-level { font-weight: 700; color: var(--dnd-class-druid); min-width: 2rem; }
 .dnd-spores__spell-names { color: var(--dnd-text-dim); }
-
-.dnd-spores__effect-list { margin: 0.2rem 0; padding-left: 1.2rem; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.6; }
 
 .dnd-spores__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); }
 .dnd-spores__use-btn {
@@ -453,22 +420,7 @@
 .dnd-spores__toggle:hover { background: var(--dnd-class-druid); color: var(--dnd-bg); }
 .dnd-spores__toggle--active { background: var(--dnd-class-druid); color: var(--dnd-bg); box-shadow: 0 0 8px rgba(42, 106, 42, 0.4); }
 
-.dnd-spores__active-badge {
-  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
-  background: rgba(42, 106, 42, 0.15); color: var(--dnd-class-druid);
-  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; text-align: center;
-}
-
 .dnd-spores__spreading-note { font-size: 0.7rem; font-style: italic; color: var(--dnd-class-druid); margin: 0.2rem 0 0; }
-
-.dnd-spores__activate-btn {
-  padding: 0.3rem 0.8rem; border: 2px solid var(--dnd-class-druid); border-radius: 0.3rem;
-  background: transparent; color: var(--dnd-class-druid); cursor: pointer;
-  font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em; transition: all 0.2s; margin-bottom: 0.3rem;
-}
-.dnd-spores__activate-btn:hover:not(:disabled) { background: var(--dnd-class-druid); color: var(--dnd-bg); }
-.dnd-spores__activate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ============================================
    STATS TAB (Abilities + Saves + Skills unified)
@@ -682,4 +634,138 @@
   margin: 0;
   white-space: pre-wrap;
   line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FormActivationPanel — Wild-Shape-style transform hero for druid subclass
+   forms (Starry Form, Symbiotic Entity). Themed per-form via --form-color.
+   ───────────────────────────────────────────────────────────────────────── */
+.dnd-form-panel {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--form-color) 40%, var(--dnd-border));
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem 0.8rem;
+  margin-bottom: 0.85rem;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--form-color) 10%, transparent), transparent 70%),
+    var(--dnd-surface);
+  overflow: hidden;
+}
+.dnd-form-panel--active {
+  border-color: var(--form-color);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--form-color) 22%, transparent), transparent 75%),
+    var(--dnd-surface);
+}
+.dnd-form-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+.dnd-form-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--dnd-text);
+}
+.dnd-form-panel__title svg { color: var(--form-color); }
+.dnd-form-panel__status {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--form-color);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--form-color) 60%, transparent);
+}
+
+.dnd-form-panel__toggle {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 9px;
+  border: 1px solid var(--form-color);
+  background: color-mix(in srgb, var(--form-color) 16%, transparent);
+  color: var(--dnd-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease, filter 0.15s ease;
+}
+.dnd-form-panel__toggle:hover:not(:disabled) {
+  background: var(--form-color);
+  color: #fff;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--form-color) 50%, transparent);
+}
+.dnd-form-panel__toggle:active:not(:disabled) { transform: scale(0.97); }
+.dnd-form-panel__toggle:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-form-panel__toggle--end {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--form-color) 55%, var(--dnd-border));
+  color: var(--dnd-text-muted);
+}
+.dnd-form-panel__toggle--end:hover:not(:disabled) {
+  background: var(--dnd-negative);
+  border-color: var(--dnd-negative);
+  color: #fff;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-negative) 45%, transparent);
+}
+
+.dnd-form-panel__effects {
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed color-mix(in srgb, var(--form-color) 35%, var(--dnd-border));
+}
+.dnd-form-panel__effect-line {
+  margin: 0.18rem 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: var(--dnd-text-dim);
+}
+.dnd-form-panel__effect-line strong { color: var(--dnd-text); }
+
+/* Variant picker (e.g. constellation choice on activation) */
+.dnd-form-panel__picker { display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-form-panel__picker-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dnd-text-faint);
+}
+.dnd-form-panel__pick {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--form-color) 35%, var(--dnd-border));
+  background: var(--dnd-bg);
+  color: var(--dnd-text);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.15s ease, transform 0.1s ease;
+}
+.dnd-form-panel__pick:hover {
+  border-color: var(--form-color);
+  background: color-mix(in srgb, var(--form-color) 12%, transparent);
+  transform: translateY(-1px);
+}
+.dnd-form-panel__pick strong { font-size: 0.82rem; }
+.dnd-form-panel__pick span { font-size: 0.7rem; color: var(--dnd-text-muted); line-height: 1.35; }
+.dnd-form-panel__cancel {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-surface);
+  color: var(--dnd-text-muted);
+  cursor: pointer;
 }

@@ -16,7 +16,8 @@ import NotesTab from './components/CampaignNotes/NotesTab';
 import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
-import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig } from './dndUtils';
+import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
+import { grantedMaxUses } from './components/Spellcasting/GrantedSpells';
 import { RACES, getSubraces } from './classProgression';
 
 export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack, onEditModeChange }) {
@@ -220,14 +221,28 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         }
         cf.runeInvocations = resetInvocations;
       }
+      // War Magic: end a short rest with no power surges → gain one.
+      if (cf.powerSurge && (cf.powerSurge.current || 0) <= 0) {
+        cf.powerSurge = { ...cf.powerSurge, current: 1 };
+      }
+      // Archfey: Fey Presence / Misty Escape / Dark Delirium recharge on short rest.
+      if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
+      if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
+      if ('darkDeliriumUsed' in cf) cf.darkDeliriumUsed = false;
       updates.classFeature = cf;
     }
 
-    // Warlock pact slots recover on short rest
-    if (character.spellcasting?.type === 'pact_magic' && character.spellcasting.pactSlots) {
+    // Spellcasting short-rest recovery: pact slots, short-rest extra sources,
+    // and granted spells that recharge on a short rest.
+    if (character.spellcasting) {
+      const sc = normalizeSpellcasting(character.spellcasting, character.meta?.className);
       updates.spellcasting = {
-        ...character.spellcasting,
-        pactSlots: { ...character.spellcasting.pactSlots, current: character.spellcasting.pactSlots.max },
+        ...sc,
+        pact: sc.casterType === 'pact' ? { ...sc.pact, expended: 0 } : sc.pact,
+        extraSlots: (sc.extraSlots || []).map(e =>
+          e.recharge === 'Short Rest' ? { ...e, expended: 0 } : e),
+        grantedSpells: (sc.grantedSpells || []).map(g =>
+          g.useType === 'per_short_rest' ? { ...g, used: 0 } : g),
       };
     }
 
@@ -284,6 +299,21 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.pactSlots) {
         cf.pactSlots = { ...cf.pactSlots, current: cf.pactSlots.max || 0 };
       }
+      // Wizard: Arcane Recovery use returns; War Magic Power Surge resets to 1
+      if (cf.arcaneRecovery) {
+        cf.arcaneRecovery = { ...cf.arcaneRecovery, currentUses: cf.arcaneRecovery.maxUses || 1 };
+      }
+      if (cf.powerSurge) {
+        cf.powerSurge = { ...cf.powerSurge, current: 1 };
+      }
+      // Warlock Pact of the Talisman recharges on long rest
+      if (cf.talisman) {
+        cf.talisman = { ...cf.talisman, current: cf.talisman.max || 0 };
+      }
+      // Archfey: short-or-long-rest abilities also recharge on a long rest
+      if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
+      if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
+      if ('darkDeliriumUsed' in cf) cf.darkDeliriumUsed = false;
       // Rune Knight: reset Giant's Might, rune invocations, Runic Shield
       if (cf.giantsMight) {
         cf.giantsMight = { ...cf.giantsMight, currentUses: cf.giantsMight.maxUses || 2, active: false };
@@ -315,20 +345,21 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       updates.classFeature = cf;
     }
 
-    // Long rest: recover all spell slots + clear concentration
+    // Long rest: recover all spell slots, pact slots, extra sources, granted
+    // uses, and clear concentration.
     if (character.spellcasting) {
-      const sc = { ...character.spellcasting, concentratingOn: null };
-      if (sc.slots) {
-        const newSlots = {};
-        Object.entries(sc.slots).forEach(([lvl, slot]) => {
-          newSlots[lvl] = { ...slot, expended: 0 };
-        });
-        sc.slots = newSlots;
-      }
-      if (sc.pactSlots) {
-        sc.pactSlots = { ...sc.pactSlots, current: sc.pactSlots.max || 0 };
-      }
-      updates.spellcasting = sc;
+      const sc = normalizeSpellcasting(character.spellcasting, character.meta?.className);
+      const prof = proficiencyBonus(character.meta?.level || 1);
+      updates.spellcasting = {
+        ...sc,
+        concentratingOn: null,
+        // Explicit zeros (not {}) so deepMerge actually clears expended levels.
+        slotsExpended: Object.fromEntries(Object.keys(sc.slotsExpended || {}).map(l => [l, 0])),
+        pact: { ...sc.pact, expended: 0 },
+        extraSlots: (sc.extraSlots || []).map(e => ({ ...e, expended: 0 })),
+        grantedSpells: (sc.grantedSpells || []).map(g =>
+          g.useType === 'at_will' ? g : { ...g, used: 0, max: grantedMaxUses(g, prof) }),
+      };
     }
 
     // Long rest: racial use-limited traits (Stone's Endurance, Breath Weapon)
@@ -399,11 +430,11 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     const updates = { tabsConfig: newConfig };
     if (nowSpells && !wasSpells && !character.spellcasting) {
       const scDefaults = SPELLCASTING_DEFAULTS[meta.className];
-      updates.spellcasting = scDefaults ? { ...scDefaults } : {
-        ability: 'WIS', type: 'prepared', slots: { '1': { max: 2, expended: 0 } },
-        cantrips: [], preparedSpells: [], knownSpells: [],
-        spellOrder: { cantrips: [], prepared: [], known: [] }, concentratingOn: null,
-      };
+      // Non-caster classes manually enabling Spells get a generic full-caster
+      // scaffold (normalizeSpellcasting fills any gaps).
+      updates.spellcasting = scDefaults
+        ? { ...scDefaults }
+        : normalizeSpellcasting({ ability: 'WIS', casterType: 'full', preparation: 'prepared' }, meta.className);
     }
     handleUpdate(updates);
   };

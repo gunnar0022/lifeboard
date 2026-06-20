@@ -108,7 +108,7 @@ export const CLASS_FEATURE_DEFAULTS = {
   },
   Warlock: {
     type: 'pact_magic',
-    pactSlots: { max: 1, current: 1, slotLevel: 1 },
+    pactBoon: '',
   },
   Sorcerer: {
     type: 'sorcery_points', maxPoints: 1, currentPoints: 1,
@@ -180,7 +180,7 @@ export const SUBCLASS_LISTS = {
     { name: 'School of Necromancy', implemented: false },
     { name: 'School of Transmutation', implemented: false },
     { name: 'Bladesinging', implemented: false },
-    { name: 'War Magic', implemented: false },
+    { name: 'War Magic', implemented: true },
     { name: 'Chronurgy Magic', implemented: false },
     { name: 'Graviturgy Magic', implemented: false },
     { name: 'Order of Scribes', implemented: false },
@@ -230,7 +230,7 @@ export const SUBCLASS_LISTS = {
     { name: 'Drakewarden', implemented: false },
   ],
   Warlock: [
-    { name: 'The Archfey', implemented: false },
+    { name: 'The Archfey', implemented: true },
     { name: 'The Fiend', implemented: false },
     { name: 'The Great Old One', implemented: false },
     { name: 'The Celestial', implemented: false },
@@ -346,41 +346,133 @@ export function reconcileTabsConfig(config, character, hasCampaign) {
   return [...valid, ...missing];
 }
 
-// Spellcasting defaults by class (null = non-caster)
-const _scPrepared = (ability) => ({
-  ability, type: 'prepared',
-  slots: { '1': { max: 2, expended: 0 } },
-  cantrips: [], preparedSpells: [], knownSpells: [],
+// ── Spellcasting ────────────────────────────────────────────────────────────
+// New shape (slots are DERIVED from class+level via spellSlots.js; we persist
+// only what the formula can't know — expended counts, the spell lists, and any
+// bonus slots granted by items/feats):
+//   {
+//     ability, casterType, preparation,   // 'prepared' | 'known'
+//     slotsExpended: { '1': 0, ... },     // per standard slot level
+//     pact: { expended: 0 },              // pact-magic pool only
+//     extraSlots: [ { id, label, level, max, expended, recharge } ],
+//     cantrips: [ids], prepared: [ids], known: [ids],
+//     alwaysPrepared: [ids],              // pinned, excluded from prepared cap
+//     grantedSpells: [ { id, spellId, source, useType, max, used, recharge,
+//                        canUseSlots, castLevel } ],
+//     spellOrder: { cantrips, prepared, known },
+//     concentratingOn: null,
+//   }
+
+// Maps a class to its caster archetype + how it accesses spells.
+// (Subclass third-casters — Eldritch Knight / Arcane Trickster — are layered
+//  in where those subclasses are authored.)
+export const CLASS_CASTER_PROFILE = {
+  Wizard:    { ability: 'INT', casterType: 'full',      preparation: 'prepared' },
+  Cleric:    { ability: 'WIS', casterType: 'full',      preparation: 'prepared' },
+  Druid:     { ability: 'WIS', casterType: 'full',      preparation: 'prepared' },
+  Bard:      { ability: 'CHA', casterType: 'full',      preparation: 'known' },
+  Sorcerer:  { ability: 'CHA', casterType: 'full',      preparation: 'known' },
+  Paladin:   { ability: 'CHA', casterType: 'half',      preparation: 'prepared' },
+  Ranger:    { ability: 'WIS', casterType: 'half',      preparation: 'known' },
+  Artificer: { ability: 'INT', casterType: 'artificer', preparation: 'prepared' },
+  Warlock:   { ability: 'CHA', casterType: 'pact',      preparation: 'known' },
+};
+
+/** True if the class has class-granted spellcasting (drives the main slot area). */
+export function isCasterClass(className) {
+  return !!CLASS_CASTER_PROFILE[className];
+}
+
+const _emptySpellcasting = (profile) => ({
+  ability: profile.ability,
+  casterType: profile.casterType,
+  preparation: profile.preparation,
+  classLevel: null,            // null → follow character level (multiclass-ready hook)
+  slotsExpended: {},
+  pact: { expended: 0 },
+  extraSlots: [],
+  cantrips: [],
+  prepared: [],
+  known: [],
+  alwaysPrepared: [],
+  grantedSpells: [],
   spellOrder: { cantrips: [], prepared: [], known: [] },
   concentratingOn: null,
 });
-const _scKnown = (ability) => ({
-  ability, type: 'known',
-  slots: { '1': { max: 2, expended: 0 } },
-  cantrips: [], knownSpells: [],
-  spellOrder: { cantrips: [], known: [] },
-  concentratingOn: null,
-});
 
-export const SPELLCASTING_DEFAULTS = {
-  Wizard:    _scPrepared('INT'),
-  Cleric:    _scPrepared('WIS'),
-  Druid:     _scPrepared('WIS'),
-  Paladin:   _scPrepared('CHA'),
-  Artificer: _scPrepared('INT'),
-  Sorcerer:  _scKnown('CHA'),
-  Bard:      _scKnown('CHA'),
-  Ranger:    _scKnown('WIS'),
-  Warlock: {
-    ability: 'CHA', type: 'pact_magic',
-    pactSlots: { max: 1, current: 1, level: 1 },
-    cantrips: [], knownSpells: [],
-    spellOrder: { cantrips: [], known: [] },
-    concentratingOn: null,
-  },
-  // Non-casters: null
-  Barbarian: null, Fighter: null, Rogue: null, Monk: null,
-};
+export const SPELLCASTING_DEFAULTS = Object.fromEntries(
+  Object.entries(CLASS_CASTER_PROFILE).map(([cls, prof]) => [cls, _emptySpellcasting(prof)])
+);
+// Non-casters
+['Barbarian', 'Fighter', 'Rogue', 'Monk'].forEach(c => { SPELLCASTING_DEFAULTS[c] = null; });
+
+/**
+ * Upgrade any stored spellcasting blob (old or new shape) to the current shape.
+ * Old shape used: type, slots:{lvl:{max,expended}}, pactSlots:{max,current,level},
+ * preparedSpells, knownSpells, specialSlots[].
+ */
+export function normalizeSpellcasting(sc, className) {
+  if (!sc) return sc;
+  const profile = CLASS_CASTER_PROFILE[className] || null;
+  // casterType & preparation are class-authoritative: the class profile wins
+  // over anything stored, so the slot system can't drift when the class changes.
+  const casterType = profile?.casterType || sc.casterType ||
+    (sc.type === 'pact_magic' ? 'pact' : 'full');
+  const preparation = profile?.preparation || sc.preparation ||
+    (sc.type === 'known' ? 'known' : 'prepared');
+  const ability = sc.ability || profile?.ability || 'INT';
+  const base = _emptySpellcasting({ ability, casterType, preparation });
+
+  // Already new shape — fill missing keys, then force class-authoritative fields.
+  if (sc.slotsExpended || sc.grantedSpells || sc.preparation) {
+    return {
+      ...base,
+      ...sc,
+      casterType,
+      preparation,
+      pact: { ...base.pact, ...(sc.pact || {}) },
+      spellOrder: { ...base.spellOrder, ...(sc.spellOrder || {}) },
+    };
+  }
+
+  // ── Migrate old shape ──
+  const slotsExpended = {};
+  if (sc.slots) {
+    Object.entries(sc.slots).forEach(([lvl, s]) => {
+      if (s && s.expended) slotsExpended[lvl] = s.expended;
+    });
+  }
+  const extraSlots = (sc.specialSlots || []).map((s, i) => ({
+    id: `legacy-${i}`,
+    label: s.source_label || 'Special',
+    level: 1,
+    max: s.charges || 1,
+    expended: s.charges_used || 0,
+    recharge: s.recharge_condition || 'Long Rest',
+  }));
+  const pactExpended = sc.pactSlots
+    ? Math.max(0, (sc.pactSlots.max || 0) - (sc.pactSlots.current ?? sc.pactSlots.max ?? 0))
+    : 0;
+
+  return {
+    ...base,
+    classLevel: sc.classLevel ?? null,
+    slotsExpended,
+    pact: { expended: pactExpended },
+    extraSlots,
+    cantrips: sc.cantrips || [],
+    prepared: sc.preparedSpells || [],
+    known: sc.knownSpells || [],
+    alwaysPrepared: sc.alwaysPrepared || [],
+    grantedSpells: sc.grantedSpells || [],
+    spellOrder: {
+      cantrips: sc.spellOrder?.cantrips || [],
+      prepared: sc.spellOrder?.prepared || [],
+      known: sc.spellOrder?.known || [],
+    },
+    concentratingOn: sc.concentratingOn || null,
+  };
+}
 
 export function deepMerge(target, source) {
   const output = { ...target };
