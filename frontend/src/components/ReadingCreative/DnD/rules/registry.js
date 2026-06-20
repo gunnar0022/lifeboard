@@ -16,6 +16,8 @@ import {
   getClassFeatures, getSubclassFeatures, getRaceFeatures, RACES,
 } from '../classProgression';
 import { CLASS_CASTER_PROFILE, CLASS_FEATURE_DEFAULTS, SUBCLASS_LISTS, CLASS_NAMES } from '../dndUtils';
+import { RACE_ABILITY_BONUSES, SUBRACE_ABILITY_BONUSES } from './data/abilityBonuses';
+import { LORE } from './data/lore';
 
 // ── blockId tables (strings only; resolved to components in
 //    components/ClassFeatures/registry.js) ──────────────────────────────────
@@ -64,6 +66,18 @@ const CLASS_META = {
 
 const emptyOverview = { tagline: null, overview: null, definingFeature: null, lore: null };
 
+// Pull the overview/lore layer for a node (defaults to empty when unauthored).
+function loreOf(name) {
+  const l = LORE[name];
+  if (!l) return emptyOverview;
+  return {
+    tagline: l.tagline ?? null,
+    overview: l.overview ?? null,
+    definingFeature: l.definingFeature ?? null,
+    lore: l.lore ?? null,
+  };
+}
+
 // ── Node builders ───────────────────────────────────────────────────────────
 function buildClassNode(name) {
   const meta = CLASS_META[name] || {};
@@ -84,7 +98,7 @@ function buildClassNode(name) {
     helpers: {},        // P3
     creation: null,     // P4
     progression: CLASS_PROGRESSION[name] || [],
-    ...emptyOverview,
+    ...loreOf(name),
   };
 }
 
@@ -99,7 +113,7 @@ function buildSubclassNode(name, classNameFallback) {
     blockId,
     implemented: progression.length > 0 || !!blockId,
     progression,
-    ...emptyOverview,
+    ...loreOf(name),
   };
 }
 
@@ -109,11 +123,11 @@ function buildRaceNode(name) {
     id: name, name, type: 'race',
     parentId: null,
     childIds: data.subraces || [],
-    abilityBonuses: {}, // P4
+    abilityBonuses: RACE_ABILITY_BONUSES[name] || {},
     speed: null, size: null, creatureType: null,
     blockId: null,      // racial trackers render via RacialBlock outside this dispatch
     progression: data.traits || [],
-    ...emptyOverview,
+    ...loreOf(name),
   };
 }
 
@@ -123,9 +137,9 @@ function buildSubraceNode(name) {
     id: name, name, type: 'subrace',
     parentId: data.race || null,
     childIds: [],
-    abilityBonuses: {}, // P4
+    abilityBonuses: SUBRACE_ABILITY_BONUSES[name] || {},
     progression: data.traits || [],
-    ...emptyOverview,
+    ...loreOf(name),
   };
 }
 
