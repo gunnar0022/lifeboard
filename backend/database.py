@@ -408,6 +408,7 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             upcast TEXT DEFAULT NULL,
             scaling_kind TEXT DEFAULT NULL,
             scaling_per_level TEXT DEFAULT NULL,
+            classes TEXT NOT NULL DEFAULT '[]',
             source TEXT NOT NULL DEFAULT 'PHB',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(name, level)
@@ -543,6 +544,12 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
             await db.execute(f"ALTER TABLE dnd_spells ADD COLUMN {col} TEXT DEFAULT NULL")
         except Exception:
             pass  # column already exists
+
+    # Migrate: add class-tag list to dnd_spells (JSON array; 'other' for homebrew)
+    try:
+        await db.execute("ALTER TABLE dnd_spells ADD COLUMN classes TEXT NOT NULL DEFAULT '[]'")
+    except Exception:
+        pass  # column already exists
 
     # Migrate: add new sleep columns to existing DBs
     new_cols = [

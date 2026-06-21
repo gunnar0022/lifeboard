@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Search, Plus } from 'lucide-react';
 import { SCALING_KINDS } from '../../spellSlots';
+import { SPELL_CLASS_TAGS } from './spellTags';
 
 const SPELL_TYPE_OPTIONS = ['damage', 'healing', 'buff', 'debuff', 'utility', 'control'];
 const SAVE_OPTIONS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
@@ -19,8 +20,15 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
     aoe: '', duration: 'Instantaneous', concentration: false, ritual: false,
     components: '', spell_type: 'utility', damage: '', save_type: '',
     save_effect: '', description: '', upcast: '', scaling_kind: '',
-    scaling_per_level: '', source: 'PHB',
+    scaling_per_level: '', classes: [], source: 'PHB',
   });
+
+  const toggleClass = (id) => setNewSpell(prev => ({
+    ...prev,
+    classes: prev.classes.includes(id)
+      ? prev.classes.filter(c => c !== id)
+      : [...prev.classes, id],
+  }));
 
   useEffect(() => {
     if (searchRef.current) searchRef.current.focus();
@@ -49,7 +57,7 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
   };
 
   const handleCreate = async () => {
-    if (!newSpell.name.trim() || !newSpell.description.trim()) return;
+    if (!newSpell.name.trim() || !newSpell.description.trim() || newSpell.classes.length === 0) return;
     setCreating(true);
     try {
       const res = await fetch('/api/dnd/spells', {
@@ -210,9 +218,26 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
               </div>
             </div>
 
+            <div className="spell-modal__form-field spell-modal__form-field--full">
+              <label>Class Tags * <span className="spell-modal__tag-hint">(which classes can cast this — pick at least one)</span></label>
+              <div className="spell-modal__tags">
+                {SPELL_CLASS_TAGS.map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`spell-tag ${newSpell.classes.includes(t.id) ? 'spell-tag--on' : ''}`}
+                    onClick={() => toggleClass(t.id)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="spell-modal__form-actions">
               <button className="dnd-add-btn" onClick={() => setShowCreate(false)}>Back to Search</button>
-              <button className="spell-modal__submit" onClick={handleCreate} disabled={creating || !newSpell.name.trim() || !newSpell.description.trim()}>
+              <button className="spell-modal__submit" onClick={handleCreate}
+                disabled={creating || !newSpell.name.trim() || !newSpell.description.trim() || newSpell.classes.length === 0}>
                 {creating ? 'Creating...' : 'Create & Add'}
               </button>
             </div>

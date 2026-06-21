@@ -124,7 +124,7 @@ async def list_spells(q: str = "", level: int = None, limit: int = 20):
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
         query = (
-            f"SELECT id, name, level, damage, range, concentration, casting_time "
+            f"SELECT id, name, level, damage, range, concentration, casting_time, classes "
             f"FROM dnd_spells {where} ORDER BY level, name LIMIT ?"
         )
         params.append(limit)
@@ -169,8 +169,8 @@ async def create_spell(body: dict):
             """INSERT INTO dnd_spells
                (name, level, casting_time, range, aoe, duration, concentration, ritual,
                 components, spell_type, damage, save_type, save_effect, description, upcast,
-                scaling_kind, scaling_per_level, source)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                scaling_kind, scaling_per_level, classes, source)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 name, level,
                 body.get("casting_time", "1 action"),
@@ -188,6 +188,7 @@ async def create_spell(body: dict):
                 body.get("upcast"),
                 body.get("scaling_kind") or None,
                 body.get("scaling_per_level") or None,
+                json.dumps(body.get("classes") or []),
                 body.get("source", "PHB"),
             ),
         )
@@ -211,7 +212,7 @@ async def update_spell(spell_id: int, body: dict):
                name=?, level=?, casting_time=?, range=?, aoe=?, duration=?,
                concentration=?, ritual=?, components=?, spell_type=?, damage=?,
                save_type=?, save_effect=?, description=?, upcast=?,
-               scaling_kind=?, scaling_per_level=?, source=?
+               scaling_kind=?, scaling_per_level=?, classes=?, source=?
                WHERE id=?""",
             (
                 body.get("name", ""), body.get("level", 0),
@@ -223,6 +224,7 @@ async def update_spell(spell_id: int, body: dict):
                 body.get("damage"), body.get("save_type"), body.get("save_effect"),
                 body.get("description", ""), body.get("upcast"),
                 body.get("scaling_kind") or None, body.get("scaling_per_level") or None,
+                json.dumps(body.get("classes") or []),
                 body.get("source", "PHB"),
                 spell_id,
             ),

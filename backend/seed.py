@@ -672,21 +672,48 @@ async def seed_dnd_spells():
         {"name": "Dispel Magic", "level": 3, "casting_time": "1 action", "range": "120ft", "duration": "Instantaneous", "concentration": False, "ritual": False, "components": "V, S", "spell_type": "utility", "description": "End one spell on a target creature, object, or area. If 3rd level or lower, automatically ends. Higher level: make ability check DC 10 + spell level.", "upcast": "Auto-dispels spells up to slot level used", "source": "PHB"},
     ]
 
+    # Class tags by spell name (JSON array on the row; 'other' = homebrew/runes).
+    tags = {
+        "Chill Touch": ["wizard", "sorcerer", "warlock"], "Cloud Rune": ["other"],
+        "Druidcraft": ["druid"], "Eldritch Blast": ["warlock"],
+        "Fire Bolt": ["wizard", "sorcerer", "artificer"], "Guidance": ["cleric", "druid", "artificer"],
+        "Mage Hand": ["wizard", "sorcerer", "warlock", "bard", "artificer"],
+        "Prestidigitation": ["wizard", "sorcerer", "warlock", "bard", "artificer"],
+        "Sacred Flame": ["cleric"], "Shillelagh": ["druid"], "Stone Rune": ["other"],
+        "Thorn Whip": ["druid", "artificer"],
+        "Absorb Elements": ["wizard", "sorcerer", "ranger", "artificer"],
+        "Cure Wounds": ["bard", "cleric", "druid", "paladin", "ranger", "artificer"],
+        "Entangle": ["druid", "ranger"], "Faerie Fire": ["bard", "druid", "artificer"],
+        "Fog Cloud": ["druid", "ranger", "sorcerer", "wizard"], "Goodberry": ["druid", "ranger"],
+        "Guiding Bolt": ["cleric"], "Healing Word": ["bard", "cleric", "druid"], "Hex": ["warlock"],
+        "Ice Knife": ["druid", "sorcerer", "wizard"], "Magic Missile": ["sorcerer", "wizard"],
+        "Shield": ["sorcerer", "wizard"], "Thunderwave": ["bard", "druid", "sorcerer", "wizard"],
+        "Wild Cunning": ["ranger"], "Heat Metal": ["bard", "druid", "artificer"],
+        "Hold Person": ["bard", "cleric", "druid", "sorcerer", "warlock", "wizard"],
+        "Misty Step": ["sorcerer", "warlock", "wizard"], "Pass Without Trace": ["druid", "ranger"],
+        "Spiritual Weapon": ["cleric"], "Counterspell": ["sorcerer", "warlock", "wizard"],
+        "Dispel Magic": ["bard", "cleric", "druid", "paladin", "sorcerer", "warlock", "wizard", "artificer"],
+        "Fireball": ["sorcerer", "wizard"],
+    }
+
     db = await get_db()
     try:
         for s in spells:
             await db.execute(
                 """INSERT OR IGNORE INTO dnd_spells
                    (name, level, casting_time, range, aoe, duration, concentration, ritual,
-                    components, spell_type, damage, save_type, save_effect, description, upcast, source)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    components, spell_type, damage, save_type, save_effect, description, upcast,
+                    classes, source)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     s["name"], s["level"], s.get("casting_time", "1 action"),
                     s.get("range", ""), s.get("aoe"), s.get("duration", "Instantaneous"),
                     1 if s.get("concentration") else 0, 1 if s.get("ritual") else 0,
                     s.get("components", ""), s.get("spell_type", "utility"),
                     s.get("damage"), s.get("save_type"), s.get("save_effect"),
-                    s.get("description", ""), s.get("upcast"), s.get("source", "PHB"),
+                    s.get("description", ""), s.get("upcast"),
+                    json.dumps(tags.get(s["name"], s.get("classes", []))),
+                    s.get("source", "PHB"),
                 ),
             )
         await db.commit()

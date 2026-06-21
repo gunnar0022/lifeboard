@@ -999,3 +999,32 @@
   line-height: 1.4;
 }
 .spells-tab__no-caster svg { flex-shrink: 0; color: var(--dnd-text-muted); }
+
+/* ── Spell class tags ── */
+.spell-modal__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+.spell-modal__tag-hint { font-size: 0.7rem; color: var(--dnd-text-faint); font-weight: 400; }
+.spell-tag {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--dnd-border);
+  background: var(--dnd-bg);
+  color: var(--dnd-text-muted);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.15s ease, color 0.12s ease;
+}
+.spell-tag:hover { border-color: var(--dnd-accent); }
+.spell-tag--on {
+  background: var(--dnd-accent);
+  border-color: var(--dnd-accent);
+  color: #fff;
+  font-weight: 600;
+}
+.spell-tag--static {
+  cursor: default;
+  font-size: 0.64rem;
+  padding: 0.12rem 0.45rem;
+  text-transform: capitalize;
+}
+.spell-tag--static:hover { border-color: var(--dnd-border); }
+.spell-row__class-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.4rem 0; }

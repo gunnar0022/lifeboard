@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, X, Zap, Edit3, Trash2, Save, Sparkles, ArrowLeftRight, Pin, PinOff } from 'lucide-react';
 import { classColor as resolveClassColor } from '../../dndUtils';
 import { SCALING_KINDS } from '../../spellSlots';
+import { SPELL_CLASS_TAGS, parseSpellClasses, spellClassLabel } from './spellTags';
 
 const SAVE_OPTS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
@@ -21,7 +22,12 @@ export default function SpellRow({
   const isActive = isConcentrating;
   const scales = !!spell.scaling_kind || !!spell.upcast;
 
-  const startEdit = () => { setEditForm({ ...spell }); setEditing(true); setExpanded(true); };
+  const startEdit = () => { setEditForm({ ...spell, classes: parseSpellClasses(spell.classes) }); setEditing(true); setExpanded(true); };
+  const toggleEditClass = (id) => setEditForm(f => ({
+    ...f,
+    classes: (f.classes || []).includes(id) ? f.classes.filter(c => c !== id) : [...(f.classes || []), id],
+  }));
+  const spellTags = parseSpellClasses(spell.classes);
   const cancelEdit = () => { setEditing(false); setEditForm(null); };
   const saveEdit = () => {
     if (onEditSpell && editForm) {
@@ -88,6 +94,12 @@ export default function SpellRow({
               <div><strong>Save:</strong> {spell.save_type}{spell.save_effect ? ` · ${spell.save_effect}` : ''}</div>
             )}
           </div>
+
+          {spellTags.length > 0 && (
+            <div className="spell-row__class-tags">
+              {spellTags.map(c => <span key={c} className="spell-tag spell-tag--static">{spellClassLabel(c)}</span>)}
+            </div>
+          )}
 
           {spell.upcast && (
             <div className="spell-row__upcast"><strong>At Higher Levels:</strong> {spell.upcast}</div>
@@ -191,6 +203,18 @@ export default function SpellRow({
               <input className="dnd-field" value={editForm.scaling_per_level || ''}
                 placeholder="1d6"
                 onChange={e => setEditForm({ ...editForm, scaling_per_level: e.target.value })} />
+            </div>
+          </div>
+          <div className="spell-row__edit-field">
+            <label>Class Tags</label>
+            <div className="spell-modal__tags">
+              {SPELL_CLASS_TAGS.map(t => (
+                <button key={t.id} type="button"
+                  className={`spell-tag ${(editForm.classes || []).includes(t.id) ? 'spell-tag--on' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); toggleEditClass(t.id); }}>
+                  {t.label}
+                </button>
+              ))}
             </div>
           </div>
           <div className="spell-row__edit-row-actions">
