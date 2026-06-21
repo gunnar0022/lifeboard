@@ -1,0 +1,20 @@
+export default {
+  name: 'Rune Knight',
+  className: 'Fighter',
+  features: [
+    { id: 'rk-bonus-prof', name: 'Bonus Proficiencies', level: 3, source: 'Rune Knight',
+      desc: 'You gain proficiency with smith\'s tools, and you learn to speak, read, and write Giant.' },
+    { id: 'rk-rune-carver', name: 'Rune Carver', level: 3, source: 'Rune Knight', choice: 'runes', combat: true,
+      desc: 'You can use magic runes to enhance your gear. You learn runes of your choice and learn more at higher levels (2 at 3rd, 3 at 7th, 4 at 10th, 5 at 15th). After a long rest, you can inscribe a different rune onto a number of objects equal to the runes you know; each object can bear only one rune at a time. Rune Magic save DC = 8 + proficiency bonus + your Constitution modifier.' },
+    { id: 'rk-giants-might', name: "Giant's Might", level: 3, source: 'Rune Knight', combat: true,
+      desc: 'As a bonus action, for 1 minute: you become Large (if smaller and you have room); you have advantage on Strength checks and Strength saving throws; and once on each of your turns one of your attacks deals an extra 1d6 damage. You can use this a number of times equal to your proficiency bonus, regaining all uses on a long rest.' },
+    { id: 'rk-runic-shield', name: 'Runic Shield', level: 7, source: 'Rune Knight', combat: true,
+      desc: 'When another creature you can see within 60 feet of you is hit by an attack roll, you can use your reaction to force the attacker to reroll the d20 and use the new roll. You can use this a number of times equal to your proficiency bonus, regaining all uses on a long rest.' },
+    { id: 'rk-great-stature', name: 'Great Stature', level: 10, source: 'Rune Knight',
+      desc: 'The magic of your runes permanently alters you: roll 3d4 and grow that many inches in height. Moreover, the extra damage of your Giant\'s Might increases to 1d8.' },
+    { id: 'rk-master-of-runes', name: 'Master of Runes', level: 15, source: 'Rune Knight',
+      desc: 'You can invoke each rune you know from your Rune Carver feature twice rather than once, and you regain all expended uses when you finish a short or long rest.' },
+    { id: 'rk-runic-juggernaut', name: 'Runic Juggernaut', level: 18, source: 'Rune Knight',
+      desc: 'The extra damage of your Giant\'s Might increases to 1d10. When you use that feature, your size can increase to Huge, and while that size your reach increases by 5 feet.' },
+  ],
+};

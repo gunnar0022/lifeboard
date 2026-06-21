@@ -1,0 +1,20 @@
+export default {
+  name: 'Circle of Spores',
+  className: 'Druid',
+  features: [
+    { id: 'csp-halo', name: 'Halo of Spores', level: 2, source: 'Circle of Spores', combat: true,
+      desc: 'Reaction: when a creature moves within 10 feet of you or starts its turn there, deal 1d4 necrotic damage (Constitution save negates). The die increases to 1d6 at 6th, 1d8 at 10th, and 1d10 at 14th level.' },
+    { id: 'csp-bonus-cantrip', name: 'Bonus Cantrip', level: 2, source: 'Circle of Spores',
+      desc: 'You learn the Chill Touch cantrip (necrotic, ranged spell attack, 120 ft).' },
+    { id: 'csp-symbiotic', name: 'Symbiotic Entity', level: 2, source: 'Circle of Spores', combat: true,
+      desc: 'As an action, expend a use of Wild Shape to gain 4 temporary hit points per druid level (10 min, or until temp HP gone). While active, your Halo of Spores damage dice are doubled, and your melee weapon hits deal an extra 1d6 necrotic damage.' },
+    { id: 'csp-circle-spells', name: 'Circle Spells', level: 3, source: 'Circle of Spores',
+      desc: 'You always have certain spells prepared (they don\'t count against your prepared limit): 3rd — Blindness/Deafness, Gentle Repose; 5th — Animate Dead, Gaseous Form; 7th — Blight, Confusion; 9th — Cloudkill, Contagion.' },
+    { id: 'csp-fungal-infestation', name: 'Fungal Infestation', level: 6, source: 'Circle of Spores', combat: true,
+      desc: 'Reaction: when a Small or Medium beast or humanoid dies within 10 feet of you, animate it as a 1-HP zombie for 1 hour (it acts on your turn). Usable a number of times equal to your Wisdom modifier (min 1) per long rest.' },
+    { id: 'csp-spreading-spores', name: 'Spreading Spores', level: 10, source: 'Circle of Spores', combat: true,
+      desc: 'While Symbiotic Entity is active, you can use a bonus action to hurl spores up to 30 feet into a 10-foot cube for 1 minute, dealing your Halo damage to creatures that enter or start their turn there. While active, you can\'t use your Halo of Spores reaction.' },
+    { id: 'csp-fungal-body', name: 'Fungal Body', level: 14, source: 'Circle of Spores',
+      desc: 'You are immune to being blinded, deafened, frightened, and poisoned. Critical hits against you count as normal hits, unless you are incapacitated.' },
+  ],
+};

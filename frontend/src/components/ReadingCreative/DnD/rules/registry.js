@@ -16,6 +16,7 @@ import {
   getClassFeatures, getSubclassFeatures, getRaceFeatures, RACES,
 } from '../classProgression';
 import { CLASS_CASTER_PROFILE, CLASS_FEATURE_DEFAULTS, SUBCLASS_LISTS, CLASS_NAMES } from '../dndUtils';
+import { CLASS_META } from './classes';
 import { RACE_ABILITY_BONUSES, SUBRACE_ABILITY_BONUSES } from './data/abilityBonuses';
 import { LORE } from './data/lore';
 
@@ -44,24 +45,6 @@ export const SUBCLASS_BLOCK_BY_NAME = {
   'Path of the Ancestral Guardian': 'AncestralGuardianBlock',
   'War Magic': 'WarMagicBlock',
   'The Archfey': 'ArchfeyBlock',
-};
-
-// Small per-class facts the legacy data never stored. These move into the
-// per-class modules in P3; for now they live here so the registry is complete.
-const CLASS_META = {
-  Barbarian: { hitDie: 'd12', subclassLabel: 'Primal Path',          subclassLevel: 3 },
-  Bard:      { hitDie: 'd8',  subclassLabel: 'Bard College',         subclassLevel: 3, spellList: 'bard' },
-  Cleric:    { hitDie: 'd8',  subclassLabel: 'Divine Domain',        subclassLevel: 1, spellList: 'cleric' },
-  Druid:     { hitDie: 'd8',  subclassLabel: 'Druid Circle',         subclassLevel: 2, spellList: 'druid' },
-  Fighter:   { hitDie: 'd10', subclassLabel: 'Martial Archetype',    subclassLevel: 3 },
-  Monk:      { hitDie: 'd8',  subclassLabel: 'Monastic Tradition',   subclassLevel: 3 },
-  Paladin:   { hitDie: 'd10', subclassLabel: 'Sacred Oath',          subclassLevel: 3, spellList: 'paladin' },
-  Ranger:    { hitDie: 'd10', subclassLabel: 'Ranger Conclave',      subclassLevel: 3, spellList: 'ranger' },
-  Rogue:     { hitDie: 'd8',  subclassLabel: 'Roguish Archetype',    subclassLevel: 3 },
-  Sorcerer:  { hitDie: 'd6',  subclassLabel: 'Sorcerous Origin',     subclassLevel: 1, spellList: 'sorcerer' },
-  Warlock:   { hitDie: 'd8',  subclassLabel: 'Otherworldly Patron',  subclassLevel: 1, spellList: 'warlock' },
-  Wizard:    { hitDie: 'd6',  subclassLabel: 'Arcane Tradition',     subclassLevel: 2, spellList: 'wizard' },
-  Artificer: { hitDie: 'd8',  subclassLabel: 'Artificer Specialist', subclassLevel: 3, spellList: 'artificer' },
 };
 
 const emptyOverview = { tagline: null, overview: null, definingFeature: null, lore: null };
