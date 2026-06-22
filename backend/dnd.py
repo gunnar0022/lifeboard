@@ -106,11 +106,67 @@ async def delete_character(character_id: int):
         await db.close()
 
 
+# ── Rules-tree lore overrides ───────────────────────────────
+# The encyclopedia's flavor text (overview, tagline, lore sections) ships as
+# static defaults in the JS rules tree. These endpoints let the user edit that
+# fluff in-app and persist per-node overrides, which the client merges over the
+# defaults at read time. Mechanical data (traits, progression) is NOT stored
+# here — only the editable prose.
+
+@router.get("/rules-overrides")
+async def list_rules_overrides():
+    """All lore overrides as a map of node_id → override object."""
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT node_id, data FROM dnd_rules_overrides")
+        rows = await cursor.fetchall()
+        return {r["node_id"]: json.loads(r["data"]) for r in rows}
+    finally:
+        await db.close()
+
+
+@router.put("/rules-overrides/{node_id}")
+async def put_rules_override(node_id: str, body: dict):
+    """Upsert the lore override for a node. Body is the override object
+    (e.g. { tagline, overview, lore: { physical, lifespan, ... } })."""
+    payload = json.dumps(body or {})
+    db = await get_db()
+    try:
+        await db.execute(
+            """INSERT INTO dnd_rules_overrides (node_id, data, updated_at)
+               VALUES (?, ?, CURRENT_TIMESTAMP)
+               ON CONFLICT(node_id) DO UPDATE SET data=excluded.data,
+                                                  updated_at=CURRENT_TIMESTAMP""",
+            (node_id, payload),
+        )
+        await db.commit()
+        return {"success": True}
+    finally:
+        await db.close()
+
+
 # ── Spell Library ───────────────────────────────────────────
 
 @router.get("/spells")
-async def list_spells(q: str = "", level: int = None, limit: int = 20):
-    """Search/list spells from the library."""
+async def list_spells(
+    q: str = "",
+    level: int = None,
+    level_min: int = None,
+    level_max: int = None,
+    cls: str = None,
+    casting_time: str = None,
+    limit: int = 20,
+):
+    """Search/list spells from the library.
+
+    Filters (all optional, AND-combined):
+      q            name contains
+      level        exact level (kept for the Add-Spell modal)
+      level_min    level >= (the encyclopedia's cantrip→X range)
+      level_max    level <=
+      cls          class tag — matches the JSON `classes` array (e.g. 'wizard')
+      casting_time exact casting time string
+    """
     db = await get_db()
     try:
         conditions = []
@@ -121,6 +177,20 @@ async def list_spells(q: str = "", level: int = None, limit: int = 20):
         if level is not None:
             conditions.append("level = ?")
             params.append(level)
+        if level_min is not None:
+            conditions.append("level >= ?")
+            params.append(level_min)
+        if level_max is not None:
+            conditions.append("level <= ?")
+            params.append(level_max)
+        if casting_time:
+            conditions.append("casting_time = ?")
+            params.append(casting_time)
+        if cls:
+            # `classes` is a JSON array string like '["wizard","sorcerer"]';
+            # match the quoted token so 'wizard' doesn't hit 'wizardry' etc.
+            conditions.append("classes LIKE ?")
+            params.append(f'%"{cls}"%')
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
         query = (

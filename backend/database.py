@@ -446,6 +446,12 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (campaign_id) REFERENCES dnd_campaigns(id) ON DELETE CASCADE
         );
+
+        CREATE TABLE IF NOT EXISTS dnd_rules_overrides (
+            node_id TEXT PRIMARY KEY,
+            data TEXT NOT NULL DEFAULT '{}',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     """)
 
 

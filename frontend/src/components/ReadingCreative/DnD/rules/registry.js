@@ -205,7 +205,15 @@ export function getNodeDetail(id) {
     progression: n.progression || [],
     creation: n.creation || null,
     abilityBonuses: n.abilityBonuses || undefined,
-    children: getChildren(id).map(c => ({ id: c.id, name: c.name, type: c.type })),
+    // Class-specific "at a glance" fields (undefined on race/subrace nodes).
+    hitDie: n.hitDie,
+    caster: n.caster,
+    subclassLabel: n.subclassLabel,
+    subclassLevel: n.subclassLevel,
+    spellList: n.spellList,
+    implemented: n.implemented,
+    // Children carry `implemented` so subclass lists can flag undetailed entries.
+    children: getChildren(id).map(c => ({ id: c.id, name: c.name, type: c.type, implemented: c.implemented })),
     parent: getParent(id) ? { id: n.parentId, name: NODES.get(n.parentId).name } : null,
   };
 }

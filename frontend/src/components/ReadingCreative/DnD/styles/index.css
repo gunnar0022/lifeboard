@@ -10,3 +10,4 @@
 @import './campaign-notes.css';  /* Campaign notes tab */
 @import './status-equipment.css'; /* Status bar, Equipment tab, Stats tab */
 @import './subclasses.css';      /* All subclass feature blocks */
+@import './encyclopedia.css';    /* Encyclopedia (wiki) tab — race/class/spell browser */

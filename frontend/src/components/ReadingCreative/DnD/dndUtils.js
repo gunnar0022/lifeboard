@@ -317,6 +317,7 @@ export const TAB_REGISTRY = [
   { id: 'features', label: 'Features' },
   { id: 'spells', label: 'Spells' },
   { id: 'info', label: 'Info' },
+  { id: 'encyclopedia', label: 'Encyclopedia' },
   { id: 'notes', label: 'Notes', requiresCampaign: true },
 ];
 

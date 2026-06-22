@@ -13,6 +13,7 @@ import RacialBlock from './components/ClassFeatures/RacialBlock';
 import SubclassBlock from './components/SubclassBlock';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
+import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
@@ -669,6 +670,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <InfoPanel
             customBoxes={character.customBoxes || []}
             editMode={editMode} onUpdate={handleUpdate} />
+        )}
+
+        {activeTab === 'encyclopedia' && (
+          <EncyclopediaTab editMode={editMode} />
         )}
 
         {activeTab === 'notes' && hasCampaign && (
