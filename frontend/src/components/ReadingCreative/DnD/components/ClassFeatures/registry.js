@@ -53,6 +53,18 @@ import LandBlock from './LandBlock';
 import MoonBlock from './MoonBlock';
 import ShepherdBlock from './ShepherdBlock';
 import WildfireBlock from './WildfireBlock';
+import DraconicBlock from './DraconicBlock';
+import AberrantMindBlock from './AberrantMindBlock';
+import ClockworkSoulBlock from './ClockworkSoulBlock';
+import DivineSoulBlock from './DivineSoulBlock';
+import InquisitiveBlock from './InquisitiveBlock';
+import MastermindBlock from './MastermindBlock';
+import PhantomBlock from './PhantomBlock';
+import ScoutBlock from './ScoutBlock';
+import SoulknifeBlock from './SoulknifeBlock';
+import ArcaneTricksterBlock from './ArcaneTricksterBlock';
+import ThiefBlock from './ThiefBlock';
+import SwashbucklerBlock from './SwashbucklerBlock';
 
 export const BLOCKS = {
   // class trackers
@@ -69,6 +81,9 @@ export const BLOCKS = {
   BattleMasterBlock, ArcaneArcherBlock, BanneretBlock, EchoKnightBlock,
   ChampionBlock, CavalierBlock, EldritchKnightBlock, PsiWarriorBlock, SamuraiBlock,
   DreamsBlock, LandBlock, MoonBlock, ShepherdBlock, WildfireBlock,
+  DraconicBlock, AberrantMindBlock, ClockworkSoulBlock, DivineSoulBlock,
+  InquisitiveBlock, MastermindBlock, PhantomBlock, ScoutBlock, SoulknifeBlock,
+  ArcaneTricksterBlock, ThiefBlock, SwashbucklerBlock,
 };
 
 /** Look up a tracker component by blockId (null if none/unknown). */

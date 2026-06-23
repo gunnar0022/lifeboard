@@ -17,7 +17,7 @@ import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
-import { deepMerge, proficiencyBonus, abilityMod, hpForClassLevel, hitDieNumber, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
+import { deepMerge, proficiencyBonus, abilityMod, hpForClassLevel, subclassHpBonus, hitDieNumber, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
 import { grantedMaxUses } from './components/Spellcasting/GrantedSpells';
 import { RACES, getSubraces } from './classProgression';
 import { getClass } from './rules/registry';
@@ -83,7 +83,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         setCharacter(charData);
         prevClassRef.current = charData?.meta?.className || '';
         prevSubclassRef.current = charData?.meta?.subclass || '';
-        hpAutoKeyRef.current = `${charData?.meta?.className || ''}|${charData?.meta?.level || 1}`;
+        hpAutoKeyRef.current = `${charData?.meta?.className || ''}|${charData?.meta?.subclass || ''}|${charData?.meta?.level || 1}`;
       } catch (e) {
         console.error('Failed to load character:', e);
         // Stale persisted reference — drop back to the picker instead of a dead screen.
@@ -223,15 +223,18 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   useEffect(() => {
     if (!character) return;
     const className = character.meta?.className;
+    const subclass = character.meta?.subclass;
     const lvl = character.meta?.level || 1;
-    const key = `${className || ''}|${lvl}`;
+    const key = `${className || ''}|${subclass || ''}|${lvl}`;
     const prevKey = hpAutoKeyRef.current;
     hpAutoKeyRef.current = key;
     if (prevKey === null || prevKey === key) return;
 
     const die = getClass(className)?.hitDie;
-    const newMax = hpForClassLevel(die, lvl, abilityMod(character.abilities?.CON || 10));
-    if (!newMax) return; // unknown class / hit die — leave HP under manual control
+    const base = hpForClassLevel(die, lvl, abilityMod(character.abilities?.CON || 10));
+    if (!base) return; // unknown class / hit die — leave HP under manual control
+    // Layer on any subclass HP bonus (e.g. Draconic Resilience: +1 per sorcerer level).
+    const newMax = base + subclassHpBonus(subclass, lvl);
 
     setCharacter(prev => {
       const combat = prev.combat || {};
@@ -248,7 +251,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         },
       };
     });
-  }, [character?.meta?.level, character?.meta?.className]);
+  }, [character?.meta?.level, character?.meta?.className, character?.meta?.subclass]);
 
   // Rest functions
   const shortRest = () => {
@@ -317,6 +320,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('psiRegainUsed' in cf) cf.psiRegainUsed = false;
       // Circle of the Shepherd: Spirit Totem recharges on a short rest.
       if ('spiritTotemUsed' in cf) cf.spiritTotemUsed = false;
+      // Divine Soul: Favored by the Gods recharges on a short rest.
+      if ('favoredUsed' in cf) cf.favoredUsed = false;
+      // Swashbuckler: Master Duelist recharges on a short rest.
+      if ('masterDuelistUsed' in cf) cf.masterDuelistUsed = false;
       updates.classFeature = cf;
     }
 
@@ -501,6 +508,35 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.cauterizingFlames) cf.cauterizingFlames = { ...cf.cauterizingFlames, current: cf.cauterizingFlames.max || 0 };
       if ('blazingRevivalUsed' in cf) cf.blazingRevivalUsed = false;
       if ('wildfireSpirit' in cf) cf.wildfireSpirit = false;
+      // Aberrant Mind: Warping Implosion resets; Revelation transform ends.
+      if ('warpingUsed' in cf) cf.warpingUsed = false;
+      if ('revelationBenefits' in cf) cf.revelationBenefits = {};
+      // Clockwork Soul: Restore Balance refills; Bastion ward fades; Trance/Cavalcade reset.
+      if (cf.restoreBalance) cf.restoreBalance = { ...cf.restoreBalance, current: cf.restoreBalance.max || 0 };
+      if (cf.bastionWard) cf.bastionWard = { dice: 0 };
+      if ('tranceUsed' in cf) cf.tranceUsed = false;
+      if ('cavalcadeUsed' in cf) cf.cavalcadeUsed = false;
+      // Divine Soul: Favored by the Gods + Unearthly Recovery reset; wings furl.
+      if ('favoredUsed' in cf) cf.favoredUsed = false;
+      if ('unearthlyUsed' in cf) cf.unearthlyUsed = false;
+      if ('angelicWings' in cf) cf.angelicWings = false;
+      // Draconic Bloodline: wings furl on a long rest.
+      if ('dragonWings' in cf) cf.dragonWings = false;
+      // Inquisitive: Unerring Eye refills; the Insightful Fighting read clears.
+      if (cf.unerringEye) cf.unerringEye = { ...cf.unerringEye, current: cf.unerringEye.max || 0 };
+      if ('insightfulTarget' in cf) cf.insightfulTarget = false;
+      // Phantom: Wails refill; Ghost Walk resets; Death's Friend grants a trinket if none.
+      if (cf.wailsFromGrave) cf.wailsFromGrave = { ...cf.wailsFromGrave, current: cf.wailsFromGrave.max || 0 };
+      if ('ghostWalkUsed' in cf) cf.ghostWalkUsed = false;
+      if ('ghostWalkActive' in cf) cf.ghostWalkActive = false;
+      if (typeof cf.soulTrinkets === 'number' && cf.soulTrinkets === 0 && level >= 17) cf.soulTrinkets = 1;
+      // Soulknife: Psychic Veil + Rend Mind reset (Psionic Energy refills with Psi Warrior's reset above).
+      if ('psychicVeilUsed' in cf) cf.psychicVeilUsed = false;
+      if ('psychicVeilActive' in cf) cf.psychicVeilActive = false;
+      if ('rendMindUsed' in cf) cf.rendMindUsed = false;
+      // Arcane Trickster: Spell Thief; Swashbuckler: Master Duelist (also short rest).
+      if ('spellThiefUsed' in cf) cf.spellThiefUsed = false;
+      if ('masterDuelistUsed' in cf) cf.masterDuelistUsed = false;
       // Circle of Spores: reset fungal infestation, spreading spores
       if ('fungalInfestationUsed' in cf) {
         cf.fungalInfestationUsed = 0;

@@ -39,6 +39,18 @@ import circleOfTheLand from './circleOfTheLand';
 import circleOfTheMoon from './circleOfTheMoon';
 import circleOfTheShepherd from './circleOfTheShepherd';
 import circleOfWildfire from './circleOfWildfire';
+import draconicBloodline from './draconicBloodline';
+import aberrantMind from './aberrantMind';
+import clockworkSoul from './clockworkSoul';
+import divineSoul from './divineSoul';
+import inquisitive from './inquisitive';
+import mastermind from './mastermind';
+import phantom from './phantom';
+import scout from './scout';
+import soulknife from './soulknife';
+import arcaneTrickster from './arcaneTrickster';
+import thief from './thief';
+import swashbuckler from './swashbuckler';
 
 const ALL = [
   runeKnight, ancestralGuardian, assassin,
@@ -50,6 +62,9 @@ const ALL = [
   battleMaster, arcaneArcher, banneret, echoKnight,
   champion, cavalier, eldritchKnight, psiWarrior, samurai,
   circleOfDreams, circleOfTheLand, circleOfTheMoon, circleOfTheShepherd, circleOfWildfire,
+  draconicBloodline, aberrantMind, clockworkSoul, divineSoul,
+  inquisitive, mastermind, phantom, scout, soulknife,
+  arcaneTrickster, thief, swashbuckler,
 ];
 
 export const SUBCLASS_PROGRESSION = Object.fromEntries(

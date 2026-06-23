@@ -1,17 +1,16 @@
+import { sneakAttackDice } from '../../classProgression';
+
 export default function CunningActionPanel({ classFeature, level = 1, editMode, onUpdate }) {
-  const sneakDamage = classFeature?.sneakAttackDamage || '1d6';
+  // Sneak Attack snaps to level: ceil(level / 2) d6, like the other
+  // class-authoritative resources (no longer a stored, manually-edited value).
+  const sneakDamage = `${sneakAttackDice(level)}d6`;
 
   return (
     <div className="dnd-cunning">
       <div className="dnd-cunning__sneak">
         <h4 className="dnd-cunning__title">SNEAK ATTACK</h4>
         <div className="dnd-cunning__dice">
-          {editMode ? (
-            <input className="dnd-field dnd-field--sm" value={sneakDamage}
-              onChange={e => onUpdate({ classFeature: { ...classFeature, sneakAttackDamage: e.target.value } })} />
-          ) : (
-            <span className="dnd-cunning__dice-value">{sneakDamage}</span>
-          )}
+          <span className="dnd-cunning__dice-value">{sneakDamage}</span>
         </div>
         <p className="dnd-cunning__reminder">
           Once per turn. Requires advantage OR an ally within 5ft of target. Must use finesse or ranged weapon.

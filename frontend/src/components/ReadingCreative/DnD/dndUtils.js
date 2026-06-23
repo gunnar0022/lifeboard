@@ -30,6 +30,16 @@ export function hpForClassLevel(hitDie, level, conMod) {
   return Math.max(1, die + conMod + (lvl - 1) * (avgPerLevel + conMod));
 }
 
+/**
+ * Extra max HP granted by a subclass, layered on top of the class HP formula.
+ * Draconic Bloodline's Draconic Resilience adds +1 at 1st level and +1 each
+ * sorcerer level thereafter — i.e. +level total.
+ */
+export function subclassHpBonus(subclass, level) {
+  if (subclass === 'Draconic Bloodline') return Math.max(1, level || 1);
+  return 0;
+}
+
 export function skillMod(abilities, skillAbility, profBonus, isProficient, isExpert) {
   const base = abilityMod(abilities[skillAbility]);
   if (isExpert) return base + profBonus * 2;
@@ -180,15 +190,15 @@ export const SUBCLASS_LISTS = {
     { name: 'Banneret (Purple Dragon Knight)', implemented: true },
   ],
   Rogue: [
-    { name: 'Thief', implemented: false },
+    { name: 'Thief', implemented: true },
     { name: 'Assassin', implemented: true },
-    { name: 'Arcane Trickster', implemented: false },
-    { name: 'Mastermind', implemented: false },
-    { name: 'Swashbuckler', implemented: false },
-    { name: 'Inquisitive', implemented: false },
-    { name: 'Scout', implemented: false },
-    { name: 'Phantom', implemented: false },
-    { name: 'Soulknife', implemented: false },
+    { name: 'Arcane Trickster', implemented: true },
+    { name: 'Mastermind', implemented: true },
+    { name: 'Swashbuckler', implemented: true },
+    { name: 'Inquisitive', implemented: true },
+    { name: 'Scout', implemented: true },
+    { name: 'Phantom', implemented: true },
+    { name: 'Soulknife', implemented: true },
   ],
   Wizard: [
     { name: 'School of Abjuration', implemented: false },
@@ -260,13 +270,13 @@ export const SUBCLASS_LISTS = {
     { name: 'The Undead', implemented: false },
   ],
   Sorcerer: [
-    { name: 'Draconic Bloodline', implemented: false },
+    { name: 'Draconic Bloodline', implemented: true },
     { name: 'Wild Magic', implemented: false },
-    { name: 'Divine Soul', implemented: false },
+    { name: 'Divine Soul', implemented: true },
     { name: 'Shadow Magic', implemented: false },
     { name: 'Storm Sorcery', implemented: false },
-    { name: 'Aberrant Mind', implemented: false },
-    { name: 'Clockwork Soul', implemented: false },
+    { name: 'Aberrant Mind', implemented: true },
+    { name: 'Clockwork Soul', implemented: true },
   ],
   Bard: [
     { name: 'College of Lore', implemented: true },

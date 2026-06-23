@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { abilityMod, proficiencyBonus, normalizeSpellcasting, casterProfileFor, buildEmptySpellcasting } from '../../dndUtils';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
-import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown, eldritchKnightCantripsKnown, eldritchKnightSpellsKnown } from '../../classProgression';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown, eldritchKnightCantripsKnown, eldritchKnightSpellsKnown, arcaneTricksterCantripsKnown } from '../../classProgression';
 import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
@@ -70,12 +70,22 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
     Wizard: wizardCantripsKnown, Warlock: warlockCantripsKnown, Druid: druidCantripsKnown,
     Bard: bardCantripsKnown, Cleric: clericCantripsKnown, Sorcerer: sorcererCantripsKnown,
   };
+  // Subclass third-casters supply their own cantrip / spells-known caps.
+  const SUBCLASS_CANTRIP_CAPS = {
+    'Eldritch Knight': eldritchKnightCantripsKnown,
+    'Arcane Trickster': arcaneTricksterCantripsKnown,
+  };
+  // Arcane Trickster's spells-known table matches the Eldritch Knight's.
+  const SUBCLASS_KNOWN_CAPS = {
+    'Eldritch Knight': eldritchKnightSpellsKnown,
+    'Arcane Trickster': eldritchKnightSpellsKnown,
+  };
   const cantripCap = CANTRIP_CAPS[meta.className] ? CANTRIP_CAPS[meta.className](classLevel)
-    : meta.subclass === 'Eldritch Knight' ? eldritchKnightCantripsKnown(classLevel) : null;
+    : SUBCLASS_CANTRIP_CAPS[meta.subclass] ? SUBCLASS_CANTRIP_CAPS[meta.subclass](classLevel) : null;
   // Known-spell cap (display-only) for "known" casters that have one.
   const KNOWN_CAPS = { Bard: bardSpellsKnown, Sorcerer: sorcererSpellsKnown, Ranger: rangerSpellsKnown };
   const knownCap = KNOWN_CAPS[meta.className] ? KNOWN_CAPS[meta.className](classLevel)
-    : meta.subclass === 'Eldritch Knight' ? eldritchKnightSpellsKnown(classLevel) : null;
+    : SUBCLASS_KNOWN_CAPS[meta.subclass] ? SUBCLASS_KNOWN_CAPS[meta.subclass](classLevel) : null;
   const alwaysSet = useMemo(() => new Set(sc.alwaysPrepared || []), [sc.alwaysPrepared]);
   const preparedCount = (sc.prepared || []).filter(id => !alwaysSet.has(id)).length;
   const preparedFull = preparedCount >= preparedCap;

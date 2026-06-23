@@ -864,6 +864,17 @@
 .dnd-ek__bonds { display: flex; gap: 0.4rem; margin: 0.3rem 0; }
 .dnd-ek__bond-input { flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem; }
 
+/* Rogue — active "read/phase" highlight + inline proficiency field */
+.dnd-inq--reading {
+  border-color: var(--dnd-class-rogue) !important;
+  background: color-mix(in srgb, var(--dnd-class-rogue) 9%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-rogue) 22%, transparent);
+}
+.dnd-phantom__prof {
+  display: inline-block; width: auto; min-width: 7rem; max-width: 11rem;
+  font-size: 0.7rem; padding: 0.1rem 0.35rem; margin-left: 0.1rem; vertical-align: baseline;
+}
+
 /* Druid — land / spirit pickers + circle-spell reference */
 .dnd-druid__lands { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
 .dnd-druid__land {

@@ -132,6 +132,16 @@ export function mysticArcanumLevels(level) {
     .map(a => a.lvl);
 }
 
+// ── Rogue ──
+export function sneakAttackDice(level) {
+  return Math.ceil((level || 1) / 2);
+}
+// Arcane Trickster (third-caster, wizard list): Mage Hand + 2 cantrips, +1 at 10th.
+// Its 1st-level-and-higher spells-known table matches the Eldritch Knight's.
+export function arcaneTricksterCantripsKnown(level) {
+  return (level || 1) >= 10 ? 4 : 3;
+}
+
 // ── Fighter: Eldritch Knight (third-caster, wizard list) ──
 export function eldritchKnightCantripsKnown(level) {
   return (level || 1) >= 10 ? 3 : 2;

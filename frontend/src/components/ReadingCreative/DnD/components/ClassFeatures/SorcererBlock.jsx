@@ -47,6 +47,13 @@ export default function SorcererBlock({ character, onUpdate }) {
   // Which slots you can afford to create right now via Flexible Casting.
   const affordable = Object.entries(SLOT_COST).filter(([, c]) => c <= sp).map(([lvl]) => lvl);
 
+  // Spend a fixed metamagic cost from the pool (variable-cost options like
+  // Twinned Spell are adjusted with the Sorcery Points stepper instead).
+  const useMeta = (cost) => {
+    const n = parseInt(cost, 10);
+    if (!Number.isNaN(n) && sp >= n) setSp(sp - n);
+  };
+
   return (
     <div className="dnd-warmagic dnd-ki" style={{ '--block-accent': 'var(--dnd-class-sorcerer)' }}>
       <div className="dnd-warmagic__section">
@@ -76,13 +83,27 @@ export default function SorcererBlock({ character, onUpdate }) {
         {metamagic.length === 0 ? (
           <span className="dnd-warmagic__note">Choose Metamagic options on the Features tab.</span>
         ) : (
-          <div className="dnd-ki__chips">
+          <div className="dnd-meta">
             {metamagic.map(name => {
               const o = METAMAGIC_OPTIONS.find(x => x.name === name);
+              const n = parseInt(o?.cost, 10);
+              const fixed = !Number.isNaN(n);
               return (
-                <span key={name} className="dnd-ki__chip" title={o?.desc} style={{ cursor: 'default' }}>
-                  {name} <span className="dnd-ki__cost">{o?.cost}</span>
-                </span>
+                <div key={name} className="dnd-meta__row">
+                  <div className="dnd-meta__top">
+                    <span className="dnd-meta__name">{name}</span>
+                    <span className="dnd-meta__cost">{o?.cost}</span>
+                    <button
+                      className="dnd-warmagic__btn dnd-warmagic__btn--spend dnd-meta__use"
+                      onClick={() => useMeta(o?.cost)}
+                      disabled={!fixed || sp < n}
+                      title={fixed ? `Spend ${n} sorcery point${n === 1 ? '' : 's'}` : 'Variable cost — use the Sorcery Points stepper'}
+                    >
+                      {fixed ? `Use −${n}` : 'Use'}
+                    </button>
+                  </div>
+                  <p className="dnd-meta__desc">{o?.desc}</p>
+                </div>
               );
             })}
           </div>

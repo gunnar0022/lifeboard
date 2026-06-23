@@ -336,6 +336,50 @@
 
 .dnd-archfey__spent { opacity: 0.6; }
 
+/* ── Shared accent-driven helpers (pickers + granted-spell reference) ── */
+.dnd-warmagic__pick { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.1rem 0 0.4rem; }
+.dnd-warmagic__pick-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 6px;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.68rem; font-weight: 600; text-transform: capitalize;
+}
+.dnd-warmagic__pick-btn--active {
+  background: var(--block-accent, var(--dnd-class-wizard)); border-color: var(--block-accent, var(--dnd-class-wizard));
+  color: var(--dnd-bg); font-weight: 700;
+}
+.dnd-warmagic__grant { display: flex; flex-direction: column; gap: 0.25rem; }
+.dnd-warmagic__grant-row { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.72rem; }
+.dnd-warmagic__grant-row--locked { opacity: 0.4; }
+.dnd-warmagic__grant-lvl {
+  flex-shrink: 0; font-size: 0.6rem; font-weight: 700; color: var(--block-accent, var(--dnd-class-wizard));
+  background: color-mix(in srgb, var(--block-accent, var(--dnd-class-wizard)) 14%, transparent);
+  padding: 0.05rem 0.35rem; border-radius: 5px;
+}
+.dnd-warmagic__grant-names { color: var(--dnd-text); }
+.dnd-warmagic__chip {
+  font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 6px;
+  color: var(--block-accent, var(--dnd-class-wizard));
+  background: color-mix(in srgb, var(--block-accent, var(--dnd-class-wizard)) 13%, transparent);
+}
+.dnd-warmagic__inline-btn { flex-shrink: 0; align-self: flex-start; margin-left: auto; }
+
+/* ── Sorcerer — Metamagic usable list ── */
+.dnd-meta { display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-meta__row {
+  padding: 0.4rem 0.5rem; border-radius: 7px;
+  border: 1px solid var(--dnd-border); border-left: 3px solid var(--block-accent, var(--dnd-class-sorcerer));
+  background: var(--dnd-bg);
+}
+.dnd-meta__top { display: flex; align-items: center; gap: 0.5rem; }
+.dnd-meta__name { font-size: 0.78rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-meta__cost {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  padding: 0.1rem 0.4rem; border-radius: 5px; color: var(--block-accent, var(--dnd-class-sorcerer));
+  background: color-mix(in srgb, var(--block-accent, var(--dnd-class-sorcerer)) 14%, transparent);
+}
+.dnd-meta__use { margin-left: auto; }
+.dnd-meta__desc { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.25rem 0 0; }
+
 /* ── Bard — Bardic Inspiration headline ── */
 .dnd-bard { display: flex; flex-direction: column; gap: 0.6rem; --bard: var(--dnd-class-bard); }
 .dnd-bard__inspiration {
