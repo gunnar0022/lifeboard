@@ -1,6 +1,14 @@
 /** Wizard base-class progression. */
 export default [
   {
+    "id": "wizard-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Wizard",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d6 per wizard level\nHit Points at 1st Level: 6 + your Constitution modifier\nHit Points at Higher Levels: 1d6 (or 4) + your Constitution modifier per wizard level after 1st"
+  },
+  {
     "id": "wiz-spellcasting",
     "name": "Spellcasting",
     "level": 1,

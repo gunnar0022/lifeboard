@@ -176,11 +176,12 @@ export const SCALING_KINDS = [
   { id: 'targets', label: 'Targets' },
   { id: 'distance', label: 'Distance/Area' },
   { id: 'duration', label: 'Duration' },
+  { id: 'challenge_rating', label: 'Challenge Rating' },
 ];
 
 const SCALING_UNIT = {
   damage: 'damage', healing: 'healing', targets: 'target(s)',
-  distance: 'ft', duration: '',
+  distance: 'ft', duration: '', challenge_rating: 'CR',
 };
 
 /** Human label for a scaling result, e.g. "10d6 damage" or "+2 target(s)". */

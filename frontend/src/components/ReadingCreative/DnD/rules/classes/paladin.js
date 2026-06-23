@@ -1,6 +1,14 @@
 /** Paladin base-class progression. */
 export default [
   {
+    "id": "paladin-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Paladin",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d10 per paladin level\nHit Points at 1st Level: 10 + your Constitution modifier\nHit Points at Higher Levels: 1d10 (or 6) + your Constitution modifier per paladin level after 1st"
+  },
+  {
     "id": "pal-divine-sense",
     "name": "Divine Sense",
     "level": 1,

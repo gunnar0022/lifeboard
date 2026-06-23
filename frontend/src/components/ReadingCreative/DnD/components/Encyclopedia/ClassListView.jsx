@@ -7,7 +7,7 @@ import { classAccent } from './accents';
  * a hint at how many subclass paths branch from it.
  */
 export default function ClassListView({ onOpen }) {
-  const classes = getRoots('class');
+  const classes = getRoots('class').slice().sort((a, b) => a.name.localeCompare(b.name));
   return (
     <div className="wiki-list">
       <h2 className="wiki-list__title">Classes</h2>

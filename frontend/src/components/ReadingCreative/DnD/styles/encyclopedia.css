@@ -93,7 +93,7 @@
   color: var(--accent, var(--dnd-text)); line-height: 1.1;
 }
 .wiki-detail__tagline { font-style: italic; color: var(--dnd-text-dim); margin: 0.3rem 0 0; }
-.wiki-detail__overview { margin: 0; line-height: 1.55; color: var(--dnd-text); max-width: 48rem; }
+.wiki-detail__overview { margin: 0; line-height: 1.55; color: var(--dnd-text); max-width: 48rem; white-space: pre-wrap; overflow-wrap: break-word; }
 
 .wiki-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .wiki-chip {
@@ -127,7 +127,7 @@
   font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dnd-text-muted);
   display: block; margin-bottom: 0.15rem;
 }
-.wiki-lore__body { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--dnd-text-dim); }
+.wiki-lore__body { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--dnd-text-dim); white-space: pre-wrap; overflow-wrap: break-word; }
 
 /* ── Inline choice: Half-Elf / Human versatility tabs ── */
 .wiki-choice { margin-top: 0.5rem; }

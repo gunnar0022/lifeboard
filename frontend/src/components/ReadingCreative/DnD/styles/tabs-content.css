@@ -85,7 +85,7 @@
   border: 1px solid var(--dnd-border); color: var(--dnd-text-dim);
   text-transform: uppercase; letter-spacing: 0.05em;
 }
-.dnd-features__desc { font-size: 0.85rem; color: var(--dnd-text-dim); margin: 0.3rem 0 0; line-height: 1.4; }
+.dnd-features__desc { font-size: 0.85rem; color: var(--dnd-text-dim); margin: 0.3rem 0 0; line-height: 1.4; white-space: pre-wrap; }
 .dnd-features__toggle {
   background: none; border: none; color: var(--dnd-accent-dim);
   cursor: pointer; font-size: 0.75rem; padding: 0; font-family: inherit;

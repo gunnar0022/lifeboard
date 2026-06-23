@@ -23,6 +23,36 @@ import CircleOfSporesBlock from './CircleOfSporesBlock';
 import AncestralGuardianBlock from './AncestralGuardianBlock';
 import WarMagicBlock from './WarMagicBlock';
 import ArchfeyBlock from './ArchfeyBlock';
+import BerserkerBlock from './BerserkerBlock';
+import BattleragerBlock from './BattleragerBlock';
+import BeastBlock from './BeastBlock';
+import GiantBlock from './GiantBlock';
+import StormHeraldBlock from './StormHeraldBlock';
+import TotemWarriorBlock from './TotemWarriorBlock';
+import WildMagicBlock from './WildMagicBlock';
+import ZealotBlock from './ZealotBlock';
+import LoreBlock from './LoreBlock';
+import EloquenceBlock from './EloquenceBlock';
+import GlamourBlock from './GlamourBlock';
+import CreationBlock from './CreationBlock';
+import SpiritsBlock from './SpiritsBlock';
+import SwordsBlock from './SwordsBlock';
+import ValorBlock from './ValorBlock';
+import WhispersBlock from './WhispersBlock';
+import BattleMasterBlock from './BattleMasterBlock';
+import ArcaneArcherBlock from './ArcaneArcherBlock';
+import BanneretBlock from './BanneretBlock';
+import EchoKnightBlock from './EchoKnightBlock';
+import ChampionBlock from './ChampionBlock';
+import CavalierBlock from './CavalierBlock';
+import EldritchKnightBlock from './EldritchKnightBlock';
+import PsiWarriorBlock from './PsiWarriorBlock';
+import SamuraiBlock from './SamuraiBlock';
+import DreamsBlock from './DreamsBlock';
+import LandBlock from './LandBlock';
+import MoonBlock from './MoonBlock';
+import ShepherdBlock from './ShepherdBlock';
+import WildfireBlock from './WildfireBlock';
 
 export const BLOCKS = {
   // class trackers
@@ -31,7 +61,14 @@ export const BLOCKS = {
   SorcererBlock, RangerBlock,
   // subclass trackers
   RuneKnightBlock, AssassinBlock, CircleOfStarsBlock, CircleOfSporesBlock,
-  AncestralGuardianBlock, WarMagicBlock, ArchfeyBlock,
+  AncestralGuardianBlock, WarMagicBlock, ArchfeyBlock, BerserkerBlock,
+  BattleragerBlock, BeastBlock, GiantBlock,
+  StormHeraldBlock, TotemWarriorBlock, WildMagicBlock, ZealotBlock,
+  LoreBlock, EloquenceBlock, GlamourBlock, CreationBlock,
+  SpiritsBlock, SwordsBlock, ValorBlock, WhispersBlock,
+  BattleMasterBlock, ArcaneArcherBlock, BanneretBlock, EchoKnightBlock,
+  ChampionBlock, CavalierBlock, EldritchKnightBlock, PsiWarriorBlock, SamuraiBlock,
+  DreamsBlock, LandBlock, MoonBlock, ShepherdBlock, WildfireBlock,
 };
 
 /** Look up a tracker component by blockId (null if none/unknown). */

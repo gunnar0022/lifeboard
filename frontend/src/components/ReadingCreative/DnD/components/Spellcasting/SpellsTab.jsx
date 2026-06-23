@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { abilityMod, proficiencyBonus, normalizeSpellcasting, CLASS_CASTER_PROFILE } from '../../dndUtils';
+import { abilityMod, proficiencyBonus, normalizeSpellcasting, casterProfileFor, buildEmptySpellcasting } from '../../dndUtils';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
-import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown } from '../../classProgression';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown, eldritchKnightCantripsKnown, eldritchKnightSpellsKnown } from '../../classProgression';
 import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
@@ -21,10 +21,16 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
   const abilities = character.abilities || {};
   const level = meta.level || 1;
 
-  // Normalize once per render so old-shape saves keep working.
+  // Caster profile comes from the class, or a subclass third-caster (Eldritch
+  // Knight / Arcane Trickster) when the base class doesn't cast.
+  const profile = casterProfileFor(meta.className, meta.subclass);
+
+  // Normalize once per render so old-shape saves keep working. Fall back to a
+  // blank blob for subclass casters whose spellcasting hasn't been seeded yet.
   const sc = useMemo(
-    () => normalizeSpellcasting(character.spellcasting, meta.className),
-    [character.spellcasting, meta.className]
+    () => normalizeSpellcasting(character.spellcasting, meta.className)
+      || buildEmptySpellcasting(profile),
+    [character.spellcasting, meta.className, profile]
   );
 
   const [spellCache, setSpellCache] = useState({});
@@ -36,10 +42,9 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
   }, [sc, onUpdate]);
 
   // ── Class-authoritative handshake ──
-  // The main slot area follows rigid class rules: caster type, preparation
-  // style, and slot counts all come from the class profile (not stored data),
-  // so switching class instantly grants/revokes the right slots.
-  const profile = CLASS_CASTER_PROFILE[meta.className] || null;
+  // The main slot area follows rigid class/subclass rules: caster type,
+  // preparation style, and slot counts all come from the profile (not stored
+  // data), so switching class/subclass instantly grants/revokes the right slots.
   const isCaster = !!profile;
   const casterType = profile?.casterType || null;
 
@@ -65,10 +70,12 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
     Wizard: wizardCantripsKnown, Warlock: warlockCantripsKnown, Druid: druidCantripsKnown,
     Bard: bardCantripsKnown, Cleric: clericCantripsKnown, Sorcerer: sorcererCantripsKnown,
   };
-  const cantripCap = CANTRIP_CAPS[meta.className] ? CANTRIP_CAPS[meta.className](classLevel) : null;
+  const cantripCap = CANTRIP_CAPS[meta.className] ? CANTRIP_CAPS[meta.className](classLevel)
+    : meta.subclass === 'Eldritch Knight' ? eldritchKnightCantripsKnown(classLevel) : null;
   // Known-spell cap (display-only) for "known" casters that have one.
   const KNOWN_CAPS = { Bard: bardSpellsKnown, Sorcerer: sorcererSpellsKnown, Ranger: rangerSpellsKnown };
-  const knownCap = KNOWN_CAPS[meta.className] ? KNOWN_CAPS[meta.className](classLevel) : null;
+  const knownCap = KNOWN_CAPS[meta.className] ? KNOWN_CAPS[meta.className](classLevel)
+    : meta.subclass === 'Eldritch Knight' ? eldritchKnightSpellsKnown(classLevel) : null;
   const alwaysSet = useMemo(() => new Set(sc.alwaysPrepared || []), [sc.alwaysPrepared]);
   const preparedCount = (sc.prepared || []).filter(id => !alwaysSet.has(id)).length;
   const preparedFull = preparedCount >= preparedCap;

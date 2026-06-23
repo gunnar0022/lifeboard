@@ -1,6 +1,14 @@
 /** Cleric base-class progression. */
 export default [
   {
+    "id": "cleric-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Cleric",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d8 per cleric level\nHit Points at 1st Level: 8 + your Constitution modifier\nHit Points at Higher Levels: 1d8 (or 5) + your Constitution modifier per cleric level after 1st"
+  },
+  {
     "id": "clr-spellcasting",
     "name": "Spellcasting",
     "level": 1,

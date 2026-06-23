@@ -1,6 +1,14 @@
 /** Monk base-class progression. */
 export default [
   {
+    "id": "monk-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Monk",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d8 per monk level\nHit Points at 1st Level: 8 + your Constitution modifier\nHit Points at Higher Levels: 1d8 (or 5) + your Constitution modifier per monk level after 1st"
+  },
+  {
     "id": "mnk-unarmored-defense",
     "name": "Unarmored Defense",
     "level": 1,

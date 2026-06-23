@@ -356,6 +356,532 @@
 .dnd-ancestral__use-btn:hover:not(:disabled) { background: var(--dnd-class-barbarian); color: var(--dnd-bg); }
 .dnd-ancestral__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* Path of the Berserker — Combat reference (shares the Barbarian palette) */
+.dnd-berserker { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-berserker__feature { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-berserker__feature-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; }
+.dnd-berserker__feature-name { font-weight: 700; font-size: 0.8rem; color: var(--dnd-class-barbarian); }
+.dnd-berserker__feature-level {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-berserker__feature-desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0; line-height: 1.5; }
+.dnd-berserker__feature-desc strong { color: var(--dnd-class-barbarian); }
+.dnd-berserker__active-note {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(160, 16, 16, 0.12); color: var(--dnd-class-barbarian);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+.dnd-berserker__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0 0; }
+.dnd-berserker__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); margin-top: 0.3rem; }
+.dnd-berserker__dc {
+  font-weight: 700; color: var(--dnd-bg); background: var(--dnd-class-barbarian);
+  padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.8rem;
+}
+
+/* ============================================
+   PATH OF THE BATTLERAGER SUBCLASS
+   ============================================ */
+.dnd-battlerager { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-battlerager__feature { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-battlerager__feature-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; }
+.dnd-battlerager__feature-name { font-weight: 700; font-size: 0.8rem; color: var(--dnd-class-barbarian); }
+.dnd-battlerager__feature-level {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-battlerager__feature-desc { font-size: 0.75rem; color: var(--dnd-text-dim); margin: 0; line-height: 1.5; }
+.dnd-battlerager__feature-desc strong { color: var(--dnd-class-barbarian); }
+.dnd-battlerager__active-note {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(160, 16, 16, 0.12); color: var(--dnd-class-barbarian);
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+.dnd-battlerager__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0 0; }
+.dnd-battlerager__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); margin-top: 0.3rem; }
+.dnd-battlerager__value {
+  font-weight: 700; color: var(--dnd-bg); background: var(--dnd-class-barbarian);
+  padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.8rem;
+}
+
+/* ============================================
+   PATH OF THE BEAST SUBCLASS
+   ============================================ */
+.dnd-beast { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-beast__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-beast__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-beast__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-barbarian); margin: 0; }
+.dnd-beast__lvl {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-beast__uses { font-weight: 700; font-size: 0.85rem; color: var(--dnd-class-barbarian); }
+.dnd-beast__note { font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0.2rem 0 0; line-height: 1.45; }
+.dnd-beast__note strong { color: var(--dnd-class-barbarian); }
+.dnd-beast__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.3rem 0 0; }
+.dnd-beast__form-tabs, .dnd-beast__adapt { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.dnd-beast__form-tab, .dnd-beast__adapt-btn {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-beast__form-tab--active, .dnd-beast__adapt-btn--active {
+  border-color: var(--dnd-class-barbarian); background: var(--dnd-class-barbarian); color: var(--dnd-bg);
+}
+.dnd-beast__form-stats { display: flex; gap: 0.5rem; margin-top: 0.3rem; font-size: 0.75rem; }
+.dnd-beast__form-attack, .dnd-beast__form-dmg {
+  font-weight: 700; color: var(--dnd-text); background: var(--dnd-surface);
+  padding: 0.1rem 0.4rem; border-radius: 0.25rem;
+}
+.dnd-beast__uses-row { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+.dnd-beast__use-btn, .dnd-beast__reset-btn {
+  padding: 0.2rem 0.6rem; border: 1px solid var(--dnd-class-barbarian); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-barbarian); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-beast__use-btn:hover:not(:disabled) { background: var(--dnd-class-barbarian); color: var(--dnd-bg); }
+.dnd-beast__use-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-beast__reset-btn { border-color: var(--dnd-border); color: var(--dnd-text-dim); }
+.dnd-beast__reset-btn:hover { border-color: var(--dnd-class-barbarian); color: var(--dnd-class-barbarian); }
+
+/* ============================================
+   PATH OF THE GIANT SUBCLASS
+   ============================================ */
+.dnd-giant { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-giant__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-giant__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-giant__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-barbarian); margin: 0; }
+.dnd-giant__lvl {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-giant__note { font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0.2rem 0 0; line-height: 1.45; }
+.dnd-giant__note strong { color: var(--dnd-class-barbarian); }
+.dnd-giant__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.3rem 0 0; }
+.dnd-giant__cleaver-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.3rem; }
+.dnd-giant__cleaver-tab {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.68rem; font-weight: 600; text-transform: capitalize;
+}
+.dnd-giant__cleaver-tab--active { color: var(--dnd-bg); font-weight: 700; }
+.dnd-giant__cleaver-tab--acid.dnd-giant__cleaver-tab--active { background: #7cb342; border-color: #7cb342; }
+.dnd-giant__cleaver-tab--cold.dnd-giant__cleaver-tab--active { background: #4fc3f7; border-color: #4fc3f7; }
+.dnd-giant__cleaver-tab--fire.dnd-giant__cleaver-tab--active { background: #e64a19; border-color: #e64a19; }
+.dnd-giant__cleaver-tab--thunder.dnd-giant__cleaver-tab--active { background: #7e57c2; border-color: #7e57c2; }
+.dnd-giant__cleaver-tab--lightning.dnd-giant__cleaver-tab--active { background: #fbc02d; border-color: #fbc02d; }
+.dnd-giant__resource-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--dnd-text); margin-top: 0.3rem; }
+.dnd-giant__dc {
+  font-weight: 700; color: var(--dnd-bg); background: var(--dnd-class-barbarian);
+  padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.8rem;
+}
+
+/* ============================================
+   PATH OF THE STORM HERALD SUBCLASS
+   ============================================ */
+.dnd-storm { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-storm__env-tabs { display: flex; gap: 0.3rem; }
+.dnd-storm__env-tab {
+  flex: 1; padding: 0.3rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.72rem; font-weight: 700; text-transform: capitalize; letter-spacing: 0.03em;
+}
+.dnd-storm__env-tab--active { color: #fff; }
+.dnd-storm__env-tab--desert.dnd-storm__env-tab--active { background: #c77f2e; border-color: #c77f2e; }
+.dnd-storm__env-tab--sea.dnd-storm__env-tab--active { background: #2a7ab8; border-color: #2a7ab8; }
+.dnd-storm__env-tab--tundra.dnd-storm__env-tab--active { background: #5a8fa6; border-color: #5a8fa6; }
+.dnd-storm__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-storm--desert .dnd-storm__section { border-left: 3px solid #c77f2e; }
+.dnd-storm--sea .dnd-storm__section { border-left: 3px solid #2a7ab8; }
+.dnd-storm--tundra .dnd-storm__section { border-left: 3px solid #5a8fa6; }
+.dnd-storm__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-storm__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-text); margin: 0; }
+.dnd-storm__lvl {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-storm__dc {
+  font-weight: 700; color: var(--dnd-bg); background: var(--dnd-class-barbarian);
+  padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75rem;
+}
+.dnd-storm__aura { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.dnd-storm__aura-label { font-size: 0.72rem; color: var(--dnd-text-dim); }
+.dnd-storm__aura-value { font-weight: 700; font-size: 0.85rem; color: var(--dnd-text); white-space: nowrap; }
+.dnd-storm__note { font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0.2rem 0 0; line-height: 1.45; }
+.dnd-storm__note--shield { margin-top: 0.3rem; }
+.dnd-storm__note strong { color: var(--dnd-class-barbarian); }
+.dnd-storm__active-note {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(160, 16, 16, 0.12); color: var(--dnd-class-barbarian);
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+.dnd-storm__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.3rem 0 0; }
+
+/* ============================================
+   PATH OF THE TOTEM WARRIOR SUBCLASS
+   ============================================ */
+.dnd-totem { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+.dnd-totem__tier { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-totem__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-totem__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-barbarian); margin: 0; }
+.dnd-totem__lvl {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-totem__animals { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.dnd-totem__animal {
+  flex: 1; min-width: 3rem; padding: 0.25rem 0.3rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.68rem; font-weight: 600;
+}
+.dnd-totem__animal--active { color: var(--dnd-bg); font-weight: 700; }
+.dnd-totem__animal--spirit { background: var(--dnd-class-barbarian); border-color: var(--dnd-class-barbarian); }
+.dnd-totem__animal--attune { background: #8a5a2a; border-color: #8a5a2a; }
+.dnd-totem__benefit {
+  font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0 0 0.2rem; line-height: 1.45;
+  padding: 0.3rem 0.4rem; background: var(--dnd-surface); border-radius: 0.3rem;
+}
+.dnd-totem__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0; }
+
+/* ============================================
+   PATH OF WILD MAGIC SUBCLASS
+   ============================================ */
+.dnd-wild { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-wild__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-wild__surge {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--dnd-surface), var(--dnd-surface)) padding-box,
+    linear-gradient(120deg, #b14ad4, #4a7ad4, #4ad4b1) border-box;
+}
+.dnd-wild__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-wild__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: #a44ad4; margin: 0; }
+.dnd-wild__dc, .dnd-wild__uses {
+  font-weight: 700; font-size: 0.75rem; color: #a44ad4;
+}
+.dnd-wild__note { font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0.2rem 0 0; line-height: 1.45; }
+.dnd-wild__prompt { font-size: 0.7rem; color: var(--dnd-text-dim); margin: 0 0 0.3rem; font-weight: 600; }
+.dnd-wild__empty { font-size: 0.7rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0; }
+.dnd-wild__result { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.3rem; background: rgba(164, 74, 212, 0.1); border-radius: 0.3rem; }
+.dnd-wild__result-num {
+  flex-shrink: 0; width: 1.5rem; height: 1.5rem; display: grid; place-items: center;
+  background: #a44ad4; color: #fff; border-radius: 0.3rem; font-weight: 700; font-size: 0.85rem;
+}
+.dnd-wild__result-text { font-size: 0.72rem; color: var(--dnd-text); line-height: 1.4; }
+.dnd-wild__choices { display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-wild__choice {
+  display: flex; gap: 0.5rem; align-items: flex-start; text-align: left;
+  padding: 0.3rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; cursor: pointer; font-family: inherit;
+}
+.dnd-wild__choice:hover { border-color: #a44ad4; background: rgba(164, 74, 212, 0.08); }
+.dnd-wild__choice-num {
+  flex-shrink: 0; width: 1.4rem; height: 1.4rem; display: grid; place-items: center;
+  background: #a44ad4; color: #fff; border-radius: 0.3rem; font-weight: 700; font-size: 0.8rem;
+}
+.dnd-wild__choice-text { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-wild__roll-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; }
+.dnd-wild__roll {
+  padding: 0.25rem 0.7rem; border: none; border-radius: 0.3rem; cursor: pointer;
+  background: linear-gradient(120deg, #b14ad4, #4a7ad4); color: #fff;
+  font-family: inherit; font-size: 0.72rem; font-weight: 700;
+}
+.dnd-wild__backlash { font-size: 0.62rem; color: var(--dnd-text-dim); font-style: italic; }
+.dnd-wild__uses-row { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+.dnd-wild__use, .dnd-wild__reset {
+  padding: 0.2rem 0.6rem; border: 1px solid #a44ad4; border-radius: 0.3rem;
+  background: transparent; color: #a44ad4; cursor: pointer; font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-wild__use:hover:not(:disabled) { background: #a44ad4; color: #fff; }
+.dnd-wild__use:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-wild__reset { border-color: var(--dnd-border); color: var(--dnd-text-dim); }
+
+/* ============================================
+   PATH OF THE ZEALOT SUBCLASS
+   ============================================ */
+.dnd-zealot { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.dnd-zealot__section { padding: 0.4rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem; }
+.dnd-zealot__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.dnd-zealot__subtitle { font-family: 'Crimson Text', serif; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-barbarian); margin: 0; }
+.dnd-zealot__lvl {
+  font-size: 0.6rem; font-weight: 600; color: var(--dnd-text-dim);
+  padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: var(--dnd-surface);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dnd-zealot__fury { display: flex; align-items: center; gap: 0.5rem; }
+.dnd-zealot__fury-dmg {
+  font-weight: 700; font-size: 0.95rem; color: var(--dnd-bg); background: var(--dnd-class-barbarian);
+  padding: 0.1rem 0.45rem; border-radius: 0.3rem;
+}
+.dnd-zealot__type-tabs { display: flex; gap: 0.3rem; }
+.dnd-zealot__type {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.7rem; font-weight: 600; text-transform: capitalize;
+}
+.dnd-zealot__type--necrotic.dnd-zealot__type--active { background: #4a3a5a; border-color: #6a4a8a; color: #d8c4ec; }
+.dnd-zealot__type--radiant.dnd-zealot__type--active { background: #c9a227; border-color: #c9a227; color: #1a1a1a; }
+.dnd-zealot__note { font-size: 0.72rem; color: var(--dnd-text-dim); margin: 0.3rem 0 0; line-height: 1.45; }
+.dnd-zealot__inactive-note { font-size: 0.65rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.3rem 0 0; }
+.dnd-zealot__active-note {
+  margin-top: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 0.3rem;
+  background: rgba(160, 16, 16, 0.12); color: var(--dnd-class-barbarian);
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; text-align: center;
+}
+.dnd-zealot__focus-btn {
+  width: 100%; margin-top: 0.4rem; padding: 0.3rem; border: 1px solid var(--dnd-class-barbarian); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-barbarian); cursor: pointer; font-family: inherit; font-size: 0.72rem; font-weight: 600;
+}
+.dnd-zealot__focus-btn--spent { border-color: var(--dnd-border); color: var(--dnd-text-dim); opacity: 0.7; }
+.dnd-zealot__uses-row { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+.dnd-zealot__use, .dnd-zealot__reset {
+  padding: 0.2rem 0.6rem; border: 1px solid var(--dnd-class-barbarian); border-radius: 0.3rem;
+  background: transparent; color: var(--dnd-class-barbarian); cursor: pointer; font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-zealot__use:hover:not(:disabled) { background: var(--dnd-class-barbarian); color: var(--dnd-bg); }
+.dnd-zealot__use:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-zealot__reset { border-color: var(--dnd-border); color: var(--dnd-text-dim); }
+
+/* ============================================
+   BARD COLLEGES — shared kit (accent via --accent)
+   ============================================ */
+.dnd-bardsub { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; --accent: var(--dnd-class-bard); }
+.dnd-bardsub__card {
+  padding: 0.5rem 0.55rem; border-radius: 8px;
+  border: 1px solid var(--dnd-border); background: var(--dnd-bg);
+}
+.dnd-bardsub__card--hero {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--dnd-border));
+  background:
+    radial-gradient(130% 130% at 0% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-bardsub__card--spent { opacity: 0.55; }
+.dnd-bardsub__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-bardsub__title { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--accent); }
+.dnd-bardsub__title svg { flex-shrink: 0; }
+.dnd-bardsub__die {
+  flex-shrink: 0; min-width: 1.9rem; text-align: center; padding: 0.1rem 0.4rem; border-radius: 6px;
+  font-weight: 800; font-size: 0.82rem; color: var(--dnd-bg);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 85%, #fff), var(--accent));
+}
+.dnd-bardsub__badge {
+  flex-shrink: 0; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  padding: 0.12rem 0.4rem; border-radius: 5px; color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.dnd-bardsub__uses { font-size: 0.95rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+.dnd-bardsub__pips { display: flex; gap: 0.3rem; flex-wrap: wrap; margin: 0.4rem 0; }
+.dnd-bardsub__pip { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--accent); background: transparent; }
+.dnd-bardsub__pip--full { background: var(--accent); box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 55%, transparent); }
+.dnd-bardsub__note { font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.25rem 0 0; }
+.dnd-bardsub__note strong { color: var(--dnd-text); }
+.dnd-bardsub__hint { display: inline-block; margin-top: 0.3rem; font-size: 0.66rem; font-style: italic; color: var(--accent); }
+.dnd-bardsub__row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.3rem; }
+.dnd-bardsub__btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
+.dnd-bardsub__btn {
+  font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 5px;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text); cursor: pointer; font-family: inherit;
+}
+.dnd-bardsub__btn--spend { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.dnd-bardsub__btn--spend:hover:not(:disabled) { background: var(--accent); color: var(--dnd-bg); }
+.dnd-bardsub__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-bardsub__chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.3rem 0 0.1rem; }
+.dnd-bardsub__chip {
+  font-size: 0.7rem; font-weight: 700; padding: 0.12rem 0.45rem; border-radius: 6px;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.dnd-bardsub__chip--big { font-size: 0.82rem; color: var(--dnd-bg); background: var(--accent); border-color: var(--accent); }
+.dnd-bardsub__mote-list { margin: 0.3rem 0 0; padding-left: 1rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.dnd-bardsub__mote-list li { font-size: 0.71rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-bardsub__mote-list strong { color: var(--accent); }
+.dnd-bardsub__reminders { display: flex; flex-direction: column; gap: 0.35rem; }
+.dnd-bardsub__reminder {
+  display: flex; align-items: flex-start; gap: 0.4rem; font-size: 0.72rem;
+  color: var(--dnd-text-dim); line-height: 1.4; padding: 0.35rem 0.45rem;
+  border-radius: 6px; border: 1px solid var(--dnd-border);
+}
+.dnd-bardsub__reminder svg { flex-shrink: 0; margin-top: 0.1rem; color: var(--accent); }
+.dnd-bardsub__reminder strong { color: var(--dnd-text); }
+
+/* Tale / surge roller (Spirits) + segmented picker (Swords) + flourish rows */
+.dnd-bardsub__prompt { font-size: 0.7rem; font-weight: 600; color: var(--dnd-text-dim); margin: 0.3rem 0; }
+.dnd-bardsub__roll-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem; }
+.dnd-bardsub__roll {
+  padding: 0.25rem 0.7rem; border: none; border-radius: 6px; cursor: pointer;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));
+  color: var(--dnd-bg); font-family: inherit; font-size: 0.72rem; font-weight: 800;
+}
+.dnd-bardsub__roll:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-bardsub__choices { display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-bardsub__choice {
+  display: flex; gap: 0.5rem; align-items: flex-start; text-align: left;
+  padding: 0.35rem; border: 1px solid var(--dnd-border); border-radius: 6px;
+  background: transparent; cursor: pointer; font-family: inherit;
+}
+.dnd-bardsub__choice:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.dnd-bardsub__choice-num, .dnd-bardsub__result-num {
+  flex-shrink: 0; width: 1.5rem; height: 1.5rem; display: grid; place-items: center;
+  background: var(--accent); color: var(--dnd-bg); border-radius: 6px; font-weight: 800; font-size: 0.82rem;
+}
+.dnd-bardsub__choice-text, .dnd-bardsub__result-text { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-bardsub__choice-text strong, .dnd-bardsub__result-text strong { color: var(--accent); }
+.dnd-bardsub__result {
+  display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 0.3rem;
+  padding: 0.4rem; border-radius: 7px; background: color-mix(in srgb, var(--accent) 11%, transparent);
+}
+.dnd-bardsub__result--spent { opacity: 0.55; }
+.dnd-bardsub__result-body { display: flex; flex-direction: column; gap: 0.25rem; }
+.dnd-bardsub__btn--inline { align-self: flex-start; margin-top: 0.1rem; }
+.dnd-bardsub__seg { display: flex; gap: 0.3rem; }
+.dnd-bardsub__seg-btn {
+  flex: 1; padding: 0.28rem 0.4rem; border: 1px solid var(--dnd-border); border-radius: 6px;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer; font-family: inherit; font-size: 0.7rem; font-weight: 600;
+}
+.dnd-bardsub__seg-btn--active { background: var(--accent); border-color: var(--accent); color: var(--dnd-bg); font-weight: 700; }
+.dnd-bardsub__flourishes-list { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.4rem; }
+.dnd-bardsub__flourish-row { display: flex; align-items: flex-start; gap: 0.4rem; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-bardsub__flourish-row svg { flex-shrink: 0; margin-top: 0.1rem; color: var(--accent); }
+.dnd-bardsub__flourish-row strong { color: var(--accent); }
+
+/* Dancing Item stat block (College of Creation) */
+.dnd-dancing {
+  margin-top: 0.45rem; padding: 0.45rem 0.5rem; border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--dnd-border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--dnd-surface));
+}
+.dnd-dancing__name { font-family: 'Crimson Text', serif; font-weight: 700; font-size: 0.85rem; color: var(--accent); }
+.dnd-dancing__type { font-family: inherit; font-weight: 400; font-size: 0.64rem; font-style: italic; color: var(--dnd-text-dim); }
+.dnd-dancing__stats { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.3rem 0; }
+.dnd-dancing__stat { display: flex; align-items: center; gap: 0.25rem; font-size: 0.71rem; color: var(--dnd-text-dim); }
+.dnd-dancing__stat svg { color: var(--accent); }
+.dnd-dancing__stat strong { color: var(--dnd-text); }
+.dnd-dancing__attack {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem;
+  padding-top: 0.3rem; border-top: 1px dashed color-mix(in srgb, var(--accent) 30%, var(--dnd-border));
+}
+.dnd-dancing__atk-name { font-size: 0.71rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-dancing__atk-line { font-size: 0.71rem; color: var(--dnd-text-dim); }
+.dnd-dancing__atk-line strong { color: var(--accent); }
+.dnd-dancing__note { font-size: 0.65rem; font-style: italic; color: var(--dnd-text-dim); line-height: 1.35; margin: 0.3rem 0 0; }
+
+/* ============================================
+   FIGHTER — Battle Master / Arcane Archer loadout cards
+   ============================================ */
+.dnd-bm__maneuvers { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.1rem; }
+.dnd-bm__empty { font-size: 0.7rem; color: var(--dnd-text-dim); font-style: italic; margin: 0.2rem 0; }
+.dnd-bm__maneuver {
+  padding: 0.4rem 0.5rem; border-radius: 7px;
+  border: 1px solid var(--dnd-border); border-left: 3px solid var(--dnd-class-fighter);
+  background: var(--dnd-bg);
+}
+.dnd-bm__maneuver-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.15rem; }
+.dnd-bm__maneuver-name { font-size: 0.78rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-bm__maneuver-desc { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0; }
+.dnd-bm__upgrade { color: var(--dnd-class-fighter); font-weight: 600; }
+.dnd-bm__tag {
+  flex-shrink: 0; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.1rem 0.4rem; border-radius: 5px; color: #fff;
+}
+.dnd-bm__tag--attack { background: #b5483f; }
+.dnd-bm__tag--reaction { background: #2f6fb0; }
+.dnd-bm__tag--bonus { background: #c08a2e; }
+.dnd-bm__tag--skill { background: #3f8f7a; }
+.dnd-bm__tag--defense { background: #7a5aa8; }
+.dnd-bm__tag--special { background: #6a6f78; }
+.dnd-bm__tag--school { background: #8a5fc0; }
+
+/* Echo Knight — manifest card */
+.dnd-echo {
+  --echo-accent: var(--dnd-class-fighter);
+  padding: 0.5rem 0.55rem; border-radius: 8px; margin-bottom: 0.1rem;
+  border: 1px dashed color-mix(in srgb, var(--echo-accent) 45%, var(--dnd-border));
+  background: var(--dnd-surface); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-echo--active {
+  border-style: solid; border-color: var(--echo-accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--echo-accent) 24%, transparent);
+}
+.dnd-echo__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-echo__title { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--echo-accent); }
+.dnd-echo__toggle {
+  padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid var(--echo-accent);
+  background: transparent; color: var(--echo-accent); cursor: pointer; font-family: inherit; font-size: 0.72rem; font-weight: 700;
+}
+.dnd-echo__toggle:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-echo--active .dnd-echo__toggle { background: var(--echo-accent); color: var(--dnd-bg); }
+.dnd-echo__stats { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.35rem 0; }
+.dnd-echo__stat { font-size: 0.71rem; color: var(--dnd-text-dim); }
+.dnd-echo__stat strong { color: var(--dnd-text); }
+.dnd-echo__note { font-size: 0.66rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0; }
+.dnd-echo__note strong { color: var(--echo-accent); }
+.dnd-echo__inline-btn { flex-shrink: 0; align-self: flex-start; margin-left: auto; }
+
+/* Circle of Wildfire — spirit card (druid-accented echo card) + stat block */
+.dnd-wildfire { --echo-accent: var(--dnd-class-druid); }
+.dnd-wildfire__expand {
+  display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.4rem; padding: 0;
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  font-size: 0.68rem; font-weight: 600; color: var(--dnd-class-druid);
+}
+.dnd-wildfire__expand svg { transition: transform 0.18s ease; }
+.dnd-wildfire__chev--open { transform: rotate(90deg); }
+.dnd-wildfire__statblock {
+  margin-top: 0.4rem; padding: 0.45rem 0.5rem; border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 40%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-druid) 8%, var(--dnd-surface));
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.dnd-wildfire__action { display: flex; flex-direction: column; gap: 0.1rem; }
+.dnd-wildfire__action-name { font-size: 0.72rem; font-weight: 700; color: var(--dnd-class-druid); }
+.dnd-wildfire__action-line { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-wildfire__action-line strong { color: var(--dnd-text); }
+.dnd-wildfire__sb-note { font-size: 0.64rem; font-style: italic; color: var(--dnd-text-dim); line-height: 1.35; margin: 0; }
+
+/* Champion — crit range badge */
+.dnd-champ__crit-card { text-align: center; }
+.dnd-champ__crit { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.2rem 0; }
+.dnd-champ__crit-range {
+  font-size: 1.6rem; font-weight: 800; line-height: 1; letter-spacing: 0.02em;
+  color: var(--dnd-class-fighter); text-shadow: 0 0 14px color-mix(in srgb, var(--dnd-class-fighter) 30%, transparent);
+}
+.dnd-champ__crit-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dnd-text-dim); }
+
+/* Eldritch Knight — DCs + bonded weapons */
+.dnd-ek__dcs { display: flex; gap: 0.4rem; margin: 0.3rem 0; }
+.dnd-ek__dc {
+  font-size: 0.72rem; color: var(--dnd-text-dim); padding: 0.15rem 0.5rem; border-radius: 6px;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+}
+.dnd-ek__dc strong { color: var(--dnd-class-fighter); font-size: 0.82rem; }
+.dnd-ek__bonds { display: flex; gap: 0.4rem; margin: 0.3rem 0; }
+.dnd-ek__bond-input { flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem; }
+
+/* Druid — land / spirit pickers + circle-spell reference */
+.dnd-druid__lands { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
+.dnd-druid__land {
+  padding: 0.2rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 6px;
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+  font-family: inherit; font-size: 0.68rem; font-weight: 600; text-transform: capitalize;
+}
+.dnd-druid__land--active { background: var(--dnd-class-druid); border-color: var(--dnd-class-druid); color: var(--dnd-bg); font-weight: 700; }
+.dnd-druid__circle-spells { display: flex; flex-direction: column; gap: 0.25rem; }
+.dnd-druid__circle-row { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.72rem; }
+.dnd-druid__circle-row--locked { opacity: 0.4; }
+.dnd-druid__circle-lvl {
+  flex-shrink: 0; font-size: 0.6rem; font-weight: 700; color: var(--dnd-class-druid);
+  background: color-mix(in srgb, var(--dnd-class-druid) 14%, transparent);
+  padding: 0.05rem 0.35rem; border-radius: 5px;
+}
+.dnd-druid__circle-names { color: var(--dnd-text); }
+
 /* ============================================
    CIRCLE OF STARS SUBCLASS
    ============================================ */

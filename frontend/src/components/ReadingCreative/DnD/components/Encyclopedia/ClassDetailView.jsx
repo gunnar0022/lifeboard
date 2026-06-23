@@ -80,7 +80,7 @@ export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, 
         <section className="wiki-section">
           <h3 className="wiki-section__title">{detail.subclassLabel ? `${detail.subclassLabel}s` : 'Subclasses'}</h3>
           <div className="wiki-cards wiki-cards--inset">
-            {children.map(c => (
+            {[...children].sort((a, b) => a.name.localeCompare(b.name)).map(c => (
               <button key={c.id} className="wiki-card" style={{ '--accent': accent }} onClick={() => onOpen(c)}>
                 <span className="wiki-card__accent" />
                 <span className="wiki-card__body">

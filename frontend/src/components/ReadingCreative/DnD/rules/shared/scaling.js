@@ -132,6 +132,16 @@ export function mysticArcanumLevels(level) {
     .map(a => a.lvl);
 }
 
+// ── Fighter: Eldritch Knight (third-caster, wizard list) ──
+export function eldritchKnightCantripsKnown(level) {
+  return (level || 1) >= 10 ? 3 : 2;
+}
+export function eldritchKnightSpellsKnown(level) {
+  // By fighter level; first spells at 3rd.
+  const table = [0, 0, 3, 4, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10, 11, 11, 11, 12, 13];
+  return table[Math.max(1, Math.min(20, level || 1)) - 1];
+}
+
 // ── Wizard ──
 export function arcaneRecoveryMax(level) {
   return Math.max(1, Math.ceil((level || 1) / 2));

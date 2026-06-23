@@ -1,6 +1,14 @@
 /** Sorcerer base-class progression. */
 export default [
   {
+    "id": "sorcerer-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Sorcerer",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d6 per sorcerer level\nHit Points at 1st Level: 6 + your Constitution modifier\nHit Points at Higher Levels: 1d6 (or 4) + your Constitution modifier per sorcerer level after 1st"
+  },
+  {
     "id": "sor-spellcasting",
     "name": "Spellcasting",
     "level": 1,

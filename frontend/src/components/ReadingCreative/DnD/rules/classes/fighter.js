@@ -1,6 +1,14 @@
 /** Fighter base-class progression. */
 export default [
   {
+    "id": "fighter-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Fighter",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d10 per fighter level\nHit Points at 1st Level: 10 + your Constitution modifier\nHit Points at Higher Levels: 1d10 (or 6) + your Constitution modifier per fighter level after 1st"
+  },
+  {
     "id": "fighter-fighting-style",
     "name": "Fighting Style",
     "level": 1,

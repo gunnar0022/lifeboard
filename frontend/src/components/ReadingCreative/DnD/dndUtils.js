@@ -12,6 +12,24 @@ export function proficiencyBonus(level) {
   return Math.floor((level - 1) / 4) + 2;
 }
 
+// Parse a hit die ('d8' or 8) to its number. Returns null if unparseable.
+export function hitDieNumber(hitDie) {
+  if (!hitDie) return null;
+  const n = typeof hitDie === 'number' ? hitDie : parseInt(String(hitDie).replace(/\D/g, ''), 10);
+  return n || null;
+}
+
+// Fixed-value max HP (PHB "take the average" — no rolling):
+//   level 1   = max die + CON mod
+//   each level after = (die/2 + 1) + CON mod   (d6→4, d8→5, d10→6, d12→7)
+export function hpForClassLevel(hitDie, level, conMod) {
+  const die = hitDieNumber(hitDie);
+  if (!die) return null;
+  const lvl = Math.max(1, level || 1);
+  const avgPerLevel = die / 2 + 1;
+  return Math.max(1, die + conMod + (lvl - 1) * (avgPerLevel + conMod));
+}
+
 export function skillMod(abilities, skillAbility, profBonus, isProficient, isExpert) {
   const base = abilityMod(abilities[skillAbility]);
   if (isExpert) return base + profBonus * 2;
@@ -139,25 +157,27 @@ export const CLASS_FEATURE_DEFAULTS = {
 
 export const SUBCLASS_LISTS = {
   Barbarian: [
-    { name: 'Path of the Berserker', implemented: false },
-    { name: 'Path of the Totem Warrior', implemented: false },
+    { name: 'Path of the Berserker', implemented: true },
+    { name: 'Path of the Totem Warrior', implemented: true },
     { name: 'Path of the Ancestral Guardian', implemented: true },
-    { name: 'Path of the Storm Herald', implemented: false },
-    { name: 'Path of the Zealot', implemented: false },
-    { name: 'Path of the Beast', implemented: false },
-    { name: 'Path of Wild Magic', implemented: false },
+    { name: 'Path of the Storm Herald', implemented: true },
+    { name: 'Path of the Zealot', implemented: true },
+    { name: 'Path of the Battlerager', implemented: true },
+    { name: 'Path of the Beast', implemented: true },
+    { name: 'Path of the Giant', implemented: true },
+    { name: 'Path of Wild Magic', implemented: true },
   ],
   Fighter: [
-    { name: 'Champion', implemented: false },
-    { name: 'Battle Master', implemented: false },
-    { name: 'Eldritch Knight', implemented: false },
-    { name: 'Arcane Archer', implemented: false },
-    { name: 'Cavalier', implemented: false },
-    { name: 'Samurai', implemented: false },
-    { name: 'Echo Knight', implemented: false },
-    { name: 'Psi Warrior', implemented: false },
+    { name: 'Champion', implemented: true },
+    { name: 'Battle Master', implemented: true },
+    { name: 'Eldritch Knight', implemented: true },
+    { name: 'Arcane Archer', implemented: true },
+    { name: 'Cavalier', implemented: true },
+    { name: 'Samurai', implemented: true },
+    { name: 'Echo Knight', implemented: true },
+    { name: 'Psi Warrior', implemented: true },
     { name: 'Rune Knight', implemented: true },
-    { name: 'Banneret (Purple Dragon Knight)', implemented: false },
+    { name: 'Banneret (Purple Dragon Knight)', implemented: true },
   ],
   Rogue: [
     { name: 'Thief', implemented: false },
@@ -186,13 +206,13 @@ export const SUBCLASS_LISTS = {
     { name: 'Order of Scribes', implemented: false },
   ],
   Druid: [
-    { name: 'Circle of the Land', implemented: false },
-    { name: 'Circle of the Moon', implemented: false },
-    { name: 'Circle of Dreams', implemented: false },
-    { name: 'Circle of the Shepherd', implemented: false },
+    { name: 'Circle of the Land', implemented: true },
+    { name: 'Circle of the Moon', implemented: true },
+    { name: 'Circle of Dreams', implemented: true },
+    { name: 'Circle of the Shepherd', implemented: true },
     { name: 'Circle of Spores', implemented: true },
     { name: 'Circle of Stars', implemented: true },
-    { name: 'Circle of Wildfire', implemented: false },
+    { name: 'Circle of Wildfire', implemented: true },
   ],
   Cleric: [
     { name: 'Knowledge Domain', implemented: false },
@@ -249,13 +269,14 @@ export const SUBCLASS_LISTS = {
     { name: 'Clockwork Soul', implemented: false },
   ],
   Bard: [
-    { name: 'College of Lore', implemented: false },
-    { name: 'College of Valor', implemented: false },
-    { name: 'College of Glamour', implemented: false },
-    { name: 'College of Swords', implemented: false },
-    { name: 'College of Whispers', implemented: false },
-    { name: 'College of Creation', implemented: false },
-    { name: 'College of Eloquence', implemented: false },
+    { name: 'College of Lore', implemented: true },
+    { name: 'College of Valor', implemented: true },
+    { name: 'College of Glamour', implemented: true },
+    { name: 'College of Swords', implemented: true },
+    { name: 'College of Whispers', implemented: true },
+    { name: 'College of Creation', implemented: true },
+    { name: 'College of Eloquence', implemented: true },
+    { name: 'College of Spirits', implemented: true },
   ],
   Monk: [
     { name: 'Way of the Open Hand', implemented: false },
@@ -379,6 +400,19 @@ export const CLASS_CASTER_PROFILE = {
   Warlock:   { ability: 'CHA', casterType: 'pact',      preparation: 'known' },
 };
 
+// Subclasses that grant their own spellcasting (third-casters). Resolved when the
+// base class isn't a caster — e.g. an Eldritch Knight Fighter or Arcane Trickster
+// Rogue. They cast from the wizard list using Intelligence, learning spells.
+export const SUBCLASS_CASTER_PROFILE = {
+  'Eldritch Knight': { ability: 'INT', casterType: 'third', preparation: 'known' },
+  'Arcane Trickster': { ability: 'INT', casterType: 'third', preparation: 'known' },
+};
+
+/** Resolve the caster profile for a character: class first, then subclass. */
+export function casterProfileFor(className, subclass) {
+  return CLASS_CASTER_PROFILE[className] || SUBCLASS_CASTER_PROFILE[subclass] || null;
+}
+
 /** True if the class has class-granted spellcasting (drives the main slot area). */
 export function isCasterClass(className) {
   return !!CLASS_CASTER_PROFILE[className];
@@ -406,6 +440,16 @@ export const SPELLCASTING_DEFAULTS = Object.fromEntries(
 );
 // Non-casters
 ['Barbarian', 'Fighter', 'Rogue', 'Monk'].forEach(c => { SPELLCASTING_DEFAULTS[c] = null; });
+
+/** Build a blank spellcasting blob for a caster profile (public wrapper). */
+export function buildEmptySpellcasting(profile) {
+  return profile ? _emptySpellcasting(profile) : null;
+}
+
+// Seed blobs for subclass third-casters (used when the subclass is chosen).
+export const SUBCLASS_SPELLCASTING_DEFAULTS = Object.fromEntries(
+  Object.entries(SUBCLASS_CASTER_PROFILE).map(([name, prof]) => [name, _emptySpellcasting(prof)])
+);
 
 /**
  * Upgrade any stored spellcasting blob (old or new shape) to the current shape.

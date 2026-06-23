@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown } from '../classProgression';
 import { SKILLS } from '../dndUtils';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
@@ -15,6 +15,10 @@ const sourceColors = {
   Artificer: 'var(--dnd-class-artificer)', Sorcerer: 'var(--dnd-class-sorcerer)',
   // Subclasses inherit their parent class color
   'Rune Knight': 'var(--dnd-class-fighter)',
+  'Battle Master': 'var(--dnd-class-fighter)',
+  'Arcane Archer': 'var(--dnd-class-fighter)',
+  'Banneret': 'var(--dnd-class-fighter)',
+  'Echo Knight': 'var(--dnd-class-fighter)',
   'Assassin': 'var(--dnd-class-rogue)',
   'Path of the Ancestral Guardian': 'var(--dnd-class-barbarian)',
   'Circle of Stars': 'var(--dnd-class-druid)',
@@ -108,6 +112,100 @@ function RuneChoice({ classFeature, onUpdate, level }) {
   );
 }
 
+// ── Inline build-choice: Battle Master maneuvers (capped pick from a fixed list) ──
+function ManeuverChoice({ classFeature, onUpdate, level }) {
+  const cf = classFeature || {};
+  const known = cf.knownManeuvers || [];
+  const max = maneuversKnown(level);
+  const [picking, setPicking] = useState(false);
+
+  const add = (name) => {
+    if (known.includes(name) || known.length >= max) return;
+    onUpdate({ classFeature: { ...cf, knownManeuvers: [...known, name] } });
+    setPicking(false);
+  };
+  const remove = (name) => onUpdate({ classFeature: { ...cf, knownManeuvers: known.filter(m => m !== name) } });
+  const available = MANEUVER_LIST.filter(m => !known.includes(m.name));
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__rune-head">
+        <span className="dnd-feature-choice__count">{known.length}/{max} maneuvers known</span>
+        {known.length < max && available.length > 0 && (
+          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Maneuver</button>
+        )}
+      </div>
+      {picking && (
+        <div className="dnd-feature-choice__picker">
+          {available.map(m => (
+            <button key={m.name} className="dnd-feature-choice__pick" onClick={() => add(m.name)} title={m.desc}>{m.name}</button>
+          ))}
+        </div>
+      )}
+      {known.length === 0 && <p className="dnd-feature-choice__empty">No maneuvers chosen yet — click + Maneuver.</p>}
+      {known.map(name => {
+        const m = MANEUVER_LIST.find(x => x.name === name);
+        return (
+          <div key={name} className="dnd-feature-choice__rune">
+            <div className="dnd-feature-choice__rune-top">
+              <span className="dnd-feature-choice__rune-name">{name}</span>
+              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove maneuver">×</button>
+            </div>
+            <p className="dnd-feature-choice__rune-line">{m?.desc}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Inline build-choice: Arcane Archer shot options (capped pick from a fixed list) ──
+function ArcaneShotChoice({ classFeature, onUpdate, level }) {
+  const cf = classFeature || {};
+  const known = cf.knownArcaneShots || [];
+  const max = arcaneShotsKnown(level);
+  const [picking, setPicking] = useState(false);
+
+  const add = (name) => {
+    if (known.includes(name) || known.length >= max) return;
+    onUpdate({ classFeature: { ...cf, knownArcaneShots: [...known, name] } });
+    setPicking(false);
+  };
+  const remove = (name) => onUpdate({ classFeature: { ...cf, knownArcaneShots: known.filter(s => s !== name) } });
+  const available = ARCANE_SHOT_LIST.filter(s => !known.includes(s.name));
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__rune-head">
+        <span className="dnd-feature-choice__count">{known.length}/{max} shots known</span>
+        {known.length < max && available.length > 0 && (
+          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Arcane Shot</button>
+        )}
+      </div>
+      {picking && (
+        <div className="dnd-feature-choice__picker">
+          {available.map(s => (
+            <button key={s.name} className="dnd-feature-choice__pick" onClick={() => add(s.name)} title={s.desc}>{s.name}</button>
+          ))}
+        </div>
+      )}
+      {known.length === 0 && <p className="dnd-feature-choice__empty">No Arcane Shots chosen yet — click + Arcane Shot.</p>}
+      {known.map(name => {
+        const s = ARCANE_SHOT_LIST.find(x => x.name === name);
+        return (
+          <div key={name} className="dnd-feature-choice__rune">
+            <div className="dnd-feature-choice__rune-top">
+              <span className="dnd-feature-choice__rune-name">{name} <em className="dnd-feature-choice__pick-lvl">{s?.school}</em></span>
+              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove Arcane Shot">×</button>
+            </div>
+            <p className="dnd-feature-choice__rune-line">{s?.desc}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Inline build-choice: Warlock Pact Boon (dropdown) ──────────────────
 function PactBoonChoice({ classFeature, onUpdate }) {
   const cf = classFeature || {};
@@ -124,6 +222,30 @@ function PactBoonChoice({ classFeature, onUpdate }) {
         {PACT_BOONS.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
       </select>
       {boon && <p className="dnd-feature-choice__detail">{boon.desc}</p>}
+    </div>
+  );
+}
+
+// ── Inline build-choice: Giant's Power cantrip (druidcraft / thaumaturgy) ──
+const GIANT_CANTRIPS = [
+  { name: 'Druidcraft', desc: 'Predict weather, bloom a flower, sense nature, snuff or light a small flame, or make a harmless sensory effect.' },
+  { name: 'Thaumaturgy', desc: 'Booming voice, flickering flames, tremors, an instantaneous sound, opening/closing doors, or altering eye appearance.' },
+];
+function GiantCantripChoice({ classFeature, onUpdate }) {
+  const cf = classFeature || {};
+  const selected = cf.giantCantrip || '';
+  const cantrip = GIANT_CANTRIPS.find(c => c.name === selected);
+  return (
+    <div className="dnd-feature-choice">
+      <select
+        className="dnd-field dnd-feature-choice__select"
+        value={selected}
+        onChange={e => onUpdate({ classFeature: { ...cf, giantCantrip: e.target.value } })}
+      >
+        <option value="">— Choose a cantrip (WIS) —</option>
+        {GIANT_CANTRIPS.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+      </select>
+      {cantrip && <p className="dnd-feature-choice__detail">{cantrip.desc}</p>}
     </div>
   );
 }
@@ -436,11 +558,14 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
   const renderChoice = (feat) => {
     if (feat.choice === 'fighting-style') return <FightingStyleChoice classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'runes') return <RuneChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+    if (feat.choice === 'maneuvers') return <ManeuverChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+    if (feat.choice === 'arcane-shots') return <ArcaneShotChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
     if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+    if (feat.choice === 'giant-cantrip') return <GiantCantripChoice classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'versatility') return <VersatilityChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
     if (feat.choice === 'spellAbility') return <SpellAbilityChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
@@ -453,7 +578,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
 
   // Read-only auto feature card (class / subclass progression)
   const renderAutoCard = (feat) => {
-    const isLong = feat.desc && feat.desc.length > 160;
+    const isLong = feat.desc && feat.desc.length > 160 && !feat.noTruncate;
     const showFull = expanded[feat.id] || !isLong;
     return (
       <div key={feat.id} className="dnd-features__card dnd-features__card--auto">

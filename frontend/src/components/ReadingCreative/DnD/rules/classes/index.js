@@ -1,7 +1,7 @@
 /**
  * Assembles CLASS_PROGRESSION from the per-class modules and holds CLASS_META
  * (hit die, subclass label/level, spell-list tag). Adding a class = drop a file
- * and add it here. Artificer has no progression authored yet (meta only).
+ * and add it here. Artificer is stubbed (Hit Points header only).
  */
 import fighter from './fighter';
 import rogue from './rogue';
@@ -15,11 +15,13 @@ import monk from './monk';
 import paladin from './paladin';
 import sorcerer from './sorcerer';
 import ranger from './ranger';
+import artificer from './artificer';
 
 export const CLASS_PROGRESSION = {
   Fighter: fighter, Rogue: rogue, Barbarian: barbarian, Druid: druid,
   Wizard: wizard, Warlock: warlock, Bard: bard, Cleric: cleric,
   Monk: monk, Paladin: paladin, Sorcerer: sorcerer, Ranger: ranger,
+  Artificer: artificer,
 };
 
 export const CLASS_META = {

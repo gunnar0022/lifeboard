@@ -1,6 +1,14 @@
 /** Barbarian base-class progression. */
 export default [
   {
+    "id": "barbarian-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Barbarian",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d12 per barbarian level\nHit Points at 1st Level: 12 + your Constitution modifier\nHit Points at Higher Levels: 1d12 (or 7) + your Constitution modifier per barbarian level after 1st"
+  },
+  {
     "id": "barb-rage",
     "name": "Rage",
     "level": 1,

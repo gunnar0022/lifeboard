@@ -24,7 +24,9 @@ export default function SubclassBlock({ character, editMode, onUpdate }) {
         ? <Block character={character} editMode={editMode} onUpdate={onUpdate} />
         : (
           <div className="dnd-subclass-block__notice">
-            Subclass features not yet implemented — track manually in the Features tab.
+            {node?.implemented
+              ? 'No live combat tracker for this subclass — its features are listed on the Features tab.'
+              : 'Subclass features not yet implemented — track manually in the Features tab.'}
           </div>
         )}
     </div>

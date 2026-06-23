@@ -1,6 +1,14 @@
 /** Bard base-class progression. */
 export default [
   {
+    "id": "bard-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Bard",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d8 per bard level\nHit Points at 1st Level: 8 + your Constitution modifier\nHit Points at Higher Levels: 1d8 (or 5) + your Constitution modifier per bard level after 1st"
+  },
+  {
     "id": "brd-spellcasting",
     "name": "Spellcasting",
     "level": 1,

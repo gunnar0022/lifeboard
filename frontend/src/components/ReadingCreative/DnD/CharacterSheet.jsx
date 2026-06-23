@@ -17,9 +17,10 @@ import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
-import { deepMerge, proficiencyBonus, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
+import { deepMerge, proficiencyBonus, abilityMod, hpForClassLevel, hitDieNumber, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
 import { grantedMaxUses } from './components/Spellcasting/GrantedSpells';
 import { RACES, getSubraces } from './classProgression';
+import { getClass } from './rules/registry';
 
 export default function CharacterSheet({ characterId, initialEditMode, campaignId, onBack, onEditModeChange }) {
   const [character, setCharacter] = useState(null);
@@ -29,6 +30,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   // Active tab persists per-character so a refresh reopens the same tab.
   const [tab, setTab] = useLocalStorageState(`lifeboard-dnd-tab-${characterId}`, 'combat');
   const prevClassRef = useRef(null);
+  const prevSubclassRef = useRef(null);
+  // Tracks the class|level the HP/hit-dice auto-calc last saw, so it only fires
+  // on an actual change (never overwrites stored HP on load).
+  const hpAutoKeyRef = useRef(null);
 
   const saveStatus = useAutosave(character, characterId);
 
@@ -77,6 +82,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         charData.tabsConfig = reconcileTabsConfig(charData.tabsConfig, charData, !!campaignId);
         setCharacter(charData);
         prevClassRef.current = charData?.meta?.className || '';
+        prevSubclassRef.current = charData?.meta?.subclass || '';
+        hpAutoKeyRef.current = `${charData?.meta?.className || ''}|${charData?.meta?.level || 1}`;
       } catch (e) {
         console.error('Failed to load character:', e);
         // Stale persisted reference — drop back to the picker instead of a dead screen.
@@ -190,6 +197,59 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     prevClassRef.current = currentClass;
   }, [character?.meta?.className]);
 
+  // Subclass third-casters (Eldritch Knight / Arcane Trickster): when chosen,
+  // seed a blank spellcasting blob and enable the Spells tab, mirroring how
+  // caster classes are handled. Skips the first run after load.
+  useEffect(() => {
+    if (!character) return;
+    const currentSubclass = character.meta?.subclass || '';
+    if (prevSubclassRef.current !== null && currentSubclass !== prevSubclassRef.current && currentSubclass) {
+      const scDefaults = SUBCLASS_SPELLCASTING_DEFAULTS[currentSubclass];
+      if (scDefaults && !character.spellcasting) {
+        setCharacter(prev => ({
+          ...prev,
+          spellcasting: { ...scDefaults },
+          tabsConfig: (prev.tabsConfig || []).map(t => t.id === 'spells' ? { ...t, enabled: true } : t),
+        }));
+      }
+    }
+    prevSubclassRef.current = currentSubclass;
+  }, [character?.meta?.subclass]);
+
+  // Auto-calc max HP + hit dice whenever level (or class) changes. Uses fixed
+  // average values (no dice rolls): level 1 = max die + CON, each later level =
+  // (die/2 + 1) + CON. Skips the first run after load so stored/manual HP is
+  // never clobbered just by opening the sheet.
+  useEffect(() => {
+    if (!character) return;
+    const className = character.meta?.className;
+    const lvl = character.meta?.level || 1;
+    const key = `${className || ''}|${lvl}`;
+    const prevKey = hpAutoKeyRef.current;
+    hpAutoKeyRef.current = key;
+    if (prevKey === null || prevKey === key) return;
+
+    const die = getClass(className)?.hitDie;
+    const newMax = hpForClassLevel(die, lvl, abilityMod(character.abilities?.CON || 10));
+    if (!newMax) return; // unknown class / hit die — leave HP under manual control
+
+    setCharacter(prev => {
+      const combat = prev.combat || {};
+      const delta = newMax - (combat.hpMax || 0);
+      return {
+        ...prev,
+        combat: {
+          ...combat,
+          hpMax: newMax,
+          // Carry the gain (or loss) into current HP, clamped to the new max.
+          hpCurrent: Math.max(0, Math.min(newMax, (combat.hpCurrent || 0) + delta)),
+          hitDiceType: hitDieNumber(die),
+          hitDiceRemaining: lvl,
+        },
+      };
+    });
+  }, [character?.meta?.level, character?.meta?.className]);
+
   // Rest functions
   const shortRest = () => {
     if (!character) return;
@@ -242,6 +302,21 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       }
       // Paladin: Channel Divinity recharges on a short or long rest.
       if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
+      // Bard / College of Glamour: Enthralling Performance & Unbreakable Majesty recharge on a short rest.
+      if ('enthrallingUsed' in cf) cf.enthrallingUsed = false;
+      if ('unbreakableMajestyUsed' in cf) cf.unbreakableMajestyUsed = false;
+      // College of Whispers: Words of Terror & Mantle of Whispers recharge on a short rest.
+      if ('wordsOfTerrorUsed' in cf) cf.wordsOfTerrorUsed = false;
+      if ('mantleWhispersUsed' in cf) cf.mantleWhispersUsed = false;
+      // Battle Master superiority dice & Arcane Shot uses recharge on a short rest.
+      if (cf.superiorityDice) cf.superiorityDice = { ...cf.superiorityDice, current: cf.superiorityDice.max || 0 };
+      if (cf.arcaneShotUses) cf.arcaneShotUses = { ...cf.arcaneShotUses, current: cf.arcaneShotUses.max || 2 };
+      // Echo Knight: Shadow Martyr recharges on a short rest.
+      if ('shadowMartyrUsed' in cf) cf.shadowMartyrUsed = false;
+      // Psi Warrior: the bonus-action Psionic Energy regain recharges on a short rest.
+      if ('psiRegainUsed' in cf) cf.psiRegainUsed = false;
+      // Circle of the Shepherd: Spirit Totem recharges on a short rest.
+      if ('spiritTotemUsed' in cf) cf.spiritTotemUsed = false;
       updates.classFeature = cf;
     }
 
@@ -360,6 +435,72 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.cosmicOmen) {
         cf.cosmicOmen = { type: null, usesRemaining: 0 };
       }
+      // Path of the Beast: Infectious Fury and Call the Hunt refill on a long rest
+      if (cf.infectiousFury) {
+        cf.infectiousFury = { ...cf.infectiousFury, currentUses: cf.infectiousFury.maxUses || 0 };
+      }
+      if (cf.callTheHunt) {
+        cf.callTheHunt = { ...cf.callTheHunt, currentUses: cf.callTheHunt.maxUses || 0 };
+      }
+      // Path of Wild Magic: Magic Awareness and Bolstering Magic refill; clear surge
+      if (cf.magicAwareness) {
+        cf.magicAwareness = { ...cf.magicAwareness, currentUses: cf.magicAwareness.maxUses || 0 };
+      }
+      if (cf.bolsteringMagic) {
+        cf.bolsteringMagic = { ...cf.bolsteringMagic, currentUses: cf.bolsteringMagic.maxUses || 0 };
+      }
+      if (cf.wildSurge) cf.wildSurge = { current: null, options: null };
+      // Path of the Zealot: Zealous Presence (long rest) and Fanatical Focus reset
+      if ('zealousPresenceUsed' in cf) cf.zealousPresenceUsed = false;
+      if ('fanaticalFocusUsed' in cf) cf.fanaticalFocusUsed = false;
+      // College of Eloquence: Universal Speech + Infectious Inspiration refill
+      if ('universalSpeechUsed' in cf) cf.universalSpeechUsed = false;
+      if (cf.infectiousInspiration) {
+        cf.infectiousInspiration = { ...cf.infectiousInspiration, currentUses: cf.infectiousInspiration.maxUses || 0 };
+      }
+      // College of Glamour: Enthralling Performance, Mantle of Majesty, Unbreakable Majesty
+      if ('enthrallingUsed' in cf) cf.enthrallingUsed = false;
+      if ('mantleMajestyUsed' in cf) cf.mantleMajestyUsed = false;
+      if ('unbreakableMajestyUsed' in cf) cf.unbreakableMajestyUsed = false;
+      // College of Creation: Performance of Creation + Animating Performance
+      if ('performanceCreationUsed' in cf) cf.performanceCreationUsed = false;
+      if ('animatingUsed' in cf) cf.animatingUsed = false;
+      // College of Spirits: Spirit Session refills; retained tale fades on a long rest
+      if ('spiritSessionUsed' in cf) cf.spiritSessionUsed = false;
+      if (cf.spiritTale) cf.spiritTale = { current: null, options: null, bestowed: false };
+      // College of Whispers: short-rest features also reset, plus Shadow Lore (long rest)
+      if ('wordsOfTerrorUsed' in cf) cf.wordsOfTerrorUsed = false;
+      if ('mantleWhispersUsed' in cf) cf.mantleWhispersUsed = false;
+      if ('shadowLoreUsed' in cf) cf.shadowLoreUsed = false;
+      // Battle Master / Arcane Archer: pools also refill on a long rest.
+      if (cf.superiorityDice) cf.superiorityDice = { ...cf.superiorityDice, current: cf.superiorityDice.max || 0 };
+      if (cf.arcaneShotUses) cf.arcaneShotUses = { ...cf.arcaneShotUses, current: cf.arcaneShotUses.max || 2 };
+      // Echo Knight: Unleash Incarnation + Reclaim Potential refill; Shadow Martyr resets.
+      if (cf.unleashIncarnation) cf.unleashIncarnation = { ...cf.unleashIncarnation, current: cf.unleashIncarnation.max || 0 };
+      if (cf.reclaimPotential) cf.reclaimPotential = { ...cf.reclaimPotential, current: cf.reclaimPotential.max || 0 };
+      if ('shadowMartyrUsed' in cf) cf.shadowMartyrUsed = false;
+      // Cavalier: Unwavering Mark + Warding Maneuver refill on a long rest.
+      if (cf.unwaveringMark) cf.unwaveringMark = { ...cf.unwaveringMark, current: cf.unwaveringMark.max || 0 };
+      if (cf.wardingManeuver) cf.wardingManeuver = { ...cf.wardingManeuver, current: cf.wardingManeuver.max || 0 };
+      // Psi Warrior: Psionic Energy refills; bonus-action regain resets.
+      if (cf.psionicEnergy) cf.psionicEnergy = { ...cf.psionicEnergy, current: cf.psionicEnergy.max || 0 };
+      if ('psiRegainUsed' in cf) cf.psiRegainUsed = false;
+      // Samurai: Fighting Spirit refills; Strength Before Death resets.
+      if (cf.fightingSpirit) cf.fightingSpirit = { ...cf.fightingSpirit, current: cf.fightingSpirit.max || 3 };
+      if ('strengthBeforeDeathUsed' in cf) cf.strengthBeforeDeathUsed = false;
+      // Circle of Dreams: Balm dice + Hidden Paths refill; Walker in Dreams resets.
+      if (cf.balmDice) cf.balmDice = { ...cf.balmDice, current: cf.balmDice.max || 0 };
+      if (cf.hiddenPaths) cf.hiddenPaths = { ...cf.hiddenPaths, current: cf.hiddenPaths.max || 0 };
+      if ('walkerUsed' in cf) cf.walkerUsed = false;
+      // Circle of the Land: Natural Recovery resets on a long rest.
+      if ('naturalRecoveryUsed' in cf) cf.naturalRecoveryUsed = false;
+      // Circle of the Shepherd: Spirit Totem + Faithful Summons reset.
+      if ('spiritTotemUsed' in cf) cf.spiritTotemUsed = false;
+      if ('faithfulSummonsUsed' in cf) cf.faithfulSummonsUsed = false;
+      // Circle of Wildfire: Cauterizing Flames refills; Blazing Revival resets; spirit fades.
+      if (cf.cauterizingFlames) cf.cauterizingFlames = { ...cf.cauterizingFlames, current: cf.cauterizingFlames.max || 0 };
+      if ('blazingRevivalUsed' in cf) cf.blazingRevivalUsed = false;
+      if ('wildfireSpirit' in cf) cf.wildfireSpirit = false;
       // Circle of Spores: reset fungal infestation, spreading spores
       if ('fungalInfestationUsed' in cf) {
         cf.fungalInfestationUsed = 0;

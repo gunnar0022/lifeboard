@@ -20,6 +20,8 @@ export {
 // ── Shared option lists + scaling helpers ──
 export { FIGHTING_STYLES } from './rules/shared/fightingStyles';
 export { RUNE_LIST, maxRunesKnown, maxRuneInvocations, giantsMightDie, giantsMightSize } from './rules/shared/runes';
+export { MANEUVER_LIST, maneuversKnown, superiorityDiceCount, superiorityDie } from './rules/shared/maneuvers';
+export { ARCANE_SHOT_LIST, arcaneShotsKnown } from './rules/shared/arcaneShots';
 export { DRAGON_ANCESTRY, DRAGON_COLORS, breathWeaponDice } from './rules/shared/dragonAncestry';
 export { METAMAGIC_OPTIONS, metamagicKnown } from './rules/shared/metamagic';
 export { PACT_BOONS } from './rules/shared/pactBoons';

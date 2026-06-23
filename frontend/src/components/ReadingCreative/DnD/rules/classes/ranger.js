@@ -1,6 +1,14 @@
 /** Ranger base-class progression. */
 export default [
   {
+    "id": "ranger-hit-points",
+    "name": "Hit Points",
+    "level": 1,
+    "source": "Ranger",
+    "noTruncate": true,
+    "desc": "Hit Dice: 1d10 per ranger level\nHit Points at 1st Level: 10 + your Constitution modifier\nHit Points at Higher Levels: 1d10 (or 6) + your Constitution modifier per ranger level after 1st"
+  },
+  {
     "id": "rng-favored-enemy",
     "name": "Favored Enemy",
     "level": 1,

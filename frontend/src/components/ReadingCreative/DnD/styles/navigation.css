@@ -1410,6 +1410,9 @@
   line-height: 1.4;
   color: var(--dnd-text);
   font-size: 0.85rem;
+  /* Preserve newlines from spell text so long descriptions break into
+     readable paragraphs instead of one solid block. */
+  white-space: pre-line;
 }
 .spell-row__actions {
   display: flex;
