@@ -336,6 +336,210 @@
 
 .dnd-archfey__spent { opacity: 0.6; }
 
+/* ── Hunter — footnote ── */
+.dnd-hunter__foot { font-style: italic; opacity: 0.8; margin-top: 0.1rem; }
+
+/* ── Companion cards (Beast Master Primal beast, Drakewarden drake) ── */
+.dnd-companion {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 45%, var(--dnd-border));
+  border-radius: 10px; padding: 0.6rem;
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 9%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-companion__header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.dnd-companion__title {
+  display: flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 800;
+  color: var(--block-accent, var(--dnd-class-ranger));
+}
+.dnd-companion__name { width: 100%; font-weight: 600; }
+.dnd-companion__pick { margin: 0; }
+.dnd-companion__modes { margin-bottom: 0.1rem; }
+
+.dnd-companion__sb { display: flex; flex-direction: column; gap: 0.45rem; }
+.dnd-companion__meta { font-size: 0.72rem; font-style: italic; color: var(--dnd-text-muted); text-transform: capitalize; }
+
+.dnd-companion__topline { display: flex; gap: 0.4rem; }
+.dnd-companion__stat {
+  display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  padding: 0.3rem 0.5rem; border: 1px solid var(--dnd-border); border-radius: 7px; background: var(--dnd-surface);
+}
+.dnd-companion__stat--wide { flex: 1; align-items: flex-start; }
+.dnd-companion__stat-lbl {
+  display: flex; align-items: center; gap: 0.2rem;
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dnd-text-muted);
+}
+.dnd-companion__stat-val { font-size: 1rem; font-weight: 800; color: var(--dnd-text); font-variant-numeric: tabular-nums; }
+.dnd-companion__stat-val--text { font-size: 0.74rem; font-weight: 600; }
+
+.dnd-companion__abilities { display: flex; gap: 0.25rem; }
+.dnd-companion__ability {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.05rem;
+  padding: 0.25rem 0; border: 1px solid var(--dnd-border); border-radius: 6px; background: var(--dnd-surface);
+}
+.dnd-companion__ability-lbl { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.04em; color: var(--dnd-text-muted); }
+.dnd-companion__ability-score { font-size: 0.82rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-companion__ability-mod { font-size: 0.62rem; color: var(--block-accent, var(--dnd-class-ranger)); font-variant-numeric: tabular-nums; }
+
+.dnd-companion__lines { display: flex; flex-direction: column; gap: 0.15rem; }
+.dnd-companion__line { margin: 0; font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-companion__line strong { color: var(--dnd-text-muted); font-weight: 700; }
+
+.dnd-companion__group { display: flex; flex-direction: column; gap: 0.3rem; padding-top: 0.3rem; border-top: 1px solid var(--dnd-border); }
+.dnd-companion__group-title {
+  margin: 0; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--block-accent, var(--dnd-class-ranger));
+}
+.dnd-companion__trait { margin: 0; font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-companion__trait strong { color: var(--dnd-text); }
+
+.dnd-companion__action {
+  padding: 0.35rem 0.45rem; border: 1px solid var(--dnd-border); border-left: 3px solid var(--block-accent, var(--dnd-class-ranger));
+  border-radius: 6px; background: var(--dnd-surface);
+}
+.dnd-companion__action-head { display: flex; align-items: center; gap: 0.5rem; }
+.dnd-companion__action-name { font-size: 0.78rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-companion__hit {
+  font-size: 0.62rem; font-weight: 700; padding: 0.05rem 0.4rem; border-radius: 5px;
+  color: var(--block-accent, var(--dnd-class-ranger));
+  background: color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 14%, transparent);
+}
+.dnd-companion__damage { font-size: 0.74rem; font-weight: 600; color: var(--dnd-text); margin-top: 0.1rem; }
+.dnd-companion__action-desc { margin: 0.15rem 0 0; font-size: 0.68rem; color: var(--dnd-text-dim); line-height: 1.35; }
+
+/* Live HP tracker (Combat-tab card) */
+.dnd-companion__hp { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
+.dnd-companion__hp-head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-companion__hp-num { font-size: 0.9rem; font-weight: 800; color: var(--dnd-text); font-variant-numeric: tabular-nums; }
+.dnd-companion__hp-max { font-size: 0.72rem; font-weight: 600; color: var(--dnd-text-muted); }
+.dnd-companion__hp-temp-num { color: var(--dnd-hp-healthy); font-size: 0.72rem; }
+.dnd-companion__hp-bar { height: 7px; border-radius: 4px; background: var(--dnd-surface); overflow: hidden; border: 1px solid var(--dnd-border); }
+.dnd-companion__hp-fill { height: 100%; transition: width 0.2s ease; }
+.dnd-companion__hp-btns { display: flex; gap: 0.25rem; align-items: center; }
+.dnd-companion__hp-btns button {
+  font-size: 0.68rem; padding: 0.15rem 0.4rem; border-radius: 5px;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text); cursor: pointer;
+}
+.dnd-companion__hp-btns button:hover { border-color: var(--block-accent, var(--dnd-class-ranger)); }
+.dnd-companion__temp-input, .dnd-companion__hp-max-input {
+  width: 2.6rem; font-size: 0.68rem; padding: 0.1rem 0.25rem; text-align: center;
+  border: 1px solid var(--dnd-border); border-radius: 5px; background: var(--dnd-bg); color: var(--dnd-text);
+}
+.dnd-companion__hp-max-input { width: 2.4rem; font-weight: 700; }
+
+/* Classic (player-chosen) beast editor */
+.dnd-companion__classic-grid { display: flex; gap: 0.4rem; }
+.dnd-companion__field { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; }
+.dnd-companion__field--full { width: 100%; }
+.dnd-companion__field span { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--dnd-text-muted); }
+.dnd-companion__hint { margin: 0; font-size: 0.68rem; color: var(--dnd-text-dim); line-height: 1.4; }
+
+/* Drakewarden summon row */
+.dnd-companion__summon { display: flex; align-items: center; gap: 0.5rem; }
+.dnd-companion__summon .dnd-warmagic__btn { flex-shrink: 0; }
+
+/* ── Signature panels (Dread Ambusher, Planar Warrior, Quarry, Swarm) ──
+   A flashy headline card; each variant retints --block-accent for its flavor. */
+.dnd-sig {
+  display: flex; gap: 0.65rem; align-items: stretch; padding: 0.6rem; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 45%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 13%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-sig--shadow { --block-accent: var(--dnd-class-rogue); }
+.dnd-sig--planar { --block-accent: var(--dnd-class-wizard); }
+.dnd-sig--quarry { --block-accent: var(--dnd-class-barbarian); }
+.dnd-sig--swarm  { --block-accent: var(--dnd-class-druid); }
+.dnd-sig--locked { box-shadow: 0 0 14px color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 32%, transparent); }
+.dnd-sig__token {
+  flex-shrink: 0; min-width: 48px; padding: 0 0.5rem; display: grid; place-items: center; border-radius: 10px;
+  font-weight: 800; font-size: 1.05rem; letter-spacing: 0.02em; color: var(--dnd-bg);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 85%, #fff), var(--block-accent, var(--dnd-class-ranger)));
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2);
+}
+.dnd-sig--mini { padding: 0.5rem; gap: 0.55rem; }
+.dnd-sig--mini .dnd-sig__token { min-width: 38px; font-size: 0.9rem; }
+.dnd-sig--empty { opacity: 0.55; }
+.dnd-sig__eyebrow { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dnd-text-muted); }
+.dnd-sig__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-sig__title { display: flex; align-items: center; gap: 0.3rem; font-size: 0.82rem; font-weight: 800; color: var(--block-accent, var(--dnd-class-ranger)); }
+.dnd-sig__desc { font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-sig__desc strong { color: var(--dnd-text); }
+.dnd-sig__chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.dnd-sig__chip {
+  font-size: 0.64rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 6px;
+  color: var(--dnd-text-muted); background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+}
+.dnd-sig__chip--on {
+  color: var(--block-accent, var(--dnd-class-ranger));
+  background: color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 14%, transparent);
+  border-color: color-mix(in srgb, var(--block-accent, var(--dnd-class-ranger)) 40%, var(--dnd-border));
+}
+.dnd-sig__target-row { display: flex; align-items: center; gap: 0.3rem; }
+.dnd-sig__target { flex: 1; min-width: 0; }
+.dnd-sig__clear {
+  flex-shrink: 0; display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 5px;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text-dim); cursor: pointer;
+}
+.dnd-sig__clear:hover { border-color: var(--block-accent, var(--dnd-class-ranger)); color: var(--block-accent, var(--dnd-class-ranger)); }
+
+/* ── Paladin — Lay on Hands healing font ── */
+.dnd-paladin__font {
+  display: flex; gap: 0.65rem; align-items: stretch; padding: 0.6rem; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-paladin) 45%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--dnd-class-paladin) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+  transition: box-shadow 0.25s ease;
+}
+.dnd-paladin__font--charged { box-shadow: 0 0 16px color-mix(in srgb, var(--dnd-class-paladin) 26%, transparent); }
+.dnd-paladin__font-token {
+  flex-shrink: 0; width: 46px; display: grid; place-items: center; border-radius: 10px; color: var(--dnd-bg);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--dnd-class-paladin) 85%, #fff), var(--dnd-class-paladin));
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2);
+}
+.dnd-paladin__font-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-paladin__font-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-paladin__font-title { font-size: 0.85rem; font-weight: 800; color: var(--dnd-class-paladin); }
+.dnd-paladin__font-num { font-size: 1.05rem; font-weight: 800; color: var(--dnd-class-paladin); font-variant-numeric: tabular-nums; }
+.dnd-paladin__font-max { font-size: 0.72rem; font-weight: 600; color: var(--dnd-text-muted); }
+.dnd-paladin__font-bar { height: 8px; border-radius: 5px; background: var(--dnd-surface); overflow: hidden; border: 1px solid var(--dnd-border); }
+.dnd-paladin__font-fill {
+  height: 100%; transition: width 0.25s ease;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--dnd-class-paladin) 70%, #fff), var(--dnd-class-paladin));
+}
+.dnd-paladin__font-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+/* ── Channel Divinity panel (paladin oaths) ── */
+.dnd-cd {
+  display: flex; flex-direction: column; gap: 0.5rem; padding: 0.6rem; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--block-accent, var(--dnd-class-paladin)) 45%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--block-accent, var(--dnd-class-paladin)) 11%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-cd__bar { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-cd__title { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; font-weight: 800; color: var(--block-accent, var(--dnd-class-paladin)); }
+.dnd-cd__meter { display: flex; align-items: center; gap: 0.4rem; }
+.dnd-cd__options { display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-cd__option {
+  padding: 0.45rem 0.55rem; border-radius: 7px; background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border); border-left: 3px solid var(--block-accent, var(--dnd-class-paladin));
+}
+.dnd-cd__opt-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-cd__opt-name { display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--dnd-text); }
+.dnd-cd__opt-name svg { color: var(--block-accent, var(--dnd-class-paladin)); flex-shrink: 0; }
+.dnd-cd__opt-desc { margin: 0.3rem 0 0; font-size: 0.71rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-cd__foot { font-size: 0.66rem; font-style: italic; color: var(--dnd-text-muted); }
+
+/* Swarmkeeper — three assist modes */
+.dnd-swarm__modes { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.1rem; }
+.dnd-swarm__mode { display: flex; gap: 0.45rem; align-items: baseline; font-size: 0.7rem; }
+.dnd-swarm__mode-name { flex-shrink: 0; min-width: 3rem; font-weight: 800; color: var(--block-accent, var(--dnd-class-druid)); }
+.dnd-swarm__mode-val { color: var(--dnd-text-dim); line-height: 1.3; }
+
 /* ── Shared accent-driven helpers (pickers + granted-spell reference) ── */
 .dnd-warmagic__pick { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.1rem 0 0.4rem; }
 .dnd-warmagic__pick-btn {
@@ -466,3 +670,132 @@
   letter-spacing: 0.04em;
   color: var(--dnd-text-faint);
 }
+
+/* ── Artificer: Infusion Workbench ──
+   A blueprint-style rack of infused-item slots; each slot is a schematic card
+   with the object name, its infusion effect, and an attunement toggle. */
+.dnd-artificer__bench {
+  border: 1px solid color-mix(in srgb, var(--block-accent) 45%, var(--dnd-border));
+  border-radius: 10px;
+  padding: 0.6rem;
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--block-accent) 12%, transparent), transparent 60%),
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--block-accent) 5%, transparent) 0 8px, transparent 8px 16px),
+    var(--dnd-surface);
+}
+.dnd-artificer__bench-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;
+}
+.dnd-artificer__hint {
+  font-size: 0.74rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.2rem 0;
+}
+.dnd-artificer__slots { display: flex; flex-direction: column; gap: 0.45rem; }
+.dnd-artificer__slot {
+  display: flex; gap: 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-left: 3px solid var(--block-accent);
+  border-radius: 8px;
+  padding: 0.45rem 0.5rem;
+  background: color-mix(in srgb, var(--block-accent) 6%, var(--dnd-bg));
+}
+.dnd-artificer__slot-icon {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 7px;
+  color: var(--block-accent);
+  background: color-mix(in srgb, var(--block-accent) 14%, transparent);
+}
+.dnd-artificer__slot-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-artificer__slot-top { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
+.dnd-artificer__slot-inf {
+  font-size: 0.78rem; font-weight: 700; color: var(--block-accent);
+}
+.dnd-artificer__slot-name { font-size: 0.78rem; padding: 0.25rem 0.4rem; }
+.dnd-artificer__slot-desc {
+  font-size: 0.68rem; color: var(--dnd-text-dim); line-height: 1.35; margin: 0;
+}
+.dnd-artificer__attune {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.66rem; font-weight: 600;
+  padding: 0.15rem 0.5rem; border-radius: 999px;
+  border: 1px solid var(--block-accent); background: transparent;
+  color: var(--block-accent); cursor: pointer;
+}
+.dnd-artificer__attune--on {
+  background: var(--block-accent);
+  color: #fff;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--block-accent) 55%, transparent);
+}
+.dnd-artificer__add {
+  width: 100%; margin-top: 0.5rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  font-size: 0.74rem; font-weight: 600;
+  padding: 0.4rem; border-radius: 7px; cursor: pointer;
+  border: 1px dashed color-mix(in srgb, var(--block-accent) 60%, var(--dnd-border));
+  background: transparent; color: var(--block-accent);
+}
+.dnd-artificer__add:hover { background: color-mix(in srgb, var(--block-accent) 10%, transparent); }
+.dnd-artificer__bench-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  margin-top: 0.55rem; padding-top: 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--block-accent) 22%, var(--dnd-border));
+}
+.dnd-artificer__bench-foot .dnd-warmagic__note { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* ── Alchemist: Alchemy Bench (elixir flasks) ── */
+.dnd-alch__brew { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+.dnd-alch__brew .dnd-warmagic__btn,
+.dnd-alch__add {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  flex: 1; margin-top: 0; width: auto;
+}
+.dnd-alch__brew .dnd-warmagic__btn--spend { font-weight: 600; }
+.dnd-alch__flasks { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+.dnd-alch__flask {
+  display: flex; align-items: center; gap: 0.5rem;
+  border: 1px solid var(--dnd-border);
+  border-left: 3px solid var(--block-accent);
+  border-radius: 8px; padding: 0.4rem 0.5rem;
+  background: color-mix(in srgb, var(--block-accent) 6%, var(--dnd-bg));
+}
+.dnd-alch__flask-icon {
+  flex-shrink: 0; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 7px; color: var(--block-accent);
+  background: color-mix(in srgb, var(--block-accent) 14%, transparent);
+}
+.dnd-alch__flask-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dnd-alch__flask-name { font-size: 0.78rem; font-weight: 700; color: var(--block-accent); }
+.dnd-alch__flask-short { font-size: 0.68rem; color: var(--dnd-text-dim); }
+.dnd-alch__flask-btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
+.dnd-alch__flask-btns .dnd-warmagic__btn { display: inline-flex; align-items: center; gap: 0.2rem; }
+.dnd-alch__temp { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.5rem; }
+.dnd-alch__mastery { display: flex; gap: 0.4rem; margin: 0.2rem 0 0.4rem; }
+.dnd-alch__spell {
+  flex: 1; font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  padding: 0.4rem; border-radius: 7px;
+  border: 1px solid var(--block-accent); background: transparent; color: var(--block-accent);
+}
+.dnd-alch__spell--used { opacity: 0.45; text-decoration: line-through; }
+
+/* ── Artillerist: Eldritch Cannon card ── */
+.dnd-cannon__list { display: flex; flex-direction: column; gap: 0.55rem; }
+.dnd-cannon {
+  border: 1px solid var(--dnd-border);
+  border-left: 3px solid var(--block-accent);
+  border-radius: 8px; padding: 0.5rem;
+  background: color-mix(in srgb, var(--block-accent) 6%, var(--dnd-bg));
+}
+.dnd-cannon__pick { display: flex; gap: 0.3rem; margin-bottom: 0.45rem; }
+.dnd-cannon__pick .dnd-warmagic__pick-btn { flex: 1; }
+.dnd-cannon__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.dnd-cannon__title {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.82rem; font-weight: 700; color: var(--block-accent);
+}
+.dnd-cannon__ac { font-size: 0.72rem; color: var(--dnd-text-muted); font-variant-numeric: tabular-nums; }
+.dnd-cannon__activation { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.45rem 0; }
+.dnd-cannon__btns { display: flex; gap: 0.4rem; }
+.dnd-cannon__btns .dnd-warmagic__btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; }

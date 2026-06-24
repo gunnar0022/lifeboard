@@ -97,6 +97,13 @@ export function sorcererSpellsKnown(level) {
   return table[Math.max(1, Math.min(20, level || 1)) - 1];
 }
 
+// ── Artificer ──
+export function artificerCantripsKnown(level) {
+  if (level >= 14) return 4;
+  if (level >= 10) return 3;
+  return 2;
+}
+
 // ── Ranger ──
 export function favoredFoeDie(level) {
   if (level >= 14) return 'd8';

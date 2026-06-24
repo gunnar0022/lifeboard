@@ -25,6 +25,7 @@ export { ARCANE_SHOT_LIST, arcaneShotsKnown } from './rules/shared/arcaneShots';
 export { DRAGON_ANCESTRY, DRAGON_COLORS, breathWeaponDice } from './rules/shared/dragonAncestry';
 export { METAMAGIC_OPTIONS, metamagicKnown } from './rules/shared/metamagic';
 export { PACT_BOONS } from './rules/shared/pactBoons';
+export { INFUSION_LIST, infusionsKnown, infusedItemsMax, attunementCap } from './rules/shared/infusions';
 export * from './rules/shared/scaling';
 
 // ── Feature getters (used by the Features tab + registry) ──

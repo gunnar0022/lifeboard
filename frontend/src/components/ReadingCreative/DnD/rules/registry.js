@@ -35,6 +35,7 @@ export const CLASS_BLOCK_BY_TYPE = {
   divine_smite: 'PaladinBlock',
   sorcery_points: 'SorcererBlock',
   ranger_spells: 'RangerBlock',
+  artificer_infusions: 'ArtificerBlock',
 };
 
 export const SUBCLASS_BLOCK_BY_NAME = {
@@ -87,6 +88,27 @@ export const SUBCLASS_BLOCK_BY_NAME = {
   'Swashbuckler': 'SwashbucklerBlock',
   'War Magic': 'WarMagicBlock',
   'The Archfey': 'ArchfeyBlock',
+  'Hunter': 'HunterBlock',
+  'Beast Master': 'BeastMasterBlock',
+  'Drakewarden': 'DrakewardenBlock',
+  'Fey Wanderer': 'FeyWandererBlock',
+  'Gloom Stalker': 'GloomStalkerBlock',
+  'Horizon Walker': 'HorizonWalkerBlock',
+  'Monster Slayer': 'MonsterSlayerBlock',
+  'Swarmkeeper': 'SwarmkeeperBlock',
+  'Oath of the Ancients': 'AncientsBlock',
+  'Oath of Conquest': 'ConquestBlock',
+  'Oath of the Crown': 'CrownBlock',
+  'Oath of Devotion': 'DevotionBlock',
+  'Oath of Glory': 'GloryBlock',
+  'Oath of Redemption': 'RedemptionBlock',
+  'Oath of Vengeance': 'VengeanceBlock',
+  'Oath of the Watchers': 'WatchersBlock',
+  'Oathbreaker': 'OathbreakerBlock',
+  'Alchemist': 'AlchemistBlock',
+  'Armorer': 'ArmorerBlock',
+  'Artillerist': 'ArtilleristBlock',
+  'Battle Smith': 'BattleSmithBlock',
 };
 
 const emptyOverview = { tagline: null, overview: null, definingFeature: null, lore: null };

@@ -161,7 +161,12 @@ export const CLASS_FEATURE_DEFAULTS = {
     type: 'ki_points', maxPoints: 1, currentPoints: 1,
   },
   Artificer: {
-    type: 'artificer_infusions', maxInfusions: 2, currentInfusions: 2,
+    type: 'artificer_infusions',
+    knownInfusions: [],                       // names chosen on the Features tab
+    infusedItems: [],                         // active: [{ id, infusion, itemName, attuned }]
+    magicalTinkering: { current: 0 },         // active tinkered objects
+    flashOfGenius: { current: 0, max: 0 },    // reaction uses (= INT mod)
+    spellStoring: { spell: '', current: 0, max: 0 },
   },
 };
 
@@ -240,24 +245,25 @@ export const SUBCLASS_LISTS = {
     { name: 'Twilight Domain', implemented: false },
   ],
   Paladin: [
-    { name: 'Oath of Devotion', implemented: false },
-    { name: 'Oath of the Ancients', implemented: false },
-    { name: 'Oath of Vengeance', implemented: false },
-    { name: 'Oath of Conquest', implemented: false },
-    { name: 'Oath of Redemption', implemented: false },
-    { name: 'Oath of Glory', implemented: false },
-    { name: 'Oath of the Watchers', implemented: false },
-    { name: 'Oathbreaker', implemented: false },
+    { name: 'Oath of Devotion', implemented: true },
+    { name: 'Oath of the Ancients', implemented: true },
+    { name: 'Oath of Vengeance', implemented: true },
+    { name: 'Oath of Conquest', implemented: true },
+    { name: 'Oath of the Crown', implemented: true },
+    { name: 'Oath of Redemption', implemented: true },
+    { name: 'Oath of Glory', implemented: true },
+    { name: 'Oath of the Watchers', implemented: true },
+    { name: 'Oathbreaker', implemented: true },
   ],
   Ranger: [
-    { name: 'Hunter', implemented: false },
-    { name: 'Beast Master', implemented: false },
-    { name: 'Gloom Stalker', implemented: false },
-    { name: 'Horizon Walker', implemented: false },
-    { name: 'Monster Slayer', implemented: false },
-    { name: 'Fey Wanderer', implemented: false },
-    { name: 'Swarmkeeper', implemented: false },
-    { name: 'Drakewarden', implemented: false },
+    { name: 'Hunter', implemented: true },
+    { name: 'Beast Master', implemented: true },
+    { name: 'Gloom Stalker', implemented: true },
+    { name: 'Horizon Walker', implemented: true },
+    { name: 'Monster Slayer', implemented: true },
+    { name: 'Fey Wanderer', implemented: true },
+    { name: 'Swarmkeeper', implemented: true },
+    { name: 'Drakewarden', implemented: true },
   ],
   Warlock: [
     { name: 'The Archfey', implemented: true },
@@ -299,10 +305,10 @@ export const SUBCLASS_LISTS = {
     { name: 'Way of Mercy', implemented: false },
   ],
   Artificer: [
-    { name: 'Alchemist', implemented: false },
-    { name: 'Armorer', implemented: false },
-    { name: 'Artillerist', implemented: false },
-    { name: 'Battle Smith', implemented: false },
+    { name: 'Alchemist', implemented: true },
+    { name: 'Armorer', implemented: true },
+    { name: 'Artillerist', implemented: true },
+    { name: 'Battle Smith', implemented: true },
   ],
 };
 

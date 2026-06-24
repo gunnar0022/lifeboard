@@ -170,6 +170,10 @@
   font-family: inherit; font-size: 0.78rem;
 }
 .dnd-feature-choice__pick:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-feature-choice__pick--active {
+  background: var(--dnd-accent); border-color: var(--dnd-accent); color: var(--dnd-bg); font-weight: 700;
+}
+.dnd-feature-choice__pick--active:hover { color: var(--dnd-bg); }
 .dnd-feature-choice__pick-lvl { font-size: 0.62rem; color: var(--dnd-text-faint); }
 .dnd-feature-choice__empty { font-size: 0.78rem; font-style: italic; color: var(--dnd-text-faint); margin: 0; }
 .dnd-feature-choice__rune {

@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown } from '../classProgression';
-import { SKILLS } from '../dndUtils';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown, INFUSION_LIST, infusionsKnown } from '../classProgression';
+import { SKILLS, abilityMod, proficiencyBonus } from '../dndUtils';
+import { buildPrimalBeast, buildDrake, buildSteelDefender, PRIMAL_VARIANTS, DRAKE_ESSENCES } from '../rules/shared/companions';
+import CompanionStatBlock from './ClassFeatures/CompanionStatBlock';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
 
@@ -218,6 +220,85 @@ function ArcaneShotChoice({ classFeature, onUpdate, level }) {
   );
 }
 
+// ── Inline build-choice: Artificer Infusions (capped, level-gated pick) ──
+// Stored as a list of infusion names in classFeature.knownInfusions; Replicate
+// Magic Item may be taken more than once, so removal is by index.
+function InfusionChoice({ classFeature, onUpdate, level }) {
+  const cf = classFeature || {};
+  const known = cf.knownInfusions || [];
+  const max = infusionsKnown(level);
+  const [picking, setPicking] = useState(false);
+
+  const add = (name) => {
+    if (known.length >= max) return;
+    onUpdate({ classFeature: { ...cf, knownInfusions: [...known, name] } });
+    setPicking(false);
+  };
+  const removeAt = (idx) => {
+    const removed = known[idx];
+    const nextKnown = known.filter((_, i) => i !== idx);
+    // Drop any infused item that was using the now-forgotten infusion.
+    const stillKnown = nextKnown.includes(removed);
+    const infusedItems = stillKnown
+      ? cf.infusedItems
+      : (cf.infusedItems || []).filter(it => it.infusion !== removed);
+    onUpdate({ classFeature: { ...cf, knownInfusions: nextKnown, infusedItems } });
+  };
+
+  const repeatable = (name) => name === 'Replicate Magic Item';
+  const available = INFUSION_LIST.filter(
+    inf => inf.prereq <= level && (repeatable(inf.name) || !known.includes(inf.name))
+  );
+  const locked = INFUSION_LIST.filter(inf => inf.prereq > level);
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__rune-head">
+        <span className="dnd-feature-choice__count">{known.length}/{max} infusions known</span>
+        {known.length < max && available.length > 0 && (
+          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Infusion</button>
+        )}
+      </div>
+
+      {picking && (
+        <div className="dnd-feature-choice__picker">
+          {available.map(inf => (
+            <button key={inf.name} className="dnd-feature-choice__pick" onClick={() => add(inf.name)} title={inf.desc}>
+              {inf.name}
+              {inf.attune && <span className="dnd-feature-choice__pick-lvl"> ⚜</span>}
+              {inf.prereq > 2 && <span className="dnd-feature-choice__pick-lvl"> Lvl {inf.prereq}+</span>}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {known.length === 0 && <p className="dnd-feature-choice__empty">No infusions learned yet — click + Infusion.</p>}
+
+      {known.map((name, idx) => {
+        const inf = INFUSION_LIST.find(x => x.name === name);
+        return (
+          <div key={`${name}-${idx}`} className="dnd-feature-choice__rune">
+            <div className="dnd-feature-choice__rune-top">
+              <span className="dnd-feature-choice__rune-name">
+                {name}{inf?.attune && <em className="dnd-feature-choice__pick-lvl"> requires attunement</em>}
+              </span>
+              <button className="dnd-feature-choice__remove" onClick={() => removeAt(idx)} title="Replace / remove infusion">×</button>
+            </div>
+            <p className="dnd-feature-choice__rune-line"><strong>Item:</strong> {inf?.target}</p>
+            <p className="dnd-feature-choice__rune-line">{inf?.desc}</p>
+          </div>
+        );
+      })}
+
+      {locked.length > 0 && (
+        <p className="dnd-feature-choice__locked">
+          Available later: {locked.map(inf => `${inf.name} (Lvl ${inf.prereq})`).join(', ')}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── Inline build-choice: Warlock Pact Boon (dropdown) ──────────────────
 function PactBoonChoice({ classFeature, onUpdate }) {
   const cf = classFeature || {};
@@ -339,6 +420,78 @@ function MetamagicChoice({ classFeature, onUpdate, level }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Inline build-choice: pick one option from a fixed set (e.g. Hunter tiers) ──
+// Stores the selection in classFeature[feat.group][feat.id]; shows the chosen
+// option's full text. Reusable for any "choose one of the following" feature.
+function OptionChoice({ feat, classFeature, onUpdate }) {
+  const cf = classFeature || {};
+  const group = feat.group || 'optionChoices';
+  const map = cf[group] || {};
+  const selected = map[feat.id] || '';
+  const opt = (feat.options || []).find(o => o.name === selected);
+  const choose = (name) =>
+    onUpdate({ classFeature: { ...cf, [group]: { ...map, [feat.id]: selected === name ? '' : name } } });
+
+  return (
+    <div className="dnd-feature-choice">
+      <div className="dnd-feature-choice__picker">
+        {(feat.options || []).map(o => (
+          <button
+            key={o.name}
+            className={`dnd-feature-choice__pick ${selected === o.name ? 'dnd-feature-choice__pick--active' : ''}`}
+            onClick={() => choose(o.name)}
+          >{o.name}</button>
+        ))}
+      </div>
+      {opt && <p className="dnd-feature-choice__detail">{opt.desc}</p>}
+    </div>
+  );
+}
+
+// ── Inline info: companion stat-block viewer (Beast Master / Drakewarden) ──
+// Collapsible so the dense numbers stay tidy; a dropdown switches variant/essence.
+// Read-only here — live HP & summoning live on the Combat tab.
+const capWord = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+function StatBlockPreview({ kind, level, abilities }) {
+  const [open, setOpen] = useState(false);
+  const [variant, setVariant] = useState(kind === 'drake' ? 'fire' : 'land');
+  const lvl = level || 3;
+  const pb = proficiencyBonus(lvl);
+  const wisMod = abilityMod(abilities?.WIS || 10);
+  const intMod = abilityMod(abilities?.INT || 10);
+
+  let block, options;
+  if (kind === 'steelDefender') {
+    block = buildSteelDefender({ level: lvl, pb, spellAtk: pb + intMod, intMod, improved: lvl >= 15 });
+    options = null;
+  } else {
+    const ctx = { level: lvl, pb, spellAtk: pb + wisMod, spellDC: 8 + pb + wisMod, wisMod };
+    block = kind === 'drake' ? buildDrake(variant, ctx) : buildPrimalBeast(variant, ctx);
+    options = kind === 'drake'
+      ? DRAKE_ESSENCES.map(e => ({ id: e, label: `${capWord(e)} essence` }))
+      : PRIMAL_VARIANTS.map(v => ({ id: v.id, label: v.label }));
+  }
+
+  return (
+    <div className="dnd-feature-choice">
+      <button className="dnd-features__toggle" onClick={() => setOpen(o => !o)}>
+        {open ? 'Hide stat block' : 'View stat block'}
+      </button>
+      {open && (
+        <>
+          {options && (
+            <select className="dnd-field dnd-feature-choice__select" value={variant}
+              onChange={e => setVariant(e.target.value)}>
+              {options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+            </select>
+          )}
+          <CompanionStatBlock block={block} />
+        </>
+      )}
     </div>
   );
 }
@@ -551,7 +704,7 @@ function SkillChoice({ racialFeature, onUpdate, options }) {
   );
 }
 
-export default function FeatureList({ features, editMode, onUpdate, level, className, subclass, classFeature, race, subrace, racialFeature }) {
+export default function FeatureList({ features, editMode, onUpdate, level, className, subclass, classFeature, race, subrace, racialFeature, abilities }) {
   const [expanded, setExpanded] = useState({});
   const toggle = (key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
 
@@ -585,6 +738,8 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
     if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
     if (feat.choice === 'metamagic') return <MetamagicChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+    if (feat.choice === 'infusions') return <InfusionChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+    if (feat.choice === 'option') return <OptionChoice feat={feat} classFeature={classFeature} onUpdate={onUpdate} />;
     return null;
   };
 
@@ -607,6 +762,7 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
           </button>
         )}
         {feat.choice && renderChoice(feat)}
+        {feat.statBlock && <StatBlockPreview kind={feat.statBlock} level={level} abilities={abilities} />}
       </div>
     );
   };

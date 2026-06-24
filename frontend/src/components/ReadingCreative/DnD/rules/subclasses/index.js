@@ -51,6 +51,27 @@ import soulknife from './soulknife';
 import arcaneTrickster from './arcaneTrickster';
 import thief from './thief';
 import swashbuckler from './swashbuckler';
+import hunter from './hunter';
+import beastMaster from './beastMaster';
+import drakewarden from './drakewarden';
+import feyWanderer from './feyWanderer';
+import gloomStalker from './gloomStalker';
+import horizonWalker from './horizonWalker';
+import monsterSlayer from './monsterSlayer';
+import swarmkeeper from './swarmkeeper';
+import oathOfTheAncients from './oathOfTheAncients';
+import oathOfConquest from './oathOfConquest';
+import oathOfTheCrown from './oathOfTheCrown';
+import oathOfDevotion from './oathOfDevotion';
+import oathOfGlory from './oathOfGlory';
+import oathOfRedemption from './oathOfRedemption';
+import oathOfVengeance from './oathOfVengeance';
+import oathOfTheWatchers from './oathOfTheWatchers';
+import oathbreaker from './oathbreaker';
+import alchemist from './alchemist';
+import armorer from './armorer';
+import artillerist from './artillerist';
+import battleSmith from './battleSmith';
 
 const ALL = [
   runeKnight, ancestralGuardian, assassin,
@@ -65,6 +86,12 @@ const ALL = [
   draconicBloodline, aberrantMind, clockworkSoul, divineSoul,
   inquisitive, mastermind, phantom, scout, soulknife,
   arcaneTrickster, thief, swashbuckler,
+  hunter, beastMaster, drakewarden, feyWanderer,
+  gloomStalker, horizonWalker, monsterSlayer, swarmkeeper,
+  oathOfTheAncients, oathOfConquest, oathOfTheCrown,
+  oathOfDevotion, oathOfGlory, oathOfRedemption,
+  oathOfVengeance, oathOfTheWatchers, oathbreaker,
+  alchemist, armorer, artillerist, battleSmith,
 ];
 
 export const SUBCLASS_PROGRESSION = Object.fromEntries(

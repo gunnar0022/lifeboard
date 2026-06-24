@@ -305,6 +305,11 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       }
       // Paladin: Channel Divinity recharges on a short or long rest.
       if (cf.channelDivinity) cf.channelDivinity = { ...cf.channelDivinity, current: cf.channelDivinity.max || 1 };
+      // Ranger subclasses — short-or-long-rest abilities
+      if ('detectPortalUsed' in cf) cf.detectPortalUsed = false;   // Horizon Walker
+      if ('etherealStepUsed' in cf) cf.etherealStepUsed = false;   // Horizon Walker
+      if ('nemesisUsed' in cf) cf.nemesisUsed = false;             // Monster Slayer
+      if ('quarry' in cf) cf.quarry = '';                          // Monster Slayer: Slayer's Prey ends on a rest
       // Bard / College of Glamour: Enthralling Performance & Unbreakable Majesty recharge on a short rest.
       if ('enthrallingUsed' in cf) cf.enthrallingUsed = false;
       if ('unbreakableMajestyUsed' in cf) cf.unbreakableMajestyUsed = false;
@@ -417,6 +422,29 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.favoredFoe) cf.favoredFoe = { ...cf.favoredFoe, current: cf.favoredFoe.max || 0 };
       if (cf.naturesVeil) cf.naturesVeil = { ...cf.naturesVeil, current: cf.naturesVeil.max || 0 };
       if (cf.tireless) cf.tireless = { ...cf.tireless, current: cf.tireless.max || 0 };
+      // Ranger subclasses — recharge on long rest (also covers their short-rest abilities)
+      if ('detectPortalUsed' in cf) cf.detectPortalUsed = false;     // Horizon Walker
+      if ('etherealStepUsed' in cf) cf.etherealStepUsed = false;     // Horizon Walker
+      if ('nemesisUsed' in cf) cf.nemesisUsed = false;               // Monster Slayer
+      if ('quarry' in cf) cf.quarry = '';                            // Monster Slayer: Slayer's Prey
+      if ('huntersSenseUsed' in cf) cf.huntersSenseUsed = 0;         // Monster Slayer
+      if ('writhingTideUsed' in cf) cf.writhingTideUsed = 0;         // Swarmkeeper
+      if ('swarmDispersalUsed' in cf) cf.swarmDispersalUsed = 0;     // Swarmkeeper
+      if ('drakeBreathUsed' in cf) cf.drakeBreathUsed = false;       // Drakewarden
+      if ('reflexUsed' in cf) cf.reflexUsed = 0;                     // Drakewarden
+      if ('summonFeyUsed' in cf) cf.summonFeyUsed = false;           // Fey Wanderer
+      if ('mistyStepUsed' in cf) cf.mistyStepUsed = 0;               // Fey Wanderer
+      // Paladin oaths — once-per-long-rest survival / capstone abilities
+      if ('undyingSentinelUsed' in cf) cf.undyingSentinelUsed = false;        // Ancients
+      if ('elderChampionUsed' in cf) cf.elderChampionUsed = false;            // Ancients
+      if ('invincibleConquerorUsed' in cf) cf.invincibleConquerorUsed = false; // Conquest
+      if ('exaltedChampionUsed' in cf) cf.exaltedChampionUsed = false;        // Crown
+      if ('holyNimbusUsed' in cf) cf.holyNimbusUsed = false;                  // Devotion
+      if ('gloriousDefenseUsed' in cf) cf.gloriousDefenseUsed = 0;            // Glory
+      if ('livingLegendUsed' in cf) cf.livingLegendUsed = false;             // Glory
+      if ('avengingAngelUsed' in cf) cf.avengingAngelUsed = false;           // Vengeance
+      if ('mortalBulwarkUsed' in cf) cf.mortalBulwarkUsed = false;           // Watchers
+      if ('dreadLordUsed' in cf) cf.dreadLordUsed = false;                   // Oathbreaker
       // Archfey: short-or-long-rest abilities also recharge on a long rest
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
@@ -835,7 +863,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <FeatureList features={character.features || []}
             editMode={editMode} onUpdate={handleUpdate} level={level}
             className={meta.className} subclass={meta.subclass}
-            classFeature={character.classFeature}
+            classFeature={character.classFeature} abilities={character.abilities}
             race={meta.race} subrace={meta.subrace} racialFeature={character.racialFeature} />
         )}
 

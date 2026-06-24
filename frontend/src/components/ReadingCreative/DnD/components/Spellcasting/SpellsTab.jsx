@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { abilityMod, proficiencyBonus, normalizeSpellcasting, casterProfileFor, buildEmptySpellcasting } from '../../dndUtils';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
-import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown, eldritchKnightCantripsKnown, eldritchKnightSpellsKnown, arcaneTricksterCantripsKnown } from '../../classProgression';
+import { wizardCantripsKnown, warlockCantripsKnown, druidCantripsKnown, bardCantripsKnown, clericCantripsKnown, sorcererCantripsKnown, bardSpellsKnown, sorcererSpellsKnown, rangerSpellsKnown, eldritchKnightCantripsKnown, eldritchKnightSpellsKnown, arcaneTricksterCantripsKnown, artificerCantripsKnown } from '../../classProgression';
 import { AlertTriangle } from 'lucide-react';
 import SpellcastingHeader from './SpellcastingHeader';
 import ConcentrationBanner from './ConcentrationBanner';
@@ -69,6 +69,7 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
   const CANTRIP_CAPS = {
     Wizard: wizardCantripsKnown, Warlock: warlockCantripsKnown, Druid: druidCantripsKnown,
     Bard: bardCantripsKnown, Cleric: clericCantripsKnown, Sorcerer: sorcererCantripsKnown,
+    Artificer: artificerCantripsKnown,
   };
   // Subclass third-casters supply their own cantrip / spells-known caps.
   const SUBCLASS_CANTRIP_CAPS = {

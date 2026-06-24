@@ -16,6 +16,7 @@ import MonkBlock from './MonkBlock';
 import PaladinBlock from './PaladinBlock';
 import SorcererBlock from './SorcererBlock';
 import RangerBlock from './RangerBlock';
+import ArtificerBlock from './ArtificerBlock';
 import RuneKnightBlock from './RuneKnightBlock';
 import AssassinBlock from './AssassinBlock';
 import CircleOfStarsBlock from './CircleOfStarsBlock';
@@ -65,12 +66,33 @@ import SoulknifeBlock from './SoulknifeBlock';
 import ArcaneTricksterBlock from './ArcaneTricksterBlock';
 import ThiefBlock from './ThiefBlock';
 import SwashbucklerBlock from './SwashbucklerBlock';
+import HunterBlock from './HunterBlock';
+import BeastMasterBlock from './BeastMasterBlock';
+import DrakewardenBlock from './DrakewardenBlock';
+import FeyWandererBlock from './FeyWandererBlock';
+import GloomStalkerBlock from './GloomStalkerBlock';
+import HorizonWalkerBlock from './HorizonWalkerBlock';
+import MonsterSlayerBlock from './MonsterSlayerBlock';
+import SwarmkeeperBlock from './SwarmkeeperBlock';
+import AncientsBlock from './AncientsBlock';
+import ConquestBlock from './ConquestBlock';
+import CrownBlock from './CrownBlock';
+import DevotionBlock from './DevotionBlock';
+import GloryBlock from './GloryBlock';
+import RedemptionBlock from './RedemptionBlock';
+import VengeanceBlock from './VengeanceBlock';
+import WatchersBlock from './WatchersBlock';
+import OathbreakerBlock from './OathbreakerBlock';
+import AlchemistBlock from './AlchemistBlock';
+import ArmorerBlock from './ArmorerBlock';
+import ArtilleristBlock from './ArtilleristBlock';
+import BattleSmithBlock from './BattleSmithBlock';
 
 export const BLOCKS = {
   // class trackers
   RageTracker, WildShapeTracker, CunningActionPanel, FighterResources,
   WizardBlock, WarlockBlock, BardBlock, ClericBlock, MonkBlock, PaladinBlock,
-  SorcererBlock, RangerBlock,
+  SorcererBlock, RangerBlock, ArtificerBlock,
   // subclass trackers
   RuneKnightBlock, AssassinBlock, CircleOfStarsBlock, CircleOfSporesBlock,
   AncestralGuardianBlock, WarMagicBlock, ArchfeyBlock, BerserkerBlock,
@@ -84,6 +106,12 @@ export const BLOCKS = {
   DraconicBlock, AberrantMindBlock, ClockworkSoulBlock, DivineSoulBlock,
   InquisitiveBlock, MastermindBlock, PhantomBlock, ScoutBlock, SoulknifeBlock,
   ArcaneTricksterBlock, ThiefBlock, SwashbucklerBlock,
+  HunterBlock, BeastMasterBlock, DrakewardenBlock, FeyWandererBlock,
+  GloomStalkerBlock, HorizonWalkerBlock, MonsterSlayerBlock, SwarmkeeperBlock,
+  AncientsBlock, ConquestBlock, CrownBlock,
+  DevotionBlock, GloryBlock, RedemptionBlock,
+  VengeanceBlock, WatchersBlock, OathbreakerBlock,
+  AlchemistBlock, ArmorerBlock, ArtilleristBlock, BattleSmithBlock,
 };
 
 /** Look up a tracker component by blockId (null if none/unknown). */
