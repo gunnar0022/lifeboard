@@ -54,7 +54,7 @@
 }
 .wiki-pillar__icon { color: var(--dnd-accent); }
 .wiki-pillar__label { font-family: 'Uncial Antiqua', serif; font-size: 1.15rem; }
-.wiki-pillar__blurb { font-size: 0.82rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.wiki-pillar__blurb { font-size: 0.92rem; color: var(--dnd-text-dim); line-height: 1.4; }
 .wiki-pillar--soon { opacity: 0.6; cursor: default; }
 .wiki-pillar__badge {
   position: absolute; top: 0.6rem; right: 0.6rem; font-size: 0.65rem;
@@ -78,7 +78,7 @@
 .wiki-card__accent { width: 4px; align-self: stretch; border-radius: 3px; background: var(--accent, var(--dnd-accent)); flex: none; }
 .wiki-card__body { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
 .wiki-card__name { font-family: 'Uncial Antiqua', serif; font-size: 1rem; color: var(--accent, var(--dnd-text)); }
-.wiki-card__tagline { font-size: 0.8rem; color: var(--dnd-text-dim); line-height: 1.3; }
+.wiki-card__tagline { font-size: 0.9rem; color: var(--dnd-text-dim); line-height: 1.35; }
 .wiki-card__meta { font-size: 0.7rem; color: var(--dnd-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
 .wiki-card__chev { color: var(--dnd-text-faint); flex: none; }
 
@@ -108,7 +108,7 @@
 }
 .wiki-defining__star { color: var(--accent, var(--dnd-accent)); flex: none; margin-top: 0.15rem; }
 .wiki-defining__name { font-weight: 700; color: var(--accent, var(--dnd-text)); }
-.wiki-defining__desc { margin: 0.2rem 0 0; font-size: 0.9rem; line-height: 1.5; color: var(--dnd-text); }
+.wiki-defining__desc { margin: 0.2rem 0 0; font-size: 1rem; line-height: 1.5; color: var(--dnd-text); }
 
 .wiki-section { display: flex; flex-direction: column; gap: 0.5rem; }
 .wiki-section__title {
@@ -118,7 +118,7 @@
 .wiki-traits { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.5rem; }
 .wiki-trait { padding: 0.6rem 0.7rem; border-radius: 6px; background: var(--dnd-surface); border: 1px solid var(--dnd-border); }
 .wiki-trait__name { font-weight: 700; color: var(--dnd-text); }
-.wiki-trait__desc { margin: 0.25rem 0 0; font-size: 0.85rem; line-height: 1.45; color: var(--dnd-text-dim); }
+.wiki-trait__desc { margin: 0.25rem 0 0; font-size: 0.95rem; line-height: 1.5; color: var(--dnd-text-dim); }
 
 .wiki-section--lore { margin-top: 0.25rem; }
 .wiki-lore { padding: 0.3rem 0; border-bottom: 1px dashed var(--dnd-border); }
@@ -127,7 +127,18 @@
   font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dnd-text-muted);
   display: block; margin-bottom: 0.15rem;
 }
-.wiki-lore__body { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--dnd-text-dim); white-space: pre-wrap; overflow-wrap: break-word; }
+.wiki-lore__body { margin: 0; font-size: 0.98rem; line-height: 1.55; color: var(--dnd-text-dim); white-space: pre-wrap; overflow-wrap: break-word; }
+.wiki-lore__edit-head { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+.wiki-lore__label-edit {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--dnd-text-muted); font-weight: 700;
+}
+.wiki-lore__del {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+  background: transparent; border: 1px solid var(--dnd-border); color: var(--dnd-text-muted);
+}
+.wiki-lore__del:hover { color: #c0392b; border-color: #c0392b; background: color-mix(in srgb, #c0392b 10%, transparent); }
 
 /* ── Inline choice: Half-Elf / Human versatility tabs ── */
 .wiki-choice { margin-top: 0.5rem; }
@@ -142,7 +153,7 @@
   background: color-mix(in srgb, var(--accent, var(--dnd-accent)) 18%, var(--dnd-surface));
   border-color: var(--accent, var(--dnd-accent)); color: var(--dnd-text); font-weight: 600;
 }
-.wiki-choice__desc { margin: 0; font-size: 0.85rem; line-height: 1.45; color: var(--dnd-text-dim); }
+.wiki-choice__desc { margin: 0; font-size: 0.95rem; line-height: 1.5; color: var(--dnd-text-dim); }
 
 /* ── Dragonborn draconic ancestry picker ── */
 .wiki-dragon { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.55rem; }
@@ -222,7 +233,7 @@
   border: 1px solid color-mix(in srgb, var(--accent, var(--dnd-accent)) 40%, var(--dnd-border));
 }
 .wiki-prog__name { font-weight: 700; color: var(--dnd-text); }
-.wiki-prog__desc { margin: 0.2rem 0 0; font-size: 0.85rem; line-height: 1.45; color: var(--dnd-text-dim); }
+.wiki-prog__desc { margin: 0.2rem 0 0; font-size: 0.95rem; line-height: 1.5; color: var(--dnd-text-dim); }
 
 /* ── Spell library ── */
 .wiki-spells { display: flex; flex-direction: column; gap: 0.75rem; }

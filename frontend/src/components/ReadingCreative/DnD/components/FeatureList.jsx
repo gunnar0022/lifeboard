@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown, INFUSION_LIST, infusionsKnown } from '../classProgression';
 import { SKILLS, abilityMod, proficiencyBonus } from '../dndUtils';
 import { buildPrimalBeast, buildDrake, buildSteelDefender, PRIMAL_VARIANTS, DRAKE_ESSENCES } from '../rules/shared/companions';
@@ -743,26 +744,26 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     return null;
   };
 
-  // Read-only auto feature card (class / subclass progression)
+  // Read-only auto feature card (class / subclass progression).
+  // Collapsed to a clickable title row by default; unfurls the full description
+  // (and any build choice / stat block) when opened, so long feature lists stay
+  // navigable.
   const renderAutoCard = (feat) => {
-    const isLong = feat.desc && feat.desc.length > 160 && !feat.noTruncate;
-    const showFull = expanded[feat.id] || !isLong;
+    const open = !!expanded[feat.id];
     return (
-      <div key={feat.id} className="dnd-features__card dnd-features__card--auto">
-        <div className="dnd-features__header">
+      <div key={feat.id} className={`dnd-features__card dnd-features__card--auto ${open ? 'dnd-features__card--open' : ''}`}>
+        <button className="dnd-features__header dnd-features__header--toggle" onClick={() => toggle(feat.id)} aria-expanded={open}>
+          <span className="dnd-features__chev">{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
           <span className="dnd-features__name">{feat.name}</span>
           {feat.level && <span className="dnd-features__level">Lvl {feat.level}</span>}
-        </div>
-        <p className="dnd-features__desc">
-          {showFull ? feat.desc : `${feat.desc.slice(0, 160)}...`}
-        </p>
-        {isLong && (
-          <button className="dnd-features__toggle" onClick={() => toggle(feat.id)}>
-            {showFull ? 'Show less' : 'Show more'}
-          </button>
+        </button>
+        {open && (
+          <>
+            <p className="dnd-features__desc">{feat.desc}</p>
+            {feat.choice && renderChoice(feat)}
+            {feat.statBlock && <StatBlockPreview kind={feat.statBlock} level={level} abilities={abilities} />}
+          </>
         )}
-        {feat.choice && renderChoice(feat)}
-        {feat.statBlock && <StatBlockPreview kind={feat.statBlock} level={level} abilities={abilities} />}
       </div>
     );
   };
@@ -789,11 +790,11 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
     }
 
     const key = `m${i}`;
-    const isLong = feat.desc && feat.desc.length > 100;
-    const showFull = expanded[key] || !isLong;
+    const open = !!expanded[key];
     return (
-      <div key={i} className="dnd-features__card">
-        <div className="dnd-features__header">
+      <div key={i} className={`dnd-features__card ${open ? 'dnd-features__card--open' : ''}`}>
+        <button className="dnd-features__header dnd-features__header--toggle" onClick={() => toggle(key)} aria-expanded={open}>
+          <span className="dnd-features__chev">{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
           <span className="dnd-features__name">{feat.name}</span>
           {feat.source && (
             <span className="dnd-features__source"
@@ -801,15 +802,8 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
               {feat.source}
             </span>
           )}
-        </div>
-        <p className="dnd-features__desc">
-          {showFull ? feat.desc : `${feat.desc.slice(0, 100)}...`}
-        </p>
-        {isLong && (
-          <button className="dnd-features__toggle" onClick={() => toggle(key)}>
-            {showFull ? 'Show less' : 'Show more'}
-          </button>
-        )}
+        </button>
+        {open && <p className="dnd-features__desc">{feat.desc}</p>}
       </div>
     );
   };

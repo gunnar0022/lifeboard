@@ -7,8 +7,8 @@ import Mech from './Mech';
  * available but folded away by default, so a class/subclass page leads with
  * flavor and only shows the table when the reader asks for it.
  */
-export default function ProgressionList({ progression, label = 'Level progression' }) {
-  const [open, setOpen] = useState(false);
+export default function ProgressionList({ progression, label = 'Level progression', defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   if (!progression?.length) return null;
 
   const sorted = [...progression].sort((a, b) => (a.level || 1) - (b.level || 1));

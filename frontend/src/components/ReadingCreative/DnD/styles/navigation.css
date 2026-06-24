@@ -278,8 +278,9 @@
   color: var(--dnd-accent); border-bottom-color: var(--dnd-accent);
 }
 
-/* Tab content */
-.dnd-sheet__tab-content { margin-bottom: 1.5rem; }
+/* Tab content — a minimum height (roughly the Stats tab's length) keeps the
+   page from snapping upward when switching to a shorter tab. */
+.dnd-sheet__tab-content { margin-bottom: 1.5rem; min-height: 640px; }
 .dnd-sheet__combat-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;

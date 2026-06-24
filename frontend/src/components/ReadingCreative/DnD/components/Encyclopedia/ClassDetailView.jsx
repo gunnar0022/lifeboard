@@ -94,9 +94,9 @@ export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, 
         </section>
       )}
 
-      <ProgressionList progression={progression} label={isSubclass ? 'Subclass features' : 'Level progression'} />
+      <ProgressionList progression={progression} label={isSubclass ? 'Subclass features' : 'Level progression'} defaultOpen={isSubclass} />
 
-      <LoreBlock lore={lore} order={LORE_ORDER.class} editMode={editMode} prose={prose} />
+      <LoreBlock lore={lore} order={LORE_ORDER.class} editMode={editMode} prose={prose} title={`Understanding the ${name}`} labels={detail.loreLabels} />
     </div>
   );
 }

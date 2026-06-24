@@ -80,7 +80,7 @@ export default function RaceDetailView({ nodeId, accent, onOpen, editMode, overr
         </section>
       )}
 
-      <LoreBlock lore={lore} order={LORE_ORDER.race} editMode={editMode} prose={prose} />
+      <LoreBlock lore={lore} order={LORE_ORDER.race} editMode={editMode} prose={prose} labels={detail.loreLabels} />
     </div>
   );
 }

@@ -79,13 +79,22 @@
 }
 .dnd-features__remove:hover { color: #8b0000; }
 .dnd-features__header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.dnd-features__header--toggle {
+  width: 100%; background: none; border: none; padding: 0;
+  font-family: inherit; cursor: pointer; text-align: left; align-items: center;
+}
+.dnd-features__chev {
+  display: inline-flex; align-items: center; flex-shrink: 0;
+  color: var(--dnd-text-muted); transition: color 0.12s ease;
+}
+.dnd-features__header--toggle:hover .dnd-features__chev { color: var(--dnd-accent); }
 .dnd-features__name { font-weight: 700; color: var(--dnd-accent); }
 .dnd-features__source {
   font-size: 0.65rem; padding: 1px 6px; border-radius: 3px;
   border: 1px solid var(--dnd-border); color: var(--dnd-text-dim);
   text-transform: uppercase; letter-spacing: 0.05em;
 }
-.dnd-features__desc { font-size: 0.85rem; color: var(--dnd-text-dim); margin: 0.3rem 0 0; line-height: 1.4; white-space: pre-wrap; }
+.dnd-features__desc { font-size: 0.95rem; color: var(--dnd-text-dim); margin: 0.3rem 0 0; line-height: 1.45; white-space: pre-wrap; }
 .dnd-features__toggle {
   background: none; border: none; color: var(--dnd-accent-dim);
   cursor: pointer; font-size: 0.75rem; padding: 0; font-family: inherit;
@@ -151,7 +160,7 @@
 .dnd-feature-choice__asi { display: flex; gap: 0.4rem; }
 .dnd-feature-choice__asi select { flex: 1; min-width: 0; }
 .dnd-feature-choice__detail {
-  font-size: 0.8rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0;
+  font-size: 0.9rem; color: var(--dnd-text-dim); line-height: 1.45; margin: 0;
 }
 .dnd-feature-choice__rune-head {
   display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
@@ -188,7 +197,7 @@
 }
 .dnd-feature-choice__remove:hover { color: #8b0000; }
 .dnd-feature-choice__rune-line {
-  font-size: 0.76rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.25rem 0 0;
+  font-size: 0.86rem; color: var(--dnd-text-dim); line-height: 1.45; margin: 0.25rem 0 0;
 }
 .dnd-feature-choice__locked { font-size: 0.72rem; font-style: italic; color: var(--dnd-text-faint); margin: 0; }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, Plus } from 'lucide-react';
+import { Star, Plus, Trash2 } from 'lucide-react';
 import Mech from './Mech';
 import { titleFor, orderedKeys } from './loreText';
 
@@ -53,25 +53,42 @@ export function DefiningFeature({ feature }) {
   );
 }
 
-/** Lore section list with add-section, editable in edit mode. */
-export function LoreBlock({ lore, order, editMode, prose }) {
+/** Lore section list with add-section, editable in edit mode. Headers can be
+ * renamed and whole sections deleted while editing. */
+export function LoreBlock({ lore, order, editMode, prose, title = 'Lore', labels = {} }) {
   const [newLabel, setNewLabel] = useState('');
   const keys = orderedKeys(lore, order).filter(k => editMode || (lore[k] && String(lore[k]).trim()));
   if (keys.length === 0 && !editMode) return null;
 
   const add = () => { prose.addSection(newLabel); setNewLabel(''); };
+  const labelFor = (key) => labels[key] || titleFor(key);
 
   return (
     <section className="wiki-section wiki-section--lore">
-      <h3 className="wiki-section__title">Lore</h3>
+      <h3 className="wiki-section__title">{title}</h3>
       {keys.map(key => (
         <div key={key} className="wiki-lore">
-          <span className="wiki-lore__label">{titleFor(key)}</span>
+          {editMode ? (
+            <div className="wiki-lore__edit-head">
+              <input
+                className="wiki-edit wiki-edit--inline wiki-lore__label-edit"
+                value={labelFor(key)}
+                placeholder="Section header…"
+                onChange={e => prose.setLabel(key, e.target.value)}
+                onBlur={prose.commit}
+              />
+              <button className="wiki-lore__del" onClick={() => prose.removeSection(key)} title="Delete this section">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ) : (
+            <span className="wiki-lore__label">{labelFor(key)}</span>
+          )}
           {editMode ? (
             <textarea
               className="wiki-edit"
               value={lore[key] || ''}
-              placeholder={`${titleFor(key)}…`}
+              placeholder={`${labelFor(key)}…`}
               rows={2}
               onChange={e => prose.setLore(key, e.target.value)}
               onBlur={prose.commit}

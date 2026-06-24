@@ -30,13 +30,18 @@ export default function useLoreOverrides() {
   return { overrides, saveOverride };
 }
 
-/** Merge a node's override prose over its static getNodeDetail result. */
+/** Merge a node's override prose over its static getNodeDetail result.
+ * Lore keys whose override value is null are tombstones — dropped entirely, so a
+ * default section can be deleted. `loreLabels` carries custom section headers. */
 export function applyOverride(detail, ov) {
   if (!detail || !ov) return detail;
+  const lore = { ...(detail.lore || {}), ...(ov.lore || {}) };
+  Object.keys(lore).forEach(k => { if (lore[k] == null) delete lore[k]; });
   return {
     ...detail,
     tagline: ov.tagline ?? detail.tagline,
     overview: ov.overview ?? detail.overview,
-    lore: { ...(detail.lore || {}), ...(ov.lore || {}) },
+    lore,
+    loreLabels: { ...(detail.loreLabels || {}), ...(ov.loreLabels || {}) },
   };
 }
