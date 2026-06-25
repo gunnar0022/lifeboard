@@ -452,6 +452,36 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             data TEXT NOT NULL DEFAULT '{}',
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+
+        CREATE TABLE IF NOT EXISTS dnd_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            kind TEXT NOT NULL DEFAULT 'gear',
+            subtype TEXT NOT NULL DEFAULT '',
+            rarity TEXT NOT NULL DEFAULT 'common',
+            description TEXT NOT NULL DEFAULT '',
+            properties TEXT NOT NULL DEFAULT '[]',
+            damage_dice TEXT DEFAULT NULL,
+            damage_type TEXT DEFAULT NULL,
+            versatile_dice TEXT DEFAULT NULL,
+            weapon_range TEXT DEFAULT NULL,
+            range_normal TEXT DEFAULT NULL,
+            default_ability TEXT DEFAULT NULL,
+            base_ac INTEGER DEFAULT NULL,
+            dex_cap INTEGER DEFAULT NULL,
+            strength_req INTEGER DEFAULT 0,
+            stealth_disadvantage BOOLEAN NOT NULL DEFAULT 0,
+            has_charges BOOLEAN NOT NULL DEFAULT 0,
+            max_charges INTEGER NOT NULL DEFAULT 0,
+            recharge TEXT DEFAULT NULL,
+            has_toggle BOOLEAN NOT NULL DEFAULT 0,
+            weight REAL NOT NULL DEFAULT 0,
+            cost TEXT NOT NULL DEFAULT '',
+            source TEXT NOT NULL DEFAULT 'PHB',
+            data TEXT NOT NULL DEFAULT '{}',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name)
+        );
     """)
 
 

@@ -722,6 +722,99 @@ async def seed_dnd_spells():
         await db.close()
 
 
+async def seed_dnd_items():
+    """Seed the DnD items library — basic weapons, armor, ammo, consumables, magic."""
+    # Each dict carries only the fields that matter; the rest fall back to column
+    # defaults. properties/recharge/data are JSON-encoded on insert.
+    items = [
+        # ── Simple melee weapons ──
+        {"name": "Dagger", "kind": "melee", "subtype": "simple", "damage_dice": "1d4", "damage_type": "piercing", "properties": ["finesse", "light", "thrown"], "range_normal": "20/60", "weight": 1, "cost": "2 gp"},
+        {"name": "Club", "kind": "melee", "subtype": "simple", "damage_dice": "1d4", "damage_type": "bludgeoning", "properties": ["light"], "weight": 2, "cost": "1 sp"},
+        {"name": "Quarterstaff", "kind": "melee", "subtype": "simple", "damage_dice": "1d6", "damage_type": "bludgeoning", "properties": ["versatile"], "versatile_dice": "1d8", "weight": 4, "cost": "2 sp"},
+        {"name": "Mace", "kind": "melee", "subtype": "simple", "damage_dice": "1d6", "damage_type": "bludgeoning", "weight": 4, "cost": "5 gp"},
+        {"name": "Spear", "kind": "melee", "subtype": "simple", "damage_dice": "1d6", "damage_type": "piercing", "properties": ["thrown", "versatile"], "versatile_dice": "1d8", "range_normal": "20/60", "weight": 3, "cost": "1 gp"},
+        {"name": "Handaxe", "kind": "melee", "subtype": "simple", "damage_dice": "1d6", "damage_type": "slashing", "properties": ["light", "thrown"], "range_normal": "20/60", "weight": 2, "cost": "5 gp"},
+        {"name": "Javelin", "kind": "melee", "subtype": "simple", "damage_dice": "1d6", "damage_type": "piercing", "properties": ["thrown"], "range_normal": "30/120", "weight": 2, "cost": "5 sp"},
+        # ── Martial melee weapons ──
+        {"name": "Shortsword", "kind": "melee", "subtype": "martial", "damage_dice": "1d6", "damage_type": "piercing", "properties": ["finesse", "light"], "weight": 2, "cost": "10 gp"},
+        {"name": "Longsword", "kind": "melee", "subtype": "martial", "damage_dice": "1d8", "damage_type": "slashing", "properties": ["versatile"], "versatile_dice": "1d10", "weight": 3, "cost": "15 gp"},
+        {"name": "Rapier", "kind": "melee", "subtype": "martial", "damage_dice": "1d8", "damage_type": "piercing", "properties": ["finesse"], "weight": 2, "cost": "25 gp"},
+        {"name": "Scimitar", "kind": "melee", "subtype": "martial", "damage_dice": "1d6", "damage_type": "slashing", "properties": ["finesse", "light"], "weight": 3, "cost": "25 gp"},
+        {"name": "Battleaxe", "kind": "melee", "subtype": "martial", "damage_dice": "1d8", "damage_type": "slashing", "properties": ["versatile"], "versatile_dice": "1d10", "weight": 4, "cost": "10 gp"},
+        {"name": "Warhammer", "kind": "melee", "subtype": "martial", "damage_dice": "1d8", "damage_type": "bludgeoning", "properties": ["versatile"], "versatile_dice": "1d10", "weight": 2, "cost": "15 gp"},
+        {"name": "Greatsword", "kind": "melee", "subtype": "martial", "damage_dice": "2d6", "damage_type": "slashing", "properties": ["heavy", "two-handed"], "weight": 6, "cost": "50 gp"},
+        {"name": "Greataxe", "kind": "melee", "subtype": "martial", "damage_dice": "1d12", "damage_type": "slashing", "properties": ["heavy", "two-handed"], "weight": 7, "cost": "30 gp"},
+        {"name": "Maul", "kind": "melee", "subtype": "martial", "damage_dice": "2d6", "damage_type": "bludgeoning", "properties": ["heavy", "two-handed"], "weight": 10, "cost": "10 gp"},
+        # ── Ranged weapons ──
+        {"name": "Shortbow", "kind": "ranged", "subtype": "simple", "damage_dice": "1d6", "damage_type": "piercing", "properties": ["ammunition", "two-handed"], "range_normal": "80/320", "default_ability": "DEX", "weight": 2, "cost": "25 gp"},
+        {"name": "Longbow", "kind": "ranged", "subtype": "martial", "damage_dice": "1d8", "damage_type": "piercing", "properties": ["ammunition", "heavy", "two-handed"], "range_normal": "150/600", "default_ability": "DEX", "weight": 2, "cost": "50 gp"},
+        {"name": "Light Crossbow", "kind": "ranged", "subtype": "simple", "damage_dice": "1d8", "damage_type": "piercing", "properties": ["ammunition", "loading", "two-handed"], "range_normal": "80/320", "default_ability": "DEX", "weight": 5, "cost": "25 gp"},
+        {"name": "Heavy Crossbow", "kind": "ranged", "subtype": "martial", "damage_dice": "1d10", "damage_type": "piercing", "properties": ["ammunition", "heavy", "loading", "two-handed"], "range_normal": "100/400", "default_ability": "DEX", "weight": 18, "cost": "50 gp"},
+        {"name": "Sling", "kind": "ranged", "subtype": "simple", "damage_dice": "1d4", "damage_type": "bludgeoning", "properties": ["ammunition"], "range_normal": "30/120", "default_ability": "DEX", "weight": 0, "cost": "1 sp"},
+        # ── Ammunition ──
+        {"name": "Arrows (20)", "kind": "ammunition", "description": "Ammunition for bows.", "weight": 1, "cost": "1 gp"},
+        {"name": "Crossbow Bolts (20)", "kind": "ammunition", "description": "Ammunition for crossbows.", "weight": 1.5, "cost": "1 gp"},
+        {"name": "Sling Bullets (20)", "kind": "ammunition", "description": "Ammunition for slings.", "weight": 1.5, "cost": "4 cp"},
+        # ── Light armor ──
+        {"name": "Padded Armor", "kind": "armor", "subtype": "light", "base_ac": 11, "stealth_disadvantage": 1, "weight": 8, "cost": "5 gp"},
+        {"name": "Leather Armor", "kind": "armor", "subtype": "light", "base_ac": 11, "weight": 10, "cost": "10 gp"},
+        {"name": "Studded Leather", "kind": "armor", "subtype": "light", "base_ac": 12, "weight": 13, "cost": "45 gp"},
+        # ── Medium armor ──
+        {"name": "Hide Armor", "kind": "armor", "subtype": "medium", "base_ac": 12, "dex_cap": 2, "weight": 12, "cost": "10 gp"},
+        {"name": "Chain Shirt", "kind": "armor", "subtype": "medium", "base_ac": 13, "dex_cap": 2, "weight": 20, "cost": "50 gp"},
+        {"name": "Scale Mail", "kind": "armor", "subtype": "medium", "base_ac": 14, "dex_cap": 2, "stealth_disadvantage": 1, "weight": 45, "cost": "50 gp"},
+        {"name": "Breastplate", "kind": "armor", "subtype": "medium", "base_ac": 14, "dex_cap": 2, "weight": 20, "cost": "400 gp"},
+        {"name": "Half Plate", "kind": "armor", "subtype": "medium", "base_ac": 15, "dex_cap": 2, "stealth_disadvantage": 1, "weight": 40, "cost": "750 gp"},
+        # ── Heavy armor ──
+        {"name": "Ring Mail", "kind": "armor", "subtype": "heavy", "base_ac": 14, "dex_cap": 0, "stealth_disadvantage": 1, "weight": 40, "cost": "30 gp"},
+        {"name": "Chain Mail", "kind": "armor", "subtype": "heavy", "base_ac": 16, "dex_cap": 0, "strength_req": 13, "stealth_disadvantage": 1, "weight": 55, "cost": "75 gp"},
+        {"name": "Splint Armor", "kind": "armor", "subtype": "heavy", "base_ac": 17, "dex_cap": 0, "strength_req": 15, "stealth_disadvantage": 1, "weight": 60, "cost": "200 gp"},
+        {"name": "Plate Armor", "kind": "armor", "subtype": "heavy", "base_ac": 18, "dex_cap": 0, "strength_req": 15, "stealth_disadvantage": 1, "weight": 65, "cost": "1500 gp"},
+        # ── Shield ──
+        {"name": "Shield", "kind": "shield", "base_ac": 2, "weight": 6, "cost": "10 gp"},
+        # ── Consumables ──
+        {"name": "Potion of Healing", "kind": "consumable", "subtype": "potion", "rarity": "common", "description": "Regain 2d4+2 hit points when you drink this potion.", "data": {"heal": "2d4+2"}, "weight": 0.5, "cost": "50 gp"},
+        {"name": "Antitoxin", "kind": "consumable", "subtype": "potion", "description": "Advantage on saving throws against poison for 1 hour. Confers no benefit to undead or constructs.", "cost": "50 gp"},
+        # ── Magic items (charges / toggle exemplars) ──
+        {"name": "Wand of Magic Missiles", "kind": "magic", "subtype": "wand", "rarity": "uncommon", "description": "Has 7 charges. Expend 1 or more to cast Magic Missile (1 charge = 1st-level, +1 slot level per extra charge). Regains 1d6+1 charges at dawn; if you expend the last charge, roll a d20 — on a 1 it crumbles to ash.", "has_charges": 1, "max_charges": 7, "recharge": {"on": "dawn", "amount": "1d6+1"}, "weight": 1},
+        {"name": "Hooded Lantern", "kind": "gear", "description": "Sheds bright light in a 30-foot radius and dim light for an additional 30 feet. Lower the hood to reduce the light to dim in a 5-foot radius. Burns oil.", "has_toggle": 1, "weight": 2, "cost": "5 gp"},
+    ]
+
+    columns = (
+        "name", "kind", "subtype", "rarity", "description", "properties",
+        "damage_dice", "damage_type", "versatile_dice", "weapon_range",
+        "range_normal", "default_ability", "base_ac", "dex_cap", "strength_req",
+        "stealth_disadvantage", "has_charges", "max_charges", "recharge",
+        "has_toggle", "weight", "cost", "source", "data",
+    )
+    json_fields = {"properties", "recharge", "data"}
+    defaults = {
+        "subtype": "", "rarity": "common", "description": "", "properties": [],
+        "strength_req": 0, "stealth_disadvantage": 0, "has_charges": 0,
+        "max_charges": 0, "recharge": None, "has_toggle": 0, "weight": 0,
+        "cost": "", "source": "PHB", "data": {},
+    }
+
+    db = await get_db()
+    try:
+        placeholders = ", ".join("?" * len(columns))
+        for it in items:
+            row = []
+            for col in columns:
+                val = it.get(col, defaults.get(col))
+                if col in json_fields:
+                    val = json.dumps(val) if val is not None else None
+                row.append(val)
+            await db.execute(
+                f"INSERT OR IGNORE INTO dnd_items ({', '.join(columns)}) VALUES ({placeholders})",
+                row,
+            )
+        await db.commit()
+        print(f"  [OK] {len(items)} items seeded")
+    finally:
+        await db.close()
+
+
 async def _get_spell_id(db, name):
     """Helper to look up a spell ID by name."""
     cursor = await db.execute("SELECT id FROM dnd_spells WHERE name = ?", (name,))
@@ -1015,6 +1108,12 @@ async def main():
         await seed_dnd_spells()
     else:
         print("[SKIP] DnD Spells -- data already exists")
+
+    if not await _has_data("dnd_items"):
+        print("\nSeeding DnD Items Library...")
+        await seed_dnd_items()
+    else:
+        print("[SKIP] DnD Items -- data already exists")
 
     if not await _has_data("dnd_characters"):
         print("\nSeeding DnD Characters...")

@@ -339,6 +339,167 @@ async def batch_spells(body: dict):
         await db.close()
 
 
+# ── Items Library (weapons, armor, ammo, consumables, magic) ──────────────
+
+# Columns whose stored value is a JSON blob (decoded on read, encoded on write).
+_ITEM_JSON_FIELDS = ("properties", "recharge", "data")
+# Columns stored as 0/1 integers.
+_ITEM_BOOL_FIELDS = ("stealth_disadvantage", "has_charges", "has_toggle")
+# Every writable column, in insert order.
+_ITEM_COLUMNS = (
+    "name", "kind", "subtype", "rarity", "description", "properties",
+    "damage_dice", "damage_type", "versatile_dice", "weapon_range",
+    "range_normal", "default_ability", "base_ac", "dex_cap", "strength_req",
+    "stealth_disadvantage", "has_charges", "max_charges", "recharge",
+    "has_toggle", "weight", "cost", "source", "data",
+)
+_ITEM_DEFAULTS = {
+    "name": "", "kind": "gear", "subtype": "", "rarity": "common",
+    "description": "", "properties": [], "strength_req": 0,
+    "stealth_disadvantage": 0, "has_charges": 0, "max_charges": 0,
+    "recharge": None, "has_toggle": 0, "weight": 0, "cost": "",
+    "source": "PHB", "data": {},
+}
+
+
+def _item_row(row):
+    """Decode a DB row into an API dict (JSON fields parsed, bools as bools)."""
+    d = dict(row)
+    for k in _ITEM_JSON_FIELDS:
+        if isinstance(d.get(k), str):
+            try:
+                d[k] = json.loads(d[k])
+            except (ValueError, TypeError):
+                d[k] = None
+    for k in _ITEM_BOOL_FIELDS:
+        d[k] = bool(d.get(k))
+    return d
+
+
+def _item_value(body, col):
+    """Coerce one column's value from a request body for storage."""
+    val = body.get(col, _ITEM_DEFAULTS.get(col))
+    if col in _ITEM_JSON_FIELDS:
+        return json.dumps(val) if val is not None else None
+    if col in _ITEM_BOOL_FIELDS:
+        return 1 if val else 0
+    return val
+
+
+@router.get("/items")
+async def list_items(q: str = "", kind: str = None, limit: int = 200):
+    """Search/list items from the library (optional name + kind filters)."""
+    db = await get_db()
+    try:
+        conditions, params = [], []
+        if q:
+            conditions.append("name LIKE ?")
+            params.append(f"%{q}%")
+        if kind:
+            conditions.append("kind = ?")
+            params.append(kind)
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        params.append(limit)
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_items {where} ORDER BY kind, name LIMIT ?", params
+        )
+        return [_item_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.get("/items/{item_id}")
+async def get_item(item_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_items WHERE id = ?", (item_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Item not found")
+        return _item_row(row)
+    finally:
+        await db.close()
+
+
+@router.post("/items")
+async def create_item(body: dict):
+    """Create an item (upsert by name — returns existing if the name matches)."""
+    name = body.get("name", "")
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_items WHERE name = ?", (name,))
+        existing = await cursor.fetchone()
+        if existing:
+            return _item_row(existing)
+
+        placeholders = ", ".join("?" * len(_ITEM_COLUMNS))
+        values = [_item_value(body, col) for col in _ITEM_COLUMNS]
+        cursor = await db.execute(
+            f"INSERT INTO dnd_items ({', '.join(_ITEM_COLUMNS)}) VALUES ({placeholders})",
+            values,
+        )
+        await db.commit()
+        cursor = await db.execute("SELECT * FROM dnd_items WHERE id = ?", (cursor.lastrowid,))
+        return _item_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.put("/items/{item_id}")
+async def update_item(item_id: int, body: dict):
+    """Update an item; only the columns present in the body are changed."""
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for col in _ITEM_COLUMNS:
+            if col in body:
+                sets.append(f"{col} = ?")
+                vals.append(_item_value(body, col))
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        vals.append(item_id)
+        cursor = await db.execute(
+            f"UPDATE dnd_items SET {', '.join(sets)} WHERE id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Item not found")
+        cursor = await db.execute("SELECT * FROM dnd_items WHERE id = ?", (item_id,))
+        return _item_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/items/{item_id}")
+async def delete_item(item_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM dnd_items WHERE id = ?", (item_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Item not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
+@router.post("/items/batch")
+async def batch_items(body: dict):
+    """Resolve multiple items by ID (for the equipment item cache)."""
+    ids = body.get("ids", [])
+    if not ids:
+        return []
+    db = await get_db()
+    try:
+        placeholders = ",".join("?" * len(ids))
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_items WHERE id IN ({placeholders})", ids
+        )
+        return [_item_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
 # ── Beast Forms ──────────────────────────────────────────
 
 @router.get("/beast-forms")
