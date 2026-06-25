@@ -844,3 +844,144 @@
 .dnd-cannon__activation { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; margin: 0.45rem 0; }
 .dnd-cannon__btns { display: flex; gap: 0.4rem; }
 .dnd-cannon__btns .dnd-warmagic__btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; }
+
+/* ============================================
+   WARLOCK — Pact Boon centerpiece + Arcanum + Invocations
+   An eldritch, glowing identity for the pact magic block.
+   ============================================ */
+.dnd-warlock { display: flex; flex-direction: column; gap: 0.7rem; --wl: var(--dnd-class-warlock); }
+.dnd-warlock__slots-note {
+  display: flex; align-items: center; gap: 0.35rem; margin: 0;
+  font-size: 0.72rem; color: var(--dnd-text-dim);
+}
+.dnd-warlock__slots-note svg { color: var(--wl); }
+
+/* ── Pact Boon hero card ── */
+.dnd-warlock__pact {
+  position: relative; display: flex; gap: 0.7rem; align-items: stretch;
+  padding: 0.75rem; border-radius: 12px; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--wl) 55%, var(--dnd-border));
+  background:
+    radial-gradient(130% 130% at 0% 0%, color-mix(in srgb, var(--wl) 22%, transparent), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--wl) 14%, transparent), transparent 55%),
+    var(--dnd-bg);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--wl) 22%, transparent);
+}
+/* A slow arcane shimmer sweeping across the card. */
+.dnd-warlock__pact::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, color-mix(in srgb, var(--wl) 14%, transparent) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: dnd-wl-sheen 7s ease-in-out infinite;
+}
+@keyframes dnd-wl-sheen {
+  0%, 100% { background-position: 150% 0; }
+  50% { background-position: -50% 0; }
+}
+.dnd-warlock__pact--none { opacity: 0.8; box-shadow: none; }
+
+.dnd-warlock__sigil {
+  position: relative; flex-shrink: 0; width: 52px; display: grid; place-items: center;
+  border-radius: 12px; color: #fff;
+  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--wl) 92%, #fff), var(--wl));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--wl) 60%, transparent), inset 0 -3px 6px rgba(0,0,0,0.25);
+  animation: dnd-wl-pulse 3.4s ease-in-out infinite;
+}
+@keyframes dnd-wl-pulse {
+  0%, 100% { box-shadow: 0 0 12px color-mix(in srgb, var(--wl) 45%, transparent), inset 0 -3px 6px rgba(0,0,0,0.25); }
+  50% { box-shadow: 0 0 24px color-mix(in srgb, var(--wl) 75%, transparent), inset 0 -3px 6px rgba(0,0,0,0.25); }
+}
+.dnd-warlock__pact-body { position: relative; z-index: 1; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.dnd-warlock__pact-head { display: flex; flex-direction: column; gap: 0.05rem; }
+.dnd-warlock__eyebrow {
+  font-size: 0.56rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--wl) 70%, var(--dnd-text-muted));
+}
+.dnd-warlock__pact-title {
+  display: flex; align-items: center; gap: 0.35rem; margin: 0;
+  font-size: 0.98rem; font-weight: 800; color: color-mix(in srgb, var(--wl) 85%, var(--dnd-text));
+}
+.dnd-warlock__pact-title svg { color: var(--wl); }
+.dnd-warlock__pact-tagline { margin: 0; font-size: 0.74rem; font-style: italic; color: var(--dnd-text-muted); }
+.dnd-warlock__points { margin: 0.1rem 0 0; padding-left: 0.9rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.dnd-warlock__points li { font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-warlock__points li::marker { color: var(--wl); }
+
+/* Boon-specific controls inside the hero card */
+.dnd-warlock__boon-tool {
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.2rem;
+  padding-top: 0.45rem; border-top: 1px solid color-mix(in srgb, var(--wl) 25%, var(--dnd-border));
+}
+.dnd-warlock__tool-lbl { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dnd-text-muted); }
+.dnd-warlock__uses { font-size: 0.74rem; font-weight: 700; color: var(--wl); font-variant-numeric: tabular-nums; }
+.dnd-warlock__conjure {
+  padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+  color: var(--wl); background: color-mix(in srgb, var(--wl) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--wl) 45%, var(--dnd-border)); transition: all 0.2s;
+}
+.dnd-warlock__conjure:hover:not(:disabled) { background: color-mix(in srgb, var(--wl) 22%, transparent); }
+.dnd-warlock__conjure:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-warlock__conjure--on {
+  color: #fff; background: var(--wl); border-color: var(--wl);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--wl) 55%, transparent);
+}
+.dnd-warlock__mini {
+  padding: 0.15rem 0.4rem; border-radius: 5px; font-size: 0.72rem; cursor: pointer;
+  color: var(--dnd-text); background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+}
+.dnd-warlock__mini:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-warlock__book { margin-top: 0.2rem; padding-top: 0.45rem; border-top: 1px solid color-mix(in srgb, var(--wl) 25%, var(--dnd-border)); display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-warlock__book-rows { display: flex; gap: 0.35rem; }
+.dnd-warlock__book-input { flex: 1; min-width: 0; font-size: 0.72rem; }
+.dnd-warlock__familiar { font-size: 0.74rem; padding: 0.15rem 0.3rem; }
+
+/* ── Mystic Arcanum ── */
+.dnd-warlock__section-title {
+  display: flex; align-items: center; gap: 0.35rem; margin: 0 0 0.1rem;
+  font-size: 0.82rem; font-weight: 800; color: color-mix(in srgb, var(--wl) 80%, var(--dnd-text));
+}
+.dnd-warlock__section-title svg { color: var(--wl); }
+.dnd-warlock__hint { margin: 0; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; }
+.dnd-warlock__arcanum, .dnd-warlock__invocations {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.6rem; border-radius: 10px;
+  border: 1px solid var(--dnd-border);
+  background: color-mix(in srgb, var(--wl) 5%, var(--dnd-surface));
+}
+.dnd-warlock__arcanum-row {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.25rem 0.35rem; border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--wl) 28%, var(--dnd-border));
+  background: var(--dnd-bg);
+}
+.dnd-warlock__arcanum-row--spent { opacity: 0.55; }
+.dnd-warlock__arcanum-lvl {
+  flex-shrink: 0; width: 1.9rem; text-align: center; font-size: 0.62rem; font-weight: 800;
+  color: #fff; background: var(--wl); border-radius: 5px; padding: 0.12rem 0;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--wl) 45%, transparent);
+}
+.dnd-warlock__arcanum-input { flex: 1; min-width: 0; font-size: 0.74rem; }
+.dnd-warlock__cast {
+  flex-shrink: 0; padding: 0.2rem 0.65rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+  color: #fff; background: var(--wl); border: 1px solid var(--wl);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--wl) 45%, transparent); transition: all 0.2s;
+}
+.dnd-warlock__cast:hover { filter: brightness(1.1); }
+.dnd-warlock__cast--spent {
+  color: var(--dnd-text-muted); background: transparent; border-color: var(--dnd-border);
+  box-shadow: none;
+}
+
+/* ── Eldritch Invocations ── */
+.dnd-warlock__inv-list { display: flex; flex-direction: column; gap: 0.35rem; }
+.dnd-warlock__inv {
+  padding: 0.35rem 0.5rem; border-radius: 7px;
+  border: 1px solid var(--dnd-border); border-left: 3px solid var(--wl);
+  background: var(--dnd-bg);
+}
+.dnd-warlock__inv-name {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.78rem; font-weight: 700; color: color-mix(in srgb, var(--wl) 80%, var(--dnd-text));
+}
+.dnd-warlock__inv-name svg { color: var(--wl); flex-shrink: 0; }
+.dnd-warlock__inv-desc { margin: 0.15rem 0 0; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; }

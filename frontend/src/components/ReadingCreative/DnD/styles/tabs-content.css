@@ -362,3 +362,61 @@
   border-top: 1px solid var(--dnd-border);
 }
 
+
+/* ── Warlock Pact Boon tabbed browser (Features tab) ──
+   Lets a player browse every boon's mechanics before committing. */
+.dnd-boon-picker {
+  margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px dashed var(--dnd-border);
+  display: flex; flex-direction: column; gap: 0.6rem; --wl: var(--dnd-class-warlock);
+}
+.dnd-boon-tabs { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.dnd-boon-tab {
+  display: flex; align-items: center; gap: 0.3rem; cursor: pointer;
+  padding: 0.3rem 0.6rem; border-radius: 7px; font-family: inherit; font-size: 0.78rem; font-weight: 600;
+  color: var(--dnd-text-dim); background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border); transition: all 0.18s;
+}
+.dnd-boon-tab svg { color: color-mix(in srgb, var(--wl) 70%, var(--dnd-text-muted)); flex-shrink: 0; }
+.dnd-boon-tab:hover { border-color: color-mix(in srgb, var(--wl) 45%, var(--dnd-border)); color: var(--dnd-text); }
+.dnd-boon-tab--active {
+  color: #fff; background: var(--wl); border-color: var(--wl);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--wl) 45%, transparent);
+}
+.dnd-boon-tab--active svg { color: #fff; }
+.dnd-boon-tab--chosen:not(.dnd-boon-tab--active) {
+  border-color: color-mix(in srgb, var(--wl) 55%, var(--dnd-border));
+  background: color-mix(in srgb, var(--wl) 12%, var(--dnd-surface));
+  color: var(--dnd-text);
+}
+.dnd-boon-tab__check { color: var(--wl) !important; }
+.dnd-boon-tab--active .dnd-boon-tab__check { color: #fff !important; }
+
+.dnd-boon-detail {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.7rem; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--wl) 40%, var(--dnd-border));
+  background:
+    radial-gradient(130% 130% at 0% 0%, color-mix(in srgb, var(--wl) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-boon-detail__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.dnd-boon-detail__title {
+  display: flex; align-items: center; gap: 0.4rem; margin: 0;
+  font-size: 0.95rem; font-weight: 800; color: color-mix(in srgb, var(--wl) 82%, var(--dnd-text));
+}
+.dnd-boon-detail__title svg { color: var(--wl); }
+.dnd-boon-detail__tagline { margin: 0; font-size: 0.82rem; font-style: italic; color: var(--dnd-text-muted); }
+.dnd-boon-detail__points { margin: 0.1rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.dnd-boon-detail__points li { font-size: 0.82rem; color: var(--dnd-text-dim); line-height: 1.45; }
+.dnd-boon-detail__points li::marker { color: var(--wl); }
+.dnd-boon-detail__select {
+  flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; cursor: pointer;
+  padding: 0.3rem 0.75rem; border-radius: 7px; font-family: inherit; font-size: 0.78rem; font-weight: 700;
+  color: var(--wl); background: color-mix(in srgb, var(--wl) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--wl) 45%, var(--dnd-border)); transition: all 0.18s;
+}
+.dnd-boon-detail__select:hover { background: color-mix(in srgb, var(--wl) 22%, transparent); }
+.dnd-boon-detail__select--on {
+  color: #fff; background: var(--wl); border-color: var(--wl);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--wl) 50%, transparent);
+}

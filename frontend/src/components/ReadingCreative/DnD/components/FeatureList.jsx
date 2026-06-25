@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sword, PawPrint, BookOpen, Gem, Star, Check } from 'lucide-react';
 import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown, INFUSION_LIST, infusionsKnown } from '../classProgression';
 import { SKILLS, abilityMod, proficiencyBonus } from '../dndUtils';
 import { buildPrimalBeast, buildDrake, buildSteelDefender, PRIMAL_VARIANTS, DRAKE_ESSENCES } from '../rules/shared/companions';
@@ -301,21 +301,55 @@ function InfusionChoice({ classFeature, onUpdate, level }) {
 }
 
 // ── Inline build-choice: Warlock Pact Boon (dropdown) ──────────────────
+const BOON_TAB_ICON = {
+  'Pact of the Blade': <Sword size={14} />,
+  'Pact of the Chain': <PawPrint size={14} />,
+  'Pact of the Tome': <BookOpen size={14} />,
+  'Pact of the Talisman': <Gem size={14} />,
+  'Pact of the Star Chain (UA)': <Star size={14} />,
+};
+const boonShortName = (name) => name.replace(/^Pact of the\s+/, '');
+
 function PactBoonChoice({ classFeature, onUpdate }) {
   const cf = classFeature || {};
   const selected = cf.pactBoon || '';
-  const boon = PACT_BOONS.find(b => b.name === selected);
+  const [active, setActive] = useState(selected || PACT_BOONS[0].name);
+  const boon = PACT_BOONS.find(b => b.name === active) || PACT_BOONS[0];
+  const isSelected = selected === boon.name;
+
   return (
-    <div className="dnd-feature-choice">
-      <select
-        className="dnd-field dnd-feature-choice__select"
-        value={selected}
-        onChange={e => onUpdate({ classFeature: { ...cf, pactBoon: e.target.value } })}
-      >
-        <option value="">— Choose a Pact Boon —</option>
-        {PACT_BOONS.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
-      </select>
-      {boon && <p className="dnd-feature-choice__detail">{boon.desc}</p>}
+    <div className="dnd-boon-picker">
+      <div className="dnd-boon-tabs" role="tablist">
+        {PACT_BOONS.map(b => (
+          <button
+            key={b.name}
+            role="tab"
+            aria-selected={active === b.name}
+            className={`dnd-boon-tab ${active === b.name ? 'dnd-boon-tab--active' : ''} ${selected === b.name ? 'dnd-boon-tab--chosen' : ''}`}
+            onClick={() => setActive(b.name)}
+          >
+            {BOON_TAB_ICON[b.name]}
+            <span className="dnd-boon-tab__name">{boonShortName(b.name)}</span>
+            {selected === b.name && <Check size={12} className="dnd-boon-tab__check" />}
+          </button>
+        ))}
+      </div>
+
+      <div className="dnd-boon-detail">
+        <div className="dnd-boon-detail__head">
+          <h5 className="dnd-boon-detail__title">{BOON_TAB_ICON[boon.name]} {boon.name}</h5>
+          <button
+            className={`dnd-boon-detail__select ${isSelected ? 'dnd-boon-detail__select--on' : ''}`}
+            onClick={() => onUpdate({ classFeature: { ...cf, pactBoon: isSelected ? '' : boon.name } })}
+          >
+            {isSelected ? <><Check size={13} /> Selected</> : 'Choose this Pact'}
+          </button>
+        </div>
+        <p className="dnd-boon-detail__tagline">{boon.tagline}</p>
+        <ul className="dnd-boon-detail__points">
+          {(boon.points || [boon.desc]).map((p, i) => <li key={i}>{p}</li>)}
+        </ul>
+      </div>
     </div>
   );
 }

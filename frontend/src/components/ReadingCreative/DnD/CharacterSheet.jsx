@@ -423,6 +423,12 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.talisman) {
         cf.talisman = { ...cf.talisman, current: cf.talisman.max || 0 };
       }
+      // Warlock Mystic Arcanum — each level's spell recharges on a long rest
+      if (cf.mysticArcanum) {
+        cf.mysticArcanum = Object.fromEntries(
+          Object.entries(cf.mysticArcanum).map(([l, a]) => [l, { ...a, used: false }])
+        );
+      }
       // Cleric / Paladin Harness Divine Power pool recharges on long rest
       if (cf.harnessDivinePower) {
         cf.harnessDivinePower = { ...cf.harnessDivinePower, current: cf.harnessDivinePower.max || 0 };
