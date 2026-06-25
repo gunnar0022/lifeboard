@@ -24,6 +24,14 @@ import CircleOfSporesBlock from './CircleOfSporesBlock';
 import AncestralGuardianBlock from './AncestralGuardianBlock';
 import WarMagicBlock from './WarMagicBlock';
 import ArchfeyBlock from './ArchfeyBlock';
+import CelestialBlock from './CelestialBlock';
+import FathomlessBlock from './FathomlessBlock';
+import FiendBlock from './FiendBlock';
+import GenieBlock from './GenieBlock';
+import GreatOldOneBlock from './GreatOldOneBlock';
+import HexbladeBlock from './HexbladeBlock';
+import UndeadBlock from './UndeadBlock';
+import UndyingBlock from './UndyingBlock';
 import BerserkerBlock from './BerserkerBlock';
 import BattleragerBlock from './BattleragerBlock';
 import BeastBlock from './BeastBlock';
@@ -109,7 +117,9 @@ export const BLOCKS = {
   SorcererBlock, RangerBlock, ArtificerBlock,
   // subclass trackers
   RuneKnightBlock, AssassinBlock, CircleOfStarsBlock, CircleOfSporesBlock,
-  AncestralGuardianBlock, WarMagicBlock, ArchfeyBlock, BerserkerBlock,
+  AncestralGuardianBlock, WarMagicBlock, ArchfeyBlock,
+  CelestialBlock, FathomlessBlock, FiendBlock, GenieBlock,
+  GreatOldOneBlock, HexbladeBlock, UndeadBlock, UndyingBlock, BerserkerBlock,
   BattleragerBlock, BeastBlock, GiantBlock,
   StormHeraldBlock, TotemWarriorBlock, WildMagicBlock, ZealotBlock,
   LoreBlock, EloquenceBlock, GlamourBlock, CreationBlock,

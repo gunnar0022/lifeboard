@@ -332,6 +332,12 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('favoredUsed' in cf) cf.favoredUsed = false;
       // Swashbuckler: Master Duelist recharges on a short rest.
       if ('masterDuelistUsed' in cf) cf.masterDuelistUsed = false;
+      // Warlock subclasses — short-or-long-rest abilities
+      if ('fathomlessPlungeUsed' in cf) cf.fathomlessPlungeUsed = false;  // Fathomless
+      if ('darkLuckUsed' in cf) cf.darkLuckUsed = false;                  // Fiend: Dark One's Own Luck
+      if ('entropicWardUsed' in cf) cf.entropicWardUsed = false;          // Great Old One
+      if ('hexCurseUsed' in cf) { cf.hexCurseUsed = false; cf.curseTarget = ''; }  // Hexblade's Curse
+      if ('indestructibleLifeUsed' in cf) cf.indestructibleLifeUsed = false;       // Undying
       updates.classFeature = cf;
     }
 
@@ -456,6 +462,32 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
       if ('darkDeliriumUsed' in cf) cf.darkDeliriumUsed = false;
+      // Warlock — Celestial: Healing Light pool refills; Searing Vengeance resets.
+      if (cf.healingLight) cf.healingLight = { ...cf.healingLight, current: cf.healingLight.max || 0 };
+      if ('searingVengeanceUsed' in cf) cf.searingVengeanceUsed = false;
+      // Warlock — Fathomless: tentacle uses refill & dismiss; Grasping/Plunge reset.
+      if ('tentacleUses' in cf) cf.tentacleUses = 0;
+      if ('tentacleActive' in cf) cf.tentacleActive = false;
+      if ('graspingUsed' in cf) cf.graspingUsed = false;
+      if ('fathomlessPlungeUsed' in cf) cf.fathomlessPlungeUsed = false;
+      // Warlock — Fiend: Dark One's Own Luck & Hurl Through Hell reset (resistance persists).
+      if ('darkLuckUsed' in cf) cf.darkLuckUsed = false;
+      if ('hurlUsed' in cf) cf.hurlUsed = false;
+      // Warlock — Genie: Bottled Respite & Elemental Flight reset (Limited Wish is manual: 1d4 rests).
+      if ('bottledRespiteUsed' in cf) cf.bottledRespiteUsed = false;
+      if ('genieFlightUsed' in cf) cf.genieFlightUsed = 0;
+      // Warlock — Great Old One: Entropic Ward resets (thrall persists).
+      if ('entropicWardUsed' in cf) cf.entropicWardUsed = false;
+      // Warlock — Hexblade: Curse & Accursed Specter reset (curse target clears).
+      if ('hexCurseUsed' in cf) { cf.hexCurseUsed = false; cf.curseTarget = ''; }
+      if ('specterBound' in cf) cf.specterBound = false;
+      // Warlock — Undead: Form of Dread uses refill & end; Spirit Projection resets (Husk is manual: 1d4 rests).
+      if ('formDreadUses' in cf) cf.formDreadUses = 0;
+      if ('formDreadActive' in cf) cf.formDreadActive = false;
+      if ('spiritProjectionUsed' in cf) cf.spiritProjectionUsed = false;
+      // Warlock — Undying: Defy Death & Indestructible Life reset.
+      if ('defyDeathUsed' in cf) cf.defyDeathUsed = false;
+      if ('indestructibleLifeUsed' in cf) cf.indestructibleLifeUsed = false;
       // Rune Knight: reset Giant's Might, rune invocations, Runic Shield
       if (cf.giantsMight) {
         cf.giantsMight = { ...cf.giantsMight, currentUses: cf.giantsMight.maxUses || 2, active: false };

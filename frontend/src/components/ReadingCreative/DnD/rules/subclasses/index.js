@@ -9,6 +9,14 @@ import circleOfStars from './circleOfStars';
 import circleOfSpores from './circleOfSpores';
 import warMagic from './warMagic';
 import archfey from './archfey';
+import celestial from './celestial';
+import fathomless from './fathomless';
+import fiend from './fiend';
+import genie from './genie';
+import greatOldOne from './greatOldOne';
+import hexblade from './hexblade';
+import undead from './undead';
+import undying from './undying';
 import pathOfTheBerserker from './pathOfTheBerserker';
 import pathOfTheBattlerager from './pathOfTheBattlerager';
 import pathOfTheBeast from './pathOfTheBeast';
@@ -90,6 +98,8 @@ import warDomain from './warDomain';
 const ALL = [
   runeKnight, ancestralGuardian, assassin,
   circleOfStars, circleOfSpores, warMagic, archfey,
+  celestial, fathomless, fiend, genie,
+  greatOldOne, hexblade, undead, undying,
   pathOfTheBerserker, pathOfTheBattlerager, pathOfTheBeast, pathOfTheGiant,
   pathOfTheStormHerald, pathOfTheTotemWarrior, pathOfWildMagic, pathOfTheZealot,
   collegeOfLore, collegeOfEloquence, collegeOfGlamour, collegeOfCreation,
