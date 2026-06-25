@@ -109,6 +109,20 @@ export const SUBCLASS_BLOCK_BY_NAME = {
   'Armorer': 'ArmorerBlock',
   'Artillerist': 'ArtilleristBlock',
   'Battle Smith': 'BattleSmithBlock',
+  'Arcana Domain': 'ArcanaDomainBlock',
+  'Death Domain': 'DeathDomainBlock',
+  'Forge Domain': 'ForgeDomainBlock',
+  'Grave Domain': 'GraveDomainBlock',
+  'Knowledge Domain': 'KnowledgeDomainBlock',
+  'Life Domain': 'LifeDomainBlock',
+  'Light Domain': 'LightDomainBlock',
+  'Nature Domain': 'NatureDomainBlock',
+  'Order Domain': 'OrderDomainBlock',
+  'Peace Domain': 'PeaceDomainBlock',
+  'Tempest Domain': 'TempestDomainBlock',
+  'Trickery Domain': 'TrickeryDomainBlock',
+  'Twilight Domain': 'TwilightDomainBlock',
+  'War Domain': 'WarDomainBlock',
 };
 
 const emptyOverview = { tagline: null, overview: null, definingFeature: null, lore: null };

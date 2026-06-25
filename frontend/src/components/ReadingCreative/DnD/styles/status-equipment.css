@@ -428,6 +428,52 @@
   color: var(--dnd-bg);
 }
 
+/* ── Library-backed equipment (slots, badges, charges, toggle, editor) ── */
+.dnd-equipment__add-group { display: flex; gap: 0.35rem; }
+
+.dnd-equipment__slot-group { margin-bottom: 0.5rem; }
+.dnd-equipment__slot-label {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--dnd-text-muted); margin: 0.4rem 0 0.2rem;
+}
+.dnd-equipment__slot-empty {
+  font-size: 0.72rem; font-style: italic; color: var(--dnd-text-faint);
+  padding: 0.25rem 0.6rem; border: 1px dashed var(--dnd-border); border-radius: 0.3rem;
+}
+
+.dnd-equipment__kind-badge {
+  flex-shrink: 0; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem; border-radius: 0.3rem; background: var(--dnd-surface); color: var(--dnd-text-muted);
+}
+.dnd-equipment__contrib {
+  flex: 1; min-width: 0; font-size: 0.72rem; color: var(--dnd-text-dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dnd-equipment__attune { color: var(--dnd-accent); margin-left: 0.3rem; vertical-align: -1px; }
+
+.dnd-equipment__charges { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.dnd-equipment__charges-val { font-size: 0.72rem; font-weight: 700; color: var(--dnd-accent); min-width: 2.4rem; text-align: center; }
+
+.dnd-equipment__power {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 0.3rem; border: 1px solid var(--dnd-border);
+  background: transparent; color: var(--dnd-text-dim); cursor: pointer;
+}
+.dnd-equipment__power--on { background: var(--dnd-positive); border-color: var(--dnd-positive); color: var(--dnd-bg); }
+
+/* Per-instance editor (expanded panel) */
+.dnd-equipment__editor { display: flex; flex-direction: column; gap: 0.5rem; }
+.dnd-equipment__editor-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;
+}
+.dnd-equipment__field { display: flex; flex-direction: column; gap: 0.15rem; }
+.dnd-equipment__field span { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dnd-text-muted); }
+.dnd-equipment__editor-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.dnd-equipment__check { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--dnd-text-dim); }
+.dnd-equipment__bonusprops { flex: 1; min-width: 140px; font-size: 0.78rem; }
+.dnd-equipment__basedesc { margin: 0; font-size: 0.75rem; color: var(--dnd-text-muted); line-height: 1.45; }
+.dnd-equipment__notes-text { margin: 0; font-size: 0.8rem; color: var(--dnd-text-dim); }
+
 /* Direct-entry coin input (overrides the +/- only layout) */
 .dnd-coins__input {
   width: 56px;

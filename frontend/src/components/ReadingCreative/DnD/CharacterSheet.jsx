@@ -16,7 +16,9 @@ import NotesTab from './components/CampaignNotes/NotesTab';
 import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
 import useAutosave from './components/useAutosave';
+import useItemCache from './components/useItemCache';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
+import { computeAC, rechargeItems, resolveItem, weaponAttack, WEAPON_KINDS } from './rules/items';
 import { deepMerge, proficiencyBonus, abilityMod, hpForClassLevel, subclassHpBonus, hitDieNumber, CLASS_COLORS, CLASS_NAMES, CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS, SUBCLASS_SPELLCASTING_DEFAULTS, SUBCLASS_LISTS, TAB_REGISTRY, reconcileTabsConfig, normalizeSpellcasting } from './dndUtils';
 import { grantedMaxUses } from './components/Spellcasting/GrantedSpells';
 import { RACES, getSubraces } from './classProgression';
@@ -36,6 +38,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const hpAutoKeyRef = useRef(null);
 
   const saveStatus = useAutosave(character, characterId);
+  const itemCache = useItemCache(character?.items);
 
   useEffect(() => {
     (async () => {
@@ -351,6 +354,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       updates.racialFeature = { ...character.racialFeature, breathWeaponUsed: false };
     }
 
+    // Item charges that recharge on a short rest.
+    const charged = rechargeItems(character.items, 'short', itemCache);
+    if (charged.changed) updates.items = charged.items;
+
     setCharacter(prev => deepMerge(prev, updates));
   };
 
@@ -614,6 +621,10 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       updates.activeConditions = character.activeConditions.filter(c => c !== 'Unconscious');
     }
 
+    // Item charges that recharge at dawn / on a long (or short) rest.
+    const charged = rechargeItems(character.items, 'long', itemCache);
+    if (charged.changed) updates.items = charged.items;
+
     setCharacter(prev => deepMerge(prev, updates));
   };
 
@@ -642,6 +653,18 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const hasSpellcasting = !!character.spellcasting;
 
   const hasCampaign = !!campaignId;
+
+  // ── Equipment-derived combat values ──────────────────────────────────────────
+  // Resolve every equipped, library-backed item once, then derive AC and the
+  // read-only "from equipment" attack cards from it.
+  const equippedResolved = (character.items || [])
+    .filter(it => it.equipped && it.refType === 'item' && itemCache[it.refId])
+    .map(it => resolveItem(it, itemCache[it.refId]));
+  const derivedAC = computeAC(character, equippedResolved, abilities);
+  const derivedAttacks = equippedResolved
+    .filter(r => WEAPON_KINDS.has(r.kind))
+    .map(r => weaponAttack(r, abilities, level, { proficient: r.instance.proficient !== false }))
+    .filter(Boolean);
 
   // Visible tabs derive from the per-character config, resolved against the registry.
   const tabRegistryMap = Object.fromEntries(TAB_REGISTRY.map(t => [t.id, t]));
@@ -780,7 +803,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       )}
 
       {/* Top section: 3-row stat block */}
-      <StatBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
+      <StatBlock character={character} editMode={editMode} onUpdate={handleUpdate} derivedAC={derivedAC} />
 
       {/* Status bar: inspiration, conditions, exhaustion */}
       <StatusBar character={character} onUpdate={handleUpdate} />
@@ -844,6 +867,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
               )}
               <AttackList attacks={character.attacks || []} abilities={abilities}
                 level={level} classFeature={character.classFeature}
+                derivedAttacks={derivedAttacks}
                 editMode={editMode} onUpdate={handleUpdate} />
               <ProficiencyTags proficiencies={character.proficiencies || {}}
                 meta={meta} editMode={editMode} onUpdate={handleUpdate} />
@@ -852,7 +876,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         )}
 
         {activeTab === 'equipment' && (
-          <EquipmentTab character={character} editMode={editMode} onUpdate={handleUpdate} />
+          <EquipmentTab character={character} editMode={editMode} onUpdate={handleUpdate} itemCache={itemCache} />
         )}
 
         {activeTab === 'stats' && (

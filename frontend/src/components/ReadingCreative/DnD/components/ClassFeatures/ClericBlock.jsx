@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { Sun, Skull, Sparkles } from 'lucide-react';
+import { Sun, Skull, Sparkles, HandHeart } from 'lucide-react';
 import { channelDivinityUses, harnessDivinePowerUses, destroyUndeadCR } from '../../classProgression';
 
 /**
- * Cleric — Combat tab. Channel Divinity (uses scale 1/2/3 by level, short-rest
- * recharge) is the core resource, with the optional Harness Divine Power pool
- * (long-rest). Turn/Destroy Undead and Divine Intervention surface as reminders.
+ * Cleric — Combat tab. Reworked into a radiant "Divine Conduit": Channel
+ * Divinity is the centerpiece, shown as a glowing halo of charges (scaling
+ * 1/2/3 by level, short-rest recharge) that the domain options on the subclass
+ * block draw from. Turn/Destroy Undead and Divine Intervention ride as reminders,
+ * with the optional Harness Divine Power pool below. The warm golden glow is the
+ * shared "healer" visual language the cleric domains echo.
  */
 export default function ClericBlock({ classFeature, level, onUpdate }) {
   const cf = classFeature || {};
@@ -36,53 +39,59 @@ export default function ClericBlock({ classFeature, level, onUpdate }) {
   const useHDP = () => { if (hdp.current > 0) onUpdate({ classFeature: { ...cf, harnessDivinePower: { ...hdp, current: hdp.current - 1, max: hdpMax } } }); };
 
   return (
-    <div className="dnd-warmagic" style={{ '--block-accent': 'var(--dnd-class-cleric)' }}>
-      <div className="dnd-warmagic__section">
-        <div className="dnd-warmagic__head">
-          <h4 className="dnd-warmagic__subtitle"><Sun size={13} /> Channel Divinity</h4>
-          <span className="dnd-warmagic__uses">{cdUses}/{cdMax}</span>
-        </div>
-        <div className="dnd-warmagic__pips">
-          {Array.from({ length: cdMax }, (_, i) => (
-            <span key={i} className={`dnd-warmagic__pip ${i < cdUses ? 'dnd-warmagic__pip--full' : ''}`} />
-          ))}
-        </div>
-        <div className="dnd-warmagic__row">
-          <span className="dnd-warmagic__note">Turn Undead or a domain effect. Recharges on a short or long rest.</span>
-          <div className="dnd-warmagic__btns">
-            <button className="dnd-warmagic__btn" onClick={restoreCD} disabled={cdUses >= cdMax}>+</button>
-            <button className="dnd-warmagic__btn dnd-warmagic__btn--spend" onClick={spendCD} disabled={cdUses <= 0}>Use</button>
+    <div className="dnd-warmagic dnd-cleric" style={{ '--block-accent': 'var(--dnd-class-cleric)' }}>
+      {/* ── Divine Conduit — Channel Divinity ── */}
+      <div className={`dnd-cleric__conduit ${cdUses > 0 ? 'dnd-cleric__conduit--charged' : ''}`}>
+        <div className="dnd-cleric__halo"><Sun size={22} /></div>
+        <div className="dnd-cleric__conduit-body">
+          <div className="dnd-cleric__conduit-head">
+            <span className="dnd-cleric__conduit-title">Channel Divinity</span>
+            <span className="dnd-cleric__conduit-num">{cdUses}<span className="dnd-cleric__conduit-max">/{cdMax}</span></span>
+          </div>
+          <div className="dnd-cleric__orbs">
+            {Array.from({ length: cdMax }, (_, i) => (
+              <span key={i} className={`dnd-cleric__orb ${i < cdUses ? 'dnd-cleric__orb--lit' : ''}`} />
+            ))}
+          </div>
+          <div className="dnd-cleric__conduit-foot">
+            <span className="dnd-warmagic__note">Turn Undead or a domain option (subclass block). Short or long rest.</span>
+            <div className="dnd-warmagic__btns">
+              <button className="dnd-warmagic__btn" onClick={restoreCD} disabled={cdUses >= cdMax}>+</button>
+              <button className="dnd-warmagic__btn dnd-warmagic__btn--spend" onClick={spendCD} disabled={cdUses <= 0}>Use</button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="dnd-warmagic__reminders">
-        <div className="dnd-warmagic__reminder">
+        <div className="dnd-warmagic__reminder dnd-warmagic__reminder--active">
           <Skull size={12} />
-          <span><strong>Turn Undead</strong> — undead within 30 ft, WIS save or flee 1 min.
-          {undeadCR && <> <strong>Destroy Undead</strong>: instantly destroyed if CR ≤ <strong>{undeadCR}</strong>.</>}</span>
+          <span><strong>Turn Undead</strong> — action: undead within 30 ft that see/hear you make a WIS save or flee for 1 min.
+          {undeadCR && <> <strong>Destroy Undead</strong>: those with CR ≤ <strong>{undeadCR}</strong> are destroyed instead.</>}</span>
         </div>
         {level >= 10 && (
           <div className="dnd-warmagic__reminder">
             <Sparkles size={12} />
-            <span><strong>Divine Intervention</strong> — action: roll d100, succeed if ≤ {level}{level >= 20 ? ' (automatic at 20th)' : ''}.</span>
+            <span><strong>Divine Intervention</strong> — action: roll d100, succeed if ≤ {level}{level >= 20 ? ' (automatic at 20th)' : ''}. Once successful, recharge after 7 days.</span>
           </div>
         )}
       </div>
 
       {/* Harness Divine Power (optional) — spends a Channel Divinity use to regain a slot */}
-      <div className="dnd-warmagic__section">
-        <div className="dnd-warmagic__head">
-          <h4 className="dnd-warmagic__subtitle">Harness Divine Power</h4>
-          <span className="dnd-warmagic__uses">{hdp.current}/{hdpMax}</span>
-        </div>
-        <div className="dnd-warmagic__row">
-          <span className="dnd-warmagic__note">Optional: bonus action, spend a Channel Divinity use to regain a slot. Long-rest pool.</span>
-          <div className="dnd-warmagic__btns">
-            <button className="dnd-warmagic__btn dnd-warmagic__btn--spend" onClick={useHDP} disabled={hdp.current <= 0}>Use</button>
+      {hdpMax > 0 && (
+        <div className="dnd-warmagic__section">
+          <div className="dnd-warmagic__head">
+            <h4 className="dnd-warmagic__subtitle"><HandHeart size={13} /> Harness Divine Power</h4>
+            <span className="dnd-warmagic__uses">{hdp.current}/{hdpMax}</span>
+          </div>
+          <div className="dnd-warmagic__row">
+            <span className="dnd-warmagic__note">Optional: bonus action, spend a Channel Divinity use to regain a spell slot. Long-rest pool.</span>
+            <div className="dnd-warmagic__btns">
+              <button className="dnd-warmagic__btn dnd-warmagic__btn--spend" onClick={useHDP} disabled={hdp.current <= 0}>Use</button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

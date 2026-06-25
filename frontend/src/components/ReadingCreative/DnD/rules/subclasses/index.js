@@ -72,6 +72,20 @@ import alchemist from './alchemist';
 import armorer from './armorer';
 import artillerist from './artillerist';
 import battleSmith from './battleSmith';
+import arcanaDomain from './arcanaDomain';
+import deathDomain from './deathDomain';
+import forgeDomain from './forgeDomain';
+import graveDomain from './graveDomain';
+import knowledgeDomain from './knowledgeDomain';
+import lifeDomain from './lifeDomain';
+import lightDomain from './lightDomain';
+import natureDomain from './natureDomain';
+import orderDomain from './orderDomain';
+import peaceDomain from './peaceDomain';
+import tempestDomain from './tempestDomain';
+import trickeryDomain from './trickeryDomain';
+import twilightDomain from './twilightDomain';
+import warDomain from './warDomain';
 
 const ALL = [
   runeKnight, ancestralGuardian, assassin,
@@ -92,6 +106,9 @@ const ALL = [
   oathOfDevotion, oathOfGlory, oathOfRedemption,
   oathOfVengeance, oathOfTheWatchers, oathbreaker,
   alchemist, armorer, artillerist, battleSmith,
+  arcanaDomain, deathDomain, forgeDomain, graveDomain,
+  knowledgeDomain, lifeDomain, lightDomain, natureDomain, orderDomain,
+  peaceDomain, tempestDomain, trickeryDomain, twilightDomain, warDomain,
 ];
 
 export const SUBCLASS_PROGRESSION = Object.fromEntries(

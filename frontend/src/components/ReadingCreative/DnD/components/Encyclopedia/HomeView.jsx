@@ -1,14 +1,13 @@
-import { Users, Swords, Sparkles } from 'lucide-react';
+import { Users, Swords, Sparkles, Shield } from 'lucide-react';
 
 /**
- * Encyclopedia home — the three pillars. Races is live in this slice; Classes
- * and Spells are shown but flagged "in progress" so the shell reads complete
- * while we nail the Races vertical first.
+ * Encyclopedia home — the pillars over the rules tree and shared libraries.
  */
 const PILLARS = [
   { id: 'races', label: 'Races', Icon: Users, blurb: 'Ancestries and their bloodlines — from the elves and their kin to dragon-blooded and the small folk.', ready: true },
   { id: 'classes', label: 'Classes', Icon: Swords, blurb: 'Callings and the paths within them — what each class plays like and where its subclasses lead.', ready: true },
   { id: 'spells', label: 'Spells', Icon: Sparkles, blurb: 'The full library, filterable by level, class, and casting time.', ready: true },
+  { id: 'items', label: 'Items', Icon: Shield, blurb: 'The armory — weapons, armor, ammo, consumables, and magic items. Add, edit, and equip from here.', ready: true },
 ];
 
 export default function HomeView({ onOpen }) {

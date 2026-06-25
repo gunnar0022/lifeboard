@@ -2,7 +2,7 @@ import { abilityMod, formatMod, proficiencyBonus, passivePerception } from '../d
 
 const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
-export default function StatBlock({ character, editMode, onUpdate }) {
+export default function StatBlock({ character, editMode, onUpdate, derivedAC = null }) {
   const abilities = character.abilities || {};
   const combat = character.combat || {};
   const meta = character.meta || {};
@@ -56,20 +56,37 @@ export default function StatBlock({ character, editMode, onUpdate }) {
     <div className="dnd-statblock">
       {/* Row 1: AC - HP (wide) - Hit Dice - Death Saves */}
       <div className="dnd-statblock__row">
-        {/* AC */}
+        {/* AC — computed from equipped gear when present, else manual (legacy). */}
         <div className="dnd-statblock__cell">
           <span className="dnd-statblock__label">AC</span>
-          {editMode ? (
-            <input type="number" className="dnd-statblock__big-input" value={combat.ac || 10}
-              onChange={e => handleCombat('ac', parseInt(e.target.value) || 0)} />
+          {derivedAC ? (
+            <>
+              <span className="dnd-statblock__big">{derivedAC.total}</span>
+              {editMode ? (
+                <label className="dnd-statblock__ac-other" title="Persistent bonus from any other source">
+                  <span>Other</span>
+                  <input type="number" className="dnd-statblock__sub-input" value={combat.acOther || 0}
+                    onChange={e => handleCombat('acOther', parseInt(e.target.value) || 0)} />
+                </label>
+              ) : (
+                <span className="dnd-statblock__sub">{derivedAC.source}</span>
+              )}
+            </>
           ) : (
-            <span className="dnd-statblock__big">{combat.ac || 10}</span>
-          )}
-          {editMode ? (
-            <input className="dnd-statblock__sub-input" value={combat.acSource || ''} placeholder="Source"
-              onChange={e => handleCombat('acSource', e.target.value)} />
-          ) : (
-            combat.acSource && <span className="dnd-statblock__sub">{combat.acSource}</span>
+            <>
+              {editMode ? (
+                <input type="number" className="dnd-statblock__big-input" value={combat.ac || 10}
+                  onChange={e => handleCombat('ac', parseInt(e.target.value) || 0)} />
+              ) : (
+                <span className="dnd-statblock__big">{combat.ac || 10}</span>
+              )}
+              {editMode ? (
+                <input className="dnd-statblock__sub-input" value={combat.acSource || ''} placeholder="Source"
+                  onChange={e => handleCombat('acSource', e.target.value)} />
+              ) : (
+                combat.acSource && <span className="dnd-statblock__sub">{combat.acSource}</span>
+              )}
+            </>
           )}
         </div>
 

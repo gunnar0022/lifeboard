@@ -282,3 +282,7 @@
 .wiki-spellmeta__cell { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.4rem 0.55rem; border-radius: 5px; background: var(--dnd-surface); border: 1px solid var(--dnd-border); }
 .wiki-spellmeta__k { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dnd-text-muted); }
 .wiki-spellmeta__v { font-weight: 600; color: var(--dnd-text); }
+
+/* ── Items library ── */
+.wiki-items__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.wiki-item__actions { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; }

@@ -8,11 +8,22 @@ import { Sun } from 'lucide-react';
  * the rest handlers manage) and lets each option spend it directly, so the
  * resource and its uses live in one place. Pass the oath's options as
  * `[{ name, icon, desc }]`.
+ *
+ * `source` selects which pool the charges live in: 'paladin' (default) uses the
+ * nested cf.channelDivinity; 'cleric' uses the flat cf.currentUses / cf.maxUses
+ * pool that ClericBlock manages, so cleric domain options spend the same charges.
  */
-export default function ChannelDivinityPanel({ character, onUpdate, options }) {
+export default function ChannelDivinityPanel({ character, onUpdate, options, source = 'paladin' }) {
   const cf = character.classFeature || {};
-  const cd = cf.channelDivinity || { current: 1, max: 1 };
-  const setCurrent = (current) => onUpdate({ classFeature: { ...cf, channelDivinity: { ...cd, current } } });
+  const cd = source === 'cleric'
+    ? { current: cf.currentUses ?? cf.maxUses ?? 1, max: cf.maxUses ?? 1 }
+    : (cf.channelDivinity || { current: 1, max: 1 });
+  const setCurrent = (current) => onUpdate({
+    classFeature: {
+      ...cf,
+      ...(source === 'cleric' ? { currentUses: current } : { channelDivinity: { ...cd, current } }),
+    },
+  });
 
   return (
     <div className="dnd-cd">

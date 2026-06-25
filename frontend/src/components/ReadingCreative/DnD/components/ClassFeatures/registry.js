@@ -87,6 +87,20 @@ import AlchemistBlock from './AlchemistBlock';
 import ArmorerBlock from './ArmorerBlock';
 import ArtilleristBlock from './ArtilleristBlock';
 import BattleSmithBlock from './BattleSmithBlock';
+import ArcanaDomainBlock from './ArcanaDomainBlock';
+import DeathDomainBlock from './DeathDomainBlock';
+import ForgeDomainBlock from './ForgeDomainBlock';
+import GraveDomainBlock from './GraveDomainBlock';
+import KnowledgeDomainBlock from './KnowledgeDomainBlock';
+import LifeDomainBlock from './LifeDomainBlock';
+import LightDomainBlock from './LightDomainBlock';
+import NatureDomainBlock from './NatureDomainBlock';
+import OrderDomainBlock from './OrderDomainBlock';
+import PeaceDomainBlock from './PeaceDomainBlock';
+import TempestDomainBlock from './TempestDomainBlock';
+import TrickeryDomainBlock from './TrickeryDomainBlock';
+import TwilightDomainBlock from './TwilightDomainBlock';
+import WarDomainBlock from './WarDomainBlock';
 
 export const BLOCKS = {
   // class trackers
@@ -112,6 +126,9 @@ export const BLOCKS = {
   DevotionBlock, GloryBlock, RedemptionBlock,
   VengeanceBlock, WatchersBlock, OathbreakerBlock,
   AlchemistBlock, ArmorerBlock, ArtilleristBlock, BattleSmithBlock,
+  ArcanaDomainBlock, DeathDomainBlock, ForgeDomainBlock, GraveDomainBlock,
+  KnowledgeDomainBlock, LifeDomainBlock, LightDomainBlock, NatureDomainBlock, OrderDomainBlock,
+  PeaceDomainBlock, TempestDomainBlock, TrickeryDomainBlock, TwilightDomainBlock, WarDomainBlock,
 };
 
 /** Look up a tracker component by blockId (null if none/unknown). */

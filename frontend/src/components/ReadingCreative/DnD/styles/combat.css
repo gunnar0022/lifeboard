@@ -7,6 +7,12 @@
   border-radius: 6px; padding: 0.6rem 0.8rem;
 }
 .dnd-attacks__card--edit { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-attacks__card--derived { border-left: 3px solid var(--dnd-accent); }
+.dnd-attacks__equip-tag {
+  font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+  padding: 0.1rem 0.35rem; border-radius: 3px; margin-right: 0.4rem;
+  background: color-mix(in srgb, var(--dnd-accent) 18%, transparent); color: var(--dnd-accent);
+}
 .dnd-attacks__remove {
   position: absolute; top: 4px; right: 6px;
   background: none; border: none; color: var(--dnd-text-faint);

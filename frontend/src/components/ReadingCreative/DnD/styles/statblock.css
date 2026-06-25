@@ -79,6 +79,11 @@
   font-family: inherit; outline: none;
 }
 .dnd-statblock__sub-input:focus { border-bottom-color: var(--dnd-accent); }
+.dnd-statblock__ac-other { display: flex; align-items: center; gap: 0.25rem; }
+.dnd-statblock__ac-other span {
+  font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--dnd-text-muted);
+}
+.dnd-statblock__ac-other .dnd-statblock__sub-input { width: 2.4rem; }
 
 /* HP specific */
 .dnd-statblock__hp-row {

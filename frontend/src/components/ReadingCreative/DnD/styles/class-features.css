@@ -512,6 +512,51 @@
 }
 .dnd-paladin__font-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 
+/* ── Cleric: Divine Conduit (Channel Divinity hero) — shared "healer" glow ──
+   The radiant halo + orb charges are the cleric visual language; the domains
+   echo it through the Channel Divinity panel and the cleric accent. */
+.dnd-cleric__conduit {
+  display: flex; gap: 0.7rem; align-items: stretch; padding: 0.7rem; border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-cleric) 50%, var(--dnd-border));
+  background:
+    radial-gradient(140% 140% at 0% 0%, color-mix(in srgb, var(--dnd-class-cleric) 16%, transparent), transparent 62%),
+    var(--dnd-bg);
+  transition: box-shadow 0.3s ease;
+}
+.dnd-cleric__conduit--charged { box-shadow: 0 0 20px color-mix(in srgb, var(--dnd-class-cleric) 26%, transparent); }
+.dnd-cleric__halo {
+  flex-shrink: 0; width: 50px; display: grid; place-items: center; border-radius: 50%; color: var(--dnd-bg);
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--dnd-class-cleric) 92%, #fff), var(--dnd-class-cleric));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-class-cleric) 55%, transparent), inset 0 -3px 6px rgba(0,0,0,0.18);
+}
+.dnd-cleric__conduit--charged .dnd-cleric__halo { animation: dnd-halo 3s ease-in-out infinite; }
+@keyframes dnd-halo {
+  0%, 100% { box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-cleric) 45%, transparent), inset 0 -3px 6px rgba(0,0,0,0.18); }
+  50% { box-shadow: 0 0 24px color-mix(in srgb, var(--dnd-class-cleric) 72%, transparent), inset 0 -3px 6px rgba(0,0,0,0.18); }
+}
+.dnd-cleric__conduit-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-cleric__conduit-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-cleric__conduit-title { font-size: 0.9rem; font-weight: 800; color: var(--dnd-class-cleric); }
+.dnd-cleric__conduit-num { font-size: 1.1rem; font-weight: 800; color: var(--dnd-class-cleric); font-variant-numeric: tabular-nums; }
+.dnd-cleric__conduit-max { font-size: 0.72rem; font-weight: 600; color: var(--dnd-text-muted); }
+.dnd-cleric__orbs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.dnd-cleric__orb {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-cleric) 55%, var(--dnd-border));
+  background: var(--dnd-surface);
+}
+.dnd-cleric__orb--lit {
+  background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--dnd-class-cleric) 95%, #fff), var(--dnd-class-cleric));
+  border-color: var(--dnd-class-cleric);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--dnd-class-cleric) 60%, transparent);
+}
+.dnd-cleric__conduit-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+/* Forge Domain — Blessing of the Forge target toggle */
+.dnd-cleric__forge-pick { display: flex; gap: 0.4rem; margin: 0.2rem 0 0.4rem; }
+.dnd-cleric__forge-pick .dnd-warmagic__pick-btn { flex: 1; }
+.dnd-cleric__used { opacity: 0.5; text-decoration: line-through; }
+
 /* ── Channel Divinity panel (paladin oaths) ── */
 .dnd-cd {
   display: flex; flex-direction: column; gap: 0.5rem; padding: 0.6rem; border-radius: 10px;

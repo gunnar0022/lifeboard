@@ -9,6 +9,8 @@ import ClassListView from './ClassListView';
 import ClassDetailView from './ClassDetailView';
 import SpellListView from './SpellListView';
 import SpellDetailView from './SpellDetailView';
+import ItemsListView from './ItemsListView';
+import ItemDetailView from './ItemDetailView';
 import { raceAccent, classAccent } from './accents';
 
 // Default page accent for a node when one isn't carried down from a parent.
@@ -38,7 +40,10 @@ export default function EncyclopediaTab({ editMode = false }) {
     if (id === 'races') push({ view: 'raceList', title: 'Races' });
     else if (id === 'classes') push({ view: 'classList', title: 'Classes' });
     else if (id === 'spells') push({ view: 'spellList', title: 'Spells', filter: {} });
+    else if (id === 'items') push({ view: 'itemList', title: 'Items' });
   };
+
+  const openItem = (item) => push({ view: 'item', title: item.name, itemId: item.id, preview: item });
 
   // Open a race/subrace/class/subclass node. Children inherit their parent's
   // accent so a lineage / subclass reads as a variation on the same page.
@@ -81,6 +86,20 @@ export default function EncyclopediaTab({ editMode = false }) {
       break;
     case 'spell':
       body = <SpellDetailView key={current.spellId} spellId={current.spellId} preview={current.preview} />;
+      break;
+    case 'itemList':
+      body = <ItemsListView onOpenItem={openItem} />;
+      break;
+    case 'item':
+      body = (
+        <ItemDetailView
+          key={current.itemId}
+          itemId={current.itemId}
+          preview={current.preview}
+          editMode={editMode}
+          onDeleted={pop}
+        />
+      );
       break;
     case 'home':
     default:

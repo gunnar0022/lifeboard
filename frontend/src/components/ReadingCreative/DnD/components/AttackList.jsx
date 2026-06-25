@@ -1,6 +1,6 @@
 import { abilityMod, formatMod, proficiencyBonus } from '../dndUtils';
 
-export default function AttackList({ attacks, abilities, level, classFeature, editMode, onUpdate }) {
+export default function AttackList({ attacks, abilities, level, classFeature, derivedAttacks = [], editMode, onUpdate }) {
   const profBonus = proficiencyBonus(level);
   const isRaging = classFeature?.type === 'rage' && classFeature?.active;
   const rageDamage = classFeature?.bonusDamage || 0;
@@ -31,6 +31,38 @@ export default function AttackList({ attacks, abilities, level, classFeature, ed
   return (
     <div className="dnd-attacks">
       <h3 className="dnd-section-title">Attacks</h3>
+
+      {/* Read-only cards derived from equipped weapons (Equipment tab). */}
+      {derivedAttacks.length > 0 && (
+        <div className="dnd-attacks__list">
+          {derivedAttacks.map((atk, i) => {
+            const isMelee = atk.range === 'melee';
+            return (
+              <div key={`eq-${i}`} className="dnd-attacks__card dnd-attacks__card--derived">
+                <div className="dnd-attacks__header">
+                  <span className="dnd-attacks__name">{atk.name}</span>
+                  <span className="dnd-attacks__equip-tag">Equipped</span>
+                  <span className={`dnd-attacks__range-tag dnd-attacks__range-tag--${isMelee ? 'melee' : 'ranged'}`}>
+                    {atk.rangeLabel}
+                  </span>
+                  <span className="dnd-attacks__hit">{formatMod(atk.toHit)} to hit</span>
+                </div>
+                <div className="dnd-attacks__damage">
+                  {atk.damageDice}{atk.damageMod ? ` ${formatMod(atk.damageMod)}` : ''} {atk.damageType}
+                  {isRaging && (
+                    <span className="dnd-attacks__rage-bonus"> (+{rageDamage} rage)</span>
+                  )}
+                  {sporesDamage && isMelee && (
+                    <span className="dnd-attacks__spores-bonus"> ({sporesDamage})</span>
+                  )}
+                </div>
+                {atk.note && <div className="dnd-attacks__props">{atk.note}</div>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="dnd-attacks__list">
         {attacks.map((atk, i) => {
           const atkMod = abilityMod(abilities[atk.atkAbility] || 10);
