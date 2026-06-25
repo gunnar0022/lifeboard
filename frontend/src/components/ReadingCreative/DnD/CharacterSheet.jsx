@@ -338,6 +338,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('entropicWardUsed' in cf) cf.entropicWardUsed = false;          // Great Old One
       if ('hexCurseUsed' in cf) { cf.hexCurseUsed = false; cf.curseTarget = ''; }  // Hexblade's Curse
       if ('indestructibleLifeUsed' in cf) cf.indestructibleLifeUsed = false;       // Undying
+      if ('windSoulUsed' in cf) cf.windSoulUsed = false;                  // Storm Sorcery: Wind Soul
       updates.classFeature = cf;
     }
 
@@ -595,6 +596,19 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if ('angelicWings' in cf) cf.angelicWings = false;
       // Draconic Bloodline: wings furl on a long rest.
       if ('dragonWings' in cf) cf.dragonWings = false;
+      // Shadow Magic: Strength of the Grave, Hound of Ill Omen, Umbral Form reset.
+      if ('strengthGraveUsed' in cf) cf.strengthGraveUsed = false;
+      if ('houndActive' in cf) cf.houndActive = false;
+      if ('umbralForm' in cf) cf.umbralForm = false;
+      // Storm Sorcery: Wind Soul flight-share resets.
+      if ('windSoulUsed' in cf) cf.windSoulUsed = false;
+      // Wild Magic: Tides of Chaos resets; clear the last surge readout.
+      if ('tidesUsed' in cf) cf.tidesUsed = false;
+      if (cf.surge) cf.surge = { a: null, b: null };
+      // Lunar Sorcery: free casts + Lunar Boons refill; Phenomenon resets (phase persists).
+      if (cf.lunarFreeCast) cf.lunarFreeCast = {};
+      if (cf.lunarBoons) cf.lunarBoons = { ...cf.lunarBoons, current: cf.lunarBoons.max || 0 };
+      if ('lunarPhenomenonUsed' in cf) cf.lunarPhenomenonUsed = false;
       // Inquisitive: Unerring Eye refills; the Insightful Fighting read clears.
       if (cf.unerringEye) cf.unerringEye = { ...cf.unerringEye, current: cf.unerringEye.max || 0 };
       if ('insightfulTarget' in cf) cf.insightfulTarget = false;
@@ -869,7 +883,6 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
-              <RacialBlock character={character} onUpdate={handleUpdate} />
               <SubclassBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
             </div>
             <div className="dnd-sheet__combat-col-right">
@@ -907,6 +920,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
                 level={level} classFeature={character.classFeature}
                 derivedAttacks={derivedAttacks}
                 editMode={editMode} onUpdate={handleUpdate} />
+              <RacialBlock character={character} onUpdate={handleUpdate} />
               <ProficiencyTags proficiencies={character.proficiencies || {}}
                 meta={meta} editMode={editMode} onUpdate={handleUpdate} />
             </div>

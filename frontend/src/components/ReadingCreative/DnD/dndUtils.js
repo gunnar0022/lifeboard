@@ -279,12 +279,13 @@ export const SUBCLASS_LISTS = {
   ],
   Sorcerer: [
     { name: 'Draconic Bloodline', implemented: true },
-    { name: 'Wild Magic', implemented: false },
+    { name: 'Wild Magic', implemented: true },
     { name: 'Divine Soul', implemented: true },
-    { name: 'Shadow Magic', implemented: false },
-    { name: 'Storm Sorcery', implemented: false },
+    { name: 'Shadow Magic', implemented: true },
+    { name: 'Storm Sorcery', implemented: true },
     { name: 'Aberrant Mind', implemented: true },
     { name: 'Clockwork Soul', implemented: true },
+    { name: 'Lunar Sorcery', implemented: true },
   ],
   Bard: [
     { name: 'College of Lore', implemented: true },

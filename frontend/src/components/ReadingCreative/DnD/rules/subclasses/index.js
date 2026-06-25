@@ -17,6 +17,10 @@ import greatOldOne from './greatOldOne';
 import hexblade from './hexblade';
 import undead from './undead';
 import undying from './undying';
+import shadowMagic from './shadowMagic';
+import stormSorcery from './stormSorcery';
+import wildMagicSorcery from './wildMagicSorcery';
+import lunarSorcery from './lunarSorcery';
 import pathOfTheBerserker from './pathOfTheBerserker';
 import pathOfTheBattlerager from './pathOfTheBattlerager';
 import pathOfTheBeast from './pathOfTheBeast';
@@ -100,6 +104,7 @@ const ALL = [
   circleOfStars, circleOfSpores, warMagic, archfey,
   celestial, fathomless, fiend, genie,
   greatOldOne, hexblade, undead, undying,
+  shadowMagic, stormSorcery, wildMagicSorcery, lunarSorcery,
   pathOfTheBerserker, pathOfTheBattlerager, pathOfTheBeast, pathOfTheGiant,
   pathOfTheStormHerald, pathOfTheTotemWarrior, pathOfWildMagic, pathOfTheZealot,
   collegeOfLore, collegeOfEloquence, collegeOfGlamour, collegeOfCreation,

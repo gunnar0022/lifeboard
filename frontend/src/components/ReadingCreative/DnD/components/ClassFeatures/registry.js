@@ -66,6 +66,10 @@ import DraconicBlock from './DraconicBlock';
 import AberrantMindBlock from './AberrantMindBlock';
 import ClockworkSoulBlock from './ClockworkSoulBlock';
 import DivineSoulBlock from './DivineSoulBlock';
+import ShadowMagicBlock from './ShadowMagicBlock';
+import StormSorceryBlock from './StormSorceryBlock';
+import WildMagicSorceryBlock from './WildMagicSorceryBlock';
+import LunarSorceryBlock from './LunarSorceryBlock';
 import InquisitiveBlock from './InquisitiveBlock';
 import MastermindBlock from './MastermindBlock';
 import PhantomBlock from './PhantomBlock';
@@ -128,6 +132,7 @@ export const BLOCKS = {
   ChampionBlock, CavalierBlock, EldritchKnightBlock, PsiWarriorBlock, SamuraiBlock,
   DreamsBlock, LandBlock, MoonBlock, ShepherdBlock, WildfireBlock,
   DraconicBlock, AberrantMindBlock, ClockworkSoulBlock, DivineSoulBlock,
+  ShadowMagicBlock, StormSorceryBlock, WildMagicSorceryBlock, LunarSorceryBlock,
   InquisitiveBlock, MastermindBlock, PhantomBlock, ScoutBlock, SoulknifeBlock,
   ArcaneTricksterBlock, ThiefBlock, SwashbucklerBlock,
   HunterBlock, BeastMasterBlock, DrakewardenBlock, FeyWandererBlock,

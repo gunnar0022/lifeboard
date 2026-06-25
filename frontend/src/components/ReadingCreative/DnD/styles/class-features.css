@@ -985,3 +985,158 @@
 }
 .dnd-warlock__inv-name svg { color: var(--wl); flex-shrink: 0; }
 .dnd-warlock__inv-desc { margin: 0.15rem 0 0; font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.4; }
+
+/* ============================================
+   SORCERER — Wild Magic chaos box + Lunar phases
+   ============================================ */
+/* ── Wild Magic Surge: the chaos roller ── */
+.dnd-chaos {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 0.45rem;
+  padding: 0.7rem; border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-sorcerer) 50%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--dnd-class-sorcerer) 20%, transparent), transparent 60%),
+    radial-gradient(120% 120% at 0% 100%, color-mix(in srgb, #c850c0 14%, transparent), transparent 55%),
+    var(--dnd-bg);
+}
+.dnd-chaos::before {
+  content: ''; position: absolute; inset: -50%; pointer-events: none; opacity: 0.5;
+  background: conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--dnd-class-sorcerer) 18%, transparent), transparent 40%);
+  animation: dnd-chaos-spin 12s linear infinite;
+}
+@keyframes dnd-chaos-spin { to { transform: rotate(360deg); } }
+.dnd-chaos > * { position: relative; z-index: 1; }
+.dnd-chaos__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-chaos__title { display: flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; font-weight: 800; color: color-mix(in srgb, var(--dnd-class-sorcerer) 82%, var(--dnd-text)); }
+.dnd-chaos__title svg { color: var(--dnd-class-sorcerer); }
+.dnd-chaos__tag {
+  display: flex; align-items: center; gap: 0.25rem; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--dnd-class-sorcerer); background: color-mix(in srgb, var(--dnd-class-sorcerer) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dnd-class-sorcerer) 40%, var(--dnd-border)); border-radius: 5px; padding: 0.1rem 0.4rem;
+}
+.dnd-chaos__hint { margin: 0; font-size: 0.68rem; color: var(--dnd-text-dim); }
+.dnd-chaos__controls { display: flex; gap: 0.4rem; align-items: center; }
+.dnd-chaos__input { width: 4.5rem; text-align: center; font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.dnd-chaos__roll-btn {
+  display: flex; align-items: center; gap: 0.35rem; cursor: pointer;
+  padding: 0.3rem 0.7rem; border-radius: 8px; font-family: inherit; font-size: 0.8rem; font-weight: 700;
+  color: #fff; background: linear-gradient(150deg, color-mix(in srgb, var(--dnd-class-sorcerer) 80%, #fff), var(--dnd-class-sorcerer));
+  border: 1px solid var(--dnd-class-sorcerer); box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-sorcerer) 45%, transparent);
+  transition: filter 0.2s;
+}
+.dnd-chaos__roll-btn:hover { filter: brightness(1.12); }
+.dnd-chaos__result {
+  display: flex; gap: 0.55rem; align-items: flex-start;
+  padding: 0.5rem; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-sorcerer) 35%, var(--dnd-border));
+  background: var(--dnd-surface);
+}
+.dnd-chaos__roll {
+  flex-shrink: 0; min-width: 2.4rem; text-align: center; font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums;
+  color: #fff; background: var(--dnd-class-sorcerer); border-radius: 7px; padding: 0.3rem 0.3rem;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dnd-class-sorcerer) 50%, transparent);
+}
+.dnd-chaos__effect { margin: 0; font-size: 0.78rem; color: var(--dnd-text); line-height: 1.4; }
+.dnd-chaos__or { text-align: center; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dnd-text-muted); }
+
+/* ── Lunar Sorcery: moon-phase selector ── */
+.dnd-lunar { display: flex; flex-direction: column; gap: 0.6rem; }
+.dnd-lunar__phases { display: flex; gap: 0.4rem; }
+.dnd-lunar__phase {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; cursor: pointer;
+  padding: 0.55rem 0.3rem; border-radius: 11px; font-family: inherit;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border); transition: all 0.2s;
+}
+.dnd-lunar__phase:hover { border-color: color-mix(in srgb, var(--block-accent) 45%, var(--dnd-border)); }
+.dnd-lunar__phase--active {
+  border-color: var(--block-accent);
+  background: color-mix(in srgb, var(--block-accent) 12%, var(--dnd-surface));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--block-accent) 28%, transparent);
+}
+.dnd-lunar__phase-name { font-size: 0.66rem; font-weight: 700; color: var(--dnd-text-muted); }
+.dnd-lunar__phase--active .dnd-lunar__phase-name { color: var(--block-accent); }
+.dnd-lunar__swap-note { margin: 0; font-size: 0.68rem; color: var(--dnd-text-dim); text-align: center; }
+
+/* The moon glyphs — silvery disc rendered three ways. */
+.dnd-moon { width: 30px; height: 30px; border-radius: 50%; display: block; }
+.dnd-moon--full {
+  background: radial-gradient(circle at 38% 32%, #fdfbff, #cfc7ea);
+  box-shadow: 0 0 12px color-mix(in srgb, #cfc7ea 80%, transparent), inset -3px -3px 6px rgba(60,40,90,0.25);
+}
+.dnd-moon--new {
+  background: radial-gradient(circle at 38% 32%, #2a2536, #14111d);
+  border: 1px solid color-mix(in srgb, #cfc7ea 30%, transparent);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+.dnd-moon--crescent {
+  background: #fdfbff;
+  box-shadow: inset -9px -4px 0 0 #16131f, 0 0 10px color-mix(in srgb, #cfc7ea 55%, transparent);
+}
+.dnd-lunar__card {
+  display: flex; flex-direction: column; gap: 0.4rem; padding: 0.6rem; border-radius: 10px;
+  border: 1px solid var(--dnd-border); background: color-mix(in srgb, var(--block-accent) 5%, var(--dnd-surface));
+}
+.dnd-lunar__card-title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 800; color: color-mix(in srgb, var(--block-accent) 80%, var(--dnd-text)); }
+.dnd-lunar__card-title svg { color: var(--block-accent); }
+
+/* ── Sorcerer: Font of Magic (sorcery-point well) — a warm arcane glow ── */
+.dnd-sorc { display: flex; flex-direction: column; gap: 0.7rem; --sorc: var(--dnd-class-sorcerer); }
+.dnd-sorc__font {
+  display: flex; gap: 0.75rem; align-items: stretch; padding: 0.7rem; border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--sorc) 48%, var(--dnd-border));
+  background:
+    radial-gradient(130% 130% at 0% 0%, color-mix(in srgb, var(--sorc) 16%, transparent), transparent 60%),
+    var(--dnd-bg);
+  transition: box-shadow 0.3s ease;
+}
+.dnd-sorc__font--charged { box-shadow: 0 0 18px color-mix(in srgb, var(--sorc) 24%, transparent); }
+
+/* The glowing well/core — a molten orb that pulses while charged. */
+.dnd-sorc__core {
+  position: relative; flex-shrink: 0; width: 58px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0; border-radius: 50%; color: #fff;
+  background: radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--sorc) 92%, #fff), color-mix(in srgb, var(--sorc) 70%, #000));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--sorc) 55%, transparent), inset 0 -4px 8px rgba(0,0,0,0.3);
+}
+.dnd-sorc__font--charged .dnd-sorc__core { animation: dnd-sorc-pulse 3s ease-in-out infinite; }
+@keyframes dnd-sorc-pulse {
+  0%, 100% { box-shadow: 0 0 12px color-mix(in srgb, var(--sorc) 45%, transparent), inset 0 -4px 8px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 26px color-mix(in srgb, var(--sorc) 80%, transparent), inset 0 -4px 8px rgba(0,0,0,0.3); }
+}
+.dnd-sorc__core-num { font-size: 1.5rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.dnd-sorc__core-max { font-size: 0.66rem; font-weight: 700; opacity: 0.85; }
+
+.dnd-sorc__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.4rem; justify-content: center; }
+.dnd-sorc__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-sorc__title {
+  display: flex; align-items: center; gap: 0.35rem; font-size: 0.92rem; font-weight: 800;
+  color: color-mix(in srgb, var(--sorc) 82%, var(--dnd-text));
+}
+.dnd-sorc__title svg { color: var(--sorc); }
+.dnd-sorc__steppers { display: flex; gap: 0.3rem; }
+.dnd-sorc__step {
+  width: 1.7rem; height: 1.7rem; display: grid; place-items: center; cursor: pointer;
+  font-size: 1rem; font-weight: 700; border-radius: 7px;
+  color: var(--sorc); background: color-mix(in srgb, var(--sorc) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sorc) 40%, var(--dnd-border)); transition: all 0.18s;
+}
+.dnd-sorc__step:hover:not(:disabled) { background: color-mix(in srgb, var(--sorc) 22%, transparent); }
+.dnd-sorc__step:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* The orbs — each spent point dims a glowing mote. */
+.dnd-sorc__orbs { display: flex; flex-wrap: wrap; gap: 0.32rem; }
+.dnd-sorc__orb {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--sorc) 45%, var(--dnd-border));
+  background: var(--dnd-surface); transition: all 0.2s ease;
+}
+.dnd-sorc__orb--lit {
+  border-color: var(--sorc);
+  background: radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--sorc) 96%, #fff), var(--sorc));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--sorc) 62%, transparent);
+}
+.dnd-sorc__note { font-size: 0.72rem; color: var(--dnd-text-dim); line-height: 1.4; }
+
+/* Metamagic header gets the sorcerer accent to match the font. */
+.dnd-sorc .dnd-warmagic__subtitle { color: color-mix(in srgb, var(--sorc) 80%, var(--dnd-text)); }
+.dnd-sorc .dnd-warmagic__subtitle svg { color: var(--sorc); }

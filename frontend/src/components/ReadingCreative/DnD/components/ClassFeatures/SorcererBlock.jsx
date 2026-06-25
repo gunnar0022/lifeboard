@@ -55,25 +55,31 @@ export default function SorcererBlock({ character, onUpdate }) {
   };
 
   return (
-    <div className="dnd-warmagic dnd-ki" style={{ '--block-accent': 'var(--dnd-class-sorcerer)' }}>
-      <div className="dnd-warmagic__section">
-        <div className="dnd-warmagic__head">
-          <h4 className="dnd-warmagic__subtitle"><Flame size={13} /> Sorcery Points</h4>
-          <span className="dnd-warmagic__uses">{sp}/{max}</span>
+    <div className="dnd-warmagic dnd-sorc" style={{ '--block-accent': 'var(--dnd-class-sorcerer)' }}>
+      {/* Font of Magic — glowing sorcery-point well */}
+      <div className={`dnd-sorc__font ${sp > 0 ? 'dnd-sorc__font--charged' : ''}`}>
+        <div className="dnd-sorc__core">
+          <span className="dnd-sorc__core-num">{sp}</span>
+          <span className="dnd-sorc__core-max">/ {max}</span>
         </div>
-        <div className="dnd-ki__counter">
-          <button className="dnd-warmagic__btn" onClick={() => setSp(sp - 1)} disabled={sp <= 0}>−</button>
-          <div className="dnd-warmagic__pips dnd-ki__pips">
+        <div className="dnd-sorc__body">
+          <div className="dnd-sorc__head">
+            <span className="dnd-sorc__title"><Flame size={14} /> Font of Magic</span>
+            <div className="dnd-sorc__steppers">
+              <button className="dnd-sorc__step" onClick={() => setSp(sp - 1)} disabled={sp <= 0} aria-label="Spend a sorcery point">−</button>
+              <button className="dnd-sorc__step" onClick={() => setSp(sp + 1)} disabled={sp >= max} aria-label="Regain a sorcery point">+</button>
+            </div>
+          </div>
+          <div className="dnd-sorc__orbs">
             {Array.from({ length: max }, (_, i) => (
-              <span key={i} className={`dnd-warmagic__pip ${i < sp ? 'dnd-warmagic__pip--full' : ''}`} />
+              <span key={i} className={`dnd-sorc__orb ${i < sp ? 'dnd-sorc__orb--lit' : ''}`} />
             ))}
           </div>
-          <button className="dnd-warmagic__btn" onClick={() => setSp(sp + 1)} disabled={sp >= max}>+</button>
+          <span className="dnd-sorc__note">
+            Flexible Casting — create a slot for 1st=2 · 2nd=3 · 3rd=5 · 4th=6 · 5th=7 SP.
+            {affordable.length > 0 && <> Affordable now: up to <strong>{['', '1st', '2nd', '3rd', '4th', '5th'][Math.max(...affordable.map(Number))]}</strong>.</>}
+          </span>
         </div>
-        <span className="dnd-warmagic__note">
-          Flexible Casting — create a slot for 1st=2, 2nd=3, 3rd=5, 4th=6, 5th=7 SP.
-          {affordable.length > 0 && <> You can afford up to <strong>{['', '1st', '2nd', '3rd', '4th', '5th'][Math.max(...affordable.map(Number))]}</strong> now.</>}
-        </span>
       </div>
 
       <div className="dnd-warmagic__section">
