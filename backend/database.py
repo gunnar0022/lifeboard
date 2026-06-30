@@ -482,6 +482,20 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(name)
         );
+
+        CREATE TABLE IF NOT EXISTS dnd_feats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            prerequisite TEXT NOT NULL DEFAULT '',
+            description TEXT NOT NULL DEFAULT '',
+            benefits TEXT NOT NULL DEFAULT '[]',
+            asi TEXT NOT NULL DEFAULT '{}',
+            repeatable BOOLEAN NOT NULL DEFAULT 0,
+            source TEXT NOT NULL DEFAULT 'PHB',
+            is_custom BOOLEAN NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name)
+        );
     """)
 
 

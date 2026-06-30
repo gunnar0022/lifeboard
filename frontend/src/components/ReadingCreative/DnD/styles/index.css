@@ -13,3 +13,4 @@
 @import './encyclopedia.css';    /* Encyclopedia (wiki) tab — race/class/spell browser */
 @import './help.css';            /* Help (?) buttons, tab titles, help modal */
 @import './levelup.css';         /* Level Up controls + reveal/recap modal */
+@import './option-picker.css';   /* Themed option-picker library modals */

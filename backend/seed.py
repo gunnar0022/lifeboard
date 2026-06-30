@@ -857,6 +857,60 @@ async def seed_dnd_items():
         await db.close()
 
 
+async def seed_dnd_feats():
+    """Seed the DnD feats library. Intentionally minimal — two simple, choice-free
+    feats that exercise the feat backbone; the rest are added by players via the
+    in-app builder or future content passes."""
+    feats = [
+        {
+            "name": "Tough",
+            "prerequisite": "",
+            "description": "Your body is hardened against punishment.",
+            "benefits": [
+                "Your hit point maximum increases by an amount equal to twice your level when you gain this feat.",
+                "Whenever you gain a level thereafter, your hit point maximum increases by an additional 2 hit points.",
+            ],
+            "asi": {},
+            "source": "PHB",
+        },
+        {
+            "name": "Alert",
+            "prerequisite": "",
+            "description": "Always on the lookout for danger, you can't be caught flat-footed.",
+            "benefits": [
+                "You gain a +5 bonus to initiative.",
+                "You can't be surprised while you are conscious.",
+                "Other creatures don't gain advantage on attack rolls against you as a result of being unseen by you.",
+            ],
+            "asi": {},
+            "source": "PHB",
+        },
+    ]
+
+    columns = ("name", "prerequisite", "description", "benefits", "asi", "repeatable", "source", "is_custom")
+    json_fields = {"benefits", "asi"}
+    defaults = {"prerequisite": "", "description": "", "benefits": [], "asi": {}, "repeatable": 0, "source": "PHB", "is_custom": 0}
+
+    db = await get_db()
+    try:
+        placeholders = ", ".join("?" * len(columns))
+        for ft in feats:
+            row = []
+            for col in columns:
+                val = ft.get(col, defaults.get(col))
+                if col in json_fields:
+                    val = json.dumps(val) if val is not None else None
+                row.append(val)
+            await db.execute(
+                f"INSERT OR IGNORE INTO dnd_feats ({', '.join(columns)}) VALUES ({placeholders})",
+                row,
+            )
+        await db.commit()
+        print(f"  [OK] {len(feats)} feats seeded")
+    finally:
+        await db.close()
+
+
 async def _get_spell_id(db, name):
     """Helper to look up a spell ID by name."""
     cursor = await db.execute("SELECT id FROM dnd_spells WHERE name = ?", (name,))
@@ -1156,6 +1210,10 @@ async def main():
     # disturbing existing rows.
     print("\nSeeding/topping up DnD Items Library...")
     await seed_dnd_items()
+
+    # Same idempotent top-up for the feats library.
+    print("\nSeeding/topping up DnD Feats Library...")
+    await seed_dnd_feats()
 
     if not await _has_data("dnd_characters"):
         print("\nSeeding DnD Characters...")

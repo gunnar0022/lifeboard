@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Sword, PawPrint, BookOpen, Gem, Star, Check } from 'lucide-react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, RUNE_LIST, maxRunesKnown, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS, invocationsKnown, METAMAGIC_OPTIONS, metamagicKnown, MANEUVER_LIST, maneuversKnown, ARCANE_SHOT_LIST, arcaneShotsKnown, INFUSION_LIST, infusionsKnown } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS } from '../classProgression';
 import { SKILLS, abilityMod, proficiencyBonus } from '../dndUtils';
 import { buildPrimalBeast, buildDrake, buildSteelDefender, PRIMAL_VARIANTS, DRAKE_ESSENCES } from '../rules/shared/companions';
 import CompanionStatBlock from './ClassFeatures/CompanionStatBlock';
+import InvocationPicker from './OptionPicker/InvocationPicker';
+import ListPicker from './OptionPicker/ListPicker';
+import FeatPicker from './OptionPicker/FeatPicker';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
 
@@ -58,244 +61,6 @@ function FightingStyleChoice({ classFeature, onUpdate }) {
         {FIGHTING_STYLES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
       </select>
       {style && <p className="dnd-feature-choice__detail">{style.desc}</p>}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Rune Carver runes ─────────────────────────────
-function RuneChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const known = cf.knownRunes || [];
-  const max = maxRunesKnown(level);
-  const [picking, setPicking] = useState(false);
-
-  const addRune = (name) => {
-    if (known.includes(name) || known.length >= max) return;
-    onUpdate({ classFeature: { ...cf, knownRunes: [...known, name] } });
-    setPicking(false);
-  };
-  const removeRune = (name) => {
-    const inv = { ...(cf.runeInvocations || {}) };
-    delete inv[name];
-    onUpdate({ classFeature: { ...cf, knownRunes: known.filter(r => r !== name), runeInvocations: inv } });
-  };
-
-  const available = RUNE_LIST.filter(r => !known.includes(r.name) && r.minLevel <= level);
-  const locked = RUNE_LIST.filter(r => r.minLevel > level);
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{known.length}/{max} runes known</span>
-        {known.length < max && available.length > 0 && (
-          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Rune</button>
-        )}
-      </div>
-
-      {picking && (
-        <div className="dnd-feature-choice__picker">
-          {available.map(r => (
-            <button key={r.name} className="dnd-feature-choice__pick" onClick={() => addRune(r.name)} title={r.passive}>
-              {r.name}{r.minLevel > 3 && <span className="dnd-feature-choice__pick-lvl"> Lvl {r.minLevel}+</span>}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {known.length === 0 && <p className="dnd-feature-choice__empty">No runes inscribed yet — click + Rune.</p>}
-
-      {known.map(name => {
-        const r = RUNE_LIST.find(x => x.name === name);
-        return (
-          <div key={name} className="dnd-feature-choice__rune">
-            <div className="dnd-feature-choice__rune-top">
-              <span className="dnd-feature-choice__rune-name">{name}</span>
-              <button className="dnd-feature-choice__remove" onClick={() => removeRune(name)} title="Replace / remove rune">×</button>
-            </div>
-            <p className="dnd-feature-choice__rune-line"><strong>Passive:</strong> {r?.passive}</p>
-            <p className="dnd-feature-choice__rune-line"><strong>Invoke:</strong> {r?.invoke}</p>
-          </div>
-        );
-      })}
-
-      {locked.length > 0 && (
-        <p className="dnd-feature-choice__locked">
-          Available later: {locked.map(r => `${r.name} (Lvl ${r.minLevel})`).join(', ')}
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Battle Master maneuvers (capped pick from a fixed list) ──
-function ManeuverChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const known = cf.knownManeuvers || [];
-  const max = maneuversKnown(level);
-  const [picking, setPicking] = useState(false);
-
-  const add = (name) => {
-    if (known.includes(name) || known.length >= max) return;
-    onUpdate({ classFeature: { ...cf, knownManeuvers: [...known, name] } });
-    setPicking(false);
-  };
-  const remove = (name) => onUpdate({ classFeature: { ...cf, knownManeuvers: known.filter(m => m !== name) } });
-  const available = MANEUVER_LIST.filter(m => !known.includes(m.name));
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{known.length}/{max} maneuvers known</span>
-        {known.length < max && available.length > 0 && (
-          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Maneuver</button>
-        )}
-      </div>
-      {picking && (
-        <div className="dnd-feature-choice__picker">
-          {available.map(m => (
-            <button key={m.name} className="dnd-feature-choice__pick" onClick={() => add(m.name)} title={m.desc}>{m.name}</button>
-          ))}
-        </div>
-      )}
-      {known.length === 0 && <p className="dnd-feature-choice__empty">No maneuvers chosen yet — click + Maneuver.</p>}
-      {known.map(name => {
-        const m = MANEUVER_LIST.find(x => x.name === name);
-        return (
-          <div key={name} className="dnd-feature-choice__rune">
-            <div className="dnd-feature-choice__rune-top">
-              <span className="dnd-feature-choice__rune-name">{name}</span>
-              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove maneuver">×</button>
-            </div>
-            <p className="dnd-feature-choice__rune-line">{m?.desc}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Arcane Archer shot options (capped pick from a fixed list) ──
-function ArcaneShotChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const known = cf.knownArcaneShots || [];
-  const max = arcaneShotsKnown(level);
-  const [picking, setPicking] = useState(false);
-
-  const add = (name) => {
-    if (known.includes(name) || known.length >= max) return;
-    onUpdate({ classFeature: { ...cf, knownArcaneShots: [...known, name] } });
-    setPicking(false);
-  };
-  const remove = (name) => onUpdate({ classFeature: { ...cf, knownArcaneShots: known.filter(s => s !== name) } });
-  const available = ARCANE_SHOT_LIST.filter(s => !known.includes(s.name));
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{known.length}/{max} shots known</span>
-        {known.length < max && available.length > 0 && (
-          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Arcane Shot</button>
-        )}
-      </div>
-      {picking && (
-        <div className="dnd-feature-choice__picker">
-          {available.map(s => (
-            <button key={s.name} className="dnd-feature-choice__pick" onClick={() => add(s.name)} title={s.desc}>{s.name}</button>
-          ))}
-        </div>
-      )}
-      {known.length === 0 && <p className="dnd-feature-choice__empty">No Arcane Shots chosen yet — click + Arcane Shot.</p>}
-      {known.map(name => {
-        const s = ARCANE_SHOT_LIST.find(x => x.name === name);
-        return (
-          <div key={name} className="dnd-feature-choice__rune">
-            <div className="dnd-feature-choice__rune-top">
-              <span className="dnd-feature-choice__rune-name">{name} <em className="dnd-feature-choice__pick-lvl">{s?.school}</em></span>
-              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove Arcane Shot">×</button>
-            </div>
-            <p className="dnd-feature-choice__rune-line">{s?.desc}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Artificer Infusions (capped, level-gated pick) ──
-// Stored as a list of infusion names in classFeature.knownInfusions; Replicate
-// Magic Item may be taken more than once, so removal is by index.
-function InfusionChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const known = cf.knownInfusions || [];
-  const max = infusionsKnown(level);
-  const [picking, setPicking] = useState(false);
-
-  const add = (name) => {
-    if (known.length >= max) return;
-    onUpdate({ classFeature: { ...cf, knownInfusions: [...known, name] } });
-    setPicking(false);
-  };
-  const removeAt = (idx) => {
-    const removed = known[idx];
-    const nextKnown = known.filter((_, i) => i !== idx);
-    // Drop any infused item that was using the now-forgotten infusion.
-    const stillKnown = nextKnown.includes(removed);
-    const infusedItems = stillKnown
-      ? cf.infusedItems
-      : (cf.infusedItems || []).filter(it => it.infusion !== removed);
-    onUpdate({ classFeature: { ...cf, knownInfusions: nextKnown, infusedItems } });
-  };
-
-  const repeatable = (name) => name === 'Replicate Magic Item';
-  const available = INFUSION_LIST.filter(
-    inf => inf.prereq <= level && (repeatable(inf.name) || !known.includes(inf.name))
-  );
-  const locked = INFUSION_LIST.filter(inf => inf.prereq > level);
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{known.length}/{max} infusions known</span>
-        {known.length < max && available.length > 0 && (
-          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Infusion</button>
-        )}
-      </div>
-
-      {picking && (
-        <div className="dnd-feature-choice__picker">
-          {available.map(inf => (
-            <button key={inf.name} className="dnd-feature-choice__pick" onClick={() => add(inf.name)} title={inf.desc}>
-              {inf.name}
-              {inf.attune && <span className="dnd-feature-choice__pick-lvl"> ⚜</span>}
-              {inf.prereq > 2 && <span className="dnd-feature-choice__pick-lvl"> Lvl {inf.prereq}+</span>}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {known.length === 0 && <p className="dnd-feature-choice__empty">No infusions learned yet — click + Infusion.</p>}
-
-      {known.map((name, idx) => {
-        const inf = INFUSION_LIST.find(x => x.name === name);
-        return (
-          <div key={`${name}-${idx}`} className="dnd-feature-choice__rune">
-            <div className="dnd-feature-choice__rune-top">
-              <span className="dnd-feature-choice__rune-name">
-                {name}{inf?.attune && <em className="dnd-feature-choice__pick-lvl"> requires attunement</em>}
-              </span>
-              <button className="dnd-feature-choice__remove" onClick={() => removeAt(idx)} title="Replace / remove infusion">×</button>
-            </div>
-            <p className="dnd-feature-choice__rune-line"><strong>Item:</strong> {inf?.target}</p>
-            <p className="dnd-feature-choice__rune-line">{inf?.desc}</p>
-          </div>
-        );
-      })}
-
-      {locked.length > 0 && (
-        <p className="dnd-feature-choice__locked">
-          Available later: {locked.map(inf => `${inf.name} (Lvl ${inf.prereq})`).join(', ')}
-        </p>
-      )}
     </div>
   );
 }
@@ -374,87 +139,6 @@ function GiantCantripChoice({ classFeature, onUpdate }) {
         {GIANT_CANTRIPS.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
       </select>
       {cantrip && <p className="dnd-feature-choice__detail">{cantrip.desc}</p>}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Eldritch Invocations (capped manual list) ──────
-function InvocationsChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const list = cf.invocations || [];
-  const max = invocationsKnown(level);
-  const setList = (next) => onUpdate({ classFeature: { ...cf, invocations: next } });
-  const add = () => { if (list.length < max) setList([...list, { name: '', desc: '' }]); };
-  const update = (i, field, value) => setList(list.map((v, idx) => idx === i ? { ...v, [field]: value } : v));
-  const remove = (i) => setList(list.filter((_, idx) => idx !== i));
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{list.length}/{max} invocations known</span>
-        {list.length < max && <button className="dnd-feature-choice__add" onClick={add}>+ Invocation</button>}
-      </div>
-      {list.length === 0 && <p className="dnd-feature-choice__empty">None chosen yet — click + Invocation.</p>}
-      {list.map((inv, i) => (
-        <div key={i} className="dnd-feature-choice__rune">
-          <div className="dnd-feature-choice__rune-top">
-            <input className="dnd-field dnd-feature-choice__select" value={inv.name} placeholder="Invocation name (e.g. Agonizing Blast)"
-              onChange={e => update(i, 'name', e.target.value)} />
-            <button className="dnd-feature-choice__remove" onClick={() => remove(i)} title="Remove">×</button>
-          </div>
-          <textarea className="dnd-field dnd-field--textarea" rows={2} value={inv.desc} placeholder="Effect"
-            onChange={e => update(i, 'desc', e.target.value)} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Inline build-choice: Sorcerer Metamagic (capped pick from a fixed list) ──
-function MetamagicChoice({ classFeature, onUpdate, level }) {
-  const cf = classFeature || {};
-  const known = cf.metamagic || [];
-  const max = metamagicKnown(level);
-  const [picking, setPicking] = useState(false);
-
-  const add = (name) => {
-    if (known.includes(name) || known.length >= max) return;
-    onUpdate({ classFeature: { ...cf, metamagic: [...known, name] } });
-    setPicking(false);
-  };
-  const remove = (name) => onUpdate({ classFeature: { ...cf, metamagic: known.filter(m => m !== name) } });
-  const available = METAMAGIC_OPTIONS.filter(o => !known.includes(o.name));
-
-  return (
-    <div className="dnd-feature-choice">
-      <div className="dnd-feature-choice__rune-head">
-        <span className="dnd-feature-choice__count">{known.length}/{max} metamagic known</span>
-        {known.length < max && available.length > 0 && (
-          <button className="dnd-feature-choice__add" onClick={() => setPicking(!picking)}>+ Metamagic</button>
-        )}
-      </div>
-      {picking && (
-        <div className="dnd-feature-choice__picker">
-          {available.map(o => (
-            <button key={o.name} className="dnd-feature-choice__pick" onClick={() => add(o.name)} title={o.desc}>
-              {o.name}<span className="dnd-feature-choice__pick-lvl"> {o.cost}</span>
-            </button>
-          ))}
-        </div>
-      )}
-      {known.length === 0 && <p className="dnd-feature-choice__empty">No Metamagic chosen yet — click + Metamagic.</p>}
-      {known.map(name => {
-        const o = METAMAGIC_OPTIONS.find(x => x.name === name);
-        return (
-          <div key={name} className="dnd-feature-choice__rune">
-            <div className="dnd-feature-choice__rune-top">
-              <span className="dnd-feature-choice__rune-name">{name} <span className="dnd-feature-choice__count">{o?.cost}</span></span>
-              <button className="dnd-feature-choice__remove" onClick={() => remove(name)} title="Replace / remove">×</button>
-            </div>
-            <p className="dnd-feature-choice__rune-line">{o?.desc}</p>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -570,30 +254,19 @@ function ASIChoice({ featId, classFeature, onUpdate }) {
       <div className="dnd-feature-choice__toggle">
         <button
           className={`dnd-feature-choice__toggle-btn ${choice.type === 'asi' ? 'dnd-feature-choice__toggle-btn--active' : ''}`}
-          onClick={() => set({ type: 'asi', a1: choice.a1 || '', a2: choice.a2 || '' })}
+          onClick={() => set(choice.type === 'asi' ? choice : { type: 'asi', a1: '', a2: '' })}
         >Ability Score</button>
         <button
           className={`dnd-feature-choice__toggle-btn ${choice.type === 'feat' ? 'dnd-feature-choice__toggle-btn--active' : ''}`}
-          onClick={() => set({ type: 'feat', name: choice.name || '', desc: choice.desc || '' })}
+          onClick={() => set(choice.type === 'feat' ? choice : { type: 'feat' })}
         >Feat</button>
       </div>
 
       {choice.type === 'feat' ? (
-        <>
-          <input
-            className="dnd-field dnd-feature-choice__select"
-            value={choice.name || ''}
-            placeholder="Feat name"
-            onChange={e => set({ ...choice, type: 'feat', name: e.target.value })}
-          />
-          <textarea
-            className="dnd-field dnd-field--textarea"
-            value={choice.desc || ''}
-            placeholder="Feat description"
-            rows={3}
-            onChange={e => set({ ...choice, type: 'feat', desc: e.target.value })}
-          />
-        </>
+        <FeatPicker
+          value={choice.featId != null || choice.name ? choice : null}
+          onChange={(f) => set(f ? { type: 'feat', ...f } : { type: 'feat' })}
+        />
       ) : (
         <div className="dnd-feature-choice__asi">
           <select className="dnd-field" value={choice.a1 || ''}
@@ -744,9 +417,9 @@ function SkillChoice({ racialFeature, onUpdate, options }) {
 // and the Level Up reveal. `ctx` carries everything the choice editors need.
 export function renderFeatureChoice(feat, { classFeature, racialFeature, onUpdate, level, abilities }) {
   if (feat.choice === 'fighting-style') return <FightingStyleChoice classFeature={classFeature} onUpdate={onUpdate} />;
-  if (feat.choice === 'runes') return <RuneChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-  if (feat.choice === 'maneuvers') return <ManeuverChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-  if (feat.choice === 'arcane-shots') return <ArcaneShotChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'runes') return <ListPicker configKey="runes" classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'maneuvers') return <ListPicker configKey="maneuvers" classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'arcane-shots') return <ListPicker configKey="arcaneShots" classFeature={classFeature} onUpdate={onUpdate} level={level} />;
   if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
   if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
   if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
@@ -758,9 +431,9 @@ export function renderFeatureChoice(feat, { classFeature, racialFeature, onUpdat
   if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
   if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
   if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
-  if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-  if (feat.choice === 'metamagic') return <MetamagicChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-  if (feat.choice === 'infusions') return <InfusionChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'invocations') return <InvocationPicker classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'metamagic') return <ListPicker configKey="metamagic" classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'infusions') return <ListPicker configKey="infusions" classFeature={classFeature} onUpdate={onUpdate} level={level} />;
   if (feat.choice === 'option') return <OptionChoice feat={feat} classFeature={classFeature} onUpdate={onUpdate} />;
   return null;
 }

@@ -500,6 +500,123 @@ async def batch_items(body: dict):
         await db.close()
 
 
+# ── Feats Library (browsable + custom homebrew) ──────────────────────────
+# Mirrors the spells/items libraries: a searchable list with custom-create. The
+# `benefits` column is a JSON array of bullet strings; `asi` is a JSON object
+# describing any ability-score rider, e.g.
+#   {}                                      no ASI
+#   {"fixed": {"CON": 1}}                   +1 to a specific ability
+#   {"choose": ["STR","DEX"], "amount": 1}  +1 to one of a set (player picks)
+
+_FEAT_JSON_FIELDS = ("benefits", "asi")
+_FEAT_BOOL_FIELDS = ("repeatable", "is_custom")
+_FEAT_COLUMNS = (
+    "name", "prerequisite", "description", "benefits", "asi",
+    "repeatable", "source", "is_custom",
+)
+_FEAT_DEFAULTS = {
+    "prerequisite": "", "description": "", "benefits": [], "asi": {},
+    "repeatable": 0, "source": "PHB", "is_custom": 0,
+}
+
+
+def _feat_row(row):
+    d = dict(row)
+    for k in _FEAT_JSON_FIELDS:
+        if isinstance(d.get(k), str):
+            try:
+                d[k] = json.loads(d[k])
+            except (ValueError, TypeError):
+                d[k] = None
+    for k in _FEAT_BOOL_FIELDS:
+        d[k] = bool(d.get(k))
+    return d
+
+
+def _feat_value(body, col):
+    val = body.get(col, _FEAT_DEFAULTS.get(col))
+    if col in _FEAT_JSON_FIELDS:
+        return json.dumps(val) if val is not None else None
+    if col in _FEAT_BOOL_FIELDS:
+        return 1 if val else 0
+    return val
+
+
+@router.get("/feats")
+async def list_feats(q: str = "", limit: int = 200):
+    """Search/list feats from the library (optional name/description filter)."""
+    db = await get_db()
+    try:
+        conditions, params = [], []
+        if q:
+            conditions.append("(name LIKE ? OR description LIKE ?)")
+            params.extend([f"%{q}%", f"%{q}%"])
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        params.append(limit)
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_feats {where} ORDER BY name LIMIT ?", params
+        )
+        return [_feat_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.get("/feats/{feat_id}")
+async def get_feat(feat_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_feats WHERE id = ?", (feat_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Feat not found")
+        return _feat_row(row)
+    finally:
+        await db.close()
+
+
+@router.post("/feats")
+async def create_feat(body: dict):
+    """Create a feat (upsert by name — returns existing if the name matches)."""
+    name = (body.get("name") or "").strip()
+    if not name:
+        raise HTTPException(400, "Feat name is required")
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_feats WHERE name = ?", (name,))
+        existing = await cursor.fetchone()
+        if existing:
+            return _feat_row(existing)
+        body = {**body, "name": name}
+        placeholders = ", ".join("?" * len(_FEAT_COLUMNS))
+        values = [_feat_value(body, col) for col in _FEAT_COLUMNS]
+        cursor = await db.execute(
+            f"INSERT INTO dnd_feats ({', '.join(_FEAT_COLUMNS)}) VALUES ({placeholders})",
+            values,
+        )
+        await db.commit()
+        cursor = await db.execute("SELECT * FROM dnd_feats WHERE id = ?", (cursor.lastrowid,))
+        return _feat_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.post("/feats/batch")
+async def batch_feats(body: dict):
+    """Resolve multiple feats by ID (for the character feat cache)."""
+    ids = body.get("ids", [])
+    if not ids:
+        return []
+    db = await get_db()
+    try:
+        placeholders = ",".join("?" * len(ids))
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_feats WHERE id IN ({placeholders})", ids
+        )
+        return [_feat_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
 # ── Beast Forms ──────────────────────────────────────────
 
 @router.get("/beast-forms")
