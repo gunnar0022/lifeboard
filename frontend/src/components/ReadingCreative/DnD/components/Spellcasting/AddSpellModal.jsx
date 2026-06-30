@@ -6,10 +6,12 @@ import { SPELL_CLASS_TAGS, spellClassLabel } from './spellTags';
 const SPELL_TYPE_OPTIONS = ['damage', 'healing', 'buff', 'debuff', 'utility', 'control'];
 const SAVE_OPTIONS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
-export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
+export default function AddSpellModal({ isCantrip, onAdd, onClose, defaultClass = '', defaultLevel }) {
   const [query, setQuery] = useState('');
-  const [levelFilter, setLevelFilter] = useState(isCantrip ? 0 : '');
-  const [classFilter, setClassFilter] = useState('');
+  const [levelFilter, setLevelFilter] = useState(
+    isCantrip ? 0 : (defaultLevel != null ? defaultLevel : '')
+  );
+  const [classFilter, setClassFilter] = useState(defaultClass || '');
   const [results, setResults] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);

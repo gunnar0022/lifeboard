@@ -1,0 +1,190 @@
+/* ============================================
+   LEVEL UP — header controls + reveal/recap modal
+   ============================================ */
+
+/* ── Header buttons ── */
+.dnd-levelup-ctrls {
+  display: flex; align-items: stretch; gap: 0.5rem; align-self: center;
+  margin-right: 1rem; /* breathing room before the Edit cluster */
+}
+.dnd-levelup-btn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.35rem 0.95rem; border-radius: 9px; cursor: pointer;
+  font-family: inherit;
+  color: #fff; border: 1px solid color-mix(in srgb, var(--dnd-accent) 70%, #000);
+  background: linear-gradient(135deg,
+    var(--dnd-accent) 0%, color-mix(in srgb, var(--dnd-accent) 70%, #6a3df0) 100%);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--dnd-accent) 35%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.dnd-levelup-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--dnd-accent) 50%, transparent);
+}
+.dnd-levelup-btn:disabled {
+  opacity: 0.6; cursor: default; background: var(--dnd-surface); color: var(--dnd-text-dim);
+  box-shadow: none; border-color: var(--dnd-border);
+}
+.dnd-levelup-btn__icon { flex-shrink: 0; }
+.dnd-levelup-btn__text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.05; }
+.dnd-levelup-btn__kicker {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  opacity: 0.9;
+}
+.dnd-levelup-btn__nums { display: inline-flex; align-items: baseline; gap: 0.28rem; }
+.dnd-levelup-btn__from { font-size: 0.95rem; font-weight: 600; opacity: 0.75; }
+.dnd-levelup-btn__arrow { font-size: 0.85rem; opacity: 0.7; }
+.dnd-levelup-btn__to {
+  font-family: 'Uncial Antiqua', serif; font-size: 1.45rem; font-weight: 700; line-height: 1;
+}
+.dnd-levelup-recap {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; align-self: stretch; border-radius: 9px; cursor: pointer;
+  color: var(--dnd-text-dim);
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  transition: color 0.15s, border-color 0.15s;
+}
+.dnd-levelup-recap:hover { color: var(--dnd-accent); border-color: var(--dnd-accent); }
+
+/* ── Modal ── */
+.dnd-lvlup__overlay {
+  /* Below the spell-modal's 1000 so the Add Spell picker (rendered as a sibling)
+     layers on top of the reveal. */
+  position: fixed; inset: 0; z-index: 990;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; white-space: normal; text-align: left;
+}
+.dnd-lvlup {
+  position: relative;
+  width: 100%; max-width: 720px; max-height: 88vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+  border-radius: 14px; box-shadow: var(--dnd-shadow-base);
+  font-family: 'Crimson Text', serif; color: var(--dnd-text);
+}
+.dnd-lvlup__close {
+  position: absolute; top: 0.6rem; right: 0.6rem; z-index: 3;
+  background: rgba(0, 0, 0, 0.25); border: none; color: #fff;
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.dnd-lvlup__close:hover { background: rgba(0, 0, 0, 0.45); }
+
+/* Hero banner */
+.dnd-lvlup__hero {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  padding: 1.6rem 1.25rem 1.4rem; text-align: center;
+  background:
+    radial-gradient(120% 140% at 50% -20%,
+      color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 38%, transparent) 0%,
+      transparent 60%),
+    var(--dnd-surface);
+  border-bottom: 1px solid var(--dnd-border);
+}
+.dnd-lvlup__badge {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  padding: 0.8rem 1.4rem; border-radius: 14px;
+  background: color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 14%, var(--dnd-bg));
+  border: 2px solid var(--lvlup-accent, var(--dnd-accent));
+  box-shadow: 0 0 26px color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 40%, transparent);
+}
+.dnd-lvlup__badge-kicker {
+  font-family: 'Uncial Antiqua', serif; font-size: 0.8rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--lvlup-accent, var(--dnd-accent));
+}
+.dnd-lvlup__badge-num {
+  font-family: 'Uncial Antiqua', serif; font-size: 3.2rem; line-height: 1;
+  color: var(--dnd-text);
+}
+.dnd-lvlup__badge-class { font-size: 0.85rem; color: var(--dnd-text-dim); }
+
+/* Stat chips */
+.dnd-lvlup__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+.dnd-lvlup__chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.8rem; border-radius: 999px;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+}
+.dnd-lvlup__chip svg { flex-shrink: 0; }
+.dnd-lvlup__chip--hp { border-color: var(--dnd-hp-healthy); }
+.dnd-lvlup__chip--hp svg { color: var(--dnd-hp-healthy); }
+.dnd-lvlup__chip--prof { border-color: var(--dnd-class-fighter); }
+.dnd-lvlup__chip--prof svg { color: var(--dnd-class-fighter); }
+.dnd-lvlup__chip--slots { border-color: var(--dnd-class-wizard); }
+.dnd-lvlup__chip--slots svg { color: var(--dnd-class-wizard); }
+.dnd-lvlup__chip-val { font-weight: 700; font-size: 1.05rem; }
+.dnd-lvlup__chip-label { font-size: 0.78rem; color: var(--dnd-text-dim); }
+
+/* Panel + tabs */
+.dnd-lvlup__panel { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.dnd-lvlup__tabs {
+  display: flex; gap: 0; padding: 0 1rem;
+  border-bottom: 1px solid var(--dnd-border); flex-shrink: 0;
+}
+.dnd-lvlup__tab {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--dnd-text-dim); padding: 0.6rem 0.9rem; cursor: pointer;
+  font-family: inherit; font-size: 0.9rem;
+}
+.dnd-lvlup__tab:hover { color: var(--dnd-text); }
+.dnd-lvlup__tab--active { color: var(--lvlup-accent, var(--dnd-accent)); border-bottom-color: var(--lvlup-accent, var(--dnd-accent)); }
+
+.dnd-lvlup__body { padding: 1rem 1.25rem 1.25rem; overflow-y: auto; }
+.dnd-lvlup__empty { color: var(--dnd-text-dim); font-size: 0.95rem; line-height: 1.5; margin: 0.5rem 0; }
+
+/* Feature zones */
+.dnd-lvlup__zones { display: flex; flex-direction: column; gap: 1.1rem; }
+.dnd-lvlup__zone-title {
+  font-family: 'Uncial Antiqua', serif; font-size: 0.95rem;
+  margin: 0 0 0.5rem; letter-spacing: 0.04em;
+}
+.dnd-lvlup__choice-tag {
+  font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  border: 1px solid currentColor; border-radius: 999px; padding: 0.05rem 0.4rem; margin-left: auto;
+}
+.dnd-lvlup__choice-hint {
+  font-size: 0.78rem; color: var(--dnd-text-dim); margin: 0.4rem 0 0; font-style: italic;
+}
+
+/* Spells tab */
+.dnd-lvlup__spells { display: flex; flex-direction: column; gap: 1rem; }
+.dnd-lvlup__slot-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.dnd-lvlup__slot-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.5rem 0.7rem; border-radius: 7px;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+}
+.dnd-lvlup__slot-name { font-weight: 600; }
+.dnd-lvlup__slot-delta { font-variant-numeric: tabular-nums; color: var(--dnd-text-dim); }
+.dnd-lvlup__slot-delta strong { color: var(--dnd-class-wizard); }
+.dnd-lvlup__slot-new {
+  font-weight: 700; color: var(--dnd-class-wizard);
+  background: color-mix(in srgb, var(--dnd-class-wizard) 14%, transparent);
+  padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.82rem;
+}
+.dnd-lvlup__slot-row--cap { border-color: var(--lvlup-accent, var(--dnd-accent)); }
+.dnd-lvlup__slot-row--cap .dnd-lvlup__slot-delta strong { color: var(--lvlup-accent, var(--dnd-accent)); }
+.dnd-lvlup__spell-actions {
+  border-top: 1px dashed var(--dnd-border); padding-top: 0.9rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.dnd-lvlup__spell-actions-label { font-weight: 600; }
+.dnd-lvlup__spell-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.dnd-lvlup__spell-btn {
+  padding: 0.4rem 0.85rem; border-radius: 7px; cursor: pointer;
+  font-family: inherit; font-size: 0.85rem; font-weight: 600;
+  color: var(--lvlup-accent, var(--dnd-accent));
+  background: color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 10%, transparent);
+  border: 1px solid var(--lvlup-accent, var(--dnd-accent));
+  transition: background 0.15s;
+}
+.dnd-lvlup__spell-btn:hover { background: color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 22%, transparent); }
+.dnd-lvlup__spell-note { font-size: 0.78rem; color: var(--dnd-text-dim); margin: 0; font-style: italic; }
+
+@media (max-width: 560px) {
+  .dnd-lvlup__badge-num { font-size: 2.6rem; }
+  .dnd-levelup-btn__kicker { display: none; }
+}

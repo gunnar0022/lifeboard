@@ -739,6 +739,55 @@ function SkillChoice({ racialFeature, onUpdate, options }) {
   );
 }
 
+// Render the inline build-choice UI for a feature (ASI/feat, fighting style,
+// expertise, runes, etc.). Module-level so it can be shared by the Features tab
+// and the Level Up reveal. `ctx` carries everything the choice editors need.
+export function renderFeatureChoice(feat, { classFeature, racialFeature, onUpdate, level, abilities }) {
+  if (feat.choice === 'fighting-style') return <FightingStyleChoice classFeature={classFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'runes') return <RuneChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'maneuvers') return <ManeuverChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'arcane-shots') return <ArcaneShotChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+  if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+  if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'giant-cantrip') return <GiantCantripChoice classFeature={classFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'versatility') return <VersatilityChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
+  if (feat.choice === 'spellAbility') return <SpellAbilityChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
+  if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'metamagic') return <MetamagicChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'infusions') return <InfusionChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
+  if (feat.choice === 'option') return <OptionChoice feat={feat} classFeature={classFeature} onUpdate={onUpdate} />;
+  return null;
+}
+
+// Read-only auto feature card (class / subclass / racial progression). Collapsed
+// to a clickable title row by default; unfurls the full description and any build
+// choice / stat block. Self-contained open state so it's reusable anywhere.
+export function AutoFeatureCard({ feat, classFeature, racialFeature, onUpdate, level, abilities }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`dnd-features__card dnd-features__card--auto ${open ? 'dnd-features__card--open' : ''}`}>
+      <button className="dnd-features__header dnd-features__header--toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+        <span className="dnd-features__chev">{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
+        <span className="dnd-features__name">{feat.name}</span>
+        {feat.level && <span className="dnd-features__level">Lvl {feat.level}</span>}
+      </button>
+      {open && (
+        <>
+          <p className="dnd-features__desc">{feat.desc}</p>
+          {feat.choice && renderFeatureChoice(feat, { classFeature, racialFeature, onUpdate, level, abilities })}
+          {feat.statBlock && <StatBlockPreview kind={feat.statBlock} level={level} abilities={abilities} />}
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function FeatureList({ features, editMode, onUpdate, level, className, subclass, classFeature, race, subrace, racialFeature, abilities }) {
   const [expanded, setExpanded] = useState({});
   const toggle = (key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
@@ -755,52 +804,17 @@ export default function FeatureList({ features, editMode, onUpdate, level, class
   const addFeature = () => onUpdate({ features: [...features, { name: '', source: '', desc: '' }] });
   const removeFeature = (index) => onUpdate({ features: features.filter((_, i) => i !== index) });
 
-  const renderChoice = (feat) => {
-    if (feat.choice === 'fighting-style') return <FightingStyleChoice classFeature={classFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'runes') return <RuneChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'maneuvers') return <ManeuverChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'arcane-shots') return <ArcaneShotChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'language') return <LanguageChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'skill') return <SkillChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
-    if (feat.choice === 'dragon') return <DragonChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'tool') return <ToolChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
-    if (feat.choice === 'cantrip') return <CantripChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'giant-cantrip') return <GiantCantripChoice classFeature={classFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'versatility') return <VersatilityChoice racialFeature={racialFeature} onUpdate={onUpdate} options={feat.options} />;
-    if (feat.choice === 'spellAbility') return <SpellAbilityChoice racialFeature={racialFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'asi') return <ASIChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'expertise') return <ExpertiseChoice featId={feat.id} classFeature={classFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'pact-boon') return <PactBoonChoice classFeature={classFeature} onUpdate={onUpdate} />;
-    if (feat.choice === 'invocations') return <InvocationsChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'metamagic') return <MetamagicChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'infusions') return <InfusionChoice classFeature={classFeature} onUpdate={onUpdate} level={level} />;
-    if (feat.choice === 'option') return <OptionChoice feat={feat} classFeature={classFeature} onUpdate={onUpdate} />;
-    return null;
-  };
-
-  // Read-only auto feature card (class / subclass progression).
-  // Collapsed to a clickable title row by default; unfurls the full description
-  // (and any build choice / stat block) when opened, so long feature lists stay
-  // navigable.
-  const renderAutoCard = (feat) => {
-    const open = !!expanded[feat.id];
-    return (
-      <div key={feat.id} className={`dnd-features__card dnd-features__card--auto ${open ? 'dnd-features__card--open' : ''}`}>
-        <button className="dnd-features__header dnd-features__header--toggle" onClick={() => toggle(feat.id)} aria-expanded={open}>
-          <span className="dnd-features__chev">{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
-          <span className="dnd-features__name">{feat.name}</span>
-          {feat.level && <span className="dnd-features__level">Lvl {feat.level}</span>}
-        </button>
-        {open && (
-          <>
-            <p className="dnd-features__desc">{feat.desc}</p>
-            {feat.choice && renderChoice(feat)}
-            {feat.statBlock && <StatBlockPreview kind={feat.statBlock} level={level} abilities={abilities} />}
-          </>
-        )}
-      </div>
-    );
-  };
+  const renderAutoCard = (feat) => (
+    <AutoFeatureCard
+      key={feat.id}
+      feat={feat}
+      classFeature={classFeature}
+      racialFeature={racialFeature}
+      onUpdate={onUpdate}
+      level={level}
+      abilities={abilities}
+    />
+  );
 
   const renderManualCard = (feat, i) => {
     if (!editMode && feat.unlockLevel && level && feat.unlockLevel > level) return null;

@@ -17,6 +17,9 @@ import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
 import HelpButton from './components/Help/HelpButton';
 import TabHeader from './components/Help/TabHeader';
+import LevelUpControls from './components/LevelUp/LevelUpControls';
+import LevelUpModal from './components/LevelUp/LevelUpModal';
+import { levelUpSummary } from './components/LevelUp/levelUpSummary';
 import useAutosave from './components/useAutosave';
 import useItemCache from './components/useItemCache';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
@@ -31,6 +34,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const [campaignName, setCampaignName] = useState('');
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(initialEditMode || false);
+  // Level Up overlay: null | { mode: 'celebrate' | 'recap', level }
+  const [levelUpView, setLevelUpView] = useState(null);
   // Active tab persists per-character so a refresh reopens the same tab.
   const [tab, setTab] = useLocalStorageState(`lifeboard-dnd-tab-${characterId}`, 'combat');
   const prevClassRef = useRef(null);
@@ -753,6 +758,18 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
   const hasCampaign = !!campaignId;
 
+  // ── Level Up ──
+  // Leveling is a normal player action (available any time, like resting). It
+  // bumps meta.level — HP, slots, proficiency, and features all re-derive from
+  // that — and opens the celebratory reveal for the level just reached.
+  const doLevelUp = () => {
+    if (level >= 20) return;
+    const newLevel = level + 1;
+    handleUpdate({ meta: { ...meta, level: newLevel } });
+    setLevelUpView({ mode: 'celebrate', level: newLevel });
+  };
+  const openRecap = () => setLevelUpView({ mode: 'recap', level });
+
   // ── Equipment-derived combat values ──────────────────────────────────────────
   // Resolve every equipped, library-backed item once, then derive AC and the
   // read-only "from equipment" attack cards from it.
@@ -872,6 +889,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
             </div>
           )}
         </div>
+
+        <LevelUpControls level={level} onLevelUp={doLevelUp} onRecap={openRecap} />
 
         <div className="dnd-sheet__header-right">
           {campaignName && (
@@ -1023,6 +1042,16 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         <button className="dnd-sheet__rest-btn" onClick={shortRest}>Short Rest</button>
         <button className="dnd-sheet__rest-btn dnd-sheet__rest-btn--long" onClick={longRest}>Long Rest</button>
       </div>
+
+      {levelUpView && (
+        <LevelUpModal
+          summary={levelUpSummary(character, levelUpView.level)}
+          mode={levelUpView.mode}
+          character={character}
+          onUpdate={handleUpdate}
+          onClose={() => setLevelUpView(null)}
+        />
+      )}
     </div>
   );
 }
