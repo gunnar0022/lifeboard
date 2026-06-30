@@ -42,7 +42,9 @@
 }
 .wiki-home__title { display: inline-flex; align-items: center; gap: 0.4rem; }
 .wiki-home__lede { color: var(--dnd-text-dim); margin: 0 0 1.25rem; max-width: 46rem; }
-.wiki-home__pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.9rem; }
+.wiki-home__pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+@media (max-width: 620px) { .wiki-home__pillars { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .wiki-home__pillars { grid-template-columns: 1fr; } }
 .wiki-pillar {
   position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem;
   padding: 1.1rem; border-radius: 8px; text-align: left; cursor: pointer;
@@ -57,6 +59,12 @@
 .wiki-pillar__label { font-family: 'Uncial Antiqua', serif; font-size: 1.15rem; }
 .wiki-pillar__blurb { font-size: 0.92rem; color: var(--dnd-text-dim); line-height: 1.4; }
 .wiki-pillar--soon { opacity: 0.6; cursor: default; }
+.wiki-pillar--themed { border-left: 3px solid var(--accent, var(--dnd-accent)); padding-right: 2rem; }
+.wiki-pillar--themed:hover:not(:disabled) { border-color: var(--accent, var(--dnd-accent)); }
+.wiki-pillar--themed .wiki-pillar__icon { color: var(--accent, var(--dnd-accent)); }
+.wiki-pillar__chev { position: absolute; right: 0.7rem; bottom: 0.7rem; color: var(--dnd-text-faint); }
+.wiki-feat__benefits { margin: 0.4rem 0 0; padding-left: 1.2rem; line-height: 1.5; color: var(--dnd-text); }
+.wiki-feat__benefits li { margin-bottom: 0.25rem; }
 .wiki-pillar__badge {
   position: absolute; top: 0.6rem; right: 0.6rem; font-size: 0.65rem;
   text-transform: uppercase; letter-spacing: 0.06em; color: var(--dnd-text-muted);

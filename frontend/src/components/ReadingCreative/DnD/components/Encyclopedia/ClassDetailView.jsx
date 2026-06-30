@@ -1,5 +1,6 @@
-import { ChevronRight, Sparkles, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Sparkles, AlertTriangle, Wand2 } from 'lucide-react';
 import { getNodeDetail, getClass } from '../../rules/registry';
+import { CLASS_OPTION_CATEGORY, OPTION_CATEGORIES } from '../OptionPicker/optionLibraries';
 import useEditableProse from './useEditableProse';
 import { LORE_ORDER } from './loreText';
 import { ProseHeader, Overview, DefiningFeature, LoreBlock } from './ProseBlocks';
@@ -24,7 +25,9 @@ function casterText(caster) {
  * Subclasses show a disclaimer when undetailed and can link to the parent
  * class's spell list.
  */
-export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, editMode, override, onSaveOverride }) {
+const OPTION_LABEL = Object.fromEntries(OPTION_CATEGORIES.map(c => [c.key, c.label]));
+
+export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, onOpenOptions, editMode, override, onSaveOverride }) {
   const base = getNodeDetail(nodeId);
   const { detail, ...prose } = useEditableProse(nodeId, base, override, onSaveOverride);
   if (!base) return <div className="wiki-detail">Unknown entry.</div>;
@@ -37,6 +40,8 @@ export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, 
   const spellTag = isSubclass ? parent?.spellList : detail.spellList;
   const spellOwner = isSubclass ? parent?.name : name;
   const undetailed = isSubclass && !detail.implemented;
+  // Contextual link to this class/subclass's option library (Warlock → Invocations, etc.).
+  const optionCat = CLASS_OPTION_CATEGORY[name];
 
   return (
     <div className="wiki-detail" style={{ '--accent': accent }}>
@@ -72,6 +77,18 @@ export default function ClassDetailView({ nodeId, accent, onOpen, onOpenSpells, 
         >
           <Sparkles size={15} />
           <span>Browse the {spellOwner} spell list</span>
+          <ChevronRight size={16} />
+        </button>
+      )}
+
+      {optionCat && onOpenOptions && (
+        <button
+          className="wiki-spell-link"
+          style={{ '--accent': accent }}
+          onClick={() => onOpenOptions(optionCat, OPTION_LABEL[optionCat])}
+        >
+          <Wand2 size={15} />
+          <span>Browse {OPTION_LABEL[optionCat]}</span>
           <ChevronRight size={16} />
         </button>
       )}

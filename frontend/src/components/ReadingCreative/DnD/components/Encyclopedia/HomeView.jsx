@@ -1,4 +1,4 @@
-import { Users, Swords, Sparkles, Shield } from 'lucide-react';
+import { Users, Swords, Sparkles, Shield, Star, Wand2 } from 'lucide-react';
 import HelpButton from '../Help/HelpButton';
 
 /**
@@ -9,6 +9,8 @@ const PILLARS = [
   { id: 'classes', label: 'Classes', Icon: Swords, blurb: 'Callings and the paths within them — what each class plays like and where its subclasses lead.', ready: true },
   { id: 'spells', label: 'Spells', Icon: Sparkles, blurb: 'The full library, filterable by level, class, and casting time.', ready: true },
   { id: 'items', label: 'Items', Icon: Shield, blurb: 'The armory — weapons, armor, ammo, consumables, and magic items. Add, edit, and equip from here.', ready: true },
+  { id: 'feats', label: 'Feats', Icon: Star, blurb: 'Talents beyond your class. Browse the library or forge homebrew feats of your own.', ready: true },
+  { id: 'classFeatures', label: 'Class Features', Icon: Wand2, blurb: 'The choosable option libraries — invocations, maneuvers, metamagic, infusions, and more.', ready: true },
 ];
 
 export default function HomeView({ onOpen }) {

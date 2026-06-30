@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { parseSpellClasses, spellClassLabel } from '../Spellcasting/spellTags';
 import { spellLevelColor, spellLevelOrdinal } from './spellTheme';
 import Mech from './Mech';
+import SpellForm, { spellToDraft, spellDraftToPayload } from './SpellForm';
 
 const META_FIELDS = [
   ['casting_time', 'Casting Time'],
@@ -16,9 +18,12 @@ const META_FIELDS = [
  * row on demand and presents it with the tier color and mechanical
  * highlighting. The end of the line: spells never link back outward.
  */
-export default function SpellDetailView({ spellId, preview }) {
+export default function SpellDetailView({ spellId, preview, editMode, onDeleted }) {
   const [spell, setSpell] = useState(preview || null);
   const [loading, setLoading] = useState(!preview);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -32,6 +37,50 @@ export default function SpellDetailView({ spellId, preview }) {
   }, [spellId]);
 
   if (!spell) return <div className="wiki-detail">{loading ? 'Loading spell…' : 'Spell not found.'}</div>;
+
+  const startEdit = () => { setDraft(spellToDraft(spell)); setEditing(true); };
+
+  const save = async () => {
+    if (!draft.name.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/dnd/spells/${spellId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(spellDraftToPayload(draft)),
+      });
+      setSpell(await res.json());
+      setEditing(false);
+    } catch (e) {
+      console.error('Update spell failed:', e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async () => {
+    if (!window.confirm(`Delete "${spell.name}" from the library?`)) return;
+    try {
+      await fetch(`/api/dnd/spells/${spellId}`, { method: 'DELETE' });
+      onDeleted && onDeleted();
+    } catch (e) {
+      console.error('Delete spell failed:', e);
+    }
+  };
+
+  if (editing && draft) {
+    return (
+      <div className="wiki-detail">
+        <h2 className="wiki-detail__name">Editing {spell.name}</h2>
+        <SpellForm draft={draft} onChange={setDraft} />
+        <div className="spell-modal__form-actions">
+          <button className="dnd-add-btn" onClick={() => setEditing(false)}>Cancel</button>
+          <button className="spell-modal__submit" onClick={save} disabled={saving || !draft.name.trim()}>
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const accent = spellLevelColor(spell.level);
   const tags = parseSpellClasses(spell.classes);
@@ -47,6 +96,12 @@ export default function SpellDetailView({ spellId, preview }) {
           {spell.concentration ? <span className="wiki-flag">Concentration</span> : null}
           {spell.ritual ? <span className="wiki-flag">Ritual</span> : null}
         </div>
+        {editMode && (
+          <div className="wiki-item__actions">
+            <button className="dnd-add-btn" onClick={startEdit}><Pencil size={13} /> Edit</button>
+            <button className="dnd-equipment__remove" onClick={remove}><Trash2 size={14} /></button>
+          </div>
+        )}
       </header>
 
       <div className="wiki-spellmeta">

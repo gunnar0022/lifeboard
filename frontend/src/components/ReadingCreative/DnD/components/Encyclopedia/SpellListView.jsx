@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, ChevronRight, Droplet } from 'lucide-react';
+import { Search, ChevronRight, Droplet, Plus, X } from 'lucide-react';
 import { SPELL_CLASS_TAGS } from '../Spellcasting/spellTags';
 import { spellLevelColor, spellLevelShort, spellLevelOrdinal } from './spellTheme';
+import SpellForm, { blankSpellDraft, spellDraftToPayload } from './SpellForm';
 
 const LEVELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const lvlOption = (l) => (l === 0 ? 'Cantrip' : `Level ${l}`);
@@ -22,6 +23,8 @@ export default function SpellListView({ initialFilter, onOpenSpell }) {
   const [castingTime, setCastingTime] = useState(initialFilter?.castingTime || 'any');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [bump, setBump] = useState(0); // re-fetch trigger after a create
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function SpellListView({ initialFilter, onOpenSpell }) {
         .finally(() => setLoading(false));
     }, 250);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [q, classTag, levelMin, levelMax, castingTime]);
+  }, [q, classTag, levelMin, levelMax, castingTime, bump]);
 
   // Group by level so the tier color ramp organizes the list.
   const groups = useMemo(() => {
@@ -56,7 +59,12 @@ export default function SpellListView({ initialFilter, onOpenSpell }) {
 
   return (
     <div className="wiki-spells">
-      <h2 className="wiki-list__title">Spells</h2>
+      <div className="wiki-items__head">
+        <h2 className="wiki-list__title">Spells</h2>
+        <button className="dnd-add-btn" onClick={() => setCreating(true)}>
+          <Plus size={14} /> New Spell
+        </button>
+      </div>
 
       <div className="wiki-spellfilter">
         <div className="wiki-spellfilter__search">
@@ -102,6 +110,50 @@ export default function SpellListView({ initialFilter, onOpenSpell }) {
           </section>
         ))
       )}
+
+      {creating && (
+        <CreateSpellModal onClose={() => setCreating(false)} onCreated={() => { setCreating(false); setBump(b => b + 1); }} />
+      )}
+    </div>
+  );
+}
+
+function CreateSpellModal({ onClose, onCreated }) {
+  const [draft, setDraft] = useState(blankSpellDraft);
+  const [saving, setSaving] = useState(false);
+  const valid = draft.name.trim() && draft.description.trim() && draft.classes.length > 0;
+
+  const submit = async () => {
+    if (!valid) return;
+    setSaving(true);
+    try {
+      await fetch('/api/dnd/spells', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(spellDraftToPayload(draft)),
+      });
+      onCreated();
+    } catch (e) {
+      console.error('Create spell failed:', e);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="spell-modal__overlay" onClick={onClose}>
+      <div className="spell-modal" onClick={e => e.stopPropagation()}>
+        <div className="spell-modal__header">
+          <h3>New Spell</h3>
+          <button className="spell-modal__close" onClick={onClose}><X size={16} /></button>
+        </div>
+        <SpellForm draft={draft} onChange={setDraft} />
+        <div className="spell-modal__form-actions">
+          <button className="dnd-add-btn" onClick={onClose}>Cancel</button>
+          <button className="spell-modal__submit" onClick={submit} disabled={saving || !valid}>
+            {saving ? 'Creating…' : 'Create Spell'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

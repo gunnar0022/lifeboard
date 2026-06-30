@@ -11,6 +11,10 @@ import SpellListView from './SpellListView';
 import SpellDetailView from './SpellDetailView';
 import ItemsListView from './ItemsListView';
 import ItemDetailView from './ItemDetailView';
+import FeatListView from './FeatListView';
+import FeatDetailView from './FeatDetailView';
+import ClassFeaturesHomeView from './ClassFeaturesHomeView';
+import OptionLibraryView from './OptionLibraryView';
 import { raceAccent, classAccent } from './accents';
 
 // Default page accent for a node when one isn't carried down from a parent.
@@ -41,9 +45,14 @@ export default function EncyclopediaTab({ editMode = false }) {
     else if (id === 'classes') push({ view: 'classList', title: 'Classes' });
     else if (id === 'spells') push({ view: 'spellList', title: 'Spells', filter: {} });
     else if (id === 'items') push({ view: 'itemList', title: 'Items' });
+    else if (id === 'feats') push({ view: 'featList', title: 'Feats' });
+    else if (id === 'classFeatures') push({ view: 'classFeatures', title: 'Class Features' });
   };
 
   const openItem = (item) => push({ view: 'item', title: item.name, itemId: item.id, preview: item });
+  const openFeat = (feat) => push({ view: 'feat', title: feat.name, featId: feat.id, preview: feat });
+  // Open a class-option library (Invocations, Maneuvers, …), themed by its key.
+  const openOptions = (categoryKey, label) => push({ view: 'optionLib', title: label, categoryKey });
 
   // Open a race/subrace/class/subclass node. Children inherit their parent's
   // accent so a lineage / subclass reads as a variation on the same page.
@@ -77,6 +86,7 @@ export default function EncyclopediaTab({ editMode = false }) {
           onSaveOverride={saveOverride}
           onOpen={(child) => openNode(child, current.accent)}
           onOpenSpells={openSpells}
+          onOpenOptions={openOptions}
         />
       );
       break;
@@ -85,7 +95,7 @@ export default function EncyclopediaTab({ editMode = false }) {
       body = <SpellListView key={current.filter?.classTag || 'all'} initialFilter={current.filter} onOpenSpell={openSpell} />;
       break;
     case 'spell':
-      body = <SpellDetailView key={current.spellId} spellId={current.spellId} preview={current.preview} />;
+      body = <SpellDetailView key={current.spellId} spellId={current.spellId} preview={current.preview} editMode={editMode} onDeleted={pop} />;
       break;
     case 'itemList':
       body = <ItemsListView onOpenItem={openItem} />;
@@ -100,6 +110,18 @@ export default function EncyclopediaTab({ editMode = false }) {
           onDeleted={pop}
         />
       );
+      break;
+    case 'featList':
+      body = <FeatListView onOpenFeat={openFeat} />;
+      break;
+    case 'feat':
+      body = <FeatDetailView key={current.featId} featId={current.featId} preview={current.preview} editMode={editMode} onDeleted={pop} />;
+      break;
+    case 'classFeatures':
+      body = <ClassFeaturesHomeView onOpenCategory={openOptions} />;
+      break;
+    case 'optionLib':
+      body = <OptionLibraryView key={current.categoryKey} categoryKey={current.categoryKey} />;
       break;
     case 'home':
     default:

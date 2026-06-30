@@ -600,6 +600,44 @@ async def create_feat(body: dict):
         await db.close()
 
 
+@router.put("/feats/{feat_id}")
+async def update_feat(feat_id: int, body: dict):
+    """Update a feat; only the columns present in the body are changed."""
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for col in _FEAT_COLUMNS:
+            if col in body:
+                sets.append(f"{col} = ?")
+                vals.append(_feat_value(body, col))
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        vals.append(feat_id)
+        cursor = await db.execute(
+            f"UPDATE dnd_feats SET {', '.join(sets)} WHERE id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Feat not found")
+        cursor = await db.execute("SELECT * FROM dnd_feats WHERE id = ?", (feat_id,))
+        return _feat_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/feats/{feat_id}")
+async def delete_feat(feat_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM dnd_feats WHERE id = ?", (feat_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Feat not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
 @router.post("/feats/batch")
 async def batch_feats(body: dict):
     """Resolve multiple feats by ID (for the character feat cache)."""
