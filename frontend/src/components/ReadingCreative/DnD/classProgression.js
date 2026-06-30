@@ -14,7 +14,7 @@ import { SUBCLASS_PROGRESSION } from './rules/subclasses';
 export { CLASS_PROGRESSION, SUBCLASS_PROGRESSION };
 export {
   RACES, RACE_PROGRESSION, SUBRACE_PROGRESSION,
-  getSubraces, getRaceFeatures, getRacialSpells,
+  getSubraces, getRaceFeatures, getRacialSpells, getRacialAttacks,
 } from './rules/races';
 
 // ── Shared option lists + scaling helpers ──

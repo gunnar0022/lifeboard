@@ -8,6 +8,7 @@
 }
 .dnd-attacks__card--edit { position: relative; display: flex; flex-direction: column; gap: 0.4rem; }
 .dnd-attacks__card--derived { border-left: 3px solid var(--dnd-accent); }
+.dnd-attacks__card--racial { border-left: 3px solid #6b7a52; }
 .dnd-attacks__equip-tag {
   font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
   padding: 0.1rem 0.35rem; border-radius: 3px; margin-right: 0.4rem;

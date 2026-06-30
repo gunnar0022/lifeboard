@@ -1,0 +1,173 @@
+/* ============================================
+   HELP — ? buttons, tab titles, beginner help modal
+   ============================================ */
+
+/* The "?" affordance */
+.dnd-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-faint);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+.dnd-help-btn:hover {
+  color: var(--dnd-accent);
+  background: var(--dnd-surface-hover);
+}
+/* Tab title row with help button */
+.dnd-tab-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--dnd-border);
+}
+.dnd-tab-header__title {
+  font-family: 'Uncial Antiqua', serif;
+  color: var(--dnd-accent);
+  font-size: 1.15rem;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+/* Modal */
+.dnd-help__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 1rem;
+  /* Reset inherited typography — the button can live inside nowrap/right-aligned
+     headers, and the modal must not inherit those (caused text to overflow). */
+  white-space: normal;
+  text-align: left;
+}
+.dnd-help {
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Crimson Text', serif;
+  color: var(--dnd-text);
+  box-shadow: var(--dnd-shadow-base);
+}
+.dnd-help__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+}
+.dnd-help__title {
+  margin: 0;
+  font-family: 'Uncial Antiqua', serif;
+  color: var(--dnd-accent);
+  font-size: 1.25rem;
+}
+.dnd-help__close {
+  background: transparent;
+  border: none;
+  color: var(--dnd-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+.dnd-help__close:hover { color: var(--dnd-text); background: var(--dnd-surface-hover); }
+.dnd-help__intro {
+  margin: 0;
+  padding: 0 1.25rem 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--dnd-text-dim);
+}
+
+/* Sub-tabs */
+.dnd-help__subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--dnd-border);
+}
+.dnd-help__subtab {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  color: var(--dnd-text-dim);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dnd-help__subtab:hover { color: var(--dnd-text); border-color: var(--dnd-border-strong); }
+.dnd-help__subtab--active {
+  background: var(--dnd-accent);
+  border-color: var(--dnd-accent);
+  color: var(--dnd-bg);
+}
+
+/* Body */
+.dnd-help__body {
+  padding: 1rem 1.25rem 1.25rem;
+  overflow-y: auto;
+}
+.dnd-help__p {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.dnd-help__p:last-child { margin-bottom: 0; }
+.dnd-help__list {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.dnd-help__list-item {
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+.dnd-help__term {
+  display: inline;
+  font-weight: 700;
+  color: var(--dnd-accent);
+}
+.dnd-help__term::after { content: ' — '; color: var(--dnd-text-muted); font-weight: 400; }
+.dnd-help__def { color: var(--dnd-text); }
+.dnd-help__tip {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: var(--dnd-positive-bg);
+  border: 1px solid var(--dnd-positive-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 0.25rem 0 0.5rem;
+}
+.dnd-help__tip-label {
+  flex: none;
+  font-family: 'Uncial Antiqua', serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dnd-positive);
+  padding-top: 0.1rem;
+}

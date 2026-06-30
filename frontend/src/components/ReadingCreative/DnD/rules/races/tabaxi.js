@@ -13,7 +13,17 @@ export default {
         "id": "tab-claws",
         "name": "Cat's Claws",
         "source": "Tabaxi",
-        "desc": "You can use your claws to make unarmed strikes. On a hit they deal 1d6 + your Strength modifier slashing damage, instead of the normal bludgeoning damage."
+        "desc": "You can use your claws to make unarmed strikes. On a hit they deal 1d6 + your Strength modifier slashing damage, instead of the normal bludgeoning damage.",
+        "attack": {
+          "name": "Cat's Claws",
+          "ability": "STR",
+          "proficient": true,
+          "damage": "1d6",
+          "addAbilityToDamage": true,
+          "damageType": "slashing",
+          "actionType": "action",
+          "note": "Unarmed strike."
+        }
       },
       {
         "id": "tab-talent",

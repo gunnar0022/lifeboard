@@ -775,6 +775,48 @@ async def seed_dnd_items():
         # ── Consumables ──
         {"name": "Potion of Healing", "kind": "consumable", "subtype": "potion", "rarity": "common", "description": "Regain 2d4+2 hit points when you drink this potion.", "data": {"heal": "2d4+2"}, "weight": 0.5, "cost": "50 gp"},
         {"name": "Antitoxin", "kind": "consumable", "subtype": "potion", "description": "Advantage on saving throws against poison for 1 hour. Confers no benefit to undead or constructs.", "cost": "50 gp"},
+        # ── Adventuring gear (the contents of the level-1 equipment packs) ──
+        # Union of items found in the PHB starting packs (Burglar's, Diplomat's,
+        # Dungeoneer's, Entertainer's, Explorer's, Priest's, Scholar's). Buying a
+        # pack is cheaper than the parts, but having each piece in the library lets
+        # players track what's actually inside the pack they picked.
+        {"name": "Backpack", "kind": "gear", "description": "Holds up to 1 cubic foot / 30 pounds of gear. The foundation of every pack.", "weight": 5, "cost": "2 gp"},
+        {"name": "Bedroll", "kind": "gear", "description": "A simple sleeping roll for resting in the wild.", "weight": 7, "cost": "1 gp"},
+        {"name": "Mess Kit", "kind": "gear", "description": "A tin box holding a cup and cutlery; clamps to make a cook pan and plate.", "weight": 1, "cost": "2 sp"},
+        {"name": "Tinderbox", "kind": "gear", "description": "Flint, steel, and tinder used to light fires. Lighting a torch takes an action; anything else takes 1 minute.", "weight": 1, "cost": "5 sp"},
+        {"name": "Torch", "kind": "gear", "description": "Burns for 1 hour, giving bright light in a 20-ft radius and dim light for 20 more. Deals 1 fire damage as an improvised weapon.", "has_toggle": 1, "weight": 1, "cost": "1 cp"},
+        {"name": "Rations (1 day)", "kind": "consumable", "description": "Dry foodstuffs for one day of travel: jerky, dried fruit, hardtack, nuts.", "weight": 2, "cost": "5 sp"},
+        {"name": "Waterskin", "kind": "gear", "description": "Holds 4 pints of liquid. Weighs 5 lb when full.", "weight": 5, "cost": "2 sp"},
+        {"name": "Hempen Rope (50 feet)", "kind": "gear", "description": "Has 2 hit points and can be burst with a DC 17 Strength check.", "weight": 10, "cost": "1 gp"},
+        {"name": "Crowbar", "kind": "gear", "description": "Grants advantage on Strength checks where its leverage applies.", "weight": 5, "cost": "2 gp"},
+        {"name": "Hammer", "kind": "gear", "description": "Drives pitons and does light work. 1 bludgeoning as an improvised weapon.", "weight": 3, "cost": "1 gp"},
+        {"name": "Piton", "kind": "gear", "description": "An iron spike for anchoring rope while climbing.", "weight": 0.25, "cost": "5 cp"},
+        {"name": "Candle", "kind": "gear", "description": "Burns for 1 hour, giving bright light in a 5-ft radius and dim light for 5 more.", "weight": 0, "cost": "1 cp"},
+        {"name": "Oil (flask)", "kind": "consumable", "description": "Fuels a lamp for 6 hours, or can be thrown/poured: thrown flask covers a 5-ft square; ignited oil deals 5 fire damage.", "weight": 1, "cost": "1 sp"},
+        {"name": "Lamp", "kind": "gear", "description": "Casts bright light in a 15-ft radius and dim light for 30 more. Burns 1 flask of oil per 6 hours.", "has_toggle": 1, "weight": 1, "cost": "5 sp"},
+        {"name": "Blanket", "kind": "gear", "description": "A warm woolen blanket for cold nights.", "weight": 3, "cost": "5 sp"},
+        {"name": "Bell", "kind": "gear", "description": "A small brass bell, useful for alarms or signaling.", "weight": 0, "cost": "1 gp"},
+        {"name": "String (10 feet)", "kind": "gear", "description": "A length of light string.", "weight": 0, "cost": "1 cp"},
+        {"name": "Ball Bearings (bag of 1,000)", "kind": "gear", "description": "Spill as an action to cover a 10-ft square; creatures moving through must succeed a DC 10 Dex save or fall prone.", "weight": 2, "cost": "1 gp"},
+        {"name": "Costume", "kind": "gear", "description": "A set of costume clothes for performance or disguise.", "weight": 4, "cost": "5 gp"},
+        {"name": "Disguise Kit", "kind": "gear", "subtype": "tool", "description": "Cosmetics, hair dye, and props for creating disguises. Proficiency adds your bonus to checks made to disguise yourself.", "weight": 3, "cost": "25 gp"},
+        {"name": "Ink (1 oz bottle)", "kind": "gear", "description": "A bottle of black ink for writing.", "weight": 0, "cost": "10 gp"},
+        {"name": "Ink Pen", "kind": "gear", "description": "A simple writing quill or pen.", "weight": 0, "cost": "2 cp"},
+        {"name": "Paper (one sheet)", "kind": "gear", "description": "A single sheet of writing paper.", "weight": 0, "cost": "2 sp"},
+        {"name": "Parchment (one sheet)", "kind": "gear", "description": "A single sheet of writing parchment.", "weight": 0, "cost": "1 sp"},
+        {"name": "Fine Clothes", "kind": "gear", "description": "Well-made clothes suitable for court or high society.", "weight": 6, "cost": "15 gp"},
+        {"name": "Perfume (vial)", "kind": "gear", "description": "A vial of pleasant scent.", "weight": 0, "cost": "5 gp"},
+        {"name": "Sealing Wax", "kind": "gear", "description": "Used with a signet to seal letters and documents.", "weight": 0, "cost": "5 sp"},
+        {"name": "Soap", "kind": "gear", "description": "A bar of soap.", "weight": 0, "cost": "2 cp"},
+        {"name": "Map or Scroll Case", "kind": "gear", "description": "A cylindrical leather case that holds rolled maps or scrolls.", "weight": 1, "cost": "1 gp"},
+        {"name": "Chest", "kind": "gear", "description": "A wooden chest that holds up to 12 cubic feet / 300 pounds of gear.", "weight": 25, "cost": "5 gp"},
+        {"name": "Book", "kind": "gear", "description": "A book of lore, poetry, or records. Reading it may grant advantage on related lore checks.", "weight": 5, "cost": "25 gp"},
+        {"name": "Bag of Sand", "kind": "gear", "description": "A little bag of sand, useful for drying ink or finding invisible creatures.", "weight": 1, "cost": "1 cp"},
+        {"name": "Small Knife", "kind": "gear", "description": "A small utility knife for everyday tasks.", "weight": 0.25, "cost": "1 sp"},
+        {"name": "Alms Box", "kind": "gear", "description": "A small box for collecting and carrying donations.", "weight": 1, "cost": "1 sp"},
+        {"name": "Incense (block)", "kind": "consumable", "description": "A block of incense burned during prayers and rituals.", "weight": 0, "cost": "1 cp"},
+        {"name": "Censer", "kind": "gear", "description": "A vessel for burning incense during religious rites.", "weight": 1, "cost": "5 gp"},
+        {"name": "Vestments", "kind": "gear", "description": "Ceremonial robes worn while performing religious services.", "weight": 4, "cost": "5 sp"},
         # ── Magic items (charges / toggle exemplars) ──
         {"name": "Wand of Magic Missiles", "kind": "magic", "subtype": "wand", "rarity": "uncommon", "description": "Has 7 charges. Expend 1 or more to cast Magic Missile (1 charge = 1st-level, +1 slot level per extra charge). Regains 1d6+1 charges at dawn; if you expend the last charge, roll a d20 — on a 1 it crumbles to ash.", "has_charges": 1, "max_charges": 7, "recharge": {"on": "dawn", "amount": "1d6+1"}, "weight": 1},
         {"name": "Hooded Lantern", "kind": "gear", "description": "Sheds bright light in a 30-foot radius and dim light for an additional 30 feet. Lower the hood to reduce the light to dim in a 5-foot radius. Burns oil.", "has_toggle": 1, "weight": 2, "cost": "5 gp"},
@@ -1109,11 +1151,11 @@ async def main():
     else:
         print("[SKIP] DnD Spells -- data already exists")
 
-    if not await _has_data("dnd_items"):
-        print("\nSeeding DnD Items Library...")
-        await seed_dnd_items()
-    else:
-        print("[SKIP] DnD Items -- data already exists")
+    # Always run: INSERT OR IGNORE only adds items whose name isn't present yet,
+    # so re-running tops up the library (e.g. newly added pack gear) without
+    # disturbing existing rows.
+    print("\nSeeding/topping up DnD Items Library...")
+    await seed_dnd_items()
 
     if not await _has_data("dnd_characters"):
         print("\nSeeding DnD Characters...")

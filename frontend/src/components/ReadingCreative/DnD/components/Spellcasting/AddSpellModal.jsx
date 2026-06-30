@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Search, Plus } from 'lucide-react';
 import { SCALING_KINDS } from '../../spellSlots';
-import { SPELL_CLASS_TAGS } from './spellTags';
+import { SPELL_CLASS_TAGS, spellClassLabel } from './spellTags';
 
 const SPELL_TYPE_OPTIONS = ['damage', 'healing', 'buff', 'debuff', 'utility', 'control'];
 const SAVE_OPTIONS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
@@ -9,6 +9,7 @@ const SAVE_OPTIONS = ['', 'STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
   const [query, setQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState(isCantrip ? 0 : '');
+  const [classFilter, setClassFilter] = useState('');
   const [results, setResults] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -37,7 +38,7 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      if (!query && levelFilter === '') {
+      if (!query && levelFilter === '' && !classFilter) {
         // Show recent spells
         fetch('/api/dnd/spells?limit=10').then(r => r.json()).then(setResults).catch(() => {});
         return;
@@ -45,11 +46,12 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
       const params = new URLSearchParams();
       if (query) params.set('q', query);
       if (levelFilter !== '') params.set('level', levelFilter);
-      params.set('limit', '20');
+      if (classFilter) params.set('cls', classFilter);
+      params.set('limit', '30');
       fetch(`/api/dnd/spells?${params}`).then(r => r.json()).then(setResults).catch(() => {});
     }, 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query, levelFilter]);
+  }, [query, levelFilter, classFilter]);
 
   const handleSelect = (spell) => {
     onAdd(spell.id);
@@ -93,6 +95,11 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
               <Search size={14} />
               <input ref={searchRef} className="dnd-field" value={query} onChange={e => setQuery(e.target.value)}
                 placeholder="Search spell library..." />
+              <select className="dnd-field spell-modal__level-filter" value={classFilter}
+                onChange={e => setClassFilter(e.target.value)} title="Filter by class spell list">
+                <option value="">All classes</option>
+                {SPELL_CLASS_TAGS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </select>
               {!isCantrip && (
                 <select className="dnd-field spell-modal__level-filter" value={levelFilter}
                   onChange={e => setLevelFilter(e.target.value === '' ? '' : parseInt(e.target.value))}>
@@ -101,6 +108,12 @@ export default function AddSpellModal({ isCantrip, onAdd, onClose }) {
                 </select>
               )}
             </div>
+            {classFilter && (
+              <div className="spell-modal__filter-hint">
+                Showing {spellClassLabel(classFilter)} spells
+                <button className="spell-modal__filter-clear" onClick={() => setClassFilter('')}>clear</button>
+              </div>
+            )}
 
             <div className="spell-modal__results">
               {results.map(spell => (

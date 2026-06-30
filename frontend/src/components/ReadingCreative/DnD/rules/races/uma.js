@@ -13,7 +13,18 @@ export default {
         "id": "uma-thundering-rush",
         "name": "Thundering Rush",
         "source": "Uma",
-        "desc": "If you move at least 25 feet straight toward a target, you can make a leaping kick as a bonus action, rolled with expertise. On a hit, deal 1d6 bludgeoning damage; on a miss, you land prone behind the target."
+        "desc": "If you move at least 25 feet straight toward a target, you can make a leaping kick as a bonus action, rolled with expertise. On a hit, deal 1d6 bludgeoning damage; on a miss, you land prone behind the target.",
+        "attack": {
+          "name": "Thundering Rush (Leaping Kick)",
+          "ability": "STR",
+          "proficient": true,
+          "expertise": true,
+          "damage": "1d6",
+          "addAbilityToDamage": false,
+          "damageType": "bludgeoning",
+          "actionType": "bonus",
+          "note": "Move 25+ ft straight toward the target first. Miss: you land prone behind it."
+        }
       },
       {
         "id": "uma-equine-build",

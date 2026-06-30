@@ -521,6 +521,25 @@
   width: 110px;
   flex: none !important;
 }
+.spell-modal__filter-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.25rem;
+  font-size: 0.72rem;
+  color: var(--dnd-text-dim);
+  background: var(--dnd-surface);
+  border-bottom: 1px solid var(--dnd-border);
+}
+.spell-modal__filter-clear {
+  background: none;
+  border: none;
+  color: var(--dnd-accent);
+  cursor: pointer;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  padding: 0;
+}
 .spell-modal__results {
   overflow-y: auto;
   max-height: 300px;

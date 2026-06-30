@@ -46,3 +46,14 @@ export function getRacialSpells(race, subrace, level) {
   }));
   return out;
 }
+
+/**
+ * Natural weapons / racial attacks (Tabaxi claws, Uma thundering rush, etc.).
+ * Returns the raw attack descriptors declared on race traits; the combat tab
+ * computes to-hit/damage numbers from the character's abilities & proficiency.
+ */
+export function getRacialAttacks(race, subrace) {
+  return getRaceFeatures(race, subrace)
+    .filter(t => t.attack)
+    .map(t => ({ traitId: t.id, ...t.attack }));
+}

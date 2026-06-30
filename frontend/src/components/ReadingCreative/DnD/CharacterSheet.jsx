@@ -15,6 +15,8 @@ import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
 import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
 import TabManager from './components/TabManager';
+import HelpButton from './components/Help/HelpButton';
+import TabHeader from './components/Help/TabHeader';
 import useAutosave from './components/useAutosave';
 import useItemCache from './components/useItemCache';
 import useLocalStorageState from '../../../hooks/useLocalStorageState';
@@ -772,6 +774,7 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     .filter(reg => reg && (!reg.requiresCampaign || hasCampaign));
   // Fall back to the first visible tab if the persisted tab is now hidden.
   const activeTab = tabs.some(t => t.id === tab) ? tab : (tabs[0]?.id || 'combat');
+  const activeTabLabel = tabs.find(t => t.id === activeTab)?.label || '';
 
   // Persist tab config changes; enabling Spells seeds spellcasting defaults.
   const handleTabsConfigChange = (newConfig) => {
@@ -798,13 +801,16 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         </button>
 
         <div className="dnd-sheet__header-center">
-          {editMode ? (
-            <input className="dnd-sheet__name-input" value={meta.name || ''}
-              onChange={e => handleUpdate({ meta: { ...meta, name: e.target.value } })}
-              placeholder="Character Name" />
-          ) : (
-            <h1 className="dnd-sheet__name">{meta.name || 'Unnamed'}</h1>
-          )}
+          <div className="dnd-sheet__name-row">
+            {editMode ? (
+              <input className="dnd-sheet__name-input" value={meta.name || ''}
+                onChange={e => handleUpdate({ meta: { ...meta, name: e.target.value } })}
+                placeholder="Character Name" />
+            ) : (
+              <h1 className="dnd-sheet__name">{meta.name || 'Unnamed'}</h1>
+            )}
+            <HelpButton topic="topbar" label="About your vital stats (HP, AC, dice…)" size={18} />
+          </div>
 
           <div className="dnd-sheet__subtitle">
             {editMode ? (
@@ -871,13 +877,16 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           {campaignName && (
             <span className="dnd-sheet__campaign-name">{campaignName}</span>
           )}
-          <button className="dnd-sheet__edit-toggle" onClick={() => {
-            const next = !editMode;
-            setEditMode(next);
-            onEditModeChange?.(next);
-          }}>
-            {editMode ? <><Eye size={14} /> View</> : <><Edit3 size={14} /> Edit</>}
-          </button>
+          <div className="dnd-sheet__edit-row">
+            <HelpButton topic="editmode" label="About Edit mode" size={18} />
+            <button className="dnd-sheet__edit-toggle" onClick={() => {
+              const next = !editMode;
+              setEditMode(next);
+              onEditModeChange?.(next);
+            }}>
+              {editMode ? <><Eye size={14} /> View</> : <><Edit3 size={14} /> Edit</>}
+            </button>
+          </div>
           <span className={`dnd-sheet__save-status dnd-sheet__save-status--${saveStatus}`}>
             {saveStatus === 'saving' && <><Loader size={12} className="dnd-sheet__spinner-sm" /> Saving...</>}
             {saveStatus === 'saved' && <><Check size={12} /> Saved</>}
@@ -924,6 +933,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
 
       {/* Tab content */}
       <div className="dnd-sheet__tab-content">
+        {/* Encyclopedia has its own "Encyclopedia" heading (with the ? inline). */}
+        {activeTab !== 'encyclopedia' && <TabHeader topic={activeTab} title={activeTabLabel} />}
         {activeTab === 'combat' && (
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">

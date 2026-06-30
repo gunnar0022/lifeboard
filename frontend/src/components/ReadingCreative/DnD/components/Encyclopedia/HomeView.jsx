@@ -1,4 +1,5 @@
 import { Users, Swords, Sparkles, Shield } from 'lucide-react';
+import HelpButton from '../Help/HelpButton';
 
 /**
  * Encyclopedia home — the pillars over the rules tree and shared libraries.
@@ -13,7 +14,10 @@ const PILLARS = [
 export default function HomeView({ onOpen }) {
   return (
     <div className="wiki-home">
-      <h2 className="wiki-home__title">Encyclopedia</h2>
+      <h2 className="wiki-home__title">
+        Encyclopedia
+        <HelpButton topic="encyclopedia" label="About the Encyclopedia" size={18} />
+      </h2>
       <p className="wiki-home__lede">Browse the rules like a tree — tunnel into a topic, then step back out one level at a time or jump straight home.</p>
       <div className="wiki-home__pillars">
         {PILLARS.map(({ id, label, Icon, blurb, ready }) => (
