@@ -1140,3 +1140,530 @@
 /* Metamagic header gets the sorcerer accent to match the font. */
 .dnd-sorc .dnd-warmagic__subtitle { color: color-mix(in srgb, var(--sorc) 80%, var(--dnd-text)); }
 .dnd-sorc .dnd-warmagic__subtitle svg { color: var(--sorc); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WIZARD SUBCLASSES — Abjuration, Bladesinging, Chronurgy, Conjuration
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── School of Abjuration — Arcane Ward aegis ─────────────────────────────── */
+.dnd-aegis {
+  border: 1px solid color-mix(in srgb, var(--dnd-class-wizard) 35%, var(--dnd-border));
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  background:
+    radial-gradient(130% 130% at 50% -10%, color-mix(in srgb, var(--dnd-class-wizard) 10%, transparent), transparent 65%),
+    var(--dnd-bg);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-aegis--up {
+  border-color: color-mix(in srgb, var(--dnd-class-wizard) 60%, var(--dnd-border));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-class-wizard) 30%, transparent);
+}
+.dnd-aegis--broken { border-color: color-mix(in srgb, var(--dnd-hp-critical) 50%, var(--dnd-border)); box-shadow: none; }
+.dnd-aegis__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-aegis__title {
+  display: flex; align-items: center; gap: 0.35rem; margin: 0;
+  font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-wizard);
+}
+.dnd-aegis__hp { font-size: 0.82rem; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--dnd-class-wizard); }
+.dnd-aegis__bar {
+  position: relative; height: 20px; margin: 0.5rem 0;
+  border-radius: 999px; overflow: hidden;
+  background: color-mix(in srgb, var(--dnd-class-wizard) 12%, var(--dnd-surface));
+  border: 1px solid color-mix(in srgb, var(--dnd-class-wizard) 30%, var(--dnd-border));
+}
+.dnd-aegis__fill {
+  position: absolute; inset: 0 auto 0 0; height: 100%;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--dnd-class-wizard) 70%, #6aa0e0),
+    color-mix(in srgb, var(--dnd-class-wizard) 95%, #fff));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dnd-class-wizard) 60%, transparent);
+  transition: width 0.3s ease;
+}
+.dnd-aegis--broken .dnd-aegis__fill { background: none; }
+.dnd-aegis__bar-label {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--dnd-text); text-shadow: 0 0 4px var(--dnd-bg);
+}
+.dnd-aegis__row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dnd-aegis__controls { margin-bottom: 0.45rem; }
+.dnd-aegis__absorb { display: flex; align-items: center; gap: 0.3rem; }
+.dnd-aegis__input {
+  width: 54px; font-size: 0.74rem; padding: 0.2rem 0.4rem;
+  border-radius: 5px; border: 1px solid var(--dnd-border);
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-aegis__recharge { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+.dnd-aegis__recharge-label { font-size: 0.68rem; color: var(--dnd-text-dim); margin-right: 0.1rem; }
+.dnd-aegis__chip {
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
+  font-size: 0.68rem; font-weight: 700; padding: 0.22rem 0.4rem;
+  border-radius: 5px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-wizard) 45%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-class-wizard);
+}
+.dnd-aegis__chip small { font-size: 0.56rem; opacity: 0.75; font-weight: 600; }
+.dnd-aegis__chip:hover:not(:disabled) { background: color-mix(in srgb, var(--dnd-class-wizard) 14%, var(--dnd-surface)); }
+.dnd-aegis__chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-aegis__dissolve { margin-left: auto; }
+
+/* ── Bladesinging — the singing blade-stance ──────────────────────────────── */
+.dnd-bladesong {
+  --song: var(--dnd-class-monk);
+  border: 1px solid color-mix(in srgb, var(--song) 35%, var(--dnd-border));
+  border-radius: 10px; padding: 0.6rem 0.7rem; background: var(--dnd-bg);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.dnd-bladesong--singing {
+  border-color: color-mix(in srgb, var(--song) 70%, var(--dnd-border));
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--song) 12%, transparent), transparent 70%),
+    var(--dnd-bg);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--song) 35%, transparent);
+}
+.dnd-bladesong__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-bladesong__title {
+  display: flex; align-items: center; gap: 0.35rem; margin: 0;
+  font-size: 0.85rem; font-weight: 700; color: var(--song);
+}
+.dnd-bladesong__row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.2rem; }
+.dnd-bladesong__state { font-size: 0.74rem; font-weight: 600; color: var(--dnd-text-dim); }
+.dnd-bladesong__state--on { color: var(--song); text-shadow: 0 0 6px color-mix(in srgb, var(--song) 50%, transparent); }
+.dnd-bladesong__buffs {
+  display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.55rem;
+  opacity: 0.45; filter: grayscale(0.5); transition: opacity 0.3s ease, filter 0.3s ease;
+}
+.dnd-bladesong__buffs--on { opacity: 1; filter: none; }
+.dnd-bladesong__buff {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--song) 45%, var(--dnd-border));
+  background: color-mix(in srgb, var(--song) 10%, var(--dnd-surface));
+  color: var(--dnd-text);
+}
+.dnd-bladesong__buff svg { color: var(--song); }
+.dnd-bladesong__buff--dmg {
+  border-color: color-mix(in srgb, var(--dnd-class-barbarian) 55%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-barbarian) 12%, var(--dnd-surface));
+}
+.dnd-bladesong__buff--dmg svg { color: var(--dnd-class-barbarian); }
+
+/* ── Chronurgy — Arcane Abeyance bead + Convergent Future ──────────────────── */
+.dnd-bead {
+  display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-rogue) 35%, var(--dnd-border));
+  background: var(--dnd-bg);
+}
+.dnd-bead__orb {
+  display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 50%; color: #fff;
+  background: radial-gradient(circle at 38% 32%, #c8c8d0, #5a5a68 70%, #38384a);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dnd-class-rogue) 45%, transparent);
+}
+.dnd-bead--spent .dnd-bead__orb { background: var(--dnd-surface); color: var(--dnd-text-dim); box-shadow: none; opacity: 0.6; }
+.dnd-bead__body { flex: 1; min-width: 0; }
+.dnd-bead__title { margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-rogue); }
+.dnd-bead__note { font-size: 0.7rem; color: var(--dnd-text-dim); line-height: 1.35; }
+.dnd-convergent {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-rogue) 45%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--dnd-class-rogue) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-convergent__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+.dnd-convergent__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-rogue); }
+.dnd-convergent__exh {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 999px;
+  border: 1px solid var(--dnd-border); color: var(--dnd-text-dim);
+}
+.dnd-convergent__exh--on { border-color: var(--dnd-hp-wounded); color: var(--dnd-hp-wounded); }
+.dnd-convergent__btn { border-color: var(--dnd-hp-wounded); color: var(--dnd-hp-wounded); font-weight: 600; }
+
+/* ── School of Conjuration — Minor Conjuration + Blink ─────────────────────── */
+.dnd-conjure {
+  display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 35%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-conjure--active {
+  border-color: color-mix(in srgb, var(--dnd-class-druid) 65%, var(--dnd-border));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-class-druid) 30%, transparent);
+}
+.dnd-conjure__icon {
+  display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 9px; color: var(--dnd-class-druid);
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 40%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-druid) 10%, var(--dnd-surface));
+  transition: all 0.25s ease;
+}
+.dnd-conjure--active .dnd-conjure__icon {
+  color: #fff;
+  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--dnd-class-druid) 90%, #fff), var(--dnd-class-druid));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dnd-class-druid) 60%, transparent);
+}
+.dnd-conjure__body { flex: 1; min-width: 0; }
+.dnd-conjure__title { margin: 0 0 0.15rem; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-druid); }
+.dnd-conjure__input {
+  width: 100%; font-size: 0.76rem; padding: 0.22rem 0.4rem;
+  border-radius: 5px; border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-blink--ready { border-color: color-mix(in srgb, var(--dnd-class-druid) 55%, var(--dnd-border)); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WIZARD SUBCLASSES II — Divination, Enchantment, Evocation, Graviturgy
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── School of Divination — Portent foretelling dice + Third Eye ───────────── */
+.dnd-portent {
+  border: 1px solid color-mix(in srgb, var(--dnd-accent) 40%, var(--dnd-border));
+  border-radius: 10px; padding: 0.6rem 0.7rem;
+  background:
+    radial-gradient(130% 120% at 50% -20%, color-mix(in srgb, var(--dnd-accent) 12%, transparent), transparent 65%),
+    var(--dnd-bg);
+}
+.dnd-portent__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-portent__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--dnd-accent); }
+.dnd-portent__dice { display: flex; gap: 0.7rem; margin: 0.6rem 0; flex-wrap: wrap; }
+.dnd-portent__die { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.dnd-portent__input {
+  width: 56px; height: 56px; text-align: center;
+  font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums;
+  color: #fff; -moz-appearance: textfield;
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--dnd-accent) 88%, #fff), var(--dnd-accent-dim));
+  border: none;
+  box-shadow: 0 0 11px color-mix(in srgb, var(--dnd-accent) 50%, transparent);
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+.dnd-portent__input::-webkit-outer-spin-button,
+.dnd-portent__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dnd-portent__input::placeholder { color: rgba(255,255,255,0.6); font-weight: 600; }
+.dnd-portent__input:focus { outline: none; box-shadow: 0 0 16px color-mix(in srgb, var(--dnd-accent) 70%, transparent); }
+.dnd-portent__die--used .dnd-portent__input {
+  filter: grayscale(1); opacity: 0.4; box-shadow: none; background: var(--dnd-text-dim);
+}
+.dnd-portent__ctrls { display: flex; align-items: center; gap: 0.25rem; }
+.dnd-portent__use {
+  font-size: 0.66rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 5px; cursor: pointer;
+  border: 1px solid var(--dnd-accent); background: var(--dnd-surface); color: var(--dnd-accent);
+}
+.dnd-portent__use:disabled { opacity: 0.4; cursor: not-allowed; }
+.dnd-portent__roll {
+  width: 22px; height: 22px; display: grid; place-items: center;
+  border-radius: 5px; cursor: pointer; color: var(--dnd-text-dim);
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface);
+}
+.dnd-portent__roll:hover { color: var(--dnd-accent); border-color: var(--dnd-accent); }
+.dnd-thirdeye__opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-top: 0.5rem; }
+.dnd-thirdeye__opt {
+  display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 600;
+  padding: 0.35rem 0.45rem; border-radius: 6px; cursor: pointer; text-align: left;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-wizard) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-thirdeye__opt svg { color: var(--dnd-class-wizard); flex-shrink: 0; }
+.dnd-thirdeye__opt:hover { background: color-mix(in srgb, var(--dnd-class-wizard) 12%, var(--dnd-surface)); }
+
+/* ── School of Enchantment — Hypnotic Gaze ────────────────────────────────── */
+.dnd-gaze {
+  display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-bard) 35%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-gaze--locked {
+  border-color: color-mix(in srgb, var(--dnd-class-bard) 65%, var(--dnd-border));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--dnd-class-bard) 32%, transparent);
+  animation: dnd-gaze-pulse 2.4s ease-in-out infinite;
+}
+@keyframes dnd-gaze-pulse {
+  0%, 100% { box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-bard) 26%, transparent); }
+  50% { box-shadow: 0 0 20px color-mix(in srgb, var(--dnd-class-bard) 45%, transparent); }
+}
+.dnd-gaze__icon {
+  display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 50%; color: var(--dnd-class-bard);
+  border: 1px solid color-mix(in srgb, var(--dnd-class-bard) 40%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-bard) 10%, var(--dnd-surface));
+  transition: all 0.25s ease;
+}
+.dnd-gaze--locked .dnd-gaze__icon {
+  color: #fff;
+  background: radial-gradient(circle at 45% 38%, color-mix(in srgb, var(--dnd-class-bard) 92%, #fff), var(--dnd-class-bard));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-bard) 60%, transparent);
+}
+.dnd-gaze__body { flex: 1; min-width: 0; }
+.dnd-gaze__title { margin: 0 0 0.15rem; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-bard); }
+.dnd-gaze__input {
+  width: 100%; font-size: 0.76rem; padding: 0.22rem 0.4rem;
+  border-radius: 5px; border: 1px solid color-mix(in srgb, var(--dnd-class-bard) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-gaze__upkeep {
+  display: block; font-size: 0.7rem; color: var(--dnd-class-bard);
+  padding: 0.3rem 0.45rem; border-radius: 6px; line-height: 1.35;
+  background: color-mix(in srgb, var(--dnd-class-bard) 10%, transparent);
+}
+
+/* ── School of Evocation — Sculpt dial + Overchannel meter ─────────────────── */
+.dnd-sculpt { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.dnd-sculpt__label { font-size: 0.7rem; color: var(--dnd-text-dim); }
+.dnd-sculpt__stepper { display: flex; align-items: center; gap: 0.35rem; }
+.dnd-sculpt__lvl {
+  min-width: 1.4rem; text-align: center; font-size: 0.95rem; font-weight: 800;
+  font-variant-numeric: tabular-nums; color: var(--dnd-class-sorcerer);
+}
+.dnd-sculpt__out { font-size: 0.72rem; color: var(--dnd-text); margin-left: auto; }
+.dnd-sculpt__out strong { color: var(--dnd-class-sorcerer); }
+.dnd-overchannel {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-sorcerer) 40%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--dnd-class-sorcerer) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-overchannel--hot {
+  border-color: color-mix(in srgb, var(--dnd-hp-critical) 60%, var(--dnd-border));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--dnd-hp-critical) 28%, transparent);
+}
+.dnd-overchannel__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-overchannel__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-sorcerer); }
+.dnd-overchannel--hot .dnd-overchannel__title { color: var(--dnd-hp-critical); }
+.dnd-overchannel__count { font-size: 0.72rem; color: var(--dnd-text-muted); font-variant-numeric: tabular-nums; }
+.dnd-overchannel__meter { margin: 0.45rem 0; font-size: 0.74rem; line-height: 1.4; }
+.dnd-overchannel__safe { color: var(--dnd-hp-healthy); }
+.dnd-overchannel__cost { color: var(--dnd-hp-critical); }
+.dnd-overchannel__btn { border-color: var(--dnd-class-sorcerer); color: var(--dnd-class-sorcerer); font-weight: 600; }
+.dnd-overchannel--hot .dnd-overchannel__btn { border-color: var(--dnd-hp-critical); color: var(--dnd-hp-critical); }
+
+/* ── Graviturgy — Adjust Density / Event Horizon ──────────────────────────── */
+.dnd-density {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-warlock) 35%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-density--on { border-color: color-mix(in srgb, var(--dnd-class-warlock) 60%, var(--dnd-border)); }
+.dnd-density--light { box-shadow: 0 -6px 16px -6px color-mix(in srgb, var(--dnd-class-warlock) 45%, transparent); }
+.dnd-density--heavy { box-shadow: 0 8px 16px -6px color-mix(in srgb, var(--dnd-class-warlock) 50%, transparent); }
+.dnd-density__head { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap; }
+.dnd-density__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-warlock); }
+.dnd-density__size { font-size: 0.66rem; color: var(--dnd-text-dim); }
+.dnd-density__toggle { display: flex; gap: 0.35rem; margin: 0.5rem 0; }
+.dnd-density__mode {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.4rem; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text-dim);
+}
+.dnd-density__mode--sel {
+  border-color: var(--dnd-class-warlock); color: #fff;
+  background: color-mix(in srgb, var(--dnd-class-warlock) 80%, var(--dnd-surface));
+}
+.dnd-density__input {
+  width: 100%; font-size: 0.76rem; padding: 0.22rem 0.4rem; margin-bottom: 0.4rem;
+  border-radius: 5px; border: 1px solid color-mix(in srgb, var(--dnd-class-warlock) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-density__effect {
+  display: block; font-size: 0.7rem; color: var(--dnd-text); line-height: 1.35;
+  padding: 0.3rem 0.45rem; border-radius: 6px;
+  background: color-mix(in srgb, var(--dnd-class-warlock) 10%, transparent);
+}
+.dnd-density__end { margin-top: 0.45rem; }
+.dnd-horizon {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-warlock) 40%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-horizon--on {
+  border-color: color-mix(in srgb, var(--dnd-class-warlock) 70%, var(--dnd-border));
+  background:
+    radial-gradient(80% 120% at 50% 50%, color-mix(in srgb, var(--dnd-class-warlock) 18%, transparent), transparent 70%),
+    var(--dnd-bg);
+  box-shadow: inset 0 0 22px color-mix(in srgb, var(--dnd-class-warlock) 30%, transparent);
+}
+.dnd-horizon__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+.dnd-horizon__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-warlock); }
+.dnd-horizon__state { font-size: 0.7rem; color: var(--dnd-text-muted); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WIZARD SUBCLASSES III — Illusion, Necromancy, Order of Scribes, Transmutation
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── School of Illusion — Illusory Self decoy + Illusory Reality ───────────── */
+.dnd-mirror {
+  display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-rogue) 40%, var(--dnd-border));
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--dnd-class-rogue) 10%, transparent), transparent 65%),
+    var(--dnd-bg);
+}
+.dnd-mirror--spent { opacity: 0.6; }
+.dnd-mirror__figures { position: relative; width: 42px; flex-shrink: 0; display: grid; place-items: center; color: var(--dnd-class-rogue); }
+.dnd-mirror__ghost { filter: drop-shadow(3px 0 0 color-mix(in srgb, var(--dnd-class-rogue) 40%, transparent)); }
+.dnd-mirror__body { flex: 1; min-width: 0; }
+.dnd-mirror__title { margin: 0 0 0.1rem; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-rogue); }
+.dnd-real--on { border-color: color-mix(in srgb, var(--dnd-class-rogue) 60%, var(--dnd-border)); }
+.dnd-real__input {
+  flex: 1; font-size: 0.76rem; padding: 0.22rem 0.4rem;
+  border-radius: 5px; border: 1px solid color-mix(in srgb, var(--dnd-class-rogue) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+
+/* ── School of Necromancy — Grim Harvest reaper + Undead Thralls ───────────── */
+.dnd-reaper {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 40%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--dnd-class-druid) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-reaper__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-reaper__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-druid); }
+.dnd-reaper__yield {
+  display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.78rem; font-weight: 800;
+  color: var(--dnd-hp-healthy); font-variant-numeric: tabular-nums;
+}
+.dnd-reaper__controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0; }
+.dnd-reaper__lbl { font-size: 0.7rem; color: var(--dnd-text-dim); }
+.dnd-reaper__toggle {
+  font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text-dim);
+}
+.dnd-reaper__toggle--on { border-color: var(--dnd-class-druid); color: var(--dnd-class-druid); background: color-mix(in srgb, var(--dnd-class-druid) 12%, var(--dnd-surface)); }
+.dnd-thralls {
+  border: 1px solid var(--dnd-border); border-radius: 8px; padding: 0.55rem 0.65rem; background: var(--dnd-bg);
+}
+.dnd-thralls__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.dnd-thralls__bonus {
+  font-size: 0.66rem; font-weight: 700; color: var(--dnd-class-druid);
+  padding: 0.12rem 0.4rem; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 45%, var(--dnd-border));
+}
+.dnd-thralls__list { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.45rem; }
+.dnd-thrall {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.25rem 0.35rem; border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-druid) 25%, var(--dnd-border));
+  background: var(--dnd-surface);
+}
+.dnd-thrall--down { opacity: 0.5; }
+.dnd-thrall__name {
+  flex: 1; min-width: 0; font-size: 0.74rem; font-weight: 600;
+  border: none; background: transparent; color: var(--dnd-text);
+}
+.dnd-thrall__name:focus { outline: none; border-bottom: 1px solid var(--dnd-class-druid); }
+.dnd-thrall__hp { display: flex; align-items: center; gap: 0.25rem; }
+.dnd-thrall__hpnum { font-size: 0.74rem; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 2.6rem; text-align: center; }
+.dnd-thrall__hpnum small { color: var(--dnd-text-dim); font-weight: 500; }
+.dnd-thrall__remove {
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text-dim);
+}
+.dnd-thrall__remove:hover { color: var(--dnd-hp-critical); border-color: var(--dnd-hp-critical); }
+.dnd-thralls__add { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+/* ── Order of Scribes — Manifest Mind + One with the Word ──────────────────── */
+.dnd-mind {
+  display: flex; gap: 0.6rem;
+  border-radius: 10px; padding: 0.6rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-artificer) 40%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.dnd-mind--manifest {
+  border-color: color-mix(in srgb, var(--dnd-class-artificer) 70%, var(--dnd-border));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--dnd-class-artificer) 30%, transparent);
+}
+.dnd-mind__orb {
+  display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; align-self: flex-start;
+  border-radius: 50%; color: var(--dnd-class-artificer);
+  border: 1px solid color-mix(in srgb, var(--dnd-class-artificer) 40%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-artificer) 10%, var(--dnd-surface));
+  transition: all 0.3s ease;
+}
+.dnd-mind--manifest .dnd-mind__orb {
+  color: #fff;
+  background: radial-gradient(circle at 42% 35%, color-mix(in srgb, var(--dnd-class-artificer) 90%, #fff), var(--dnd-class-artificer));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--dnd-class-artificer) 60%, transparent);
+  animation: dnd-mind-float 3s ease-in-out infinite;
+}
+@keyframes dnd-mind-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.dnd-mind__body { flex: 1; min-width: 0; }
+.dnd-mind__head { display: flex; align-items: center; justify-content: space-between; }
+.dnd-mind__title { margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--dnd-class-artificer); }
+.dnd-mind__btns { margin-top: 0.45rem; }
+.dnd-scroll--ready { border-color: color-mix(in srgb, var(--dnd-class-artificer) 55%, var(--dnd-border)); }
+.dnd-scroll__input {
+  flex: 1; font-size: 0.74rem; padding: 0.22rem 0.4rem;
+  border-radius: 5px; border: 1px solid color-mix(in srgb, var(--dnd-class-artificer) 40%, var(--dnd-border));
+  background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-wordburn {
+  border-radius: 10px; padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-artificer) 45%, var(--dnd-border));
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--dnd-class-artificer) 12%, transparent), transparent 60%),
+    var(--dnd-bg);
+}
+.dnd-wordburn--spent { opacity: 0.75; }
+.dnd-wordburn__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem; }
+.dnd-wordburn__title { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--dnd-class-artificer); }
+
+/* ── School of Transmutation — Transmuter's Stone ─────────────────────────── */
+.dnd-stone {
+  border-radius: 10px; padding: 0.6rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-cleric) 40%, var(--dnd-border));
+  background: var(--dnd-bg); transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dnd-stone--lit {
+  border-color: color-mix(in srgb, var(--dnd-class-cleric) 65%, var(--dnd-border));
+  box-shadow: 0 0 15px color-mix(in srgb, var(--dnd-class-cleric) 28%, transparent);
+}
+.dnd-stone__head { display: flex; align-items: flex-start; gap: 0.55rem; }
+.dnd-stone__gem {
+  display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 10px; color: var(--dnd-class-cleric);
+  border: 1px solid color-mix(in srgb, var(--dnd-class-cleric) 40%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-cleric) 10%, var(--dnd-surface));
+}
+.dnd-stone--lit .dnd-stone__gem {
+  color: #fff;
+  background: radial-gradient(circle at 40% 32%, color-mix(in srgb, var(--dnd-class-cleric) 92%, #fff), var(--dnd-class-cleric));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-cleric) 55%, transparent);
+}
+.dnd-stone__title { margin: 0 0 0.1rem; font-size: 0.84rem; font-weight: 700; color: var(--dnd-class-cleric); }
+.dnd-stone__forge { margin-left: auto; flex-shrink: 0; }
+.dnd-stone__opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-top: 0.55rem; }
+.dnd-stone__opt {
+  display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 600;
+  padding: 0.32rem 0.45rem; border-radius: 6px; cursor: pointer; text-align: left;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text);
+}
+.dnd-stone__opt svg { color: var(--dnd-class-cleric); flex-shrink: 0; }
+.dnd-stone__opt--sel {
+  border-color: var(--dnd-class-cleric); color: #fff;
+  background: color-mix(in srgb, var(--dnd-class-cleric) 78%, var(--dnd-surface));
+}
+.dnd-stone__opt--sel svg { color: #fff; }
+.dnd-stone__resist { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.dnd-stone__rchip {
+  font-size: 0.66rem; font-weight: 600; text-transform: capitalize;
+  padding: 0.2rem 0.5rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--dnd-border); background: var(--dnd-surface); color: var(--dnd-text-dim);
+}
+.dnd-stone__rchip--sel { border-color: var(--dnd-class-cleric); color: var(--dnd-class-cleric); background: color-mix(in srgb, var(--dnd-class-cleric) 12%, var(--dnd-surface)); }
+.dnd-master__opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-top: 0.45rem; }
+.dnd-master__opt {
+  font-size: 0.7rem; font-weight: 600; padding: 0.35rem 0.45rem; border-radius: 6px; cursor: pointer; text-align: center;
+  border: 1px solid color-mix(in srgb, var(--dnd-class-cleric) 45%, var(--dnd-border));
+  background: color-mix(in srgb, var(--dnd-class-cleric) 8%, var(--dnd-surface)); color: var(--dnd-text);
+}
+.dnd-master__opt:hover { background: color-mix(in srgb, var(--dnd-class-cleric) 18%, var(--dnd-surface)); }

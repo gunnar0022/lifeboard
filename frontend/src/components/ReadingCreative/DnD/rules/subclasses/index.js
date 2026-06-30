@@ -8,6 +8,18 @@ import assassin from './assassin';
 import circleOfStars from './circleOfStars';
 import circleOfSpores from './circleOfSpores';
 import warMagic from './warMagic';
+import schoolOfAbjuration from './schoolOfAbjuration';
+import schoolOfConjuration from './schoolOfConjuration';
+import bladesinging from './bladesinging';
+import chronurgyMagic from './chronurgyMagic';
+import schoolOfDivination from './schoolOfDivination';
+import schoolOfEnchantment from './schoolOfEnchantment';
+import schoolOfEvocation from './schoolOfEvocation';
+import graviturgyMagic from './graviturgyMagic';
+import schoolOfIllusion from './schoolOfIllusion';
+import schoolOfNecromancy from './schoolOfNecromancy';
+import schoolOfTransmutation from './schoolOfTransmutation';
+import orderOfScribes from './orderOfScribes';
 import archfey from './archfey';
 import celestial from './celestial';
 import fathomless from './fathomless';
@@ -102,6 +114,9 @@ import warDomain from './warDomain';
 const ALL = [
   runeKnight, ancestralGuardian, assassin,
   circleOfStars, circleOfSpores, warMagic, archfey,
+  schoolOfAbjuration, schoolOfConjuration, bladesinging, chronurgyMagic,
+  schoolOfDivination, schoolOfEnchantment, schoolOfEvocation, graviturgyMagic,
+  schoolOfIllusion, schoolOfNecromancy, schoolOfTransmutation, orderOfScribes,
   celestial, fathomless, fiend, genie,
   greatOldOne, hexblade, undead, undying,
   shadowMagic, stormSorcery, wildMagicSorcery, lunarSorcery,

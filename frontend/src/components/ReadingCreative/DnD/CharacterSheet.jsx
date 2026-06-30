@@ -292,6 +292,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.powerSurge && (cf.powerSurge.current || 0) <= 0) {
         cf.powerSurge = { ...cf.powerSurge, current: 1 };
       }
+      // Chronurgy: Arcane Abeyance recharges on a short or long rest.
+      if ('abeyanceUsed' in cf) cf.abeyanceUsed = false;
+      // Divination: The Third Eye recharges on a short or long rest.
+      if (cf.thirdEye) cf.thirdEye = { benefit: null, used: false };
+      // Illusion: Illusory Self recharges on a short or long rest.
+      if ('illusorySelf' in cf) cf.illusorySelf = false;
+      // Transmutation: free Polymorph (Shapechanger) recharges on a short or long rest.
+      if ('shapechangerUsed' in cf) cf.shapechangerUsed = false;
       // Archfey: Fey Presence / Misty Escape / Dark Delirium recharge on short rest.
       if ('feyPresenceUsed' in cf) cf.feyPresenceUsed = false;
       if ('mistyEscapeUsed' in cf) cf.mistyEscapeUsed = false;
@@ -420,6 +428,43 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
       if (cf.powerSurge) {
         cf.powerSurge = { ...cf.powerSurge, current: 1 };
       }
+      // Wizard — School of Abjuration: the Arcane Ward fades; you can weave a new one.
+      if (cf.arcaneWard) cf.arcaneWard = { hp: 0, created: false };
+      // Wizard — Bladesinging: Bladesong uses refill; the song falls silent.
+      if (cf.bladesong) cf.bladesong = { ...cf.bladesong, active: false, uses: { ...cf.bladesong.uses, current: cf.bladesong.uses?.max || 0 } };
+      // Wizard — Chronurgy: Chronal Shift + Momentary Stasis refill; the bead recharges.
+      if (cf.chronalShift) cf.chronalShift = { ...cf.chronalShift, current: cf.chronalShift.max || 2 };
+      if (cf.momentaryStasis) cf.momentaryStasis = { ...cf.momentaryStasis, current: cf.momentaryStasis.max || 1 };
+      if ('abeyanceUsed' in cf) cf.abeyanceUsed = false;
+      // Wizard — School of Conjuration: Benign Transportation resets; conjured object fades.
+      if ('benignTransportUsed' in cf) cf.benignTransportUsed = false;
+      if (cf.minorConjuration) cf.minorConjuration = { ...cf.minorConjuration, active: false };
+      // Wizard — School of Divination: Portent clears (re-enter your dawn d20s); The Third Eye resets.
+      if (cf.portent) {
+        const portentCount = (character.meta?.level || 1) >= 14 ? 3 : 2;
+        cf.portent = { rolls: Array.from({ length: portentCount }, () => ({ v: null, used: false })) };
+      }
+      if (cf.thirdEye) cf.thirdEye = { benefit: null, used: false };
+      // Wizard — School of Enchantment: Hypnotic Gaze releases.
+      if (cf.hypnoticGaze) cf.hypnoticGaze = { ...cf.hypnoticGaze, active: false };
+      // Wizard — School of Evocation: Overchannel backlash resets.
+      if (cf.overchannel) cf.overchannel = { uses: 0 };
+      // Wizard — Graviturgy: Adjust Density / Event Horizon end; Violent Attraction refills.
+      if (cf.adjustDensity) cf.adjustDensity = { ...cf.adjustDensity, active: false };
+      if (cf.violentAttraction) cf.violentAttraction = { ...cf.violentAttraction, current: cf.violentAttraction.max || 1 };
+      if ('eventHorizonActive' in cf) cf.eventHorizonActive = false;
+      if ('eventHorizonUsed' in cf) cf.eventHorizonUsed = false;
+      // Wizard — School of Illusion: Illusory Self returns; made-real object fades.
+      if ('illusorySelf' in cf) cf.illusorySelf = false;
+      if (cf.illusoryReality) cf.illusoryReality = { ...cf.illusoryReality, active: false };
+      // Wizard — Order of Scribes: Manifest Mind refills & dismisses; ritual, scroll & gambit reset.
+      if (cf.manifestMind) cf.manifestMind = { ...cf.manifestMind, active: false, uses: { ...cf.manifestMind.uses, current: cf.manifestMind.uses?.max || 0 } };
+      if ('awakenedRitualUsed' in cf) cf.awakenedRitualUsed = false;
+      if (cf.masterScroll) cf.masterScroll = { ...cf.masterScroll, used: false };
+      if (cf.oneWithWord) cf.oneWithWord = { used: false, lastRoll: null };
+      // Wizard — School of Transmutation: free Polymorph returns; a shattered stone can be reforged.
+      if ('shapechangerUsed' in cf) cf.shapechangerUsed = false;
+      if (cf.transmutersStone?.consumed) cf.transmutersStone = { ...cf.transmutersStone, consumed: false };
       // Warlock Pact of the Talisman recharges on long rest
       if (cf.talisman) {
         cf.talisman = { ...cf.talisman, current: cf.talisman.max || 0 };
