@@ -144,6 +144,16 @@
   font-size: 0.8rem; font-style: italic; color: var(--dnd-text-faint); margin: 0;
 }
 
+/* Scaling-choice "bump": a previously-unlocked picker that grants one more pick
+   at this level (e.g. Metamagic at 10). Highlighted so it isn't mistaken for a
+   duplicate of the original feature. */
+.dnd-features__card--bump { border-left-color: var(--dnd-positive, #5a9e5a); }
+.dnd-features__bump-tag {
+  font-size: 0.6rem; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+  background: var(--dnd-positive, #5a9e5a); color: var(--dnd-bg);
+  text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
+}
+
 /* Inline build-choice controls (Fighting Style, Rune Carver) */
 .dnd-feature-choice {
   margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px dashed var(--dnd-border);

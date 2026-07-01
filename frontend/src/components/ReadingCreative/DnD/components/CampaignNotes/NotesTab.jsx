@@ -31,8 +31,10 @@ export default function NotesTab({ campaignId }) {
         if (ta && !tb) return -1;
         return ta.localeCompare(tb);
       }
-      // 'created' — DB insertion order via autoincrement id (oldest first)
-      return (a.id || 0) - (b.id || 0);
+      // 'created' — DB insertion order via autoincrement id. The journal reads as
+      // a session log, so its newest memo sits on top; other types stay oldest-first.
+      const byId = (a.id || 0) - (b.id || 0);
+      return activeType === 'journal' ? -byId : byId;
     });
 
   const handleAddNote = useCallback(async () => {

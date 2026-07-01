@@ -191,6 +191,50 @@
 .dnd-note-card__body-input:focus { border-color: var(--dnd-accent-dim); }
 .dnd-note-card__body-input::placeholder { color: var(--dnd-text-faint); }
 
+/* Journal: session tag + in-world date */
+.dnd-note-card__journal-meta {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+.dnd-note-card__journal-field {
+  flex: 1 1 8rem;
+  min-width: 0;
+  background: transparent;
+  border: 1px dashed var(--dnd-border);
+  color: var(--dnd-text-dim);
+  font-size: 0.72rem;
+  font-family: inherit;
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+  outline: none;
+}
+.dnd-note-card__journal-field:focus { border-color: var(--dnd-accent-dim); }
+.dnd-note-card__journal-field::placeholder { color: var(--dnd-text-faint); }
+
+.dnd-note-card__journal-tags {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin: 0.1rem 0 0.3rem;
+}
+.dnd-note-card__journal-chip {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--dnd-accent);
+  background: var(--dnd-accent-faint, rgba(255,255,255,0.04));
+  border: 1px solid var(--dnd-accent-dim);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+}
+.dnd-note-card__journal-chip--date {
+  color: var(--dnd-text-dim);
+  border-color: var(--dnd-border);
+  font-style: italic;
+}
+
 /* Note card confirm delete */
 .dnd-note-card--confirm {
   cursor: default;

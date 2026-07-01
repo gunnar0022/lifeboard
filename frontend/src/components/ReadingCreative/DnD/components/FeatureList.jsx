@@ -441,13 +441,14 @@ export function renderFeatureChoice(feat, { classFeature, racialFeature, onUpdat
 // Read-only auto feature card (class / subclass / racial progression). Collapsed
 // to a clickable title row by default; unfurls the full description and any build
 // choice / stat block. Self-contained open state so it's reusable anywhere.
-export function AutoFeatureCard({ feat, classFeature, racialFeature, onUpdate, level, abilities }) {
-  const [open, setOpen] = useState(false);
+export function AutoFeatureCard({ feat, classFeature, racialFeature, onUpdate, level, abilities, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`dnd-features__card dnd-features__card--auto ${open ? 'dnd-features__card--open' : ''}`}>
+    <div className={`dnd-features__card dnd-features__card--auto ${open ? 'dnd-features__card--open' : ''} ${feat.scalingBump ? 'dnd-features__card--bump' : ''}`}>
       <button className="dnd-features__header dnd-features__header--toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <span className="dnd-features__chev">{open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
         <span className="dnd-features__name">{feat.name}</span>
+        {feat.scalingBump && <span className="dnd-features__bump-tag">+1 to learn</span>}
         {feat.level && <span className="dnd-features__level">Lvl {feat.level}</span>}
       </button>
       {open && (

@@ -8,6 +8,7 @@ const PLACEHOLDERS = {
   quest: 'Objective? Who gave it? Status?',
   item: 'What does it do? Who has it?',
   note: 'Session notes, observations, anything...',
+  journal: 'What happened this session? Key events, decisions, loot, cliffhangers...',
 };
 
 export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
@@ -15,6 +16,8 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
   const [title, setTitle] = useState(note.title);
   const [body, setBody] = useState(note.body);
   const [type, setType] = useState(note.type);
+  const [sessionTag, setSessionTag] = useState(note.session_tag || '');
+  const [inWorldDate, setInWorldDate] = useState(note.in_world_date || '');
   const [confirming, setConfirming] = useState(false);
   const titleRef = useRef(null);
   const saveTimer = useRef(null);
@@ -32,11 +35,20 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
       setTitle(note.title);
       setBody(note.body);
       setType(note.type);
+      setSessionTag(note.session_tag || '');
+      setInWorldDate(note.in_world_date || '');
     }
-  }, [note.id, note.title, note.body, note.type]);
+  }, [note.id, note.title, note.body, note.type, note.session_tag, note.in_world_date]);
 
-  const scheduleAutosave = (updates) => {
+  // Build the full save payload. Journal fields always ride along (harmless empty
+  // strings for other types) so switching a note to/from journal never loses them.
+  const payload = (over = {}) => ({
+    title, body, type, session_tag: sessionTag, in_world_date: inWorldDate, ...over,
+  });
+
+  const scheduleAutosave = (over) => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
+    const updates = payload(over);
     saveTimer.current = setTimeout(() => {
       onUpdate(note.id, updates);
     }, 1000);
@@ -44,24 +56,35 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
 
   const handleTitleChange = (val) => {
     setTitle(val);
-    scheduleAutosave({ title: val, body, type });
+    scheduleAutosave({ title: val });
   };
 
   const handleBodyChange = (val) => {
     setBody(val);
-    scheduleAutosave({ title, body: val, type });
+    scheduleAutosave({ body: val });
+  };
+
+  const handleSessionTagChange = (val) => {
+    setSessionTag(val);
+    scheduleAutosave({ session_tag: val });
+  };
+
+  const handleInWorldDateChange = (val) => {
+    setInWorldDate(val);
+    scheduleAutosave({ in_world_date: val });
   };
 
   const handleTypeChange = (val) => {
     setType(val);
-    onUpdate(note.id, { title, body, type: val });
+    onUpdate(note.id, payload({ type: val }));
   };
 
   const handleDone = () => {
     // Flush any pending save
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    if (title !== note.title || body !== note.body || type !== note.type) {
-      onUpdate(note.id, { title, body, type });
+    if (title !== note.title || body !== note.body || type !== note.type
+      || sessionTag !== (note.session_tag || '') || inWorldDate !== (note.in_world_date || '')) {
+      onUpdate(note.id, payload());
     }
     setEditing(false);
   };
@@ -109,6 +132,22 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
             <X size={14} />
           </button>
         </div>
+        {type === 'journal' && (
+          <div className="dnd-note-card__journal-meta">
+            <input
+              className="dnd-note-card__journal-field"
+              value={sessionTag}
+              onChange={e => handleSessionTagChange(e.target.value)}
+              placeholder="Session # / title (e.g. Session 12)"
+            />
+            <input
+              className="dnd-note-card__journal-field"
+              value={inWorldDate}
+              onChange={e => handleInWorldDateChange(e.target.value)}
+              placeholder="In-world date (e.g. 14th of Mirtul)"
+            />
+          </div>
+        )}
         <textarea
           className="dnd-note-card__body-input"
           value={body}
@@ -128,6 +167,12 @@ export default function NoteCard({ note, onUpdate, onDelete, autoFocus }) {
           <X size={14} />
         </button>
       </div>
+      {type === 'journal' && (sessionTag || inWorldDate) && (
+        <div className="dnd-note-card__journal-tags">
+          {sessionTag && <span className="dnd-note-card__journal-chip">{sessionTag}</span>}
+          {inWorldDate && <span className="dnd-note-card__journal-chip dnd-note-card__journal-chip--date">{inWorldDate}</span>}
+        </div>
+      )}
       {body && <p className="dnd-note-card__body">{body}</p>}
     </div>
   );

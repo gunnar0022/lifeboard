@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { abilityMod, casterProfileFor, normalizeSpellcasting, buildEmptySpellcasting } from '../../dndUtils';
-import { slotOrd } from './levelUpSummary';
+import { slotOrd, prepCap } from './levelUpSummary';
 import SpellZone from '../Spellcasting/SpellZone';
 import AddSpellModal from '../Spellcasting/AddSpellModal';
 
@@ -12,14 +12,6 @@ function classTagFor(className, subclass) {
   if (CLASS_TAG[className]) return CLASS_TAG[className];
   if (subclass === 'Eldritch Knight' || subclass === 'Arcane Trickster') return 'wizard';
   return '';
-}
-
-// Prepared-spell cap = spellcasting ability mod + caster-scaled class level.
-function prepCap(casterType, classLevel, abilMod) {
-  const prepLevel = casterType === 'full' ? classLevel
-    : (casterType === 'half' || casterType === 'artificer') ? Math.floor(classLevel / 2)
-    : classLevel;
-  return Math.max(1, abilMod + prepLevel);
 }
 
 /**

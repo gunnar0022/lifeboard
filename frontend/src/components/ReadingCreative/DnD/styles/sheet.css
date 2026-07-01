@@ -64,6 +64,22 @@
   content: '\00b7';
   margin-left: 0.5rem;
 }
+/* "Choose your subclass" nudge — shown until a subclass is locked in */
+.dnd-sheet__subclass-flag {
+  border: 1px solid var(--dnd-accent);
+  background: color-mix(in srgb, var(--dnd-accent) 14%, transparent);
+  color: var(--dnd-accent);
+  font-family: inherit; font-size: 0.78rem; font-weight: 700;
+  padding: 0.1rem 0.5rem; border-radius: 999px; cursor: pointer;
+  animation: dnd-subclass-flag-pulse 2s ease-in-out infinite;
+}
+.dnd-sheet__subclass-flag:hover { background: color-mix(in srgb, var(--dnd-accent) 24%, transparent); }
+.dnd-sheet__subtitle span:not(:last-child).dnd-sheet__subclass-flag::after { content: none; }
+@keyframes dnd-subclass-flag-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--dnd-accent) 40%, transparent); }
+  50% { box-shadow: 0 0 0 4px transparent; }
+}
+
 .dnd-sheet__subtitle-edit {
   display: flex; gap: 0.5rem; flex-wrap: wrap;
 }

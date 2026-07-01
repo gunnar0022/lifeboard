@@ -11,6 +11,7 @@ import EquipmentTab from './components/EquipmentTab';
 import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
 import RacialBlock from './components/ClassFeatures/RacialBlock';
 import SubclassBlock from './components/SubclassBlock';
+import SubclassPicker from './components/SubclassPicker';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
 import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
@@ -36,6 +37,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const [editMode, setEditMode] = useState(initialEditMode || false);
   // Level Up overlay: null | { mode: 'celebrate' | 'recap', level }
   const [levelUpView, setLevelUpView] = useState(null);
+  // Subclass chooser overlay (opened from the level-up reveal or the sheet flag).
+  const [subclassPickerOpen, setSubclassPickerOpen] = useState(false);
   // Active tab persists per-character so a refresh reopens the same tab.
   const [tab, setTab] = useLocalStorageState(`lifeboard-dnd-tab-${characterId}`, 'combat');
   const prevClassRef = useRef(null);
@@ -753,6 +756,11 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const abilities = character.abilities || {};
   const classColor = CLASS_COLORS[meta.className] || 'var(--dnd-border)';
   const level = meta.level || 1;
+  // Subclass-choice flag: at/past the class's subclass level with none chosen.
+  const classNode = getClass(meta.className);
+  const subclassLevel = classNode?.subclassLevel || null;
+  const subclassLabel = classNode?.subclassLabel || 'Subclass';
+  const subclassDue = !!meta.className && !meta.subclass && !!subclassLevel && level >= subclassLevel;
   const profBonus = proficiencyBonus(level);
   const hasSpellcasting = !!character.spellcasting;
 
@@ -869,6 +877,15 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
                   <span style={{ color: classColor }}>{meta.className} {level}</span>
                 )}
                 {meta.subclass && <span>{meta.subclass}</span>}
+                {subclassDue && (
+                  <button
+                    className="dnd-sheet__subclass-flag"
+                    onClick={() => setSubclassPickerOpen(true)}
+                    title={`Choose your ${subclassLabel}`}
+                  >
+                    Choose {subclassLabel}
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -1049,7 +1066,18 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
           mode={levelUpView.mode}
           character={character}
           onUpdate={handleUpdate}
+          onChooseSubclass={() => setSubclassPickerOpen(true)}
           onClose={() => setLevelUpView(null)}
+        />
+      )}
+
+      {subclassPickerOpen && meta.className && (
+        <SubclassPicker
+          className={meta.className}
+          subclassLabel={subclassLabel}
+          currentSubclass={meta.subclass}
+          onConfirm={(name) => { handleUpdate({ meta: { subclass: name } }); setSubclassPickerOpen(false); }}
+          onClose={() => setSubclassPickerOpen(false)}
         />
       )}
     </div>

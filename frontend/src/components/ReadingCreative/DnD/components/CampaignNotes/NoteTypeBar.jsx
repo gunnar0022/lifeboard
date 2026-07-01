@@ -4,6 +4,7 @@ const NOTE_TYPES = [
   { id: 'quest', icon: '\uD83D\uDCDC', label: 'Quests' },
   { id: 'item', icon: '\u2694', label: 'Items' },
   { id: 'note', icon: '\uD83D\uDCDD', label: 'Notes' },
+  { id: 'journal', icon: '\uD83D\uDCD6', label: 'Journal' },
 ];
 
 export default function NoteTypeBar({ activeType, counts, onSelect }) {

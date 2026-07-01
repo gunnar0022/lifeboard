@@ -1,7 +1,9 @@
 const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
 export function blankFeatDraft() {
-  return { name: '', prerequisite: '', description: '', benefits: '', asiAbility: '', source: 'Homebrew', is_custom: true };
+  // Default to a standard (official) entry — most hand-added feats are real feats,
+  // not homebrew. Flip the Type toggle to homebrew when authoring something custom.
+  return { name: '', prerequisite: '', description: '', benefits: '', asiAbility: '', source: 'PHB', is_custom: false };
 }
 
 export function featToDraft(feat) {
@@ -60,6 +62,48 @@ export default function FeatForm({ draft, onChange }) {
           {ABILITIES.map(a => <option key={a} value={a}>+1 {a}</option>)}
         </select>
       </div>
+      <SourceTypeField draft={draft} set={set} />
     </div>
+  );
+}
+
+/**
+ * Homebrew vs. standard (official) toggle, shared by the Feat and Background
+ * editors. Standard entries carry a source book so a hand-typed PHB feat isn't
+ * mislabeled as homebrew.
+ */
+export function SourceTypeField({ draft, set }) {
+  const homebrew = !!draft.is_custom;
+  return (
+    <>
+      <div className="spell-modal__form-field">
+        <label>Type</label>
+        <select
+          className="dnd-field"
+          value={homebrew ? 'homebrew' : 'standard'}
+          onChange={e => {
+            const hb = e.target.value === 'homebrew';
+            set({
+              is_custom: hb,
+              source: hb ? 'Homebrew' : (draft.source && draft.source !== 'Homebrew' ? draft.source : 'PHB'),
+            });
+          }}
+        >
+          <option value="standard">Standard (official)</option>
+          <option value="homebrew">Homebrew</option>
+        </select>
+      </div>
+      {!homebrew && (
+        <div className="spell-modal__form-field">
+          <label>Source book</label>
+          <input
+            className="dnd-field"
+            value={draft.source === 'Homebrew' ? '' : (draft.source || '')}
+            onChange={e => set({ source: e.target.value })}
+            placeholder="PHB, XGE, TCE, SCAG…"
+          />
+        </div>
+      )}
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Heart, Shield, Sparkles, ScrollText, Wand2 } from 'lucide-react';
+import { X, Heart, Shield, Sparkles, ScrollText, Wand2, BookMarked, Compass } from 'lucide-react';
 import { CLASS_COLORS } from '../../dndUtils';
 import { AutoFeatureCard } from '../FeatureList';
 import LevelUpSpells from './LevelUpSpells';
@@ -11,7 +11,7 @@ function FeatureZone({ title, features, accent, ctx }) {
     <section className="dnd-lvlup__zone">
       <h4 className="dnd-lvlup__zone-title" style={{ color: accent }}>{title}</h4>
       <div className="dnd-features__grid">
-        {features.map(f => <AutoFeatureCard key={f.id || f.name} feat={f} {...ctx} />)}
+        {features.map(f => <AutoFeatureCard key={f.id || f.name} feat={f} defaultOpen={f.scalingBump} {...ctx} />)}
       </div>
     </section>
   );
@@ -24,7 +24,7 @@ function FeatureZone({ title, features, accent, ctx }) {
  * Features render exactly like the Features tab (AutoFeatureCard) so choices like
  * ASI / feat are editable right here.
  */
-export default function LevelUpModal({ summary, mode = 'celebrate', character, onUpdate, onClose }) {
+export default function LevelUpModal({ summary, mode = 'celebrate', character, onUpdate, onChooseSubclass, onClose }) {
   const celebrate = mode === 'celebrate';
   const accent = CLASS_COLORS?.[summary.className] || 'var(--dnd-accent)';
   const [tab, setTab] = useState('features');
@@ -100,8 +100,36 @@ export default function LevelUpModal({ summary, mode = 'celebrate', character, o
                 <span className="dnd-lvlup__chip-label">Spell Slots</span>
               </div>
             )}
+            {summary.preparation === 'prepared' && summary.preparedCap != null && (
+              <div className="dnd-lvlup__chip dnd-lvlup__chip--prep">
+                <BookMarked size={16} />
+                <span className="dnd-lvlup__chip-val">{summary.preparedCap}</span>
+                <span className="dnd-lvlup__chip-label">
+                  Can Prepare{summary.preparedCapIncreased ? ` (↑ from ${summary.preparedCapBefore})` : ''}
+                </span>
+              </div>
+            )}
           </motion.div>
         </motion.div>
+
+        {/* Subclass-choice prompt — shown when at/past the subclass level with none set */}
+        {summary.subclassDue && onChooseSubclass && (
+          <motion.div
+            className="dnd-lvlup__subclass-cta"
+            initial={celebrate ? { opacity: 0, y: 8 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={celebrate ? { delay: 0.6, duration: 0.35 } : { duration: 0 }}
+          >
+            <Compass size={18} />
+            <div className="dnd-lvlup__subclass-cta-text">
+              <strong>Choose your {summary.subclassLabel}</strong>
+              <span>Your {summary.className} picks a path at level {summary.subclassLevel}. Browse them and lock one in.</span>
+            </div>
+            <button className="dnd-lvlup__subclass-cta-btn" onClick={onChooseSubclass}>
+              Choose {summary.subclassLabel}
+            </button>
+          </motion.div>
+        )}
 
         {/* Persistent panel: tabs */}
         <motion.div

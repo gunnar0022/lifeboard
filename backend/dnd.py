@@ -655,6 +655,141 @@ async def batch_feats(body: dict):
         await db.close()
 
 
+# ── Backgrounds ──────────────────────────────────────────
+# Bespoke library table (own model per the D&D conventions). Mirrors the feats
+# CRUD shape. Backgrounds lean heavily on text — proficiencies, languages,
+# equipment, and a roleplay feature — so most fields are free lists / prose.
+_BG_COLUMNS = (
+    "name", "description", "skill_proficiencies", "tool_proficiencies",
+    "languages", "equipment", "feature_name", "feature_desc", "source", "is_custom",
+)
+_BG_JSON_FIELDS = ("skill_proficiencies", "tool_proficiencies", "languages", "equipment")
+_BG_BOOL_FIELDS = ("is_custom",)
+_BG_DEFAULTS = {
+    "description": "", "skill_proficiencies": [], "tool_proficiencies": [],
+    "languages": [], "equipment": [], "feature_name": "", "feature_desc": "",
+    "source": "PHB", "is_custom": 0,
+}
+
+
+def _bg_row(row):
+    d = dict(row)
+    for k in _BG_JSON_FIELDS:
+        if isinstance(d.get(k), str):
+            try:
+                d[k] = json.loads(d[k])
+            except (ValueError, TypeError):
+                d[k] = []
+    for k in _BG_BOOL_FIELDS:
+        d[k] = bool(d.get(k))
+    return d
+
+
+def _bg_value(body, col):
+    val = body.get(col, _BG_DEFAULTS.get(col))
+    if col in _BG_JSON_FIELDS:
+        return json.dumps(val if val is not None else [])
+    if col in _BG_BOOL_FIELDS:
+        return 1 if val else 0
+    return val
+
+
+@router.get("/backgrounds")
+async def list_backgrounds(q: str = "", limit: int = 200):
+    """Search/list backgrounds (optional name/description filter)."""
+    db = await get_db()
+    try:
+        conditions, params = [], []
+        if q:
+            conditions.append("(name LIKE ? OR description LIKE ?)")
+            params.extend([f"%{q}%", f"%{q}%"])
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        params.append(limit)
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_backgrounds {where} ORDER BY name LIMIT ?", params
+        )
+        return [_bg_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.get("/backgrounds/{bg_id}")
+async def get_background(bg_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_backgrounds WHERE id = ?", (bg_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Background not found")
+        return _bg_row(row)
+    finally:
+        await db.close()
+
+
+@router.post("/backgrounds")
+async def create_background(body: dict):
+    """Create a background (upsert by name — returns existing if the name matches)."""
+    name = (body.get("name") or "").strip()
+    if not name:
+        raise HTTPException(400, "Background name is required")
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_backgrounds WHERE name = ?", (name,))
+        existing = await cursor.fetchone()
+        if existing:
+            return _bg_row(existing)
+        body = {**body, "name": name}
+        placeholders = ", ".join("?" * len(_BG_COLUMNS))
+        values = [_bg_value(body, col) for col in _BG_COLUMNS]
+        cursor = await db.execute(
+            f"INSERT INTO dnd_backgrounds ({', '.join(_BG_COLUMNS)}) VALUES ({placeholders})",
+            values,
+        )
+        await db.commit()
+        cursor = await db.execute("SELECT * FROM dnd_backgrounds WHERE id = ?", (cursor.lastrowid,))
+        return _bg_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.put("/backgrounds/{bg_id}")
+async def update_background(bg_id: int, body: dict):
+    """Update a background; only the columns present in the body are changed."""
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for col in _BG_COLUMNS:
+            if col in body:
+                sets.append(f"{col} = ?")
+                vals.append(_bg_value(body, col))
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        vals.append(bg_id)
+        cursor = await db.execute(
+            f"UPDATE dnd_backgrounds SET {', '.join(sets)} WHERE id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Background not found")
+        cursor = await db.execute("SELECT * FROM dnd_backgrounds WHERE id = ?", (bg_id,))
+        return _bg_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/backgrounds/{bg_id}")
+async def delete_background(bg_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM dnd_backgrounds WHERE id = ?", (bg_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Background not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
 # ── Beast Forms ──────────────────────────────────────────
 
 @router.get("/beast-forms")
@@ -858,8 +993,16 @@ async def create_campaign_note(campaign_id: int, body: dict):
     db = await get_db()
     try:
         cursor = await db.execute(
-            "INSERT INTO dnd_campaign_notes (campaign_id, type, title, body) VALUES (?, ?, ?, ?)",
-            (campaign_id, body.get("type", "note"), body.get("title", ""), body.get("body", "")),
+            "INSERT INTO dnd_campaign_notes (campaign_id, type, title, body, session_tag, in_world_date) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                campaign_id,
+                body.get("type", "note"),
+                body.get("title", ""),
+                body.get("body", ""),
+                body.get("session_tag", ""),
+                body.get("in_world_date", ""),
+            ),
         )
         await db.commit()
         new_id = cursor.lastrowid
@@ -874,7 +1017,7 @@ async def update_campaign_note(campaign_id: int, note_id: int, body: dict):
     db = await get_db()
     try:
         sets, vals = [], []
-        for k in ("type", "title", "body"):
+        for k in ("type", "title", "body", "session_tag", "in_world_date"):
             if k in body:
                 sets.append(f"{k} = ?")
                 vals.append(body[k])

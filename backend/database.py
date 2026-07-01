@@ -442,6 +442,8 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             type TEXT NOT NULL DEFAULT 'note',
             title TEXT NOT NULL DEFAULT '',
             body TEXT NOT NULL DEFAULT '',
+            session_tag TEXT NOT NULL DEFAULT '',
+            in_world_date TEXT NOT NULL DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (campaign_id) REFERENCES dnd_campaigns(id) ON DELETE CASCADE
@@ -491,6 +493,22 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             benefits TEXT NOT NULL DEFAULT '[]',
             asi TEXT NOT NULL DEFAULT '{}',
             repeatable BOOLEAN NOT NULL DEFAULT 0,
+            source TEXT NOT NULL DEFAULT 'PHB',
+            is_custom BOOLEAN NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name)
+        );
+
+        CREATE TABLE IF NOT EXISTS dnd_backgrounds (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL DEFAULT '',
+            skill_proficiencies TEXT NOT NULL DEFAULT '[]',
+            tool_proficiencies TEXT NOT NULL DEFAULT '[]',
+            languages TEXT NOT NULL DEFAULT '[]',
+            equipment TEXT NOT NULL DEFAULT '[]',
+            feature_name TEXT NOT NULL DEFAULT '',
+            feature_desc TEXT NOT NULL DEFAULT '',
             source TEXT NOT NULL DEFAULT 'PHB',
             is_custom BOOLEAN NOT NULL DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -600,6 +618,13 @@ async def _create_garmin_tables(db: aiosqlite.Connection):
         await db.execute("ALTER TABLE dnd_spells ADD COLUMN classes TEXT NOT NULL DEFAULT '[]'")
     except Exception:
         pass  # column already exists
+
+    # Migrate: add journal fields (session tag + in-world date) to campaign notes
+    for col in ("session_tag", "in_world_date"):
+        try:
+            await db.execute(f"ALTER TABLE dnd_campaign_notes ADD COLUMN {col} TEXT NOT NULL DEFAULT ''")
+        except Exception:
+            pass  # column already exists
 
     # Migrate: add new sleep columns to existing DBs
     new_cols = [

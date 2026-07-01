@@ -14,3 +14,4 @@
 @import './help.css';            /* Help (?) buttons, tab titles, help modal */
 @import './levelup.css';         /* Level Up controls + reveal/recap modal */
 @import './option-picker.css';   /* Themed option-picker library modals */
+@import './subclass-picker.css'; /* Subclass chooser (master/detail) modal */

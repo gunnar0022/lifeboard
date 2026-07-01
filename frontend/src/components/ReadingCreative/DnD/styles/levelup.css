@@ -114,6 +114,30 @@
 .dnd-lvlup__chip--prof svg { color: var(--dnd-class-fighter); }
 .dnd-lvlup__chip--slots { border-color: var(--dnd-class-wizard); }
 .dnd-lvlup__chip--slots svg { color: var(--dnd-class-wizard); }
+.dnd-lvlup__chip--prep { border-color: var(--dnd-class-cleric); }
+.dnd-lvlup__chip--prep svg { color: var(--dnd-class-cleric); }
+
+/* Subclass-choice call-to-action banner */
+.dnd-lvlup__subclass-cta {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 0.85rem 1rem 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--lvlup-accent, var(--dnd-accent));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--lvlup-accent, var(--dnd-accent)) 12%, transparent);
+}
+.dnd-lvlup__subclass-cta > svg { color: var(--lvlup-accent, var(--dnd-accent)); flex-shrink: 0; }
+.dnd-lvlup__subclass-cta-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.dnd-lvlup__subclass-cta-text strong { color: var(--dnd-text); font-size: 0.92rem; }
+.dnd-lvlup__subclass-cta-text span { color: var(--dnd-text-dim); font-size: 0.78rem; }
+.dnd-lvlup__subclass-cta-btn {
+  flex-shrink: 0;
+  background: var(--lvlup-accent, var(--dnd-accent)); color: var(--dnd-bg);
+  border: none; border-radius: 8px; padding: 0.5rem 0.85rem;
+  font-family: inherit; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+  white-space: nowrap;
+}
+.dnd-lvlup__subclass-cta-btn:hover { filter: brightness(1.08); }
 .dnd-lvlup__chip-val { font-weight: 700; font-size: 1.05rem; }
 .dnd-lvlup__chip-label { font-size: 0.78rem; color: var(--dnd-text-dim); }
 

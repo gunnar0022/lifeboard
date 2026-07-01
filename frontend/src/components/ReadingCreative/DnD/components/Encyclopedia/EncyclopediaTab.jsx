@@ -13,6 +13,8 @@ import ItemsListView from './ItemsListView';
 import ItemDetailView from './ItemDetailView';
 import FeatListView from './FeatListView';
 import FeatDetailView from './FeatDetailView';
+import BackgroundListView from './BackgroundListView';
+import BackgroundDetailView from './BackgroundDetailView';
 import ClassFeaturesHomeView from './ClassFeaturesHomeView';
 import OptionLibraryView from './OptionLibraryView';
 import { raceAccent, classAccent } from './accents';
@@ -46,11 +48,13 @@ export default function EncyclopediaTab({ editMode = false }) {
     else if (id === 'spells') push({ view: 'spellList', title: 'Spells', filter: {} });
     else if (id === 'items') push({ view: 'itemList', title: 'Items' });
     else if (id === 'feats') push({ view: 'featList', title: 'Feats' });
+    else if (id === 'backgrounds') push({ view: 'backgroundList', title: 'Backgrounds' });
     else if (id === 'classFeatures') push({ view: 'classFeatures', title: 'Class Features' });
   };
 
   const openItem = (item) => push({ view: 'item', title: item.name, itemId: item.id, preview: item });
   const openFeat = (feat) => push({ view: 'feat', title: feat.name, featId: feat.id, preview: feat });
+  const openBackground = (bg) => push({ view: 'background', title: bg.name, bgId: bg.id, preview: bg });
   // Open a class-option library (Invocations, Maneuvers, …), themed by its key.
   const openOptions = (categoryKey, label) => push({ view: 'optionLib', title: label, categoryKey });
 
@@ -116,6 +120,12 @@ export default function EncyclopediaTab({ editMode = false }) {
       break;
     case 'feat':
       body = <FeatDetailView key={current.featId} featId={current.featId} preview={current.preview} editMode={editMode} onDeleted={pop} />;
+      break;
+    case 'backgroundList':
+      body = <BackgroundListView onOpenBackground={openBackground} />;
+      break;
+    case 'background':
+      body = <BackgroundDetailView key={current.bgId} bgId={current.bgId} preview={current.preview} editMode={editMode} onDeleted={pop} />;
       break;
     case 'classFeatures':
       body = <ClassFeaturesHomeView onOpenCategory={openOptions} />;

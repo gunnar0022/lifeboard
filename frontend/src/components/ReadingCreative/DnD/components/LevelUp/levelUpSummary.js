@@ -12,15 +12,74 @@ import {
 import { getClass } from '../../rules/registry';
 import {
   getClassFeatures, getSubclassFeatures, getRaceFeatures, getRacialSpells,
+  metamagicKnown, invocationsKnown, infusionsKnown, maneuversKnown, arcaneShotsKnown, maxRunesKnown,
 } from '../../classProgression';
 import { maxSlotsForSources, pactSlotsForLevel } from '../../spellSlots';
 
 const ORD = ['Cantrip', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
 export const slotOrd = (n) => ORD[n] || `${n}th`;
 
+/**
+ * Prepared-spell cap = spellcasting ability mod + caster-scaled class level.
+ * Shared by the Level Up reveal (chip) and LevelUpSpells (Spells sub-tab) so the
+ * number can never disagree between the two surfaces.
+ */
+export function prepCap(casterType, classLevel, abilMod) {
+  const prepLevel = casterType === 'full' ? classLevel
+    : (casterType === 'half' || casterType === 'artificer') ? Math.floor(classLevel / 2)
+    : classLevel;
+  return Math.max(1, abilMod + prepLevel);
+}
+
 /** Features whose `level` is exactly N (i.e. newly granted at this level). */
 function gainedAt(features, level) {
   return features.filter(f => (f.level || 1) === level);
+}
+
+/**
+ * Build-choices whose KNOWN count scales with level. Each is authored once as a
+ * single feature anchored at the level it unlocks, but the number you know grows
+ * at later levels — so the Level Up reveal must re-surface the picker on those
+ * "bump" levels even though the feature's own `level` is earlier.
+ */
+const SCALING_CHOICE = {
+  metamagic:      { cap: metamagicKnown,   label: 'Metamagic option' },
+  invocations:    { cap: invocationsKnown, label: 'Eldritch Invocation' },
+  infusions:      { cap: infusionsKnown,   label: 'infusion' },
+  maneuvers:      { cap: maneuversKnown,   label: 'maneuver' },
+  'arcane-shots': { cap: arcaneShotsKnown, label: 'Arcane Shot option' },
+  runes:          { cap: maxRunesKnown,    label: 'rune' },
+};
+
+/**
+ * From a feature list, find scaling-choice features whose cap grew at exactly
+ * `level` (vs level-1) and whose anchor is BELOW this level — the initial grant
+ * at the anchor level is already surfaced by gainedAt(). Returns presentational
+ * clones that keep the same `choice`/`options` (so the picker writes the same
+ * storage) but swap in a compact "you learn 1 more" desc, so the reveal never
+ * repeats the full feature text. The canonical node is never mutated.
+ */
+function scalingBumps(features, level) {
+  const out = [];
+  for (const f of features) {
+    const sc = f.choice && SCALING_CHOICE[f.choice];
+    if (!sc) continue;
+    if ((f.level || 1) >= level) continue; // anchor at this level: already in gainedAt
+    const now = sc.cap(level);
+    const prev = sc.cap(level - 1);
+    if (now > prev) {
+      const delta = now - prev;
+      const plural = delta > 1;
+      out.push({
+        ...f,
+        id: `${f.id}-bump-${level}`,
+        level,
+        scalingBump: true,
+        desc: `You learn ${delta} more ${sc.label}${plural ? 's' : ''} — now ${now} known (was ${prev}). Choose ${plural ? 'them' : 'it'} below.`,
+      });
+    }
+  }
+  return out;
 }
 
 /** Standard (non-pact) slot increases between two levels for a caster type. */
@@ -59,6 +118,15 @@ export function levelUpSummary(character, level) {
   const subrace = meta.subrace;
   const conMod = abilityMod(character?.abilities?.CON || 10);
 
+  // ── Subclass-choice flag ──
+  // Most classes pick a subclass at level 3 (Cleric/Sorcerer/Warlock at 1,
+  // Druid/Wizard at 2). If the character is at/past that level without one set,
+  // the level-up reveal prompts them to choose.
+  const classNode = getClass(className);
+  const subclassLevel = classNode?.subclassLevel || null;
+  const subclassLabel = classNode?.subclassLabel || 'Subclass';
+  const subclassDue = !!className && !subclass && !!subclassLevel && level >= subclassLevel;
+
   // ── HP ──
   const die = getClass(className)?.hitDie;
   let hpGain = null;
@@ -90,9 +158,23 @@ export function levelUpSummary(character, level) {
   }
   const slotsChanged = slotDeltas.length > 0 || (pact && pact.deltas.length > 0);
 
+  // ── Prepared-spell cap (prepared casters only) ──
+  const preparation = profile?.preparation || null;
+  let preparedCap = null;
+  let preparedCapBefore = null;
+  let preparedCapIncreased = false;
+  if (preparation === 'prepared') {
+    const abilMod = abilityMod(character?.abilities?.[profile.ability] || 10);
+    preparedCap = prepCap(casterType, level, abilMod);
+    preparedCapBefore = prepCap(casterType, level - 1, abilMod);
+    preparedCapIncreased = preparedCap > preparedCapBefore;
+  }
+
   // ── Features gained at this level ──
-  const classFeatures = gainedAt(getClassFeatures(className, level), level);
-  const subclassFeatures = gainedAt(getSubclassFeatures(subclass, level), level);
+  const allClassFeatures = getClassFeatures(className, level);
+  const allSubclassFeatures = getSubclassFeatures(subclass, level);
+  const classFeatures = [...gainedAt(allClassFeatures, level), ...scalingBumps(allClassFeatures, level)];
+  const subclassFeatures = [...gainedAt(allSubclassFeatures, level), ...scalingBumps(allSubclassFeatures, level)];
   const raceFeatures = gainedAt(getRaceFeatures(race, subrace), level);
   // Racial spells newly unlocked at this level (level-gated bloodline magic, etc.)
   const racialSpellsNow = getRacialSpells(race, subrace, level);
@@ -108,6 +190,9 @@ export function levelUpSummary(character, level) {
     level,
     className,
     subclass,
+    subclassDue,
+    subclassLabel,
+    subclassLevel,
     race,
     subrace,
     hpGain,
@@ -116,7 +201,10 @@ export function levelUpSummary(character, level) {
     profIncreased,
     isCaster,
     casterType,
-    preparation: profile?.preparation || null,
+    preparation,
+    preparedCap,
+    preparedCapBefore,
+    preparedCapIncreased,
     slotDeltas,
     pact,
     slotsChanged,
