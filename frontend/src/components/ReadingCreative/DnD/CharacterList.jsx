@@ -3,16 +3,21 @@ import { motion } from 'framer-motion';
 import { Plus, Trash2 } from 'lucide-react';
 import { CLASS_COLORS, NEW_CHARACTER_DATA } from './dndUtils';
 import DeleteConfirm from './DeleteConfirm';
+import CreationGate from './components/Creation/CreationGate';
+import CreationFlow from './components/Creation/CreationFlow';
 
 export default function CharacterList({ characters, onSelect, onRefresh }) {
   const [confirmChar, setConfirmChar] = useState(null);
+  // Creation UX: 'gate' (choose guided vs blank), 'flow' (guided wizard), or null.
+  const [creationMode, setCreationMode] = useState(null);
 
-  const createCharacter = async () => {
+  // Persist a fully-built (or blank) character, then open its sheet in edit mode.
+  const createCharacter = async (data = NEW_CHARACTER_DATA) => {
     try {
       const res = await fetch('/api/dnd/characters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: NEW_CHARACTER_DATA }),
+        body: JSON.stringify({ data }),
       });
       const result = await res.json();
       onSelect(result.id, true); // open in edit mode
@@ -37,7 +42,7 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
         {/* New character card */}
         <motion.button
           className="dnd-list__card dnd-list__card--new"
-          onClick={createCharacter}
+          onClick={() => setCreationMode('gate')}
           whileHover={{ y: -4 }}
           whileTap={{ scale: 0.97 }}
         >
@@ -86,6 +91,20 @@ export default function CharacterList({ characters, onSelect, onRefresh }) {
           name={confirmChar.name}
           onConfirm={deleteCharacter}
           onCancel={() => setConfirmChar(null)}
+        />
+      )}
+
+      {creationMode === 'gate' && (
+        <CreationGate
+          onGuided={() => setCreationMode('flow')}
+          onBlank={() => { setCreationMode(null); createCharacter(NEW_CHARACTER_DATA); }}
+          onClose={() => setCreationMode(null)}
+        />
+      )}
+      {creationMode === 'flow' && (
+        <CreationFlow
+          onCreate={(data) => createCharacter(data)}
+          onExit={() => setCreationMode(null)}
         />
       )}
     </div>

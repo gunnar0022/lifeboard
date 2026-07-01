@@ -17,6 +17,7 @@ import {
 } from '../classProgression';
 import { CLASS_CASTER_PROFILE, CLASS_FEATURE_DEFAULTS, SUBCLASS_LISTS, CLASS_NAMES } from '../dndUtils';
 import { CLASS_META } from './classes';
+import { CLASS_CREATION } from './classes/creation';
 import { RACE_ABILITY_BONUSES, SUBRACE_ABILITY_BONUSES } from './data/abilityBonuses';
 import { LORE } from './data/lore';
 
@@ -181,7 +182,7 @@ function buildClassNode(name) {
     subclassLabel: meta.subclassLabel || 'Subclass',
     subclassLevel: meta.subclassLevel || 3,
     helpers: {},        // P3
-    creation: null,     // P4
+    creation: CLASS_CREATION[name] || null,
     progression: CLASS_PROGRESSION[name] || [],
     ...loreOf(name),
   };
