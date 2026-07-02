@@ -156,6 +156,8 @@
 .op-picker__opt-desc {
   grid-column: 1 / -1; margin: 0.2rem 0 0.1rem; font-size: 0.85rem;
   color: var(--dnd-text-dim); line-height: 1.45;
+  /* Preserve authored line breaks (e.g. feat description + bulleted benefits) */
+  white-space: pre-line;
 }
 
 /* Custom builder */

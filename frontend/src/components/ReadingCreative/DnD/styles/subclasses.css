@@ -987,6 +987,14 @@
 }
 .dnd-build__points { font-size: 0.8rem; font-weight: 700; color: var(--dnd-text-dim); }
 .dnd-build__points--over { color: #b53030; }
+.dnd-build__clear-temp {
+  margin-left: auto; margin-right: 0.6rem; font-family: inherit; cursor: pointer;
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--dnd-text-dim); background: var(--dnd-bg);
+  border: 1px solid var(--dnd-border); border-radius: 4px; padding: 2px 7px;
+}
+.dnd-build__clear-temp:hover { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-build__total--temp { color: var(--dnd-accent); }
 .dnd-build__table { width: 100%; border-collapse: collapse; }
 .dnd-build__table th {
   font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
@@ -1076,6 +1084,13 @@
   font-weight: 700;
   color: var(--dnd-text);
 }
+
+.dnd-stats-tab__temp-badge {
+  font-size: 0.7rem; font-weight: 700; padding: 0.05rem 0.35rem;
+  border-radius: 0.6rem; line-height: 1.4; white-space: nowrap;
+}
+.dnd-stats-tab__temp-badge--buff { color: var(--dnd-positive); background: color-mix(in srgb, var(--dnd-positive) 15%, transparent); }
+.dnd-stats-tab__temp-badge--nerf { color: var(--dnd-negative); background: color-mix(in srgb, var(--dnd-negative) 15%, transparent); }
 
 .dnd-stats-tab__save {
   display: flex;

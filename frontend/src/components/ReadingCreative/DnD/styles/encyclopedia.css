@@ -274,9 +274,15 @@
   background: var(--dnd-surface); border: 1px solid var(--dnd-border); color: var(--dnd-text);
 }
 .wiki-spellrow:hover { border-color: var(--tier); transform: translateY(-1px); box-shadow: 0 2px 8px var(--dnd-shadow-base); }
-.wiki-spellrow__name { flex: 1; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wiki-spellrow__dmg { font-size: 0.8rem; }
-.wiki-spellrow__range { font-size: 0.75rem; color: var(--dnd-text-muted); }
+.wiki-spellrow__name { flex: 1 1 auto; font-weight: 600; min-width: 2.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wiki-spellrow__dmg { font-size: 0.8rem; flex: none; }
+/* Subtext (prerequisite / skill proficiencies) yields to the title: it truncates
+   and is capped so it can never crowd the name off the row. */
+.wiki-spellrow__range {
+  font-size: 0.75rem; color: var(--dnd-text-muted);
+  flex: 0 1 auto; min-width: 0; max-width: 45%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .wiki-spellrow__conc { color: var(--dnd-class-wizard); flex: none; }
 .wiki-spellrow__chev { color: var(--dnd-text-faint); flex: none; }
 

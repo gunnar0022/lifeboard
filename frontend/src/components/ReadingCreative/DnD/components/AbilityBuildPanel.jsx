@@ -8,32 +8,36 @@ const POINT_COST = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
 const POINT_BUDGET = 27;
 const RACIAL_MAX = 2; // any stat can be raised up to twice for racial reasons
 
-// The three-layer build, derived from the final scores if not stored yet.
+// The build layers, derived from the final scores if not stored yet.
 // Migration preserves totals: base = min(15, score), asi = max(0, score - 15).
+// `temp` is a signed transient buff/nerf layer (spells, potions, enemy drains)
+// that can be zeroed out to cleanly revert without disturbing the permanent build.
 export function deriveBuild(character) {
   const stored = character.abilityBuild;
   const abilities = character.abilities || {};
-  const base = {}, racial = {}, asi = {};
+  const base = {}, racial = {}, asi = {}, temp = {};
   BUILD_ORDER.forEach(ab => {
     if (stored) {
       base[ab] = stored.base?.[ab] ?? 10;
       racial[ab] = stored.racial?.[ab] ?? 0;
       asi[ab] = stored.asi?.[ab] ?? 0;
+      temp[ab] = stored.temp?.[ab] ?? 0;
     } else {
       const s = abilities[ab] ?? 10;
       base[ab] = Math.min(15, s);
       racial[ab] = 0;
       asi[ab] = Math.max(0, s - 15);
+      temp[ab] = 0;
     }
   });
-  return { base, racial, asi };
+  return { base, racial, asi, temp };
 }
 
 /** A fresh point-buy build with every base at 8 (the creation starting point). */
 export function freshAbilityBuild() {
-  const base = {}, racial = {}, asi = {}, abilities = {};
-  BUILD_ORDER.forEach(ab => { base[ab] = 8; racial[ab] = 0; asi[ab] = 0; abilities[ab] = 8; });
-  return { abilityBuild: { base, racial, asi }, abilities };
+  const base = {}, racial = {}, asi = {}, temp = {}, abilities = {};
+  BUILD_ORDER.forEach(ab => { base[ab] = 8; racial[ab] = 0; asi[ab] = 0; temp[ab] = 0; abilities[ab] = 8; });
+  return { abilityBuild: { base, racial, asi, temp }, abilities };
 }
 
 function Stepper({ value, prefix = '', cost, onDec, onInc, decDisabled, incDisabled }) {
@@ -48,22 +52,29 @@ function Stepper({ value, prefix = '', cost, onDec, onInc, decDisabled, incDisab
 
 // Point buy (base) + racial bonus + ASI/feat layers.
 export default function AbilityBuildPanel({ character, onUpdate }) {
-  const { base, racial, asi } = deriveBuild(character);
+  const { base, racial, asi, temp } = deriveBuild(character);
   const pointsUsed = BUILD_ORDER.reduce((sum, ab) => sum + (POINT_COST[base[ab]] ?? 0), 0);
   const remaining = POINT_BUDGET - pointsUsed;
+  const anyTemp = BUILD_ORDER.some(ab => (temp[ab] || 0) !== 0);
 
   const commit = (next) => {
     const abilities = { ...(character.abilities || {}) };
     BUILD_ORDER.forEach(ab => {
-      abilities[ab] = (next.base[ab] || 0) + (next.racial[ab] || 0) + (next.asi[ab] || 0);
+      abilities[ab] = (next.base[ab] || 0) + (next.racial[ab] || 0) + (next.asi[ab] || 0) + (next.temp[ab] || 0);
     });
     onUpdate({ abilityBuild: next, abilities });
   };
 
   const setLayer = (layer, ab, val) => {
-    const next = { base: { ...base }, racial: { ...racial }, asi: { ...asi } };
+    const next = { base: { ...base }, racial: { ...racial }, asi: { ...asi }, temp: { ...temp } };
     next[layer][ab] = val;
     commit(next);
+  };
+
+  const clearTemp = () => {
+    const cleared = {};
+    BUILD_ORDER.forEach(ab => { cleared[ab] = 0; });
+    commit({ base: { ...base }, racial: { ...racial }, asi: { ...asi }, temp: cleared });
   };
 
   const changeBase = (ab, dir) => {
@@ -86,6 +97,11 @@ export default function AbilityBuildPanel({ character, onUpdate }) {
     <div className="dnd-build">
       <div className="dnd-build__header">
         <span className="dnd-build__title">Ability Scores</span>
+        {anyTemp && (
+          <button className="dnd-build__clear-temp" onClick={clearTemp} title="Reset all temporary buffs/nerfs to zero">
+            Clear temp
+          </button>
+        )}
         <span className={`dnd-build__points ${remaining < 0 ? 'dnd-build__points--over' : ''}`}>
           Point Buy: {pointsUsed} / {POINT_BUDGET}
         </span>
@@ -93,12 +109,13 @@ export default function AbilityBuildPanel({ character, onUpdate }) {
       <table className="dnd-build__table">
         <thead>
           <tr>
-            <th></th><th>Base</th><th>Racial</th><th>ASI / Feat</th><th>Total</th>
+            <th></th><th>Base</th><th>Racial</th><th>ASI / Feat</th><th>Temp</th><th>Total</th>
           </tr>
         </thead>
         <tbody>
           {BUILD_ORDER.map(ab => {
-            const total = (base[ab] || 0) + (racial[ab] || 0) + (asi[ab] || 0);
+            const t = temp[ab] || 0;
+            const total = (base[ab] || 0) + (racial[ab] || 0) + (asi[ab] || 0) + t;
             return (
               <tr key={ab}>
                 <td className="dnd-build__ab">{ab}</td>
@@ -131,7 +148,15 @@ export default function AbilityBuildPanel({ character, onUpdate }) {
                     decDisabled={(asi[ab] || 0) <= 0}
                   />
                 </td>
-                <td className="dnd-build__total">{total}</td>
+                <td>
+                  <Stepper
+                    value={t}
+                    prefix={t > 0 ? '+' : ''}
+                    onDec={() => setLayer('temp', ab, t - 1)}
+                    onInc={() => setLayer('temp', ab, t + 1)}
+                  />
+                </td>
+                <td className={`dnd-build__total ${t !== 0 ? 'dnd-build__total--temp' : ''}`}>{total}</td>
               </tr>
             );
           })}
@@ -139,6 +164,7 @@ export default function AbilityBuildPanel({ character, onUpdate }) {
       </table>
       <p className="dnd-build__hint">
         Point buy: base scores 8–15 (27 points). Racial: up to +2 per ability. ASI / Feat: level-up boosts (no cap).
+        Temp: transient buffs/nerfs (spells, potions, drains) — use “Clear temp” to revert.
       </p>
     </div>
   );

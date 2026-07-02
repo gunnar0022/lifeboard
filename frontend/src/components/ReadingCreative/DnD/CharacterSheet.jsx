@@ -247,10 +247,14 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
     const base = hpForClassLevel(die, lvl, abilityMod(character.abilities?.CON || 10));
     if (!base) return; // unknown class / hit die — leave HP under manual control
     // Layer on any subclass HP bonus (e.g. Draconic Resilience: +1 per sorcerer level).
-    const newMax = base + subclassHpBonus(subclass, lvl);
+    const derivedMax = base + subclassHpBonus(subclass, lvl);
 
     setCharacter(prev => {
       const combat = prev.combat || {};
+      // Preserve both manual max-HP modifiers (a standing bonus like the Tough
+      // feat, and a reduction like a max-HP drain) across level/class changes so
+      // the recalculated value stays consistent.
+      const newMax = Math.max(1, derivedMax + (combat.hpMaxBonus || 0) - (combat.hpMaxPenalty || 0));
       const delta = newMax - (combat.hpMax || 0);
       return {
         ...prev,

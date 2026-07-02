@@ -87,10 +87,39 @@
 
 /* HP specific */
 .dnd-statblock__hp-row {
-  display: flex; align-items: baseline; gap: 2px;
+  display: flex; align-items: baseline; gap: 2px; justify-content: center;
 }
 .dnd-statblock__hp-sep { color: var(--dnd-text-dim); font-size: 1.2rem; }
 .dnd-statblock__hp-max { font-size: 1.2rem; color: var(--dnd-text-dim); font-weight: 600; }
+/* Two independent max-HP trackers flanking the HP readout (edit mode). */
+.dnd-statblock__hp-mod {
+  align-self: center; display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.dnd-statblock__hp-mod--reduce { margin-right: 1.75rem; }
+.dnd-statblock__hp-mod--bonus { margin-left: 1.75rem; }
+.dnd-statblock__hp-mod-label {
+  font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+}
+.dnd-statblock__hp-mod--bonus .dnd-statblock__hp-mod-label { color: var(--dnd-positive); }
+.dnd-statblock__hp-mod--reduce .dnd-statblock__hp-mod-label { color: var(--dnd-negative); }
+.dnd-statblock__hp-mod-ctrl { display: inline-flex; align-items: center; gap: 2px; }
+.dnd-statblock__hp-mod-ctrl button {
+  width: 18px; height: 18px; padding: 0; border-radius: 4px; cursor: pointer;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border); color: var(--dnd-text-dim);
+  font-size: 0.85rem; font-family: inherit; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.dnd-statblock__hp-mod-ctrl button:hover:not(:disabled) { border-color: var(--dnd-accent); color: var(--dnd-accent); }
+.dnd-statblock__hp-mod-ctrl button:disabled { opacity: 0.3; cursor: default; }
+.dnd-statblock__hp-mod-val { min-width: 1.6rem; text-align: center; font-size: 0.8rem; font-weight: 700; }
+.dnd-statblock__hp-mod--bonus .dnd-statblock__hp-mod-val { color: var(--dnd-positive); }
+.dnd-statblock__hp-mod--reduce .dnd-statblock__hp-mod-val { color: var(--dnd-negative); }
+.dnd-statblock__hp-modnote {
+  display: block; text-align: center; font-size: 0.6rem; color: var(--dnd-text-faint);
+  margin-top: 2px; letter-spacing: 0.02em;
+}
+.dnd-statblock__hp-modnote--bonus { color: var(--dnd-positive); font-weight: 700; }
+.dnd-statblock__hp-modnote--reduce { color: var(--dnd-negative); font-weight: 700; }
 .dnd-statblock__hp-bar {
   position: relative;
   width: 90%; height: 6px; background: var(--dnd-border);

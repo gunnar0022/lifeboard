@@ -43,6 +43,35 @@ export default function StatBlock({ character, editMode, onUpdate, derivedAC = n
     onUpdate({ combat: { ...combat, [field]: value } });
   };
 
+  // Two independent, persistent max-HP modifiers tracked side by side:
+  //   hpMaxBonus    — a standing bonus (Tough feat, etc.), always ≥ 0
+  //   hpMaxPenalty  — a reduction (max-HP drain ray, etc.), stored as a magnitude ≥ 0
+  // Both survive level/class recalcs (see CharacterSheet); the effective `hpMax`
+  // is nudged in lockstep here. Net increases add to current HP (like a level
+  // gain); net decreases only clip current HP if it now exceeds the lowered max.
+  // Normalize both to magnitudes ≥ 0. A negative bonus (possible from an earlier
+  // single-field version) folds into the reduction bucket; net stays identical, so
+  // hpMax needs no change, and the first edit persists the tidied split.
+  const rawBonus = combat.hpMaxBonus || 0;
+  const bonus = Math.max(0, rawBonus);
+  const penalty = Math.max(0, combat.hpMaxPenalty || 0) + Math.max(0, -rawBonus);
+  const applyMaxMod = ({ bonusDelta = 0, penaltyDelta = 0 }) => {
+    const newBonus = Math.max(0, bonus + bonusDelta);
+    const newPenalty = Math.max(0, penalty + penaltyDelta);
+    const maxDelta = (newBonus - bonus) - (newPenalty - penalty);
+    const newMax = Math.max(1, hpMax + maxDelta);
+    const newCurrent = maxDelta > 0 ? Math.min(newMax, hp + maxDelta) : Math.min(hp, newMax);
+    onUpdate({
+      combat: {
+        ...combat,
+        hpMaxBonus: newBonus,
+        hpMaxPenalty: newPenalty,
+        hpMax: newMax,
+        hpCurrent: newCurrent,
+      },
+    });
+  };
+
   const handleMeta = (field, value) => {
     onUpdate({ meta: { ...meta, [field]: value } });
   };
@@ -94,15 +123,41 @@ export default function StatBlock({ character, editMode, onUpdate, derivedAC = n
         <div className="dnd-statblock__cell dnd-statblock__cell--hp">
           <span className="dnd-statblock__label">HP</span>
           <div className="dnd-statblock__hp-row">
+            {editMode && (
+              <div className="dnd-statblock__hp-mod dnd-statblock__hp-mod--reduce">
+                <span className="dnd-statblock__hp-mod-label">Reduce</span>
+                <div className="dnd-statblock__hp-mod-ctrl">
+                  <button onClick={() => applyMaxMod({ penaltyDelta: -1 })} disabled={penalty <= 0}
+                    title="Recover reduced max HP">&minus;</button>
+                  <span className="dnd-statblock__hp-mod-val">{penalty ? `−${penalty}` : '0'}</span>
+                  <button onClick={() => applyMaxMod({ penaltyDelta: 1 })}
+                    title="Reduce max HP (e.g. a max-HP drain effect)">+</button>
+                </div>
+              </div>
+            )}
             <span className="dnd-statblock__big">{hp}</span>
             <span className="dnd-statblock__hp-sep">/</span>
-            {editMode ? (
-              <input type="number" className="dnd-statblock__big-input dnd-statblock__big-input--sm"
-                value={hpMax} onChange={e => handleCombat('hpMax', parseInt(e.target.value) || 1)} />
-            ) : (
-              <span className="dnd-statblock__hp-max">{hpMax}</span>
+            <span className="dnd-statblock__hp-max">{hpMax}</span>
+            {editMode && (
+              <div className="dnd-statblock__hp-mod dnd-statblock__hp-mod--bonus">
+                <span className="dnd-statblock__hp-mod-label">Bonus</span>
+                <div className="dnd-statblock__hp-mod-ctrl">
+                  <button onClick={() => applyMaxMod({ bonusDelta: -1 })} disabled={bonus <= 0}
+                    title="Remove standing max-HP bonus">&minus;</button>
+                  <span className="dnd-statblock__hp-mod-val">{bonus ? `+${bonus}` : '0'}</span>
+                  <button onClick={() => applyMaxMod({ bonusDelta: 1 })}
+                    title="Add a standing max-HP bonus (e.g. the Tough feat)">+</button>
+                </div>
+              </div>
             )}
           </div>
+          {(bonus !== 0 || penalty !== 0) && (
+            <span className="dnd-statblock__hp-modnote">
+              Max HP{bonus > 0 && <> <span className="dnd-statblock__hp-modnote--bonus">+{bonus} bonus</span></>}
+              {bonus > 0 && penalty > 0 && ','}
+              {penalty > 0 && <> <span className="dnd-statblock__hp-modnote--reduce">&minus;{penalty} reduced</span></>}
+            </span>
+          )}
           <div className="dnd-statblock__hp-bar">
             <div className="dnd-statblock__hp-fill" style={{ width: `${Math.min(100, hpPct)}%`, background: barColor }} />
             {(combat.hpTemp || 0) > 0 && (

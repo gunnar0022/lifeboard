@@ -1,5 +1,5 @@
 import { abilityMod, formatMod, proficiencyBonus, SKILLS } from '../dndUtils';
-import AbilityBuildPanel from './AbilityBuildPanel';
+import AbilityBuildPanel, { deriveBuild } from './AbilityBuildPanel';
 
 // Interleaved for 2-column grid: left column STR/DEX/CON, right column INT/WIS/CHA
 const ABILITIES = ['STR', 'INT', 'DEX', 'WIS', 'CON', 'CHA'];
@@ -21,6 +21,7 @@ export default function StatsTab({ character, editMode, onUpdate }) {
   const saveProficiencies = character.saveProficiencies || [];
   const skillProficiencies = character.skillProficiencies || [];
   const skillExpertise = character.skillExpertise || [];
+  const { temp: tempMods } = deriveBuild(character);
 
   const toggleSaveProf = (ab) => {
     if (!editMode) return;
@@ -67,6 +68,12 @@ export default function StatsTab({ character, editMode, onUpdate }) {
                 <div className="dnd-stats-tab__ability-core">
                   <span className="dnd-stats-tab__ability-name">{ABILITY_NAMES[ab]}</span>
                   <span className="dnd-stats-tab__score">{score}</span>
+                  {(tempMods[ab] || 0) !== 0 && (
+                    <span className={`dnd-stats-tab__temp-badge ${tempMods[ab] > 0 ? 'dnd-stats-tab__temp-badge--buff' : 'dnd-stats-tab__temp-badge--nerf'}`}
+                      title="Temporary buff/nerf active (edit Stats to adjust)">
+                      {tempMods[ab] > 0 ? '+' : ''}{tempMods[ab]}
+                    </span>
+                  )}
                   <span className="dnd-stats-tab__mod">{formatMod(mod)}</span>
                 </div>
 
