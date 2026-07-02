@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Sword, PawPrint, BookOpen, Gem, Star, Check } from 'lucide-react';
-import { getClassFeatures, getSubclassFeatures, getRaceFeatures, FIGHTING_STYLES, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS } from '../classProgression';
+import { getClassFeatures, getSubclassFeatures, getRaceFeatures, DRAGON_ANCESTRY, DRAGON_COLORS, PACT_BOONS } from '../classProgression';
 import { SKILLS, abilityMod, proficiencyBonus } from '../dndUtils';
 import { buildPrimalBeast, buildDrake, buildSteelDefender, PRIMAL_VARIANTS, DRAKE_ESSENCES } from '../rules/shared/companions';
 import CompanionStatBlock from './ClassFeatures/CompanionStatBlock';
 import InvocationPicker from './OptionPicker/InvocationPicker';
 import ListPicker from './OptionPicker/ListPicker';
 import FeatPicker from './OptionPicker/FeatPicker';
+import FightingStylePicker from './OptionPicker/FightingStylePicker';
 
 const EXPERTISE_OPTIONS = [...SKILLS.map(s => s.name), "Thieves' Tools"];
 
@@ -46,23 +47,10 @@ const sourceColors = {
 };
 
 // ── Inline build-choice: Fighting Style ────────────────────────────────
+// Themed single-select picker (Fighter / Paladin / Ranger); see
+// OptionPicker/FightingStylePicker.
 function FightingStyleChoice({ classFeature, onUpdate }) {
-  const cf = classFeature || {};
-  const selected = cf.fightingStyle || '';
-  const style = FIGHTING_STYLES.find(s => s.name === selected);
-  return (
-    <div className="dnd-feature-choice">
-      <select
-        className="dnd-field dnd-feature-choice__select"
-        value={selected}
-        onChange={e => onUpdate({ classFeature: { ...cf, fightingStyle: e.target.value } })}
-      >
-        <option value="">— Choose a Fighting Style —</option>
-        {FIGHTING_STYLES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
-      </select>
-      {style && <p className="dnd-feature-choice__detail">{style.desc}</p>}
-    </div>
-  );
+  return <FightingStylePicker classFeature={classFeature} onUpdate={onUpdate} />;
 }
 
 // ── Inline build-choice: Warlock Pact Boon (dropdown) ──────────────────

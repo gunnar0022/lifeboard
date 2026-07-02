@@ -15,7 +15,7 @@ import { pickerTheme } from './pickerThemes';
  */
 export default function OptionPickerModal({
   themeKey, count, max, options = [], chosen = [], chosenIds,
-  repeatable = false, onAdd, onRemove, customBuilder, emptyHint, onClose,
+  repeatable = false, singleSelect = false, onAdd, onRemove, customBuilder, emptyHint, onClose,
 }) {
   const theme = pickerTheme(themeKey);
   const { Icon } = theme;
@@ -99,7 +99,9 @@ export default function OptionPickerModal({
                 const isSel = selectedSet.has(o.id);
                 const open = !!expanded[o.id];
                 const optRepeatable = o.repeatable ?? repeatable;
-                const disabled = o.locked || atCap || (isSel && !optRepeatable);
+                // Single-select behaves like a radio: picking another option swaps
+                // the choice, so a full counter must never block the unselected ones.
+                const disabled = o.locked || (isSel && !optRepeatable) || (atCap && !singleSelect);
                 return (
                   <div key={o.id} className={`op-picker__opt ${isSel ? 'op-picker__opt--selected' : ''} ${o.locked ? 'op-picker__opt--locked' : ''}`}>
                     <button className="op-picker__opt-main" onClick={() => toggleDesc(o.id)} aria-expanded={open}>
@@ -112,7 +114,10 @@ export default function OptionPickerModal({
                       className="op-picker__opt-add"
                       onClick={() => onAdd(o)}
                       disabled={disabled}
-                      title={o.locked ? o.lockedReason : isSel && !repeatable ? 'Already chosen' : atCap ? 'At your limit' : 'Add'}
+                      title={o.locked ? o.lockedReason
+                        : isSel && !optRepeatable ? 'Already chosen'
+                        : singleSelect ? 'Choose'
+                        : atCap ? 'At your limit' : 'Add'}
                     >
                       {isSel && !optRepeatable ? <Check size={15} /> : <Plus size={15} />}
                     </button>

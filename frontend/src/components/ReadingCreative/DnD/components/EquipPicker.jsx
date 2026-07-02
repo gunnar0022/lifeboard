@@ -42,7 +42,7 @@ export default function EquipPicker({ onPick, onClose }) {
         <div className="spell-modal__search">
           <Search size={14} />
           <input ref={searchRef} className="dnd-field" value={q} onChange={e => setQ(e.target.value)}
-            placeholder="Search items…" />
+            placeholder="Search by name or style (e.g. martial)…" />
           <select className="dnd-field spell-modal__level-filter" value={kind} onChange={e => setKind(e.target.value)}>
             <option value="any">Any kind</option>
             {ITEM_KINDS.map(k => <option key={k} value={k}>{KIND_LABELS[k]}</option>)}

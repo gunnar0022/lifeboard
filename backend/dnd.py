@@ -388,13 +388,18 @@ def _item_value(body, col):
 
 @router.get("/items")
 async def list_items(q: str = "", kind: str = None, limit: int = 200):
-    """Search/list items from the library (optional name + kind filters)."""
+    """Search/list items from the library (optional name + kind filters).
+
+    The text query matches both the item name and its `subtype`, so a search for
+    a weapon style ("martial", "simple") or armor tier ("light", "medium",
+    "heavy") surfaces every matching item instead of forcing a name-by-name hunt.
+    """
     db = await get_db()
     try:
         conditions, params = [], []
         if q:
-            conditions.append("name LIKE ?")
-            params.append(f"%{q}%")
+            conditions.append("(name LIKE ? OR subtype LIKE ?)")
+            params.extend([f"%{q}%", f"%{q}%"])
         if kind:
             conditions.append("kind = ?")
             params.append(kind)

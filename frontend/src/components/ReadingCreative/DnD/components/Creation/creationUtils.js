@@ -2,7 +2,10 @@ import { RACE_ABILITY_BONUSES, SUBRACE_ABILITY_BONUSES } from '../../rules/data/
 import { CLASS_CREATION } from '../../rules/classes/creation';
 import { getClass } from '../../rules/registry';
 import { loadItemIndex, resolveStartingItems } from '../../rules/startingEquipment';
-import { abilityMod, hpForClassLevel, subclassHpBonus, hitDieNumber } from '../../dndUtils';
+import {
+  abilityMod, hpForClassLevel, subclassHpBonus, hitDieNumber,
+  CLASS_FEATURE_DEFAULTS, SPELLCASTING_DEFAULTS,
+} from '../../dndUtils';
 
 const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
@@ -119,6 +122,17 @@ export async function finalizeDraft(draft) {
     const hp = hpForClassLevel(die, 1, conMod) + subclassHpBonus(meta.subclass, 1);
     out.combat = { ...(draft.combat || {}), hpMax: hp, hpCurrent: hp, hitDiceType: hitDieNumber(die) };
   }
+
+  // Seed the class's Combat-tab tracker and (for casters) spellcasting. The
+  // sheet's class-change effect only fires when the class *changes*, and a
+  // freshly-created character loads with its class already set — so without this
+  // the base-class combat block renders empty and the Spells tab stays hidden
+  // until the player switches class and back. The Spells tab auto-enables from
+  // `spellcasting` via reconcileTabsConfig on load.
+  const cfDefaults = CLASS_FEATURE_DEFAULTS[meta.className];
+  if (cfDefaults) out.classFeature = { ...cfDefaults };
+  const scDefaults = SPELLCASTING_DEFAULTS[meta.className];
+  if (scDefaults && !out.spellcasting) out.spellcasting = { ...scDefaults };
 
   // Resolve the placeholder class gear against the library; leave any other
   // items (user-added free-form) untouched. Then drop the creation scaffolding.

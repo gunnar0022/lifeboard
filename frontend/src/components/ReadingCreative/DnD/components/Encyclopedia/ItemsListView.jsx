@@ -55,7 +55,7 @@ export default function ItemsListView({ onOpenItem }) {
       <div className="wiki-spellfilter">
         <div className="wiki-spellfilter__search">
           <Search size={14} />
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search by name…" />
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search by name or style (e.g. martial, light)…" />
         </div>
         <select value={kind} onChange={e => setKind(e.target.value)} className="dnd-field">
           <option value="any">Any kind</option>

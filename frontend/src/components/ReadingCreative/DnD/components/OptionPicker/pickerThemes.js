@@ -4,9 +4,16 @@
  * color, header icon, and flavor copy. Adding a picker = add a theme here and a
  * matching `op-picker--{skin}` block in option-picker.css.
  */
-import { Eye, Cog, Swords, Flame, Target, Mountain, Star } from 'lucide-react';
+import { Eye, Cog, Swords, Flame, Target, Mountain, Star, Shield } from 'lucide-react';
 
 export const PICKER_THEMES = {
+  fightingStyle: {
+    skin: 'fightingstyle',
+    accent: 'var(--dnd-class-fighter)',
+    Icon: Shield,
+    title: 'Fighting Style',
+    tagline: 'Drill a signature technique into muscle and steel.',
+  },
   invocations: {
     skin: 'warlock',
     accent: 'var(--dnd-class-warlock)',

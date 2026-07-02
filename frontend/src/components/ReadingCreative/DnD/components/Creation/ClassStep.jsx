@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronLeft } from 'lucide-react';
 import { getRoots, getClass } from '../../rules/registry';
 import { classAccent } from '../Encyclopedia/accents';
 import ClassDetailView from '../Encyclopedia/ClassDetailView';
+import useLoreOverrides from '../Encyclopedia/useLoreOverrides';
 import SubclassPicker from '../SubclassPicker';
 import ChooserShell from './ChooserShell';
 import ClassSetup from './ClassSetup';
@@ -16,6 +17,11 @@ import { classSetupPatch } from './creationUtils';
  */
 export default function ClassStep({ draft, setDraft }) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  // When set, the detail pane drills into a subclass (browse it like the wiki).
+  const [subView, setSubView] = useState(null); // { id, name } | null
+  // Same editable-flavor overrides the wiki/SubclassPicker read, so authored
+  // subclass (and class) prose shows here too — not just the mechanics.
+  const { overrides } = useLoreOverrides();
   const classes = getRoots('class').slice().sort((a, b) => a.name.localeCompare(b.name));
   const className = draft.meta.className || null;
   const subclass = draft.meta.subclass || '';
@@ -29,17 +35,54 @@ export default function ClassStep({ draft, setDraft }) {
 
   const selectClass = (name) => {
     if (name === className) return;
+    setSubView(null); // leaving the class drops any subclass we'd drilled into
     // Apply the new class's level-1 grants (clears any prior class's grants).
     setDraft({ meta: { className: name, subclass: '' }, ...classSetupPatch(draft, name, [], {}) });
+  };
+
+  // Drill-in view: a single subclass's detail, like clicking through in the wiki.
+  const renderSubclassDetail = (name) => {
+    const cNode = getClass(name);
+    const label = cNode?.subclassLabel || 'Subclass';
+    const picksAtOne = (cNode?.subclassLevel || 3) <= 1;
+    const isChosen = subclass === subView.name;
+    return (
+      <div>
+        <button className="crt-linkbtn crt-subclass-back" onClick={() => setSubView(null)}>
+          <ChevronLeft size={14} /> Back to {name}
+        </button>
+        <ClassDetailView key={subView.id} nodeId={subView.id} accent={accent} editMode={false}
+          onOpen={() => {}} override={overrides[subView.id]} />
+        {picksAtOne && (
+          <div className="crt-subclass-slot">
+            {isChosen ? (
+              <div className="crt-subclass-chosen">
+                <Check size={15} /> <span><strong>{subView.name}</strong> is your {label}.</span>
+              </div>
+            ) : (
+              <div className="crt-subclass-prompt">
+                <span>Make this your {label}?</span>
+                <button className="crt-btn crt-btn--accent"
+                  onClick={() => { setDraft({ meta: { subclass: subView.name } }); setSubView(null); }}>
+                  Choose {subView.name}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderDetail = (name) => {
     const cNode = getClass(name);
     const picksAtOne = (cNode?.subclassLevel || 3) <= 1;
     const label = cNode?.subclassLabel || 'Subclass';
+    if (subView) return renderSubclassDetail(name);
     return (
       <div>
-        <ClassDetailView key={name} nodeId={name} accent={accent} editMode={false} onOpen={() => {}} />
+        <ClassDetailView key={name} nodeId={name} accent={accent} editMode={false}
+          onOpen={(child) => setSubView({ id: child.id, name: child.name })} override={overrides[name]} />
         <div className="crt-subclass-slot">
           {picksAtOne ? (
             subclass ? (

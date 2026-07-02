@@ -206,6 +206,7 @@
 .op-picker--warlock .op-picker__tagline,
 .op-picker--artificer .op-picker__tagline,
 .op-picker--battlemaster .op-picker__tagline,
+.op-picker--fightingstyle .op-picker__tagline,
 .op-picker--sorcerer .op-picker__tagline,
 .op-picker--arcanearcher .op-picker__tagline,
 .op-picker--runeknight .op-picker__tagline,
@@ -220,6 +221,7 @@
 /* Shared: light, high-contrast title for the dark themed banners below. */
 .op-picker--artificer .op-picker__title,
 .op-picker--battlemaster .op-picker__title,
+.op-picker--fightingstyle .op-picker__title,
 .op-picker--sorcerer .op-picker__title,
 .op-picker--arcanearcher .op-picker__title,
 .op-picker--runeknight .op-picker__title,
@@ -229,6 +231,7 @@
 }
 .op-picker--artificer .op-picker__opt--selected,
 .op-picker--battlemaster .op-picker__opt--selected,
+.op-picker--fightingstyle .op-picker__opt--selected,
 .op-picker--sorcerer .op-picker__opt--selected,
 .op-picker--arcanearcher .op-picker__opt--selected,
 .op-picker--runeknight .op-picker__opt--selected,
@@ -256,6 +259,24 @@
     linear-gradient(160deg, #182532 0%, var(--dnd-surface) 70%);
 }
 .op-picker--battlemaster .op-picker__banner-icon { border-radius: 4px; } /* squared, blade-like */
+
+/* ── Fighting Style — forge-lit crimson steel, a braced shield ── */
+.op-picker--fightingstyle { box-shadow: 0 0 34px color-mix(in srgb, var(--dnd-class-fighter) 30%, transparent); }
+.op-picker--fightingstyle .op-picker__banner {
+  background:
+    radial-gradient(70% 130% at 18% 130%, color-mix(in srgb, #c0392b 45%, transparent) 0%, transparent 55%),
+    radial-gradient(80% 120% at 86% -22%, color-mix(in srgb, var(--dnd-class-fighter) 55%, transparent) 0%, transparent 55%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.045) 0 3px, transparent 3px 9px),
+    linear-gradient(160deg, #241417 0%, var(--dnd-surface) 72%);
+}
+.op-picker--fightingstyle .op-picker__banner-icon {
+  border-radius: 5px 5px 9px 9px; /* a shield's braced foot */
+  animation: op-brace 2.8s ease-in-out infinite;
+}
+@keyframes op-brace {
+  0%, 100% { box-shadow: 0 0 12px color-mix(in srgb, var(--dnd-class-fighter) 55%, transparent); }
+  50% { box-shadow: 0 0 26px color-mix(in srgb, #c0392b 80%, transparent); }
+}
 
 /* ── Sorcerer / Metamagic — molten ember, flickering core ── */
 .op-picker--sorcerer { box-shadow: 0 0 38px color-mix(in srgb, var(--dnd-class-sorcerer) 30%, transparent); }
