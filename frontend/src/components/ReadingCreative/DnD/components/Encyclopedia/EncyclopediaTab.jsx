@@ -15,7 +15,6 @@ import FeatListView from './FeatListView';
 import FeatDetailView from './FeatDetailView';
 import BackgroundListView from './BackgroundListView';
 import BackgroundDetailView from './BackgroundDetailView';
-import ClassFeaturesHomeView from './ClassFeaturesHomeView';
 import OptionLibraryView from './OptionLibraryView';
 import { raceAccent, classAccent } from './accents';
 
@@ -49,7 +48,6 @@ export default function EncyclopediaTab({ editMode = false }) {
     else if (id === 'items') push({ view: 'itemList', title: 'Items' });
     else if (id === 'feats') push({ view: 'featList', title: 'Feats' });
     else if (id === 'backgrounds') push({ view: 'backgroundList', title: 'Backgrounds' });
-    else if (id === 'classFeatures') push({ view: 'classFeatures', title: 'Class Features' });
   };
 
   const openItem = (item) => push({ view: 'item', title: item.name, itemId: item.id, preview: item });
@@ -126,9 +124,6 @@ export default function EncyclopediaTab({ editMode = false }) {
       break;
     case 'background':
       body = <BackgroundDetailView key={current.bgId} bgId={current.bgId} preview={current.preview} editMode={editMode} onDeleted={pop} />;
-      break;
-    case 'classFeatures':
-      body = <ClassFeaturesHomeView onOpenCategory={openOptions} />;
       break;
     case 'optionLib':
       body = <OptionLibraryView key={current.categoryKey} categoryKey={current.categoryKey} />;

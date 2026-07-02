@@ -1,7 +1,27 @@
 import { ChevronRight } from 'lucide-react';
 import { getRoots, getNode } from '../../rules/registry';
 import { raceAccent } from './accents';
-import useLoreOverrides from './useLoreOverrides';
+
+// Base-race card one-liners are hard-coded so the grid paints instantly instead
+// of popping in after the async lore fetch. Each race's full, editable tagline
+// still lives in the DB and shows on its detail page; this is just the at-a-glance
+// hook for the list. Keep in sync if you rename a race's tagline.
+const RACE_TAGLINES = {
+  Dragonborn: 'Proud dragon-blooded humanoids with a breath weapon.',
+  Dwarf: 'Stout, stalwart folk of stone and forge.',
+  Elf: 'Graceful, long-lived folk attuned to magic.',
+  Fairy: 'Tiny winged folk of the Feywild.',
+  Genasi: 'Elemental-touched humanoids of the planes.',
+  Gnome: 'Small, brilliant, irrepressibly curious folk.',
+  Goliath: 'Towering, competitive mountain dwellers.',
+  'Half-Elf': 'Charismatic wanderers of two worlds.',
+  'Half-Orc': 'Fierce, enduring folk of orcish strength.',
+  Halfling: 'Small, brave, and improbably lucky folk.',
+  Human: 'Ambitious, adaptable, and everywhere.',
+  Tabaxi: 'Curious, catlike wanderers and collectors.',
+  Tiefling: 'Fiend-blooded folk marked by infernal heritage.',
+  Uma: 'Driven heirs to an eternal tradition of competition.',
+};
 
 /**
  * The major-races grid. Each major race is one card (Elf encompasses Wood/High/
@@ -10,7 +30,6 @@ import useLoreOverrides from './useLoreOverrides';
  */
 export default function RaceListView({ onOpen }) {
   const races = getRoots('race');
-  const { overrides } = useLoreOverrides();
   return (
     <div className="wiki-list">
       <h2 className="wiki-list__title">Races</h2>
@@ -28,7 +47,7 @@ export default function RaceListView({ onOpen }) {
               <span className="wiki-card__accent" />
               <span className="wiki-card__body">
                 <span className="wiki-card__name">{node.name}</span>
-                {overrides[node.id]?.tagline && <span className="wiki-card__tagline">{overrides[node.id].tagline}</span>}
+                {RACE_TAGLINES[node.name] && <span className="wiki-card__tagline">{RACE_TAGLINES[node.name]}</span>}
                 {subraceCount > 0 && (
                   <span className="wiki-card__meta">{subraceCount} lineage{subraceCount > 1 ? 's' : ''}</span>
                 )}
