@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Athlete",
+    "description": "You trained your body to peak physical condition, competing in feats of strength, speed, and agility. Whether wrestler, runner, gladiator, or acrobat, you know both the roar of the crowd and the quiet discipline of relentless practice.",
+    "skill_proficiencies": [
+      "Athletics",
+      "Acrobatics"
+    ],
+    "tool_proficiencies": [],
+    "languages": [
+      "One of your choice"
+    ],
+    "equipment": [
+      "A trophy from an athletic contest (a ribbon, a medal, or a bit of a wooden spar you broke)",
+      "A bottle of liniment",
+      "A bandage",
+      "A set of common clothes",
+      "A belt pouch containing 10 gp"
+    ],
+    "feature_name": "Echoes of Victory",
+    "feature_desc": "People are inclined to remember your past athletic triumphs, and you can trade on that fame. You know the local sports scene and can readily find fellow athletes, trainers, sponsors, and enthusiasts who might offer lodging, a friendly ear, or an introduction. You can also recall notable competitions, champions, and rivalries, and use that knowledge to strike up rapport with those who follow the games.",
+    "source": "SCAG",
+    "is_custom": 0
+  }
+]

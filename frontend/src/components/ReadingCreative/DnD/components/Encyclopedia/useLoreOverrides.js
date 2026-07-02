@@ -41,6 +41,7 @@ export function applyOverride(detail, ov) {
     ...detail,
     tagline: ov.tagline ?? detail.tagline,
     overview: ov.overview ?? detail.overview,
+    definingFeature: ov.definingFeature ?? detail.definingFeature,
     lore,
     loreLabels: { ...(detail.loreLabels || {}), ...(ov.loreLabels || {}) },
   };

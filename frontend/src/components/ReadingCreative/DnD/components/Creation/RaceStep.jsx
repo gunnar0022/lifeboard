@@ -2,6 +2,7 @@ import { ChevronLeft } from 'lucide-react';
 import { getRoots, getChildren } from '../../rules/registry';
 import { raceAccent } from '../Encyclopedia/accents';
 import RaceDetailView from '../Encyclopedia/RaceDetailView';
+import useLoreOverrides from '../Encyclopedia/useLoreOverrides';
 import ChooserShell from './ChooserShell';
 import { racialLayerPatch } from './creationUtils';
 
@@ -13,6 +14,7 @@ import { racialLayerPatch } from './creationUtils';
  */
 export default function RaceStep({ draft, setDraft }) {
   const races = getRoots('race');
+  const { overrides } = useLoreOverrides();
   const race = draft.meta.race || null;
   const subrace = draft.meta.subrace || '';
   const accent = raceAccent(race);
@@ -50,6 +52,7 @@ export default function RaceStep({ draft, setDraft }) {
           nodeId={focus}
           accent={accent}
           editMode={false}
+          override={overrides[focus]}
           onOpen={(child) => selectSubrace(child.name)}
         />
       </div>

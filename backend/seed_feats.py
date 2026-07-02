@@ -11,7 +11,10 @@ Run from the project root:
 import asyncio
 
 from backend.database import get_db
-from backend.seed import seed_dnd_feats
+from backend.export_content import CONTENT_TABLES
+from backend.seed_content import load_table
+
+_FEATS_SPEC = next(s for s in CONTENT_TABLES if s["table"] == "dnd_feats")
 
 # Mirror of the dnd_feats schema in database.py, so this seeder also works on a
 # DB created before the feats table was added (without running full init_db).
@@ -38,12 +41,11 @@ async def main():
         await db.execute(_CREATE_FEATS)
         await db.commit()
         print("  [OK] dnd_feats table ready")
+        # Load the feats from the git-tracked JSON snapshot (INSERT OR IGNORE).
+        await load_table(db, _FEATS_SPEC)
+        print("Feats seeding complete.")
     finally:
         await db.close()
-
-    # Reuses the single source of truth for the starter feat data (INSERT OR IGNORE).
-    await seed_dnd_feats()
-    print("Feats seeding complete.")
 
 
 if __name__ == "__main__":

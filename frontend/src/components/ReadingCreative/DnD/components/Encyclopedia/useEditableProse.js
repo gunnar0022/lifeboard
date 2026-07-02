@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { applyOverride } from './useLoreOverrides';
 import { slugify } from './loreText';
 
@@ -12,6 +12,12 @@ import { slugify } from './loreText';
  */
 export default function useEditableProse(nodeId, base, override, onSaveOverride) {
   const [draft, setDraft] = useState(() => override || {});
+
+  // Flavor now lives solely in the backend and arrives asynchronously, so adopt
+  // the override into the draft when it loads or changes (the useState initializer
+  // only runs once). Editing commits on blur, which sets the override to the same
+  // draft, so this never clobbers in-flight edits.
+  useEffect(() => { setDraft(override || {}); }, [nodeId, override]);
 
   const detail = applyOverride(base, draft);
   const commit = () => onSaveOverride?.(nodeId, draft);

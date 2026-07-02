@@ -23,7 +23,9 @@ venv/
 env/
 
 # Data & database (user-specific)
-data/
+# Anchored to the repo root so it only ignores the backend DB dir — an unanchored
+# `data/` also swallowed frontend source under rules/data/ (abilityBonuses.js etc.).
+/data/
 *.db
 *.sqlite3
 

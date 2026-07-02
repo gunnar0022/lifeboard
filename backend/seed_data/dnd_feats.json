@@ -1,0 +1,42 @@
+[
+  {
+    "id": 2,
+    "name": "Alert",
+    "prerequisite": "",
+    "description": "Always on the lookout for danger, you can't be caught flat-footed.",
+    "benefits": [
+      "You gain a +5 bonus to initiative.",
+      "You can't be surprised while you are conscious.",
+      "Other creatures don't gain advantage on attack rolls against you as a result of being unseen by you."
+    ],
+    "asi": {},
+    "repeatable": 0,
+    "source": "PHB",
+    "is_custom": 0
+  },
+  {
+    "id": 3,
+    "name": "Charger",
+    "prerequisite": "",
+    "description": "When you use your action to Dash, you can use a bonus action to make one melee weapon attack or to shove a creature. If you move at least 10 feet in a straight line immediately before taking this bonus action, you either gain a +5 bonus to the attack’s damage roll (if you chose to make a melee attack and hit) or push the target up to 10 feet away from you (if you chose to shove and you succeed).",
+    "benefits": [],
+    "asi": {},
+    "repeatable": 0,
+    "source": "Homebrew",
+    "is_custom": 1
+  },
+  {
+    "id": 1,
+    "name": "Tough",
+    "prerequisite": "",
+    "description": "Your body is hardened against punishment.",
+    "benefits": [
+      "Your hit point maximum increases by an amount equal to twice your level when you gain this feat.",
+      "Whenever you gain a level thereafter, your hit point maximum increases by an additional 2 hit points."
+    ],
+    "asi": {},
+    "repeatable": 0,
+    "source": "PHB",
+    "is_custom": 0
+  }
+]

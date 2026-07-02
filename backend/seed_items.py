@@ -12,7 +12,10 @@ Run from the project root:
 import asyncio
 
 from backend.database import get_db
-from backend.seed import seed_dnd_items
+from backend.export_content import CONTENT_TABLES
+from backend.seed_content import load_table
+
+_ITEMS_SPEC = next(s for s in CONTENT_TABLES if s["table"] == "dnd_items")
 
 # Mirror of the dnd_items schema in database.py, so this seeder also works on a
 # DB created before the items table existed (without running full init_db).
@@ -55,12 +58,11 @@ async def main():
         await db.execute(_CREATE_ITEMS)
         await db.commit()
         print("  [OK] dnd_items table ready")
+        # Load the items from the git-tracked JSON snapshot (INSERT OR IGNORE).
+        await load_table(db, _ITEMS_SPEC)
+        print("Items seeding complete.")
     finally:
         await db.close()
-
-    # Reuses the single source of truth for the item data (INSERT OR IGNORE).
-    await seed_dnd_items()
-    print("Items seeding complete.")
 
 
 if __name__ == "__main__":

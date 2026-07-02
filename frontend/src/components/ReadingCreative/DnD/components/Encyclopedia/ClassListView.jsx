@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import { getRoots } from '../../rules/registry';
 import { classAccent } from './accents';
+import useLoreOverrides from './useLoreOverrides';
 
 /**
  * The classes grid. Each calling is one card, tinted with its class color, with
@@ -8,6 +9,7 @@ import { classAccent } from './accents';
  */
 export default function ClassListView({ onOpen }) {
   const classes = getRoots('class').slice().sort((a, b) => a.name.localeCompare(b.name));
+  const { overrides } = useLoreOverrides();
   return (
     <div className="wiki-list">
       <h2 className="wiki-list__title">Classes</h2>
@@ -24,7 +26,7 @@ export default function ClassListView({ onOpen }) {
               <span className="wiki-card__accent" />
               <span className="wiki-card__body">
                 <span className="wiki-card__name">{node.name}</span>
-                {node.tagline && <span className="wiki-card__tagline">{node.tagline}</span>}
+                {overrides[node.id]?.tagline && <span className="wiki-card__tagline">{overrides[node.id].tagline}</span>}
                 {subCount > 0 && (
                   <span className="wiki-card__meta">{subCount} {node.subclassLabel || 'subclass'}{subCount > 1 ? 's' : ''}</span>
                 )}

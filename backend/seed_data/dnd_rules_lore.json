@@ -1,0 +1,1590 @@
+[
+  {
+    "node_id": "Aberrant Mind",
+    "data": {
+      "tagline": "Rewrite reality through psychic power that was never meant for mortal minds.",
+      "overview": "Aberrant Mind shifts the sorcerer toward telepathy, mental manipulation, and subtle spellcasting. It excels at controlling minds, gathering information, and casting powerful magic without obvious signs, making it dangerous both inside and outside combat. Mechanically, it offers exceptional flexibility and efficiency, giving the sorcerer more tools than most origins while maintaining its devastating magical offense."
+    }
+  },
+  {
+    "node_id": "Air Genasi",
+    "data": {
+      "tagline": "Breezy and untethered.",
+      "overview": "Air genasi are descended from djinn, the genies of the Elemental Plane of Air. Embodying many of the airy traits of their otherworldly ancestors, air genasi can draw upon their connection to the winds.\n\nAir genasi’s skin tones include many shades of blue, along with the full range of human skin tones, with bluish or ashen casts. Sometimes their skin is marked by lines that seem like cracks with bluish-white energy spilling out. An air genasi’s hair might blow in a phantom wind or be made entirely of clouds or vapor.",
+      "definingFeature": {
+        "name": "Unending Breath",
+        "desc": "Hold your breath indefinitely; lightning resistance and Levitate at higher level."
+      }
+    }
+  },
+  {
+    "node_id": "Alchemist",
+    "data": {
+      "tagline": "Every problem has a formula—it's just a matter of mixing the right ingredients.",
+      "overview": "The Alchemist specializes in experimental elixirs, restorative magic, and enhancing allies through magical concoctions. Rather than overwhelming enemies with direct damage, it provides healing, buffs, and flexible support while supplementing its spells with chemical creations. Playing an Alchemist feels like constantly looking for the right solution to the current problem, making it one of the most support-oriented artificer paths."
+    }
+  },
+  {
+    "node_id": "Arcana Domain",
+    "data": {
+      "overview": "The Arcana Domain is the cleric for players who want to stand at the intersection of divine power and arcane magic. While most clerics focus primarily on healing, protection, or direct intervention from their deity, Arcana clerics expand their toolkit by borrowing from the wizard's world of spells and magical knowledge. They gain access to arcane cantrips and abilities that make them far more versatile problem-solvers than many other clerics, allowing them to contribute in situations that normally fall outside the class's traditional strengths. An Arcana cleric still serves as a capable healer and support character, but their deeper understanding of magic itself makes them particularly effective against magical threats, enemy spellcasters, and supernatural phenomena. If a standard cleric channels divine power to shape the world, an Arcana cleric seeks to understand the underlying rules that govern magic and use that knowledge to their advantage.",
+      "tagline": "A divine scholar who blends the miracles of a cleric with the versatility and magical expertise of a wizard."
+    }
+  },
+  {
+    "node_id": "Arcane Archer",
+    "data": {
+      "overview": "Arcane Archers transform ordinary shots into precise magical attacks capable of hindering, damaging, or manipulating enemies. Rather than casting spells directly, they enhance key attacks with specialized arcane techniques that reward accuracy and careful timing. Playing one feels deliberate, choosing exactly the right enchanted arrow to change the course of a battle."
+    }
+  },
+  {
+    "node_id": "Arcane Trickster",
+    "data": {
+      "tagline": "A magician who lies, cheats, and steals with illusion and enchantment.",
+      "overview": "Arcane Tricksters blend the Rogue's agility with a limited selection of magical spells, using illusions, enchantments, and magical tricks to deceive enemies and overcome obstacles. Their magic enhances their existing toolkit rather than replacing it, opening countless creative solutions both inside and outside combat. This subclass rewards players who enjoy improvisation and solving problems in unconventional ways."
+    }
+  },
+  {
+    "node_id": "Armorer",
+    "data": {
+      "tagline": "Become the weapon by turning enchanted armor into an extension of yourself.",
+      "overview": "The Armorer transforms magical armor into its defining invention, allowing the artificer to serve as either a durable frontline defender or a stealthy ranged combatant. Its armor evolves alongside the character, providing defensive strength, mobility, and specialized weapon systems without relying on conventional equipment. The subclass feels like a customizable powered suit, encouraging players to adapt their role to the needs of the party."
+    }
+  },
+  {
+    "node_id": "Artificer",
+    "data": {
+      "tagline": "An inventor who infuses items with magic.",
+      "overview": "Artificers are inventors, engineers, and magical craftsmen who approach spellcasting as a science rather than a mystical gift. Instead of simply casting spells, they create magical devices, infuse ordinary equipment with lasting enchantments, and solve problems through preparation and ingenuity. Their strength lies in versatility—an artificer can adapt to nearly any situation by combining magic, technology, and clever planning. Whether supporting allies, enhancing equipment, or bringing specialized inventions into battle, they excel at making both themselves and their team more capable.",
+      "definingFeature": {
+        "name": "Infuse Item",
+        "desc": "Imbue mundane gear with magical infusions, equipping yourself and allies with custom magic items."
+      },
+      "lore": {
+        "role": "Flex / Support / Force Multiplier\n\nArtificers specialize in making themselves and their allies better at what they already do. Through infused equipment, magical inventions, and carefully chosen spells, they can reinforce weaknesses, amplify strengths, or temporarily reshape the party's capabilities to meet the challenges ahead. An artificer may spend one day turning a frontline fighter into an unstoppable defensive wall, the next day enhancing a damage dealer's effectiveness, or adjusting their own equipment to fill a role the group is missing. While they can contribute respectable damage, control, or defense themselves, their greatest strength is often increasing the effectiveness of everyone around them.",
+        "playstyle": "Artificer rewards players who enjoy understanding how a party functions as a system. Much of the class's power comes from recognizing which allies benefit most from additional armor, mobility, accuracy, utility, or magical equipment, then distributing resources accordingly. Unlike many classes that focus primarily on optimizing their own turns, artificers frequently make decisions that affect the entire group's performance throughout an adventuring day.\n\nDuring combat, artificers typically juggle several overlapping responsibilities: supporting allies, managing subclass features, maintaining concentration spells, and contributing damage or control when opportunities arise. Their turns are rarely explosive, but the cumulative impact of good preparation and smart resource allocation can be felt across every encounter. Artificers are also remarkably self-sufficient, able to shift toward offense, defense, support, or utility when circumstances demand it. The class is moderately complex mechanically, but especially rewarding for players who enjoy evaluating tradeoffs, identifying what the party needs most, and adjusting their toolkit to meet those needs.",
+        "subclasses": "Every artificer approaches problems through magical invention, but each subclass answers a different question about where those inventions should be focused. Some turn themselves into heavily armored combatants, some deploy magical artillery, some fight alongside engineered companions, and others support their party through restorative mixtures and experimental formulas. Unlike many classes where subclasses primarily change combat abilities, artificer subclasses often redefine how you contribute to the group's overall strategy. Whether you're enhancing yourself, empowering allies, controlling space, or commanding constructs, every artificer remains a builder of solutions—but the form those solutions take can be dramatically different."
+      }
+    }
+  },
+  {
+    "node_id": "Artillerist",
+    "data": {
+      "tagline": "Fill the battlefield with magical firepower and let your inventions do the talking.",
+      "overview": "The Artillerist focuses on destructive spellcasting supported by magical cannons that provide sustained offense or defensive utility. These arcane weapons can bombard enemies, protect nearby allies, or control space throughout an encounter, allowing the artificer to influence the battlefield every round. It plays like a dedicated magical artillery platform, excelling at ranged combat and area damage while remaining safely behind the front line."
+    }
+  },
+  {
+    "node_id": "Assassin",
+    "data": {
+      "tagline": "Strike first, strike hard, and end the fight before it truly begins.",
+      "overview": "Assassins specialize in eliminating priority targets before they have a chance to react. Their abilities reward careful planning, stealth, and ambush tactics, making them devastating when they control how an encounter begins. Playing one feels patient and calculated, with your biggest victories coming from preparation rather than prolonged combat.",
+      "definingFeature": {
+        "name": "Assassinate",
+        "desc": "Advantage on surprised foes, and automatic critical hits against them."
+      }
+    }
+  },
+  {
+    "node_id": "Banneret (Purple Dragon Knight)",
+    "data": {
+      "tagline": "Lead from the front, inspiring allies through courage and determination.",
+      "overview": "Bannerets embody the ideal of the battlefield commander, supporting their companions through leadership rather than magic. Their abilities improve the effectiveness of the entire party by allowing allies to recover, reposition, and fight with renewed confidence while the Banneret remains an accomplished Fighter in their own right. Playing one feels collaborative, finding satisfaction in making the entire team stronger through your presence."
+    }
+  },
+  {
+    "node_id": "Barbarian",
+    "data": {
+      "tagline": "A fury-fueled warrior of primal might.",
+      "overview": "Barbarians are warriors who overcome impossible odds through raw physical power and sheer determination. Rather than relying on refined technique or magical abilities, they thrive by charging directly into danger, enduring punishment that would cripple other adventurers, and hitting back even harder. They excel when the fight becomes chaotic, turning aggression into a weapon and surviving encounters through toughness as much as skill. Regardless of specialization, every Barbarian embodies the fantasy of an unstoppable force that refuses to stay down.",
+      "definingFeature": {
+        "name": "Rage",
+        "desc": "Enter a battle fury for bonus damage, resistance to physical damage, and advantage on Strength checks and saves."
+      },
+      "lore": {
+        "role": "Tank • Bruiser • Single-Target DPS\n\nBarbarians are front-line combatants who absorb enemy attention while dealing consistently heavy melee damage. Rather than protecting allies through shields or tactics, they survive by being incredibly difficult to kill, allowing them to pressure dangerous enemies and dominate prolonged fights.",
+        "playstyle": "Playing a Barbarian is straightforward on the surface but rewards good positioning and target selection. Their turns are often focused on getting into melee quickly and staying there, making them one of the most accessible martial classes for new players. Outside combat, Barbarians tend to solve problems through physicality, intimidation, and endurance rather than subtlety or knowledge, giving them a distinct role during exploration and social encounters.",
+        "subclasses": "Every Barbarian shares the same foundation of relentless offense and exceptional durability, but subclasses determine how they express that strength. Some become nearly indestructible defenders, others channel supernatural spirits or primal magic, while some focus entirely on overwhelming offense or battlefield disruption. No matter the path, every Barbarian remains a fearless front-line warrior whose greatest strength is meeting danger head-on."
+      }
+    }
+  },
+  {
+    "node_id": "Bard",
+    "data": {
+      "tagline": "A jack-of-all-trades whose art is magic.",
+      "overview": "Bards are masters of inspiration, creativity, and versatility, weaving magic through music, stories, performances, or sheer force of personality. Rather than specializing in one discipline, they excel at adapting to the needs of the moment—supporting allies, hindering enemies, solving problems, and filling gaps wherever the party needs them most. Their greatest strength isn't raw magical power, but their ability to elevate everyone around them while remaining remarkably capable in almost any situation.",
+      "definingFeature": {
+        "name": "Bardic Inspiration",
+        "desc": "Hand allies a die they can add to a later check, attack, or save — a flexible bonus you grant from across the field."
+      },
+      "lore": {
+        "role": "Support / Controller / Flex\n\nBards specialize in empowering allies and disrupting enemies through buffs, debuffs, crowd control, and utility magic. While they can contribute respectable damage or even fight on the front lines depending on their subclass, their true value comes from making the entire party perform better and giving the group answers to a wide variety of challenges.",
+        "playstyle": "Bards reward creativity and adaptability more than rigid optimization. They constantly make small decisions that influence the flow of combat, choosing whether to inspire allies, disable enemies, cast versatile spells, or step into another role as needed. Outside combat, they are among the strongest classes in the game, often excelling in social encounters, investigations, negotiations, performances, and general problem-solving. The class is moderately complex, encouraging players to think beyond simply defeating enemies and instead focus on enabling the entire party to succeed. Getting stronger as a Bard isn't just about level-ups, but learning the broad range of choices while managing your magic resources and being ready to improve through non-combat scenarios. ",
+        "subclasses": "Every bard shares the identity of a charismatic support caster whose magic is tied to expression and inspiration. The subclasses determine how that inspiration manifests. Some become exceptional diplomats, others fearless warriors, storytellers, mediums, manipulators, or creators of magical wonders. While every bard retains their flexible core, each college shifts the balance between support, offense, control, and utility in dramatically different ways.",
+        "what_does_the_bard_really_offer": "The bard is one of D&D's most difficult classes to evaluate because much of its strength comes from understanding the situation rather than using a specific ability. While other classes often solve problems directly, the bard excels at identifying where a small push can create the greatest impact. A well-timed Inspiration can turn a missed attack into a victory, a carefully chosen spell can remove the most dangerous enemy from a fight, and a successful conversation can avoid a battle entirely. Because of this, many experienced players describe the bard as a force multiplier—a character whose greatest strength is making everyone else more effective.\n\nThe bard rewards players who pay attention to the relationships between the party, the world, and the challenges in front of them. A skilled bard learns where the group's weaknesses are, which allies need support, which enemies pose the greatest threat, and when a social encounter is becoming more dangerous than a combat encounter. Rather than excelling in a single area, the bard moves freely between many roles, adapting to whatever the moment requires. In the hands of a player who understands the flow of the campaign and how their abilities influence the people and events around them, the bard can have an impact on nearly every part of the adventure. Their greatest successes are often subtle, but over time they have a remarkable ability to make difficult situations tilt in the party's favor."
+      },
+      "loreLabels": {
+        "what_does_the_bard_really_offer": "What does the Bard Really Offer?"
+      }
+    }
+  },
+  {
+    "node_id": "Battle Master",
+    "data": {
+      "tagline": "A tactical genius who wins through skill, precision, and battlefield control.",
+      "overview": "Battle Masters study martial techniques that let them influence the flow of combat in ways other Fighters cannot. Their special maneuvers allow them to trip enemies, protect allies, disarm opponents, or create openings through superior technique rather than raw strength. Playing one rewards thoughtful decision-making, with every turn presenting opportunities to outplay your opponents."
+    }
+  },
+  {
+    "node_id": "Battle Smith",
+    "data": {
+      "tagline": "Stand beside your greatest invention and fight as one.",
+      "overview": "The Battle Smith blends martial combat with magical support, fighting alongside a loyal mechanical companion that protects allies and pressures enemies. Unlike many support-focused artificers, it is comfortable on the front lines, combining weapon attacks, spellcasting, and coordinated teamwork with its construct. The subclass rewards thoughtful positioning and cooperation, making both the artificer and its companion feel like equal parts of a single fighting unit."
+    }
+  },
+  {
+    "node_id": "Beast Master",
+    "data": {
+      "tagline": "Two combatants. One strategy.",
+      "overview": "Beast Master transforms the ranger into a coordinated fighting pair, where success comes from managing both your own actions and your companion's positioning. Your beast isn't just extra damage—it can block movement, pressure vulnerable enemies, protect allies, and help control the battlefield in ways a lone ranger cannot. The subclass rewards players who enjoy planning around two pieces on the board, constantly deciding whether the ranger or their companion is best suited to solve the immediate problem."
+    }
+  },
+  {
+    "node_id": "Bladesinging",
+    "data": {
+      "tagline": "A graceful spellblade who dances between swordplay and spellcasting.",
+      "overview": "Bladesingers blend elegant melee combat with arcane magic, becoming surprisingly agile and resilient for a Wizard. Rather than standing safely behind the front line, they weave spells and weapon attacks together while relying on speed and precision instead of heavy armor. Playing one feels fast and fluid, rewarding careful positioning and balancing offense with defense."
+    }
+  },
+  {
+    "node_id": "Bloodline of Asmodeus",
+    "data": {
+      "tagline": "The classic infernal line.",
+      "overview": "The tieflings connected to Nessus command the power of fire and darkness, guided by a keener than normal intellect, as befits those linked to Asmodeus himself.",
+      "definingFeature": {
+        "name": "Infernal Legacy",
+        "desc": "Thaumaturgy, then Hellish Rebuke and Darkness."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Baalzebul",
+    "data": {
+      "tagline": "Lord of decay.",
+      "overview": "The crumbling realm of Maladomini is ruled by Baalzebul, who excels at corrupting those whose minor sins can be transformed into acts of damnation. Tieflings linked to this archdevil can corrupt others both physically and psychically.",
+      "definingFeature": {
+        "name": "Legacy of Maladomini",
+        "desc": "Thaumaturgy, then Ray of Sickness and Crown of Madness."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Dispater",
+    "data": {
+      "tagline": "Master of secrets.",
+      "overview": "The great city of Dis occupies most of Hell's second layer. It is a place where secrets are uncovered and shared with the highest bidder, making tieflings tied to Dispater excellent spies and infiltrators.",
+      "definingFeature": {
+        "name": "Legacy of Dis",
+        "desc": "Thaumaturgy, then Disguise Self and Detect Thoughts."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Fierna",
+    "data": {
+      "tagline": "Line of influence.",
+      "overview": "A master manipulator, Fierna grants tieflings tied to her forceful personalities.\n\n",
+      "definingFeature": {
+        "name": "Legacy of Phlegethos",
+        "desc": "Friends, then Charm Person and Suggestion."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Glasya",
+    "data": {
+      "tagline": "Line of trickery.",
+      "overview": "Glasya, Hell's criminal mastermind, grants her tiefiings magic that is useful for committing heists.",
+      "definingFeature": {
+        "name": "Legacy of Malbolge",
+        "desc": "Minor Illusion, then Disguise Self and Invisibility."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Levistus",
+    "data": {
+      "tagline": "Line of ice.",
+      "overview": "Frozen Stygia is ruled by Levistus, an archdevil known for offering bargains to those who face an inescapable doom.",
+      "definingFeature": {
+        "name": "Legacy of Stygia",
+        "desc": "Ray of Frost, then Armor of Agathys and Darkness."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Mammon",
+    "data": {
+      "tagline": "Line of greed.",
+      "overview": "The great miser Mammon loves coins above all else. Tieflings tied to him excel at gathering and safeguarding wealth.",
+      "definingFeature": {
+        "name": "Legacy of Minauros",
+        "desc": "Mage Hand, then Tenser's Floating Disk and Arcane Lock."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Mephistopheles",
+    "data": {
+      "tagline": "Line of arcane fire.",
+      "overview": "In the frozen realm of Cania, Mephistopheles offers arcane power to those who entreat with him. Tieflings linked to him master some arcane magic.",
+      "definingFeature": {
+        "name": "Legacy of Cania",
+        "desc": "Mage Hand, then Burning Hands and Flame Blade."
+      }
+    }
+  },
+  {
+    "node_id": "Bloodline of Zariel",
+    "data": {
+      "tagline": "Line of war.",
+      "overview": "Tieflings with a blood tie to Zariel are stronger than the typical tiefling and receive magical abilities that aid them in battle.",
+      "definingFeature": {
+        "name": "Legacy of Avernus",
+        "desc": "Thaumaturgy, then Searing Smite and Branding Smite."
+      }
+    }
+  },
+  {
+    "node_id": "Cavalier",
+    "data": {
+      "tagline": "The steadfast guardian who protects allies and refuses to yield ground.",
+      "overview": "Cavaliers excel at defending companions and punishing enemies who ignore them. While often associated with mounted combat, their protective abilities remain highly effective even on foot, making them exceptional front-line defenders in nearly any campaign. Playing one feels like holding the line, forcing enemies to deal with you before they can threaten anyone else."
+    }
+  },
+  {
+    "node_id": "Champion",
+    "data": {
+      "tagline": "Simple, reliable, and brutally effective—the pure martial warrior.",
+      "overview": "The Champion focuses on refining the Fighter's core strengths rather than introducing complex mechanics. It emphasizes athletic excellence, durability, and consistently powerful attacks, making it one of the easiest subclasses to pick up while remaining effective throughout an entire campaign. Playing a Champion feels dependable—you spend less time managing abilities and more time mastering the fundamentals of positioning and combat."
+    }
+  },
+  {
+    "node_id": "Chronurgy Magic",
+    "data": {
+      "tagline": "Bend time itself to ensure events unfold in your favor.",
+      "overview": "Chronurgy Wizards manipulate the flow of time, altering initiative, delaying effects, and influencing the outcome of crucial moments. Their abilities reward foresight and tactical planning, allowing them to reshape encounters in subtle but incredibly powerful ways. Playing one feels like quietly rewriting history, ensuring the battle progresses exactly as you intended."
+    }
+  },
+  {
+    "node_id": "Circle of Dreams",
+    "data": {
+      "tagline": "Keep your allies standing while the wilderness quietly works in your favor.",
+      "overview": "The Circle of Dreams leans heavily into healing, protection, and keeping the party moving through long adventures. Its healing doesn't compete directly with its spellcasting, allowing you to rescue injured allies without giving up your turn's biggest spell. Much of the gameplay revolves around deciding whether to spend your resources preventing the next problem or saving them for when things inevitably go wrong."
+    }
+  },
+  {
+    "node_id": "Circle of Spores",
+    "data": {
+      "tagline": "Life and death are part of the same cycle—use both as your weapons.",
+      "overview": "Circle of Spores encourages druids to fight much closer to the action than most of their peers. Rather than transforming into animals, it often uses Wild Shape to awaken a cloud of deadly spores that punishes nearby enemies while making the druid far tougher. The subclass constantly asks whether it's worth stepping into dangerous positions to maximize its abilities or staying back to preserve concentration on powerful control spells.",
+      "definingFeature": {
+        "name": "Symbiotic Entity",
+        "desc": "Spend Wild Shape for temporary hit points and supercharged spore damage."
+      }
+    }
+  },
+  {
+    "node_id": "Circle of Stars",
+    "data": {
+      "tagline": "The heavens always have another answer if you're willing to read them.",
+      "overview": "Circle of Stars adds remarkable consistency to the druid's toolkit by letting you shift between offensive, defensive, and supportive celestial forms without giving up access to your spellcasting. Before or during a fight, you'll regularly choose which stellar form best fits the encounter—more damage, better healing, or stronger concentration on your spells. It rewards players who enjoy adapting from round to round instead of committing to a single role.",
+      "definingFeature": {
+        "name": "Starry Form",
+        "desc": "Spend Wild Shape to take a constellation form granting ranged attacks, healing, or insight."
+      }
+    }
+  },
+  {
+    "node_id": "Circle of Wildfire",
+    "data": {
+      "tagline": "Sometimes nature protects by letting the old burn away to make room for the new.",
+      "overview": "Circle of Wildfire balances destruction and restoration, pairing explosive fire magic with healing and a loyal wildfire spirit that fights beside you. You'll constantly decide whether to use the spirit to improve your mobility, support allies, or help pressure enemies while choosing between offensive fire spells and the druid's broader support toolkit. It captures the dual nature of fire: equally capable of devastation and renewal."
+    }
+  },
+  {
+    "node_id": "Circle of the Land",
+    "data": {
+      "overview": "Circle of the Land doubles down on the druid's identity as a full spellcaster, expanding both its magical endurance and the variety of spells it can bring to an adventure. Rather than relying heavily on Wild Shape in combat, it rewards careful spell selection and recognizing which terrain-controlling or utility spell will have the biggest impact. If you enjoy solving problems through clever spell choice, this is the quintessential caster druid.",
+      "tagline": "Master the land itself, and you'll always have the right spell prepared."
+    }
+  },
+  {
+    "node_id": "Circle of the Moon",
+    "data": {
+      "tagline": "When the fighting starts, become the beast instead of commanding one.",
+      "overview": "Circle of the Moon transforms Wild Shape from a utility tool into your primary combat feature. You'll regularly decide whether a situation is better solved with powerful spellcasting or by immediately becoming a bear, wolf, elemental, or another powerful beast and fighting on the front line. It offers one of the most durable playstyles in the game, rewarding players who know exactly when to switch between animal instincts and magical mastery."
+    }
+  },
+  {
+    "node_id": "Circle of the Shepherd",
+    "data": {
+      "tagline": "The battlefield belongs to those who never fight alone.",
+      "overview": "Circle of the Shepherd specializes in empowering summoned creatures and supporting the entire party through powerful spiritual totems. Positioning becomes especially important, both for your allies and for the creatures you've summoned, as much of your effectiveness comes from keeping everyone within the right areas of influence. Success often comes from coordinating multiple friendly creatures rather than maximizing your own individual actions."
+    }
+  },
+  {
+    "node_id": "Cleric",
+    "data": {
+      "tagline": "A divine conduit of healing and judgment.",
+      "overview": "Clerics are divine spellcasters whose magic comes from their faith and devotion to a higher power. They wield some of the most versatile magic in the game, able to heal wounds, protect allies, destroy undead, reshape the battlefield, and call down devastating divine wrath. Their connection to a deity also makes them one of the classes most naturally tied to a world's religions, politics, and history, giving plenty of opportunities for roleplaying beyond combat.",
+      "definingFeature": {
+        "name": "Channel Divinity",
+        "desc": "Spend divine energy on Turn Undead or a domain power, recharging on a short rest."
+      },
+      "lore": {
+        "role": "Support / Healer / Controller / Flex\n\nClerics are the backbone of many adventuring parties. They can deal impressive damage—especially against undead—but one of their biggest challenges is deciding when to spend their turn supporting the team instead. Every round asks the question: Is ending the fight faster more valuable than keeping an ally standing? Knowing when to attack, heal, protect, or disable enemies is what separates an average cleric from an exceptional one.",
+        "playstyle": "Clerics are mechanically straightforward to learn but difficult to master. They have access to a wide range of powerful spells each day, so much of their skill comes from choosing the right tools before an adventure and recognizing the right moment to use them. Unlike dedicated healers in many RPGs, clerics are expected to actively contribute throughout a fight rather than stand in the back casting healing spells. Some battles call for divine fire, others for protective blessings or timely healing, and learning to shift between those roles is the essence of playing a cleric well.",
+        "subclasses": "Every cleric draws from the same powerful divine spell list, but each Divine Domain changes what your deity expects of you and how you serve them. Some domains encourage fighting alongside the front line, others emphasize preserving life, gathering forgotten knowledge, crafting divine relics, or even wielding death itself. The subclass shapes not only your combat style, but often your place within the world's religions and your relationship with the people who share—or oppose—your faith."
+      }
+    }
+  },
+  {
+    "node_id": "Clockwork Soul",
+    "data": {
+      "tagline": "Bring perfect order to a chaotic world and make chance itself obey your will.",
+      "overview": "Clockwork Soul focuses on balance, protection, and consistency, counteracting randomness while shielding allies from harm. Its expanded magical options allow it to control the battlefield, reinforce companions, and solve problems with remarkable reliability. Rather than producing dramatic bursts of chaos, this subclass shines by steadily imposing order and ensuring the party performs at its best regardless of the situation."
+    }
+  },
+  {
+    "node_id": "College of Creation",
+    "data": {
+      "tagline": "Bring imagination to life and let your creations shape the battlefield.",
+      "overview": "The College of Creation turns artistic expression into tangible magic, allowing the bard to conjure objects, animate items, and solve problems with physical manifestations of creativity. It thrives on flexibility, creating opportunities that other classes simply cannot. Playing one rewards inventive thinking, as the best solution is often something no one else considered."
+    }
+  },
+  {
+    "node_id": "College of Eloquence",
+    "data": {
+      "tagline": "Words become weapons when every sentence is impossible to ignore.",
+      "overview": "The College of Eloquence focuses on persuasion, diplomacy, and magical influence, becoming one of the most reliable support bards available. It excels at ensuring allies succeed while making enemy resistance increasingly difficult. Whether negotiating peace or dismantling an opponent's resolve, an Eloquence bard succeeds through confidence and precision rather than spectacle."
+    }
+  },
+  {
+    "node_id": "College of Glamour",
+    "data": {
+      "tagline": "Command every room as though the world itself wants to follow your lead.",
+      "overview": "The College of Glamour channels captivating supernatural beauty into powerful support abilities that reposition allies and influence crowds. It shines by protecting teammates, controlling the flow of battle, and inspiring others to perform beyond their limits. The subclass feels like a charismatic leader whose presence alone reshapes the encounter."
+    }
+  },
+  {
+    "node_id": "College of Lore",
+    "data": {
+      "tagline": "Knowledge is your greatest performance, and every secret is another tool.",
+      "overview": "The College of Lore embraces the bard's role as the ultimate generalist, expanding its magical options and unmatched versatility. It excels at adapting to nearly any challenge, often borrowing techniques that normally belong to entirely different classes. Playing a Lore bard feels like always having another answer waiting in reserve, making it one of the most flexible subclasses in the game."
+    }
+  },
+  {
+    "node_id": "College of Spirits",
+    "data": {
+      "tagline": "Every tale carries power, especially those told by the dead.",
+      "overview": "The College of Spirits draws upon ghostly legends and supernatural storytellers to produce unpredictable but powerful magical effects. It blends support, utility, and battlefield control with a strong element of chance, making each encounter feel slightly different from the last. The subclass rewards players who enjoy embracing narrative flavor alongside mechanical variety."
+    }
+  },
+  {
+    "node_id": "College of Swords",
+    "data": {
+      "tagline": "Turn every duel into a performance where style is just as deadly as skill.",
+      "overview": "The College of Swords transforms the bard into an agile martial combatant who mixes weapon attacks with graceful magical flourishes. Rather than standing behind the front line, it actively weaves between offense, defense, and mobility while still providing support when needed. The result is a highly active playstyle that rewards positioning and tactical movement."
+    }
+  },
+  {
+    "node_id": "College of Valor",
+    "data": {
+      "tagline": "Lead from the front and inspire courage where it matters most.",
+      "overview": "The College of Valor is built for bards who want to stand shoulder to shoulder with the party's warriors. It combines durable frontline combat with classic bardic support, encouraging a balance between weapon attacks, protective magic, and inspiring allies. Compared to the more agile College of Swords, Valor emphasizes teamwork and resilience over personal flair."
+    }
+  },
+  {
+    "node_id": "College of Whispers",
+    "data": {
+      "tagline": "Fear, secrets, and manipulation are sharper than any blade.",
+      "overview": "The College of Whispers specializes in deception, psychological warfare, and devastating single-target strikes. It uses fear and hidden knowledge to undermine enemies both socially and in combat, making it equally dangerous during negotiations and assassinations. Playing a Whispers bard feels like always operating one step beneath the surface, where information and intimidation become your most powerful weapons."
+    }
+  },
+  {
+    "node_id": "Dark Elf",
+    "data": {
+      "tagline": "Drow of the Underdark.",
+      "overview": "Descended from an earlier subrace of dark-skinned elves, the drow were banished from the surface world for following the goddess Lolth down the path to evil and corruption. Now they have built their own civilization in the depths of the Underdark, patterned after the Way of Lolth. Also called dark elves. The drow have black skin that resembles polished obsidian and stark white or pale yellow hair. They commonly have very pale eyes (so pale as to be mistaken for white) in shades of lilac, silver, pink, red, and blue. They tend to be smaller and thinner than most elves.\n\nDrow adventurers are rare, and the race does not exist in all worlds. Check with your Dungeon Master to see if you can play a drow character.",
+      "definingFeature": {
+        "name": "Drow Magic",
+        "desc": "Superior darkvision plus Dancing Lights, Faerie Fire, and Darkness."
+      },
+      "lore": {
+        "society": "Surface dwellers often fear or revile drow on sight thanks to their reputation; many drow adventurers struggle against that prejudice while forging their own path."
+      }
+    }
+  },
+  {
+    "node_id": "Death Domain",
+    "data": {
+      "tagline": "If death comes for your enemies, make sure it arrives quickly.",
+      "overview": "Death clerics trade much of the traditional support identity for raw offensive magic. They specialize in necrotic damage, punishing weakened enemies, and eliminating threats before they can overwhelm the party. Playing one means constantly deciding whether removing an enemy from the fight is worth more than spending that turn protecting an ally—a much more aggressive mindset than most clerics adopt."
+    }
+  },
+  {
+    "node_id": "Divine Soul",
+    "data": {
+      "tagline": "Blend arcane talent with divine grace to become a master of both offense and support.",
+      "overview": "Divine Soul dramatically expands the sorcerer's options by granting access to powerful restorative and protective magic alongside traditional arcane spells. It remains an exceptional offensive caster while gaining the ability to heal allies, remove harmful effects, and strengthen the party. The result is one of the most versatile spellcasters in the game, capable of filling multiple team roles without sacrificing magical power."
+    }
+  },
+  {
+    "node_id": "Draconic Bloodline",
+    "data": {
+      "tagline": "Channel the majesty of dragons and wield elemental power with unwavering confidence.",
+      "overview": "Draconic Bloodline grants the sorcerer greater resilience than most spellcasters while strengthening spells tied to a chosen dragon's elemental affinity. It blends durability with reliable damage, allowing the sorcerer to stay in dangerous situations longer than expected. The subclass feels like a classic battle mage whose magical heritage grows more evident as their power increases."
+    }
+  },
+  {
+    "node_id": "Dragonborn",
+    "data": {
+      "tagline": "Proud dragon-blooded humanoids with a breath weapon.",
+      "overview": "Born of dragons, as their name proclaims, the dragonborn walk proudly through a world that greets them with fearful incomprehension. Shaped by draconic gods or the dragons themselves, dragonborn originally hatched from dragon eggs as a unique race, combining the best attributes of dragons and humanoids. Some dragonborn are faithful servants to true dragons, others form the ranks of soldiers in great wars, and still others find themselves adrift, with no clear calling in life.\n\nThey are distantly related to a particular kind of dragon. Their ancestry determines the damage and area of their breath weapon, and the type of resistance they have.",
+      "definingFeature": {
+        "name": "Breath Weapon",
+        "desc": "Exhale a line or cone of elemental damage determined by your draconic ancestry."
+      },
+      "lore": {
+        "lifespan": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
+        "society": "Value clan and personal honor above all; many wander as exiles or mercenaries proving their worth.",
+        "physical": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Their size is Medium.",
+        "alignment": "Dragonborn tend towards extremes, making a conscious choice for one side or the other between Good and Evil (represented by Bahamut and Tiamat, respectively). More side with Bahamut than Tiamat (whose non-dragon followers are mostly kobolds), but villainous dragonborn can be quite terrible indeed. Some rare few choose to devote themselves to lesser dragon deities, such as Chronepsis (Neutral), and fewer still choose to worship Io, the Ninefold Dragon, who is all alignments at once."
+      }
+    }
+  },
+  {
+    "node_id": "Drakewarden",
+    "data": {
+      "tagline": "Raise a dragon. Fight as one.",
+      "overview": "Drakewarden builds around a draconic companion that steadily grows alongside you, becoming a larger part of your strategy as you level. Unlike Beast Master, the drake leans more toward durability and direct combat support, adding elemental damage, mobility, and eventually aerial options to the ranger's toolkit. The subclass feels like a gradual partnership, rewarding players who enjoy watching a companion evolve from a helpful ally into a defining feature of their combat style."
+    }
+  },
+  {
+    "node_id": "Druid",
+    "data": {
+      "tagline": "A shapeshifting guardian of the wild.",
+      "overview": "Druids are guardians of the natural world, wielding primal magic drawn from the land itself. They command one of the broadest collections of spells in the game, capable of dealing devastating damage, healing allies, controlling the battlefield, summoning creatures, or protecting the party from the elements. Their signature ability, Wild Shape, adds another layer entirely, allowing them to abandon spellcasting altogether and take the form of beasts to scout, infiltrate, explore, or fight. A druid can freeze an advancing army with a blizzard, restore the party's strength, then become a bear and charge into the front line—all within the same encounter.\n\nBeyond combat, druids excel in exploration. Wild Shape allows them to slip into enemy camps as a mouse, scout from above as a hawk, swim beneath dangerous waters, or traverse terrain that would stop most adventurers. Their connection to nature lets them understand wildlife, survive in hostile environments, and uncover clues others would overlook. That deep bond with the natural world also shapes their roleplaying, as many druids see themselves as protectors of balance rather than conquerors of it.",
+      "definingFeature": {
+        "name": "Wild Shape",
+        "desc": "Assume the form of a beast you have seen, gaining its statistics for exploration, scouting, or a tankier body in a fight."
+      },
+      "lore": {
+        "role": "Controller / Support / Flex\n\nDruids are among the most adaptable classes in D&D. They can lock down large sections of the battlefield with terrain and hazards, provide powerful healing and support, unleash respectable magical damage, or transform into durable frontline combatants. Their biggest challenge isn't lacking options—it's deciding which role the party needs most at any given moment.",
+        "playstyle": "Druids are easy to enjoy but difficult to master. At a basic level, you can always contribute by casting reliable spells or using Wild Shape to survive dangerous situations. As you gain experience, however, the class opens dramatically. Every encounter asks questions like: Should I spend this fight concentrating on battlefield control? Is this the moment to heal? Would turning into an animal accomplish more than casting another spell? Should I save Wild Shape for scouting after the battle? Experienced druids succeed not because they always have the strongest ability, but because they recognize which of their many tools best fits the situation.",
+        "subclasses": "Every druid shares the same foundation of primal spellcasting and Wild Shape, but each Circle emphasizes a different expression of nature. Some strengthen beast transformations, others focus on summoning allies, healing companions, commanding stars, spreading decay, or wielding destructive elemental forces. Rather than replacing the druid's flexibility, most subclasses encourage you to lean into one aspect of the class while still leaving the rest of its versatile toolkit available.",
+        "decide_what_kind_of_druid_you_want_to_be": "The druid is one of the most flexible classes in D&D, but that flexibility can also be its greatest challenge. Between your spell list, Wild Shape, and subclass, you have access to healing, battlefield control, exploration, utility, scouting, and, depending on your Circle, even front-line combat. The key is understanding that no single druid excels equally at all of these roles. Before choosing the class, think less about everything a druid can do, and more about what you want to do. Your subclass will heavily influence your strengths, while your spell preparation allows you to adapt around them. Druids thrive when they have a clear identity, even if that identity changes from one adventure to the next.",
+        "flexibility_is_your_greatest_strength": "Unlike many classes, a druid can adjust their prepared spells after every Long Rest, allowing them to respond to the challenges ahead or fill gaps within the party. This adaptability makes the class incredibly rewarding for players who enjoy planning ahead and thinking creatively. It also means you'll often have more choices than almost anyone else at the table. Rather than trying to prepare a little bit of everything, experienced druids usually focus on the role their party needs most that day, trusting their natural versatility to handle unexpected situations as they arise. The druid isn't powerful because it always has the perfect answer—it's powerful because it can become the right character for the adventure ahead."
+      }
+    }
+  },
+  {
+    "node_id": "Dwarf",
+    "data": {
+      "tagline": "Stout, stalwart folk of stone and forge.",
+      "overview": "Kingdoms rich in ancient grandeur, halls carved into the roots of mountains, the echoing of picks and hammers in deep mines and blazing forges, a commitment to clan and tradition, and a burning hatred of goblins and orcs – these common threads unite all dwarves.",
+      "definingFeature": {
+        "name": "Dwarven Resilience",
+        "desc": "Advantage on saves against poison and resistance to poison damage, plus darkvision and stonecunning."
+      },
+      "lore": {
+        "lifespan": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+        "society": "Clan- and craft-focused, valuing tradition, loyalty, and grudges held for generations. Mountain holds and deep mines are home.",
+        "physical": "Short and broad (4–5 ft) but heavy, with thick hair and prized beards.",
+        "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order."
+      }
+    }
+  },
+  {
+    "node_id": "Earth Genasi",
+    "data": {
+      "tagline": "Steady as stone.",
+      "overview": "Tracing their ancestry to dao, the genies of the Elemental Plane of Earth, earth genasi inherit dao’s steadfast strength and control over earth.\n\nAn earth genasi’s skin can be the colors of stone and earth or a human skin tone with glittering sparkles like gem dust. Some earth genasi have lines marking their skin like cracks, either showing glimmering gemlike veins or a dim, yellowish glow. Earth genasi hair can appear carved of stone or crystal or resemble strands of spun metal.",
+      "definingFeature": {
+        "name": "Merge with Stone",
+        "desc": "Unimpeded movement over difficult earthen terrain; Pass Without Trace at higher level."
+      }
+    }
+  },
+  {
+    "node_id": "Echo Knight",
+    "data": {
+      "tagline": "Fight alongside a spectral duplicate that turns the battlefield into your domain.",
+      "overview": "Echo Knights summon a mystical echo of themselves that can attack, defend, and occupy space independently. This unique mechanic allows them to threaten enemies from multiple positions at once, creating opportunities for clever movement, defense, and offense unlike any other Fighter. Playing one feels highly tactical, constantly thinking about positioning—not just for yourself, but for your echo as well."
+    }
+  },
+  {
+    "node_id": "Eldritch Knight",
+    "data": {
+      "tagline": "A warrior who reinforces steel with arcane magic.",
+      "overview": "Eldritch Knights combine traditional martial combat with a carefully chosen selection of wizard spells. Their magic enhances their survivability, mobility, and versatility without replacing their role as front-line Fighters, allowing them to solve problems that ordinary warriors cannot. Playing one feels like weaving spells seamlessly between weapon strikes, balancing martial discipline with magical utility."
+    }
+  },
+  {
+    "node_id": "Elf",
+    "data": {
+      "tagline": "Graceful, long-lived folk attuned to magic.",
+      "overview": "Elves are a magical people of otherworldly grace, living in places of ethereal beauty, in the midst of ancient forests or in silvery spires glittering with faerie light, where soft music drifts through the air and gentle fragrances waft on the breeze. Elves love nature and magic, art and artistry, music and poetry.",
+      "definingFeature": {
+        "name": "Fey Ancestry & Trance",
+        "desc": "Advantage against being charmed, immunity to magical sleep, and a 4-hour meditative trance in place of sleep."
+      },
+      "lore": {
+        "lifespan": "Although elves reach physical maturity at about the same age as humans, the elven understanding of adulthood goes beyond physical growth to encompass worldly experience. An elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old.",
+        "society": "Reclusive and refined, viewing shorter-lived races as hasty. Communities prize art, magic, and long memory.",
+        "physical": "Slender and a little shorter than humans, with pointed ears and an ageless, otherworldly grace.",
+        "alignment": "Elves love freedom, variety, and self-expression, so they lean strongly towards the gentler aspects of chaos. They value and protect others' freedom as well as their own, and are good more often than not. Drow are an exception; their exile into the Underdark has made them vicious and dangerous. Drow are more often evil than not."
+      }
+    }
+  },
+  {
+    "node_id": "Fairy",
+    "data": {
+      "tagline": "Tiny winged folk of the Feywild.",
+      "overview": "The Feywild is home to many fantastic peoples, including fairies. Fairies are a wee folk, but not nearly as much so as their pixie and sprite friends. The first fairies spoke Elvish, Goblin, or Sylvan, and encounters with human visitors prompted many of them to learn Common as well.\n\nInfused with the magic of the Feywild, most fairies look like Small elves with insectile wings, but each fairy has a special physical characteristic that sets the fairy apart. For your fairy, roll on the Fey Characteristics table or choose an option from it. You’re also free to come up with your own characteristic if none of the suggestions below fit your character.",
+      "definingFeature": {
+        "name": "Fairy Magic & Flight",
+        "desc": "Innate fey spells and a flying speed from gossamer wings."
+      },
+      "lore": {
+        "lifespan": "Long-lived like their fey kin, often centuries.",
+        "society": "Whimsical and curious, tied to the courts and wild magic of the Feywild.",
+        "physical": "Small (around 3 ft) and delicate, with insect- or leaf-like wings."
+      }
+    }
+  },
+  {
+    "node_id": "Fey Wanderer",
+    "data": {
+      "tagline": "Charm your allies, unsettle your enemies.",
+      "overview": "Fey Wanderer blends martial combat with the unpredictable influence of the Feywild, adding social presence and subtle magical control to the ranger's toolkit. Rather than focusing solely on damage, it excels at redirecting fear and charm effects, manipulating enemy behavior, and remaining effective in both conversations and combat. Players who enjoy alternating between diplomacy, utility, and reliable weapon attacks will appreciate having meaningful contributions in almost every pillar of the game."
+    }
+  },
+  {
+    "node_id": "Fighter",
+    "data": {
+      "tagline": "The master of weapons and war.",
+      "overview": "Fighters are masters of martial combat, defined not by a single fighting style but by their ability to excel with almost any weapon, armor, or battlefield role. Through discipline, training, and experience, they become adaptable warriors capable of meeting nearly any challenge head-on. Whether standing as an unbreakable defender, a deadly archer, or an aggressive duelist, Fighters succeed through consistency and versatility rather than supernatural gifts. Regardless of specialization, every Fighter represents the pinnacle of skill earned through dedication and practice.",
+      "definingFeature": {
+        "name": "Action Surge",
+        "desc": "Take an entire extra action on your turn, then recharge on a short rest — burst potential no other class matches."
+      },
+      "lore": {
+        "role": "Flex • Tank • Bruiser • Single-Target DPS\nDue to the array of subclasses, the Fighter is one of the most adaptable classes in the game, capable of filling almost any martial role depending on their equipment and subclass. They can defend allies, deal sustained damage, control enemy movement, or specialize in ranged combat, making them valuable in nearly every party composition.",
+        "playstyle": "Playing a Fighter rewards solid tactical decision-making rather than complex resource management. They consistently perform well in combat, with the flexibility to adapt to changing situations and make effective use of weapons, positioning, and teamwork. While Fighters are often most comfortable in battle, many subclasses expand their capabilities with leadership, magic, or unique utility that gives them meaningful contributions outside combat as well.",
+        "subclasses": "Every Fighter shares the same foundation of martial excellence, but subclasses determine how that mastery is expressed. Some focus on perfecting technique, others blend swordplay with magic or supernatural power, while others become inspiring leaders, mounted warriors, or masters of battlefield tactics. No matter the path, every Fighter is defined by skill, reliability, and the ability to rise to whatever challenge lies ahead.\nEach fighter branch has a very distinct feel that separates it from the other sub classes allowing for different fighters to have very different roles and playstyles. "
+      }
+    }
+  },
+  {
+    "node_id": "Fire Genasi",
+    "data": {
+      "tagline": "Hot-blooded and bright.",
+      "overview": "Descended from efreet, the genies of the Elemental Plane of Fire, fire genasi channel the flamboyant and often destructive nature of flame. They show their heritage in their skin tones, which can range from deep charcoal to shades of red and orange. Some bear skin tones common to humanity but with fiery marks, such as slowly swirling lights under their skin that resemble embers or glowing red lines tracing over their bodies like cracks. Fire genasi hair can resemble threads of fire or sooty smoke.",
+      "definingFeature": {
+        "name": "Reach to the Blaze",
+        "desc": "Darkvision and fire resistance; Produce Flame and Burning Hands."
+      }
+    }
+  },
+  {
+    "node_id": "Forest Gnome",
+    "data": {
+      "tagline": "Shy and illusion-touched.",
+      "overview": "As a forest gnome, you have a natural knack for illusion and inherent quickness and stealth. In the worlds of D&D, forest gnomes are rare and secretive. They gather in hidden communities in sylvan forests, using illusions and trickery to conceal themselves from threats or to mask their escape should they be detected. Forest gnomes tend to be friendly with other good-spirited woodland folk, and they regard elves and good fey as their most important allies. These gnomes also befriend small forest animals and rely on them for information about threats that might prowl their lands.",
+      "definingFeature": {
+        "name": "Natural Illusionist",
+        "desc": "You know the Minor Illusion cantrip and can speak with small animals."
+      }
+    }
+  },
+  {
+    "node_id": "Forge Domain",
+    "data": {
+      "tagline": "Stand where the fighting is fiercest, clad in armor blessed by your own handiwork.",
+      "overview": "Forge clerics become durable frontline defenders without sacrificing their spellcasting. They strengthen weapons and armor, shrug off punishment, and comfortably alternate between swinging a weapon and casting powerful support spells. Much of the gameplay revolves around choosing when to stand beside your party's warriors and when to step back to solve problems only a spellcaster can."
+    }
+  },
+  {
+    "node_id": "Genasi",
+    "data": {
+      "tagline": "Elemental-touched humanoids of the planes.",
+      "overview": "Tracing their ancestry to the genies of the Elemental Planes, each genasi can tap into the power of one of the elements. Air, earth, fire, and water — these are the four pillars of the Material Plane and the four types of genasi. Some genasi are direct descendants of a genie, while others were born to non-genasi parents who lived near a place suffused by a genie’s magic.",
+      "definingFeature": {
+        "name": "Elemental Heritage",
+        "desc": "Resistances and innate spells determined by your elemental variant."
+      },
+      "lore": {
+        "lifespan": "Often spans over 120 years.",
+        "society": "Rare and varied; many feel pulled toward the element in their blood and the planes it ties them to.",
+        "physical": "Human-like with an elemental tell — flame-like hair, crystalline skin, a constant breeze, or watery sheen."
+      }
+    }
+  },
+  {
+    "node_id": "Gloom Stalker",
+    "data": {
+      "tagline": "Strike from the darkness before the battle truly begins.",
+      "overview": "Gloom Stalker specializes in opening fights with overwhelming momentum. Its abilities emphasize acting early, remaining difficult to detect, and eliminating dangerous targets before they have an opportunity to respond. While the subclass remains effective throughout longer encounters, it shines brightest when preparation, stealth, and target selection allow it to dictate the first moments of combat. It's an excellent choice for players who enjoy planning engagements and capitalizing on the advantage of going first."
+    }
+  },
+  {
+    "node_id": "Gnome",
+    "data": {
+      "tagline": "Small, brilliant, irrepressibly curious folk.",
+      "overview": "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close-knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play.",
+      "definingFeature": {
+        "name": "Gnome Cunning",
+        "desc": "Advantage on Intelligence, Wisdom, and Charisma saving throws against magic."
+      },
+      "lore": {
+        "lifespan": "Gnomes mature at the same rate as humans, and most are expected to settle into adult life around the age of 40. They can live to 350 years on average, but it's not too uncommon for them to reach 500 years of age.",
+        "society": "Inventive and joyful, delighting in tinkering, illusion, and discovery.",
+        "physical": "Gnomes are between 3 and 4 feet tall and weigh around 40 pounds. Your size is Small.",
+        "alignment": "Gnomes are generally Good. Those who tend towards Law are sages, engineers, researchers, scholars, investigators, or inventors. Those who tend towards Chaos are often minstrels, tricksters, wanderers, or fanciful jewelers. Gnomes are light-hearted, and even the tricksters amongst them favor harmless pranks over vicious schemes."
+      }
+    }
+  },
+  {
+    "node_id": "Goliath",
+    "data": {
+      "tagline": "Towering, competitive mountain dwellers.",
+      "overview": "The first goliaths lived on the highest mountain peaks — far above the tree line, where the air is thin and frigid winds howl. Distantly related to giants and infused with the supernatural essence of their ancestors’ mountainous home, goliaths stand between 7 and 8 feet tall and have a wide array of skin tones resembling different types of stone.",
+      "definingFeature": {
+        "name": "Stone's Endurance",
+        "desc": "Reduce incoming damage with a reaction, a number of times per rest tied to your Constitution."
+      },
+      "lore": {
+        "lifespan": "Comparable to humans.",
+        "society": "Nomadic, intensely competitive, and meritocratic — every member must pull their weight.",
+        "physical": "Huge (7–8 ft) and powerfully built, with grey, stony skin marked by lithoderm patterns."
+      }
+    }
+  },
+  {
+    "node_id": "Grave Domain",
+    "data": {
+      "tagline": "Keep your allies alive until fate truly says their time has come.",
+      "overview": "Grave clerics excel at preventing death rather than constantly restoring lost health. They are rewarded for waiting until healing is truly needed instead of topping off every scratch, allowing them to spend more turns controlling the battlefield or helping eliminate dangerous enemies. Their abilities also make them exceptionally effective against undead, reinforcing their role as guardians of the natural cycle of life and death."
+    }
+  },
+  {
+    "node_id": "Graviturgy Magic",
+    "data": {
+      "tagline": "Control the battlefield by bending the force of gravity itself.",
+      "overview": "Graviturgy Wizards manipulate weight, momentum, and gravitational forces to hinder enemies and assist allies. Rather than dealing overwhelming damage, they excel at repositioning creatures, limiting movement, and subtly influencing the terrain of combat. Playing one feels highly tactical, constantly reshaping how everyone moves across the battlefield."
+    }
+  },
+  {
+    "node_id": "Half-Elf",
+    "data": {
+      "tagline": "Charismatic wanderers of two worlds.",
+      "overview": "Walking in two worlds but truly belonging to neither, half-elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves.",
+      "definingFeature": {
+        "name": "Fey Ancestry & Versatility",
+        "desc": "Advantage against charm, immunity to magical sleep, and flexible skill and ability bonuses."
+      },
+      "lore": {
+        "lifespan": " Half-elves age at much the same rate as humans, reaching adulthood at the age of 20. They live much longer than humans, however, often exceeding 180 years.",
+        "society": "Often outsiders bridging cultures; valued as diplomats, leaders, and free spirits.",
+        "physical": "Half-elves are more or less the same size as humans, ranging from 5 to 6 feet tall. Your size is Medium.",
+        "alignment": "Half-elves share the chaotic bent of their elven heritage. They both value personal freedom and creative expression, demonstrating neither love of leaders nor desire for followers. They chafe at rules, resent others' demands, and sometimes prove unreliable, or at least unpredictable. They are good and evil in equal numbers, a trait they share with their human parents."
+      }
+    }
+  },
+  {
+    "node_id": "Half-Orc",
+    "data": {
+      "tagline": "Fierce, enduring folk of orcish strength.",
+      "overview": "When alliances between humans and orcs are sealed by marriages, half-orcs are born. Some half-orcs rise to become proud chiefs of orc tribes, their human blood giving them an edge over their full-blooded orc rivals. Some venture into the world to prove their worth among humans and other more civilized races. Many of these become adventurers, achieving greatness for their mighty deeds and notoriety for their barbaric customs and savage fury.",
+      "definingFeature": {
+        "name": "Relentless Endurance",
+        "desc": "Once per long rest, drop to 1 hit point instead of 0 — and Savage Attacks add a die to your critical hits."
+      },
+      "lore": {
+        "lifespan": "Half-orcs mature a little faster than humans, reaching adulthood around age 14. They age noticeably faster and rarely live longer than 75 years.",
+        "society": "Often caught between human and orc worlds; prove themselves through strength and loyalty.",
+        "physical": "Half-orcs are somewhat larger and bulkier than humans, and they range from 5 to well over 6 feet tall. Your size is Medium.",
+        "alignment": "Half-orcs inherit a tendency toward chaos from their orc parents and are not strongly inclined toward good. Half-orcs raised among orcs and willing to live out their lives among them are usually evil."
+      }
+    }
+  },
+  {
+    "node_id": "Halfling",
+    "data": {
+      "tagline": "Small, brave, and improbably lucky folk.",
+      "overview": "The comforts of home are the goals of most halflings' lives: a place to settle in peace and quiet, far from marauding monsters and clashing armies. Others form nomadic bands that travel constantly, lured by the open road and the wide horizon to discover the wonders of new lands and peoples. Halflings work readily with others, and they are loyal to their friends, whether halfling or otherwise. They can display remarkable ferocity when their friends, families, or communities are threatened.",
+      "definingFeature": {
+        "name": "Lucky & Brave",
+        "desc": "Reroll natural 1s on d20 tests and gain advantage against being frightened."
+      },
+      "lore": {
+        "lifespan": "A halfling reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
+        "society": "Community- and comfort-loving, valuing family, food, and home over ambition.",
+        "physical": "Halflings average about 3 feet tall and weigh about 40 pounds. Your size is small.",
+        "alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of the old ways."
+      }
+    }
+  },
+  {
+    "node_id": "High Elf",
+    "data": {
+      "tagline": "Scholarly and arcane.",
+      "overview": "As a high elf, you have a keen mind and a mastery of at least the basics of magic. In many of the worlds of D&D, there are two kinds of high elves. One type (which includes the gray elves and valley elves of Greyhawk, the Silvanesti of Dragonlance, and the sun elves of the Forgotten Realms) is haughty and reclusive, believing themselves to be superior to non-elves and even other elves. The other type (including the high elves of Greyhawk. the Qualinesti of Dragonlance, and the moon elves of the Forgotten Realms) are more common and more friendly, and often encountered among humans and other races.\n\nThe sun elves of Faerun (also called gold elves or sunrise elves) have bronze skin and hair of copper, black, or golden blood. Their eyes are golden, silver, or black. Moon elves (also called silver elves or gray elves) are much paler, with alabaster skin sometimes tinged with blue. They often have hair of silver-while, black, or blue, but various shades of blond, brown, and red are not uncommon. Their eyes are blue or green and flecked with gold.",
+      "definingFeature": {
+        "name": "Cantrip",
+        "desc": "You know one wizard cantrip (Intelligence-based)."
+      }
+    }
+  },
+  {
+    "node_id": "Hill Dwarf",
+    "data": {
+      "tagline": "Wise, hardy, and tough.",
+      "overview": "As a hill dwarf, you have keen senses, deep intuition, and remarkable resilience. The gold dwarves of Faerun in their mighty southern kingdom are hill dwarves, as are the exiled Neidar and the debased Klar of Krynn in the Dragonlance setting.",
+      "definingFeature": {
+        "name": "Dwarven Toughness",
+        "desc": "+1 hit point per level."
+      }
+    }
+  },
+  {
+    "node_id": "Horizon Walker",
+    "data": {
+      "tagline": "No distance is too great. No plane is beyond your reach.",
+      "overview": "Horizon Walker expands the ranger into a highly mobile hunter of extraplanar threats, adding teleportation and force-infused attacks that let it reposition constantly throughout combat. Rather than simply staying at range, this subclass encourages moving aggressively between enemies to pressure whichever target matters most. As it develops, mobility becomes just as important as damage, rewarding players who enjoy thinking about where they should be standing every turn rather than settling into one position for an entire fight."
+    }
+  },
+  {
+    "node_id": "Human",
+    "data": {
+      "tagline": "Ambitious, adaptable, and everywhere.",
+      "overview": "In the reckonings of most worlds, humans are the youngest of the common races, late to arrive on the world scene and short-lived in comparison to dwarves, elves, and dragons. Perhaps it is because of their shorter lives that they strive to achieve as much as they can in the years they are given. Or maybe they feel they have something to prove to the elder races, and that's why they build their mighty empires on the foundation of conquest and trade. Whatever drives them, humans are the innovators, the achievers, and the pioneers of the worlds.",
+      "definingFeature": {
+        "name": "Versatility",
+        "desc": "Broad ability bonuses (or, as a variant, a feat and a skill) make humans fit any class."
+      },
+      "lore": {
+        "lifespan": "Humans reach adulthood in their late teens and live less than a century.",
+        "society": "Endlessly diverse — humans build the widest range of cultures, nations, and faiths.",
+        "physical": "Highly varied in size, coloration, and feature across every land.",
+        "alignment": "Humans tend toward no particular alignment. The best and the worst are found among them."
+      }
+    }
+  },
+  {
+    "node_id": "Hunter",
+    "data": {
+      "tagline": "Master the fundamentals until every hunt has an answer.",
+      "overview": "Hunter refines the ranger's core strengths without locking it into a single gimmick or companion. As you level, you'll repeatedly choose from specialized features that improve your effectiveness against groups, powerful single enemies, or specific battlefield situations, allowing you to tailor the subclass to your preferred style. Rather than dramatically changing how the ranger plays, Hunter reinforces the class's identity as an adaptable martial specialist whose strength comes from making sound tactical choices over the course of an adventure."
+    }
+  },
+  {
+    "node_id": "Inquisitive",
+    "data": {
+      "tagline": "The detective who sees through every lie and finds every weakness.",
+      "overview": "Inquisitive Rogues rely on sharp observation and insight instead of stealth alone. They specialize in uncovering hidden truths, exposing deception, and identifying openings that other adventurers might miss. This subclass shines for players who enjoy investigation, deduction, and carefully analyzing both mysteries and enemies before acting."
+    }
+  },
+  {
+    "node_id": "Knowledge Domain",
+    "data": {
+      "tagline": "The right answer is often stronger than the strongest spell.",
+      "overview": "Knowledge clerics thrive on preparation, investigation, and versatility outside combat while remaining capable support casters in battle. They gain extra skills and magical options that help uncover secrets, solve mysteries, and overcome obstacles through information rather than force. Playing one means asking, \"What do I know that changes this situation?\" just as often as, \"Which spell should I cast?\""
+    }
+  },
+  {
+    "node_id": "Life Domain",
+    "data": {
+      "tagline": "No one keeps a party standing longer than you do.",
+      "overview": "Life clerics are the definitive healers of D&D, turning every healing spell into exceptional value while remaining capable combatants in their own right. Their greatest challenge is resisting the temptation to spend every turn healing. The strongest Life clerics know that preventing damage, defeating enemies, and healing at exactly the right moment will usually accomplish far more than trying to erase every injury as it happens."
+    }
+  },
+  {
+    "node_id": "Light Domain",
+    "data": {
+      "tagline": "Blind evil with holy radiance before it ever reaches your allies.",
+      "overview": "Light clerics are among the most offensively focused clerics, wielding powerful fire and radiant spells to eliminate groups of enemies. They excel at deciding when to spend precious spell slots on explosive damage versus relying on the cleric's more traditional support tools. While they can still heal and protect like any cleric, they often prevent damage simply by ending fights quickly."
+    }
+  },
+  {
+    "node_id": "Lightfoot",
+    "data": {
+      "tagline": "Sociable and stealthy.",
+      "overview": "As a lightfoot halfling, you can easily hide from notice, even using other people as cover. You're inclined to be affable and get along well with others. In the Forgotten Realms, lightfoot halflings have spread the farthest and thus are the most common variety.\n\nLightfoots are more prone to wanderlust than other halflings, and often dwell alongside other races or take up a nomadic life. In the world of Grayhawk, these halflings are called hairfeet or tallfellows.As a lightfoot halfling, you can easily hide from notice, even using other people as cover. You're inclined to be affable and get along well with others. In the Forgotten Realms, lightfoot halflings have spread the farthest and thus are the most common variety.\n\nLightfoots are more prone to wanderlust than other halflings, and often dwell alongside other races or take up a nomadic life. In the world of Grayhawk, these halflings are called hairfeet or tallfellows.",
+      "definingFeature": {
+        "name": "Naturally Stealthy",
+        "desc": "Hide behind creatures at least one size larger than you."
+      }
+    }
+  },
+  {
+    "node_id": "Lunar Sorcery",
+    "data": {
+      "tagline": "Sorcerer of the three moons.",
+      "overview": "Lunar sorcerers draw power from a chosen moon phase — Full, New, or Crescent — that shapes their bonus spells, Metamagic discounts, and lunar powers.",
+      "definingFeature": {
+        "name": "Lunar Embodiment",
+        "desc": "Attune to a moon phase that colors your spells and abilities."
+      }
+    }
+  },
+  {
+    "node_id": "Mastermind",
+    "data": {
+      "tagline": "Win with strategy, manipulation, and making everyone else more effective.",
+      "overview": "Masterminds excel at reading people, coordinating allies, and manipulating enemies through careful planning. While still capable of classic Rogue tactics, they lean toward support and social interaction, helping the entire party perform more effectively. Playing a Mastermind feels like directing the action from behind the scenes, always thinking several moves ahead."
+    }
+  },
+  {
+    "node_id": "Monk",
+    "data": {
+      "tagline": "A martial artist who weaponizes inner ki.",
+      "overview": "Monks are agile martial artists who rely on speed, precision, and discipline instead of heavy armor or oversized weapons. Rather than overpowering enemies, they excel at controlling the pace of a fight—darting into vulnerable positions, delivering a flurry of strikes, then slipping away before retaliation. Many of their strongest techniques draw from a limited pool of inner energy, forcing them to decide when to push their offense, reinforce their defenses, or preserve resources for a more dangerous encounter. Although many monks share backgrounds rooted in rigorous training or spiritual practice, that discipline can manifest in countless ways, from secluded monastery traditions to street-fighting schools or wandering duelists.",
+      "definingFeature": {
+        "name": "Ki",
+        "desc": "A pool of inner energy spent on Flurry of Blows, Patient Defense, Step of the Wind, and Stunning Strike — recharging on a short rest."
+      },
+      "lore": {
+        "role": "Mobile DPS / Skirmisher / Disruptor\n\nMonks specialize in reaching high-priority enemies that other frontliners struggle to pressure. Rather than soaking damage, they weave through the battlefield, applying consistent melee pressure while using their mobility and control tools to isolate dangerous targets or escape unfavorable fights. As they gain levels, they also become unusually resilient against many status effects and ranged threats, making them difficult to pin down despite their lighter defenses.",
+        "playstyle": "Monk rewards careful positioning and resource management more than raw aggression. Nearly every turn asks whether spending precious Ki will create enough value now or whether it's better saved for a more dangerous fight later. They have answers for a wide variety of situations—mobility, defense, control, and offense—but rarely enough resources to excel at all of them simultaneously. Outside combat, their exceptional movement and physical abilities often let them solve traversal problems, infiltrate difficult locations, or accomplish athletic feats that few other classes can match. They're highly rewarding for players who enjoy constantly evaluating the battlefield, but can feel unforgiving when poor positioning or inefficient Ki usage leaves them exposed.",
+        "subclasses": "Every monk shares the same core identity: exceptional mobility, multiple attacks, and careful Ki management. Subclasses decide what that mobility is used for. Some focus almost entirely on overwhelming offense, while others become controllers, stealth specialists, defenders, or even limited spellcasters. Compared to many martial classes, monk subclasses often reshape the class's tactical priorities more than its overall rhythm—you'll still be managing Ki and moving aggressively around the battlefield, but the reason you're spending those resources can feel dramatically different."
+      }
+    }
+  },
+  {
+    "node_id": "Monster Slayer",
+    "data": {
+      "tagline": "Find the greatest threat—and make it your only target.",
+      "overview": "Monster Slayer is built around identifying and dismantling dangerous individual enemies. Its features improve your ability to pressure priority targets, resist supernatural tricks, and disrupt creatures that rely on powerful magical abilities or unusual defenses. Rather than spreading attention across the battlefield, the subclass encourages disciplined target selection, rewarding players who can quickly recognize which enemy poses the greatest danger and commit their resources to bringing it down."
+    }
+  },
+  {
+    "node_id": "Mountain Dwarf",
+    "data": {
+      "tagline": "Strong and armored.",
+      "overview": "As a mountain dwarf, you're strong and hardy, accustomed to a difficult life in rugged terrain. You're probably on the tall side (for a dwarf), and tend toward lighter coloration, The shield dwarves of northern Faerun, as well as the ruling Hylar clan and the noble Daewar clan of Dragonlance, are mountain dwarves.",
+      "definingFeature": {
+        "name": "Armor Training",
+        "desc": "Proficiency with light and medium armor."
+      }
+    }
+  },
+  {
+    "node_id": "Nature Domain",
+    "data": {
+      "tagline": "The wilderness is as much your ally as your faith.",
+      "overview": "Nature clerics blend divine magic with the resilience and control associated with the natural world. They often solve encounters by slowing enemies, controlling movement, or resisting elemental threats rather than simply trading damage. Playing one rewards recognizing when controlling the battlefield will save more resources than trying to overpower it."
+    }
+  },
+  {
+    "node_id": "Oath of Conquest",
+    "data": {
+      "tagline": "Control the battlefield through fear and relentless pressure.",
+      "overview": "Conquest paladins are aggressive frontline controllers who excel at locking enemies down instead of simply defeating them. Many of their abilities frighten foes, reducing their mobility and forcing enemies to fight on your terms. If you enjoy dictating the pace of combat and slowly crushing your opponents rather than charging headfirst into battle, Conquest is an excellent choice."
+    }
+  },
+  {
+    "node_id": "Oath of Devotion",
+    "data": {
+      "tagline": "The classic holy knight.",
+      "overview": "Devotion is the most traditional paladin, emphasizing reliability, protection, and unwavering righteousness. Rather than specializing in a particular strategy, it strengthens nearly every aspect of the core paladin kit with defensive magic, improved weapon accuracy, and protection against evil influences. It's an approachable subclass that rewards solid fundamentals over complicated mechanics."
+    }
+  },
+  {
+    "node_id": "Oath of Glory",
+    "data": {
+      "tagline": "Lead from the front through athleticism and inspiration.",
+      "overview": "Glory paladins focus on mobility, momentum, and empowering both themselves and nearby allies. They excel at reaching important targets, repositioning around the battlefield, and turning successful attacks into opportunities for the rest of the party. Compared to other paladins, Glory feels faster, more proactive, and less defensive."
+    }
+  },
+  {
+    "node_id": "Oath of Redemption",
+    "data": {
+      "tagline": "Win battles without fighting whenever possible.",
+      "overview": "Redemption encourages solving problems peacefully, but remains fully capable of defending allies when diplomacy fails. In combat, it focuses on protecting teammates, reducing incoming damage, and discouraging enemies from attacking your party. Rather than defeating enemies through overwhelming offense, Redemption succeeds by outlasting them and minimizing harm."
+    }
+  },
+  {
+    "node_id": "Oath of Vengeance",
+    "data": {
+      "tagline": "Hunt down priority targets and eliminate them.",
+      "overview": "Vengeance trades some of the paladin's defensive focus for exceptional single-target offense. Its abilities help you pursue dangerous enemies, remain in melee, and deliver devastating damage to high-priority threats. If you enjoy playing the party's executioner—the one responsible for bringing down the biggest enemy on the field—Vengeance delivers that fantasy exceptionally well."
+    }
+  },
+  {
+    "node_id": "Oath of the Ancients",
+    "data": {
+      "tagline": "Become an unbreakable guardian against magical threats.",
+      "overview": "Ancients specializes in resilience, particularly against spellcasters. Its abilities improve survivability for both the paladin and nearby allies while reinforcing the role of an enduring frontline protector. If your campaign features dangerous magic or you enjoy shielding your team from devastating spells, this oath shines."
+    }
+  },
+  {
+    "node_id": "Oath of the Crown",
+    "data": {
+      "tagline": "Stand your ground and force enemies to deal with you.",
+      "overview": "Crown leans furthest into the \"tank\" role by encouraging enemies to focus their attacks on you instead of your allies. Its abilities reward staying close to the party, intercepting damage, and holding the front line. Players who enjoy protecting teammates through positioning and battlefield presence will feel at home with this oath."
+    }
+  },
+  {
+    "node_id": "Oath of the Watchers",
+    "data": {
+      "tagline": "Protect the world from supernatural threats.",
+      "overview": "Watchers specialize in combating extraplanar enemies such as fiends, aberrations, fey, and other magical creatures. Their abilities improve the party's resistance to magical influence while helping allies act more quickly in dangerous encounters. Although some features are campaign-dependent, they become exceptionally valuable in adventures filled with otherworldly foes."
+    }
+  },
+  {
+    "node_id": "Oathbreaker",
+    "data": {
+      "tagline": "Turn divine power toward domination instead of protection.",
+      "overview": "The Oathbreaker abandons the ideals of a traditional paladin, replacing support-focused abilities with features that empower both themselves and, in some cases, undead allies. Rather than protecting companions, this subclass emphasizes personal power, fear, and commanding dark forces. While mechanically effective, it is generally intended for evil or morally corrupt characters and may not be appropriate for every campaign."
+    }
+  },
+  {
+    "node_id": "Order Domain",
+    "data": {
+      "tagline": "A disciplined team is stronger than any individual hero.",
+      "overview": "Order clerics specialize in enabling allies to act more efficiently, often allowing teammates to capitalize immediately on the cleric's magic. Their turns are less about making the biggest play themselves and more about deciding which ally can make the best play if given the opportunity. They reward players who pay close attention to initiative order, positioning, and the strengths of the rest of the party."
+    }
+  },
+  {
+    "node_id": "Order of Scribes",
+    "data": {
+      "tagline": "The ultimate magical scholar whose spellbook is their greatest weapon.",
+      "overview": "The Order of Scribes focuses on mastering magical knowledge itself, transforming the Wizard's spellbook into an active magical companion. Their abilities enhance spellcasting flexibility, allowing them to adapt spells and safely experiment with arcane power more easily than any other Wizard. Playing one feels like the consummate academic, solving problems through superior understanding rather than specializing in a single school of magic."
+    }
+  },
+  {
+    "node_id": "Paladin",
+    "data": {
+      "tagline": "A holy warrior bound by a sacred oath.",
+      "overview": "Paladins are holy warriors who combine the martial prowess of a heavily armored knight with the divine magic of a devoted champion. Comfortable on the front lines, they wield powerful weapons while protecting allies with healing, defensive magic, and inspiring auras. Unlike fighters, who focus almost entirely on martial skill, paladins constantly balance their weapon attacks with a small but impactful selection of spells, making them one of the strongest hybrid classes in the game.\n\nWhat truly defines a paladin, however, is their Oath. Their power comes from an unwavering commitment to a set of sacred ideals—whether that means justice, vengeance, devotion, redemption, or another calling. Those beliefs shape not only their abilities, but also how they approach difficult decisions throughout the campaign. A paladin's convictions are meant to be tested, making them one of the classes whose mechanics and roleplaying are most closely intertwined.",
+      "definingFeature": {
+        "name": "Divine Smite",
+        "desc": "Expend a spell slot on a melee hit to deal a burst of radiant damage — nova potential that scales with the slot."
+      },
+      "lore": {
+        "role": "Tank / Bruiser / Support\n\nPaladins thrive in the middle of the fight, protecting allies while posing a serious offensive threat themselves. They absorb punishment with heavy armor, bolster nearby teammates with defensive abilities, and can suddenly unleash devastating bursts of damage when an important enemy needs to fall. Their greatest strength is knowing which role is most valuable at any given moment: holding the line, supporting the party, or ending the fight with overwhelming force.",
+        "playstyle": "Paladins are easy to learn but reward good judgment. Their core gameplay is built around weapon attacks, making them approachable for new players, but every combat presents meaningful choices. Should you spend a spell slot on a powerful Divine Smite now, or save it for a more dangerous enemy? Should you heal a fallen ally, cast a support spell, or keep attacking to remove a threat before it acts again? While their toolkit is smaller than that of a full spellcaster, making the right decision at the right moment gives the class surprising depth.",
+        "subclasses": "Every paladin shares the same foundation of frontline combat, divine magic, and unwavering conviction, but each Sacred Oath defines what those ideals demand. Some emphasize protecting the innocent, others relentless justice, ancient traditions, conquest, or redemption. Your oath doesn't simply grant new abilities—it shapes how your character views the world, what they fight for, and sometimes what sacrifices they're willing to make. Even an Oathbreaker is defined by the oath they abandoned, making conviction the heart of every paladin's identity."
+      }
+    }
+  },
+  {
+    "node_id": "Path of Wild Magic",
+    "data": {
+      "overview": "Wild Magic Barbarians are infused with unpredictable magical energy that erupts whenever they enter battle. Each rage triggers a random magical effect, creating encounters that can play out differently every time while still preserving the class's powerful melee core. This subclass appeals to players who enjoy improvisation, adapting to unexpected advantages, and embracing a bit of controlled chaos without becoming a traditional spellcaster.",
+      "tagline": "Every battle begins with a magical surprise that turns chaos into your greatest strength."
+    }
+  },
+  {
+    "node_id": "Path of the Ancestral Guardian",
+    "data": {
+      "tagline": "A spectral protector who shields allies by forcing enemies to face you instead.",
+      "overview": "Ancestral Guardians call upon the spirits of their ancestors to defend those fighting beside them. Rather than simply enduring punishment, they actively discourage enemies from attacking their allies, making them one of the strongest defensive Barbarians in the game. Playing one feels like becoming the party's immovable protector, using supernatural guardians to control who your enemies can effectively threaten.",
+      "definingFeature": {
+        "name": "Ancestral Protectors",
+        "desc": "Spirits hinder the foe you strike, shielding your allies from it."
+      }
+    }
+  },
+  {
+    "node_id": "Path of the Beast",
+    "data": {
+      "tagline": "Become the monster, growing natural weapons that adapt to every fight.",
+      "overview": "The Beast Barbarian unleashes their primal instincts, transforming parts of their body into savage natural weapons. Claws, fangs, or a powerful tail each offer different advantages, encouraging players to adapt their approach depending on the situation. Playing one feels feral and unpredictable, blending brutal melee combat with surprising versatility and mobility."
+    }
+  },
+  {
+    "node_id": "Path of the Berserker",
+    "data": {
+      "tagline": "The pure embodiment of reckless rage—more attacks, more aggression, no restraint.",
+      "overview": "The Berserker embraces unrestrained fury, sacrificing caution in exchange for overwhelming aggression. This subclass focuses on staying in the middle of combat and attacking as often as possible, making it one of the most direct and offense-oriented Barbarians available. Playing a Berserker feels relentless—you push yourself beyond normal limits to keep the pressure on, thriving when fights end before your exhaustion catches up to you.",
+      "definingFeature": {
+        "name": "Frenzy",
+        "desc": "Rage harder for a bonus-action attack every turn — at the cost of exhaustion when it ends."
+      }
+    }
+  },
+  {
+    "node_id": "Path of the Giant",
+    "data": {
+      "tagline": "Become the biggest threat on the battlefield—literally.",
+      "overview": "Path of the Giant transforms the barbarian into a towering frontline presence that dominates space as much as it deals damage. Growing in size extends your reach, making it easier to lock down multiple enemies and threaten a much larger area, while elemental-infused attacks add consistent versatility to every swing. Unlike other barbarians that focus purely on surviving or hitting harder, the Giant specializes in controlling the battlefield through sheer physical presence—throwing creatures and objects, protecting allies by occupying critical space, and making it difficult for enemies to ignore you. It rewards players who enjoy feeling larger than life, using positioning and reach to shape the flow of combat rather than simply charging at the nearest target."
+    }
+  },
+  {
+    "node_id": "Path of the Storm Herald",
+    "data": {
+      "overview": "Storm Heralds channel the raw power of nature, cloaking themselves in an aura tied to the desert, sea, or tundra. Their abilities steadily influence the battlefield by damaging enemies, protecting allies, or wearing opponents down over time rather than relying on explosive bursts. This subclass suits players who enjoy creating constant pressure simply by staying in the heart of the fight.",
+      "tagline": "Carry the fury of nature into battle, surrounding yourself with an ever-present elemental storm."
+    }
+  },
+  {
+    "node_id": "Path of the Totem Warrior",
+    "data": {
+      "tagline": "Channel the spirits of mighty beasts to become the Barbarian you want to be.",
+      "overview": "The Totem Warrior forms a spiritual bond with powerful animal totems, each granting unique strengths that shape their role in combat. Whether emphasizing resilience, mobility, or battlefield utility, the subclass offers flexibility while keeping the Barbarian's durable front-line identity intact. It rewards players who enjoy tailoring their strengths to suit their preferred playstyle rather than committing to a single specialty."
+    }
+  },
+  {
+    "node_id": "Path of the Zealot",
+    "data": {
+      "overview": "The Zealot fights with unwavering divine conviction, blending brutal martial combat with holy power. They add reliable radiant or necrotic damage to their attacks and become exceptionally difficult to keep dead, making them relentless in both story and gameplay. The subclass shines in long adventuring days, where its resilience and consistent damage allow it to keep pushing forward when others begin to wear down.",
+      "tagline": "A holy warrior whose faith makes them terrifyingly difficult to stop."
+    }
+  },
+  {
+    "node_id": "Peace Domain",
+    "data": {
+      "tagline": "Keep the party together, and everyone becomes stronger.",
+      "overview": "Peace clerics excel at strengthening allies before things go wrong rather than repairing the damage afterward. Much of their gameplay revolves around maintaining powerful bonds between teammates, deciding who benefits most from their support, and positioning themselves so those benefits reach the people who need them most. They often win encounters through consistency rather than dramatic moments."
+    }
+  },
+  {
+    "node_id": "Phantom",
+    "data": {
+      "tagline": "Walk the line between life and death, carrying the whispers of departed souls.",
+      "overview": "Phantoms draw supernatural power from the spirits of the dead, allowing them to spread their deadly strikes beyond a single target while gaining eerie knowledge from lingering souls. Their abilities make them feel mysterious and unsettling without abandoning the Rogue's core identity as a precise damage dealer. Playing a Phantom blends efficient combat with a haunting, otherworldly atmosphere that grows stronger as adventures become darker."
+    }
+  },
+  {
+    "node_id": "Psi Warrior",
+    "data": {
+      "tagline": "A disciplined soldier whose mind is as deadly as their blade.",
+      "overview": "Psi Warriors augment their martial abilities with controlled psychic power, shielding allies, empowering attacks, and manipulating objects through pure mental force. Their abilities provide a balance of offense, defense, and utility without overwhelming the Fighter's straightforward combat style. Playing one feels versatile and composed, solving problems with both physical prowess and disciplined mental strength."
+    }
+  },
+  {
+    "node_id": "Ranger",
+    "data": {
+      "tagline": "Their magic is best viewed as a flexible toolkit rather than a primary source of power.",
+      "overview": "Rangers are adaptable martial specialists who combine skilled weapon combat with practical magic to stay effective in almost any situation. Rather than relying on overwhelming force or powerful spells alone, they excel by bringing the right tool to the right problem—whether that's tracking a dangerous quarry, scouting ahead, controlling the battlefield, or steadily wearing down priority targets. Their spellcasting is designed to enhance what they're already doing, providing mobility, utility, and tactical advantages instead of replacing their martial role. Just as valuable outside combat as within it, rangers are often the party members who spot danger first, navigate hostile environments, and help ensure the fight begins on favorable terms.",
+      "definingFeature": {
+        "name": "Favored Foe / Natural Explorer",
+        "desc": "Mark prey for bonus damage and move through the wilds with supernatural ease — the hunter's edge."
+      },
+      "lore": {
+        "role": "Sustained DPS / Scout / Flex\n\nRangers deal reliable damage over the course of an encounter while adapting to changing situations with a versatile mix of weapons and utility spells. They can pressure key targets, support allies through battlefield control and exploration magic, and often contribute meaningful solutions outside of combat through scouting, survival, tracking, and problem-solving. Rather than dominating one phase of the game, rangers remain consistently useful across nearly every part of an adventure.",
+        "playstyle": "Ranger rewards preparation, positioning, and good decision-making over explosive turns. You'll often find yourself asking where you're needed most—whether that's eliminating a dangerous enemy, controlling space with a well-timed spell, scouting ahead, or solving a problem before combat even begins. Their magic is best viewed as a flexible toolkit rather than a primary source of power, giving them answers to a wide variety of situations without overshadowing their martial combat. Rangers are also one of the most self-sufficient classes, with the mobility, utility, and survivability to operate independently when necessary. They appeal to players who enjoy having meaningful options every encounter instead of repeating the same sequence of actions, but can feel underwhelming if played as a character who only attacks each turn or tries to compete with classes built around short bursts of overwhelming damage.",
+        "subclasses": "Few classes branch into as many distinct identities as the ranger. Some subclasses sharpen the ranger into an unmatched ambusher or monster hunter, while others introduce companions, powerful magical themes, or entirely new ways of controlling the battlefield. You might fight alongside an animal or draconic ally, step between planes, command supernatural swarms, embrace fey magic, or become a hunter who thrives in darkness. Despite these dramatically different flavors, every ranger remains rooted in the same foundation: a capable martial combatant whose versatility, preparation, and practical magic allow them to succeed in almost any environment or encounter."
+      }
+    }
+  },
+  {
+    "node_id": "Rock Gnome",
+    "data": {
+      "tagline": "Inventive tinkers.",
+      "overview": "As a rock gnome, you have a natural inventiveness and hardiness beyond that of other gnomes. Most gnomes in the worlds of D&D are rock gnomes, including the tinker gnomes of the Dragonlance setting.",
+      "definingFeature": {
+        "name": "Tinker",
+        "desc": "Construct tiny clockwork gadgets and gain expertise with magical lore."
+      }
+    }
+  },
+  {
+    "node_id": "Rogue",
+    "data": {
+      "tagline": "A precise, elusive expert and skirmisher.",
+      "overview": "Rogues are specialists who rely on precision, planning, and opportunity rather than brute force. They excel at exploiting weaknesses, striking when enemies are vulnerable, and solving problems through skill instead of raw power. Outside of combat, Rogues are among the most versatile adventurers in the game, often serving as scouts, infiltrators, detectives, diplomats, or experts at navigating dangerous environments. While every Rogue approaches challenges differently, they all reward clever thinking and making the most of every opportunity.",
+      "definingFeature": {
+        "name": "Sneak Attack",
+        "desc": "Once per turn, add a burst of extra dice when you have advantage or an ally flanks — precision damage that scales steeply."
+      },
+      "lore": {
+        "role": "Single-Target DPS • Scout • Skill Specialist\n\nRogues focus on delivering high damage to individual targets rather than controlling large groups of enemies. Outside combat, they're often the party member best equipped to handle stealth, locks, traps, investigation, and other specialized tasks, making them invaluable during exploration and social encounters.",
+        "playstyle": "Playing a Rogue is about positioning and timing. Rather than standing toe-to-toe with enemies, you're constantly looking for openings, choosing high-value targets, and using mobility or cunning to stay one step ahead. The class has a moderate skill ceiling, rewarding players who think tactically both in and out of combat. Rogues also spend more time interacting with the world than many classes, often taking the lead during exploration, infiltration, and investigation.",
+        "subclasses": "Every Rogue shares the same core identity of precision, mobility, and expertise, but subclasses determine how they outsmart their opponents. Some embrace assassination or espionage, others weave magic into their tricks, while others become detectives, duelists, or even wield supernatural powers. No matter the path, every Rogue succeeds by creating advantages instead of overpowering enemies through force.",
+        "understanding_sneak_attack_and_cunning_action": "Despite its name, Sneak Attack rarely requires you to be hidden. Most rogues trigger Sneak Attack simply by attacking an enemy that is distracted by one of your allies, allowing you to deal a large amount of extra damage once per turn. Rather than making several smaller attacks like a Fighter, the rogue is built around landing one accurate, high-impact strike every round. As you level up, Sneak Attack becomes one of the strongest sources of consistent single-target damage in the game, especially when combined with critical hits.\n\nSupporting this playstyle is Cunning Action, which allows you to Dash, Disengage, or Hide as a Bonus Action. This gives rogues exceptional mobility, making it easy to weave in and out of combat, reposition for advantage, escape dangerous situations, or disappear from sight before striking again. Together, these two features define the rogue's combat identity: precise, mobile, and consistently effective.",
+        "the_skill_monkey": "Outside of combat, the rogue is often considered the party's greatest skill user. While every character can attempt skill checks, rogues gain Expertise, allowing them to double their proficiency bonus in selected skills. Even at low levels, this can create bonuses that other characters simply cannot match. Whether you've specialized in Stealth, Persuasion, Deception, Investigation, Sleight of Hand, or Thieves' Tools, your character becomes remarkably reliable whenever those skills are called upon.\n\nA rogue with Expertise isn't just slightly better than everyone else—they often become the obvious choice whenever that type of challenge appears. This allows rogues to influence adventures in ways that aren't measured by damage alone. Convincing a suspicious guard, tracking a hidden criminal, bypassing a complex lock, or sneaking an entire party through enemy territory can change the course of an adventure just as dramatically as winning a difficult battle.",
+        "how_the_rogue_rewards_creativity": "The rogue is at its best when problems cannot be solved by force alone. While other classes often rely on powerful spells or combat abilities, rogues excel at finding opportunities where others see obstacles. In a bustling city, a rogue might uncover a criminal network by following the right person through the streets, forge documents that redirect suspicion onto a rival faction, or convince a guard captain that the party has official permission to be somewhere they absolutely should not be. When a noble's estate seems impossible to infiltrate, the rogue looks for servants, supply routes, forgotten entrances, and weaknesses in routine rather than stronger locks to pick.\n\nMany of the rogue's most memorable victories happen before initiative is ever rolled. Their abilities encourage players to gather information, manipulate situations, exploit weaknesses, and create advantages that can completely change the direction of an adventure. While every class benefits from creative thinking, few classes reward it as consistently as the rogue. The more you pay attention to the people, places, and opportunities around you, the more powerful the class becomes. A skilled rogue doesn't just react to challenges—they often solve them before they become problems at all."
+      },
+      "loreLabels": {
+        "the_skill_monkey": "Expertise and \"The Skill Monkey\""
+      }
+    }
+  },
+  {
+    "node_id": "Rune Knight",
+    "data": {
+      "tagline": "Harness the ancient magic of giants to become an unstoppable juggernaut.",
+      "overview": "Rune Knights carve mystical runes that grant powerful passive benefits and unique activated abilities while channeling giant magic to grow to enormous size. Their toolkit blends durability, control, utility, and bursts of incredible strength, making them one of the most versatile Fighters available. Playing one feels imposing, combining ancient magical power with overwhelming physical presence.",
+      "definingFeature": {
+        "name": "Giant's Might",
+        "desc": "Grow larger for advantage on Strength and bonus damage."
+      }
+    }
+  },
+  {
+    "node_id": "Samurai",
+    "data": {
+      "tagline": "Calm discipline and unwavering resolve turned into overwhelming offense.",
+      "overview": "The Samurai channels intense focus and determination to perform at their absolute best when the pressure is highest. Their abilities emphasize accuracy, resilience, and moments of explosive offensive power while also granting unexpected strengths in social situations through force of personality. Playing one feels composed and decisive, waiting for the perfect moment before unleashing a devastating assault."
+    }
+  },
+  {
+    "node_id": "School of Abjuration",
+    "data": {
+      "tagline": "The magical guardian who turns defensive spells into powerful protection.",
+      "overview": "Abjurers specialize in wards, barriers, and protective magic that keep themselves and their allies safe from harm. Rather than simply avoiding danger, they actively reduce or negate it, becoming remarkably durable despite their fragile reputation. Playing an Abjurer feels reassuring, rewarding players who enjoy protecting the party while remaining an exceptionally capable spellcaster."
+    }
+  },
+  {
+    "node_id": "School of Conjuration",
+    "data": {
+      "overview": "Conjurers excel at bringing creatures, objects, and magical effects into existence, making them one of the most versatile Wizard traditions. Whether creating useful tools, teleporting across the battlefield, or filling the fight with summoned allies, they constantly expand the party's options. Playing one feels inventive, solving problems by making exactly what the situation demands appear out of thin air.",
+      "tagline": "Summon creatures, objects, and allies wherever they're needed most."
+    }
+  },
+  {
+    "node_id": "School of Divination",
+    "data": {
+      "tagline": "Knowledge is power—and you already know what's about to happen.",
+      "overview": "Diviners peer into possible futures, gaining extraordinary insight into both the world and the outcome of important events. Their signature abilities allow them to manipulate key rolls, making them one of the most consistently influential Wizards regardless of the situation. Playing one feels almost prophetic, rewarding careful timing and the confidence that comes from seeing what others cannot."
+    }
+  },
+  {
+    "node_id": "School of Enchantment",
+    "data": {
+      "tagline": "Why fight fairly when you can simply change someone's mind?",
+      "overview": "Enchanters specialize in influencing thoughts, emotions, and behavior through subtle but powerful magic. Rather than defeating enemies through force alone, they charm, disable, or redirect opponents to control encounters with minimal violence. Playing one feels clever and manipulative, thriving whenever words or magical persuasion can accomplish more than destruction."
+    }
+  },
+  {
+    "node_id": "School of Evocation",
+    "data": {
+      "tagline": "The classic battle mage, hurling devastating spells with pinpoint precision.",
+      "overview": "Evokers master destructive elemental magic, unleashing explosive spells while learning to protect allies from the worst of their own attacks. They remain one of the strongest choices for players who enjoy direct magical offense without sacrificing the Wizard's overall versatility. Playing one feels spectacular, filling the battlefield with fire, lightning, ice, and raw arcane power."
+    }
+  },
+  {
+    "node_id": "School of Illusion",
+    "data": {
+      "tagline": "Reality is optional if your enemies believe the illusion.",
+      "overview": "Illusionists deceive the senses with convincing magical creations that confuse, distract, and outwit their opponents. Their effectiveness depends as much on creativity as raw mechanics, rewarding players who enjoy thinking beyond straightforward spellcasting. Playing one feels imaginative and unpredictable, often overcoming challenges through deception instead of direct confrontation."
+    }
+  },
+  {
+    "node_id": "School of Necromancy",
+    "data": {
+      "tagline": "Command the forces of life and death to build an undead army.",
+      "overview": "Necromancers explore the magic of death, life force, and undeath, draining vitality from enemies while empowering themselves and raising undead servants. Although famous for commanding skeletons and zombies, they also excel at enduring difficult fights through careful manipulation of life energy. Playing one feels methodical, gradually building momentum as your dark magic and loyal minions overwhelm your enemies."
+    }
+  },
+  {
+    "node_id": "School of Transmutation",
+    "data": {
+      "tagline": "Reshape the world by changing the nature of people and objects.",
+      "overview": "Transmuters specialize in altering the physical properties of creatures, materials, and even themselves. Their magic provides exceptional versatility, enhancing allies, overcoming obstacles, and adapting to changing situations through transformation rather than destruction. Playing one feels resourceful, constantly asking, \"What if I simply changed this into something more useful?\""
+    }
+  },
+  {
+    "node_id": "Scout",
+    "data": {
+      "tagline": "The wilderness expert who strikes fast and never gets pinned down.",
+      "overview": "Scouts combine the Rogue's precision with the survival instincts of an experienced explorer. Exceptional mobility and wilderness expertise allow them to control distance, reposition constantly, and guide the party safely through dangerous terrain. Playing one feels like a hunter who always knows where to stand and when to move."
+    }
+  },
+  {
+    "node_id": "Shadow Magic",
+    "data": {
+      "tagline": "Strike from darkness and refuse to stay dead when others would fall.",
+      "overview": "Shadow Magic embraces stealth, survival, and the unsettling powers of darkness. It gains tools that make the sorcerer unusually difficult to kill while enhancing mobility, vision, and battlefield presence in dim environments. Rather than overwhelming enemies with raw force, it thrives through persistence, positioning, and an aura of supernatural menace.",
+      "definingFeature": {
+        "name": "Hound of Ill Omen",
+        "desc": "Spend sorcery points to summon a shadow hound that hunts one foe."
+      }
+    }
+  },
+  {
+    "node_id": "Sorcerer",
+    "data": {
+      "tagline": "A born spellcaster who bends magic itself.",
+      "overview": "Sorcerers are spellcasters whose magic comes from within rather than from study, faith, or bargains with powerful beings. Their power is an innate part of who they are, often tied to an extraordinary bloodline, a magical event, or a supernatural transformation. While they know fewer spells than many other casters, they possess an unparalleled ability to shape, enhance, and adapt those spells in the moment. A sorcerer isn't defined by having the right spell for every situation—they're defined by making the spells they do know exceptionally effective.",
+      "definingFeature": {
+        "name": "Metamagic",
+        "desc": "Spend sorcery points to twin, quicken, subtle, or empower spells — customizing each cast on the fly."
+      },
+      "lore": {
+        "role": "Primary Role: DPS / Controller / Flex\n\nSorcerers specialize in delivering explosive magical offense while adapting their spells to fit the situation. They can devastate groups of enemies, focus down dangerous single targets, or reshape the battlefield with disabling effects. Depending on their origin, they may also branch into support, durability, or utility, but magical offense remains their strongest identity.",
+        "playstyle": "Sorcerers are all about efficiency and amplification. Their unique resource allows them to modify spells in powerful ways—casting faster, farther, more subtly, or affecting multiple targets where others cannot. This makes them one of the most explosive spellcasters in the game, capable of producing turns that dramatically shift the course of combat. Outside battle, they rely more on creativity than breadth, since they know relatively few spells, but their natural charisma often makes them excellent negotiators, performers, or leaders. The class is moderately complex, rewarding players who understand when to spend resources for maximum impact.",
+        "subclasses": "Every sorcerer shares the same core identity: innate magical power refined through mastery of their own abilities rather than an external source. The subclasses define where that power originates and how it expresses itself. Some origins make the sorcerer tougher, others emphasize chaos, psychic abilities, divine blessings, battlefield control, or overwhelming elemental force. While all sorcerers bend magic to their will, each subclass changes the flavor—and often the role—of that magical talent."
+      }
+    }
+  },
+  {
+    "node_id": "Soulknife",
+    "data": {
+      "tagline": "A silent psychic assassin whose greatest weapon exists only in the mind.",
+      "overview": "Soulknives wield blades forged from pure psychic energy, allowing them to fight without conventional weapons while enhancing their skills through mental power. Their abilities make them exceptionally reliable, adaptable, and difficult to disarm or anticipate, whether sneaking through enemy territory or confronting foes directly. Playing a Soulknife feels smooth and self-sufficient, with psychic abilities quietly improving nearly everything the Rogue already does well."
+    }
+  },
+  {
+    "node_id": "Storm Sorcery",
+    "data": {
+      "tagline": "Ride the winds into battle and let lightning answer your every move.",
+      "overview": "Storm Sorcery combines elemental magic with constant mobility, encouraging the sorcerer to reposition freely while unleashing thunder and lightning. It excels at weaving through combat without becoming trapped, making movement a key part of its offense and defense. The subclass feels fast, dynamic, and energetic, rewarding players who are always looking for the next advantageous position.",
+      "definingFeature": {
+        "name": "Heart of the Storm",
+        "desc": "Casting storm spells erupts in lightning or thunder around you."
+      }
+    }
+  },
+  {
+    "node_id": "Stout",
+    "data": {
+      "tagline": "Tough and poison-resistant.",
+      "overview": "As a stout halfling, you're hardier than average and have some resistance to poison. Some say that stouts have dwarven blood. In the Forgotten Realms, these halflings are called stronghearts, and they're most common in the south.",
+      "definingFeature": {
+        "name": "Stout Resilience",
+        "desc": "Advantage on saves against poison and resistance to poison damage."
+      }
+    }
+  },
+  {
+    "node_id": "Swarmkeeper",
+    "data": {
+      "tagline": "Command the battlefield through a thousand tiny allies.",
+      "overview": "Swarmkeeper surrounds the ranger with a supernatural swarm that transforms nearly every successful attack into an opportunity to reposition creatures, move yourself, or add extra damage. Rather than simply increasing offensive power, the swarm constantly creates small tactical advantages that accumulate over the course of a fight. Players who enjoy evaluating multiple good options each turn will appreciate the flexibility, as deciding whether to push enemies, reposition yourself, or maximize damage often depends on the evolving state of the battlefield rather than a fixed rotation."
+    }
+  },
+  {
+    "node_id": "Swashbuckler",
+    "data": {
+      "overview": "Swashbucklers trade skulking in the shadows for confidence and flair, thriving in fast-paced melee duels. Their mobility and charisma allow them to dart through combat, pressure isolated enemies, and escape retaliation with ease. Playing one feels energetic and cinematic, rewarding bold plays and constant movement rather than careful hiding.",
+      "tagline": "A daring duelist who turns every fight into a stylish one-on-one contest."
+    }
+  },
+  {
+    "node_id": "Tabaxi",
+    "data": {
+      "tagline": "Curious, catlike wanderers and collectors.",
+      "overview": "Created by the Cat Lord—a divine being of the Upper Planes—to blend the qualities of humanoids and cats, tabaxi are a varied people in both attitude and appearance. In some lands, tabaxi live like the cats they resemble, naturally curious and at home in playful environments. In other places, tabaxi live as other folk do, not exhibiting the feline behavior the Cat Lord intended.\n\nTabaxi’s appearance is as varied as their attitudes. Some tabaxi have features or patterning in their fur like tigers, jaguars, or other big cats, while others have appearances more like a house cat. Still others have unique patterns or might style their fur to their preferences — or might even be hairless!",
+      "definingFeature": {
+        "name": "Cat's Talent & Feline Agility",
+        "desc": "Natural climbers and stealthy hunters who can burst to double speed in a sprint."
+      },
+      "lore": {
+        "lifespan": "Comparable to humans.",
+        "society": "Restless travelers who collect tales and curios, rarely staying anywhere long.",
+        "physical": "Lithe and cat-like, with fur, retractable claws, and a long tail."
+      }
+    }
+  },
+  {
+    "node_id": "Tempest Domain",
+    "data": {
+      "tagline": "Meet every attack with thunder, lightning, and overwhelming force.",
+      "overview": "Tempest clerics are aggressive frontline casters who combine heavy armor with devastating elemental magic. Their abilities reward staying close enough to punish enemies that engage them while still looking for opportunities to unleash powerful lightning or thunder spells on clustered foes. The constant decision is whether to hold the line beside your allies or spend your turn delivering a decisive magical strike."
+    }
+  },
+  {
+    "node_id": "The Archfey",
+    "data": {
+      "tagline": "Dance around danger, confuse your enemies, and let chaos win the battle for you.",
+      "overview": "The Archfey patron transforms the warlock into a master of enchantment, illusion, and mobility. Rather than overwhelming enemies with raw force, it specializes in charming, frightening, and repositioning foes while slipping safely out of danger. An Archfey warlock often feels elusive, winning encounters by making opponents waste actions or fight on unfavorable terms instead of simply dealing more damage.",
+      "definingFeature": {
+        "name": "Fey Presence",
+        "desc": "Charm or frighten creatures around you with a burst of fey power."
+      }
+    }
+  },
+  {
+    "node_id": "The Celestial",
+    "data": {
+      "tagline": "Bring divine light to a class better known for darkness.",
+      "overview": "The Celestial patron blends the warlock's offensive toolkit with meaningful healing and support. While still capable of dealing respectable damage, it can rescue allies, restore health without sacrificing its limited spellcasting, and provide valuable utility that most warlocks cannot. It feels like a hybrid between a damage dealer and an emergency support caster, making it one of the class's most team-oriented options.",
+      "definingFeature": {
+        "name": "Healing Light",
+        "desc": "Spend a pool of d6s as a bonus action to heal creatures at range."
+      }
+    }
+  },
+  {
+    "node_id": "The Fathomless",
+    "data": {
+      "tagline": "Control the battlefield like the tide itself, dragging enemies exactly where you want them.",
+      "overview": "The Fathomless specializes in battlefield control through summoned tentacles, movement reduction, and defensive utility. It steadily limits enemy mobility while protecting itself and its allies from incoming threats, making encounters feel increasingly one-sided as the battlefield bends to its will. Rather than explosive bursts of power, it excels through persistent pressure and positional control.",
+      "definingFeature": {
+        "name": "Tentacle of the Deeps",
+        "desc": "Summon a spectral tentacle to lash foes for cold damage and slow them."
+      }
+    }
+  },
+  {
+    "node_id": "The Fiend",
+    "data": {
+      "tagline": "Turn every victory into momentum and burn through anything standing in your way.",
+      "overview": "The Fiend is the classic offensive warlock, rewarding aggression with durability and destructive magic. It gains temporary resilience whenever enemies fall, allowing it to stay in the fight while unleashing devastating firepower and explosive area attacks. Among warlocks, it leans furthest toward straightforward magical destruction while still retaining the class's signature versatility.",
+      "definingFeature": {
+        "name": "Dark One's Blessing",
+        "desc": "Gain temporary hit points each time you drop a hostile creature."
+      }
+    }
+  },
+  {
+    "node_id": "The Genie",
+    "data": {
+      "tagline": "Your patron grants incredible versatility—and a place to call home almost anywhere.",
+      "overview": "The Genie offers one of the most adaptable warlock experiences, adding elemental power, exceptional utility, and unique exploration tools. Depending on the chosen genie, the subclass gains different magical flavors while sharing a strong focus on mobility, sustained damage, and creative problem solving. Its signature magical refuge also gives it unmatched flexibility during travel, infiltration, and downtime.",
+      "definingFeature": {
+        "name": "Genie's Vessel",
+        "desc": "A magical vessel grants an extradimensional refuge and bonus elemental damage."
+      }
+    }
+  },
+  {
+    "node_id": "The Great Old One",
+    "data": {
+      "tagline": "Win battles by breaking minds instead of bodies.",
+      "overview": "The Great Old One embraces psychic manipulation, subtle influence, and unsettling mental abilities. It focuses less on direct damage and more on information gathering, communication, fear, and disrupting enemy decision-making. Playing one often feels like staying several steps ahead, turning knowledge and psychological pressure into powerful advantages.",
+      "definingFeature": {
+        "name": "Entropic Ward",
+        "desc": "Turn an enemy's attack into disadvantage — and a miss into your own advantage."
+      }
+    }
+  },
+  {
+    "node_id": "The Hexblade",
+    "data": {
+      "tagline": "Turn forbidden magic into deadly martial skill.",
+      "overview": "The Hexblade reshapes the warlock into a formidable weapon user without abandoning its magical identity. It combines powerful melee combat with curses, defensive magic, and supernatural precision, creating a character who can comfortably fight on the front lines while still casting potent spells. The subclass rewards balancing swordplay and spellcasting rather than committing entirely to either.",
+      "definingFeature": {
+        "name": "Hexblade's Curse",
+        "desc": "Mark a foe for bonus damage, easier crits, and a heal when it dies."
+      }
+    }
+  },
+  {
+    "node_id": "The Undead",
+    "data": {
+      "tagline": "Become the monster your enemies fear before they ever touch you.",
+      "overview": "The Undead patron revolves around fear, resilience, and gradually transforming into an avatar of death itself. It excels at frightening enemies, resisting retaliation, and surviving encounters that would overwhelm more fragile spellcasters. Playing an Undead warlock feels increasingly oppressive over the course of a fight, as opponents struggle to stand their ground against a relentless supernatural presence.",
+      "definingFeature": {
+        "name": "Form of Dread",
+        "desc": "Transform into a terrifying aspect for temp HP and fear on your strikes."
+      }
+    }
+  },
+  {
+    "node_id": "The Undying",
+    "data": {
+      "tagline": "Pact with one who cheated death.",
+      "overview": "Undying warlocks borrow the resilience of a deathless lord — warding off undead and clawing back life whenever death draws near.",
+      "definingFeature": {
+        "name": "Defy Death",
+        "desc": "Heal yourself whenever you cheat death or pull someone else back."
+      }
+    }
+  },
+  {
+    "node_id": "Thief",
+    "data": {
+      "tagline": "The classic adventurer—fast hands, quick feet, and always one step ahead.",
+      "overview": "The Thief doubles down on the Rogue's natural agility and talent for infiltration, becoming exceptionally skilled at climbing, sneaking, and making use of objects in the middle of combat. Rather than relying on flashy abilities, it rewards creative problem-solving and clever use of the environment. Playing a Thief feels flexible and resourceful, turning every battlefield and dungeon into a playground of opportunities."
+    }
+  },
+  {
+    "node_id": "Tiefling",
+    "data": {
+      "tagline": "Fiend-blooded folk marked by infernal heritage.",
+      "overview": "To be greeted with stares and whispers, to suffer violence and insult on the street, to see mistrust and fear in every eye: this is the lot of the tiefling. And to twist the knife, tieflings know that this is because a pact struck generations ago infused the essence of Asmodeus, overlord of the Nine Hells (and many of the other powerful devils serving under him) into their bloodline. Their appearance and their nature are not their fault but the result of an ancient sin, for which they and their children and their children's children will always be held accountable.",
+      "definingFeature": {
+        "name": "Infernal Legacy",
+        "desc": "Resistance to fire and a bloodline of innate spells (a cantrip plus level-gated spells)."
+      },
+      "lore": {
+        "lifespan": "Slightly longer than humans.",
+        "society": "Often distrusted or shunned for their heritage, many become self-reliant and wary, forging found families. Bloodlines tie them to specific archdevils.",
+        "physical": "Human-like but unmistakably fiendish — horns, a tail, unusual skin tones, and solid-colored eyes."
+      }
+    }
+  },
+  {
+    "node_id": "Trickery Domain",
+    "data": {
+      "overview": "Trickery clerics rely on deception, illusion, stealth, and misdirection to give their party the upper hand. Their strongest turns often come from creating confusion, improving an ally's positioning, or avoiding a fight altogether rather than dealing direct damage. Success comes from recognizing opportunities that more straightforward classes would never even consider.",
+      "tagline": "Victory doesn't always come from fighting fair."
+    }
+  },
+  {
+    "node_id": "Twilight Domain",
+    "data": {
+      "tagline": "Stand between darkness and your companions, making every ally harder to bring down.",
+      "overview": "Twilight clerics are exceptional protectors, surrounding nearby allies with persistent defensive magic while remaining surprisingly capable combatants themselves. They constantly weigh whether to stay near the party to maximize their protective abilities or move into a better position for spellcasting or offense. Few subclasses are better at helping an entire group survive long, difficult encounters."
+    }
+  },
+  {
+    "node_id": "Uma",
+    "data": {
+      "tagline": "Driven heirs to an eternal tradition of competition.",
+      "overview": "The Uma are a proud people whose isolated clans dwell in distant, often fey-touched planes, far removed from the concerns of most civilizations. Every aspect of Uma life revolves around the pursuit of physical excellence. Strength, speed, endurance, precision, and discipline are not merely admired—they are the highest expressions of virtue. From childhood onward, every Uma trains relentlessly, refining their chosen specialty in preparation for the great festivals where competitors test themselves in contests ranging from footraces and wrestling to elaborate displays of athletic ingenuity. Victory earns not wealth, but honor: champions are granted lifelong titles and immortal remembrance among their people.\n---\nDespite their competitive nature, Uma society is built upon profound mutual respect. Fair competition is sacred, and the rules of any contest are upheld with almost religious devotion. Clever tactics, superior preparation, and creative use of one's surroundings are celebrated as marks of mastery, but deception outside the agreed bounds of a contest is considered deeply dishonorable. This philosophy extends into daily life, producing individuals who are disciplined, direct, and surprisingly gracious in both victory and defeat.\n---\nAncestor reverence shapes nearly every Uma tradition. Great competitors are remembered through carved monuments, statues, and memorials that preserve their achievements for generations to come. Artistic expression exists almost exclusively to commemorate excellence, ensuring that every legendary athlete becomes part of the clan's living history. Uma names often resemble those of celebrated racehorses—grand, evocative, or simply memorable combinations of words such as Summer Anthem, King Cobalt, or Resonant Whisper. Some names even include apparent titles, such as Emperor Vardus or Admiral, though these carry no authority of their own. True titles can only be earned through victory in competition, often leading to amusing misunderstandings when outsiders mistake a name for a rank.\n---\nWhile most Uma spend their entire lives within their clan, many eventually depart on a period of adventure. Such journeys are viewed as an advanced stage of training rather than exile or wanderlust. By testing themselves against unfamiliar lands, monsters, and cultures, these travelers seek experiences impossible to find within the safety of their homeland before returning to compete with newfound skill and perspective.",
+      "definingFeature": {
+        "name": "Natural Affinity",
+        "desc": "A fey bond grants proficiency in a nature-themed skill of your choice."
+      },
+      "lore": {
+        "lifespan": "Uma mature at roughly the same rate as humans and typically live between 80 and 100 years. Their lives are often divided into distinct stages: years of disciplined training, a prime spent earning honors through competition, and a respected elderhood dedicated to teaching younger generations and preserving the legacy of the clan's greatest champions.",
+        "society": "Uma clans are close-knit communities where personal achievement strengthens the honor of the entire people. Seasonal festivals serve as both celebration and proving ground, with competitors earning titles that become part of their identity for the rest of their lives. Even outside formal competition, Uma naturally seek opportunities to improve themselves, viewing hardship and adventure alike as valuable training rather than misfortune.",
+        "physical": "Uma are tall, athletic humanoids with distinctly equine features, including horse-like ears, expressive tails, and powerful lower bodies built for explosive speed and endurance. Their physiques are lean but muscular, reflecting lifetimes spent training for feats of strength and agility.",
+        "alignment": "Most Uma lean toward lawful alignments, believing that clear rules are essential for fair competition and honorable conduct. They value integrity above kindness or cruelty, respecting worthy opponents regardless of their intentions. While they readily accept cunning tactics employed within an agreed contest, they have little tolerance for lies, broken promises, or victories won through betrayal rather than merit."
+      }
+    }
+  },
+  {
+    "node_id": "War Domain",
+    "data": {
+      "tagline": "Fight beside your allies instead of behind them.",
+      "overview": "War clerics blur the line between warrior and spellcaster, comfortably mixing weapon attacks with divine magic throughout a fight. They frequently choose between spending a turn making another attack or casting one of the cleric's many impactful spells, making action economy one of the subclass's defining challenges. The best War clerics know when steel is enough—and when only divine intervention will turn the battle."
+    }
+  },
+  {
+    "node_id": "War Magic",
+    "data": {
+      "tagline": "A battlefield mage who balances devastating offense with disciplined defense.",
+      "overview": "War Mages are trained for combat above all else, combining powerful spellcasting with enhanced defenses that help them survive dangerous encounters. Rather than focusing entirely on one school of magic, they emphasize reliability, maintaining concentration, and staying effective even under heavy pressure. Playing one feels confident and resilient, standing firm where many other Wizards would be forced to retreat.",
+      "definingFeature": {
+        "name": "Arcane Deflection",
+        "desc": "React to boost your AC or a save, at the cost of casting only cantrips next turn."
+      }
+    }
+  },
+  {
+    "node_id": "Warlock",
+    "data": {
+      "tagline": "A pact-bound wielder of borrowed power.",
+      "overview": "Warlocks are spellcasters who draw their power from a supernatural patron rather than years of study or innate magical talent. Their abilities revolve around a bargain with an immensely powerful being—whether that patron is benevolent, manipulative, or something far stranger. Unlike other full casters, warlocks wield a relatively small number of spells but cast them at consistently high power, supplementing them with customizable magical talents and one of the strongest repeatable magical attacks in the game. The class thrives on making deliberate choices that shape its identity, allowing two warlocks with the same patron to feel mechanically distinct.",
+      "definingFeature": {
+        "name": "Pact Magic",
+        "desc": "A handful of always-max-level spell slots that recharge on a short rest, backed by invocations and a pact boon."
+      },
+      "lore": {
+        "role": "Primary Role: Flexible DPS / Controller / Utility\n\nWarlocks fill the role of a reliable ranged damage dealer that can shift into powerful support or control whenever the moment demands it. Unlike other spellcasters, a warlock isn't expected to solve every encounter with a different spell. Instead, you'll spend most combats contributing steady damage through Eldritch Blast while waiting for the right opportunity to spend one of your limited spell slots. This consistency makes the warlock one of the most dependable damage dealers in the game, able to contribute meaningful damage every round without worrying about running out of resources. When the situation truly calls for it, however, your spells can completely change the course of a fight, making every spell slot feel impactful rather than routine.",
+        "playstyle": "The warlock rewards patience, planning, and specialization over adaptability. Combat itself is often straightforward, but deciding when to commit your limited resources is one of the class's greatest challenges. Spending a spell too early can leave you without an answer later, while holding onto it for too long may mean you never use it at all. Outside of combat, your high Charisma often places you in the role of the party's spokesperson, making social encounters just as important as battles. While the warlock isn't mechanically difficult to pilot from round to round, it asks you to make meaningful decisions both in character creation and throughout an adventuring day. Success comes less from mastering complicated turns and more from understanding your strengths, recognizing the moments where your magic matters most, and knowing when consistency is more valuable than spectacle.",
+        "subclasses": "Every warlock shares the same foundation of consistent ranged combat, powerful but limited spellcasting, and deep customization through Invocations and Pact Boons. Your Patron doesn't replace that identity—it shapes how you apply it. Some Patrons encourage battlefield control, others improve your survivability, enhance your spellcasting, or introduce entirely new tactical options. Rather than dramatically changing your role within the party, your subclass refines the type of warlock you become, allowing two warlocks to feel remarkably different while still sharing the same core philosophy of making a few powerful choices exceptionally well.",
+        "your_magic_isn_t_your_main_weapon": "New players often assume a warlock fights like a wizard, constantly casting powerful spells throughout the day. In reality, your primary weapon is usually Eldritch Blast. Think of it less as a backup cantrip and more as the magical equivalent of a fighter's sword or a ranger's bow—it's what you'll rely on in nearly every combat. Your spell slots aren't there to replace your consistent damage; they're there to create defining moments. Once you embrace that mindset, the class begins to feel far more natural, and every spell you cast carries a sense of importance that many other spellcasters rarely experience.",
+        "understanding_your_spell_slots": "The warlock's spellcasting is unlike any other class in D&D, and understanding it is essential to enjoying the class. You have very few spell slots, but they are always cast at your highest available level and are recovered after a Short Rest rather than a Long Rest. This creates a unique rhythm where your power can fluctuate depending on how your group approaches an adventuring day. In campaigns with regular Short Rests, warlocks can cast powerful spells surprisingly often. In campaigns where rests are rare, however, you'll need to be much more conservative with your magic. Before choosing a warlock, it's worth understanding how your group and Dungeon Master typically pace their adventures, as it can have a noticeable impact on how the class feels to play.",
+        "your_depth_comes_from_your_choices": "Although the warlock's turns in combat are often simple, the class offers some of the deepest character customization in the game. Invocations, Pact Boons, spell selection, feats, and your Patron all combine to shape what your character is capable of both in and out of combat. Many of these choices are permanent or difficult to change, making each level-up feel significant. Rather than giving you an answer to every problem, the warlock encourages you to become exceptionally good at a handful of things. The class rewards players who enjoy carefully crafting a unique build, finding creative uses for specialized abilities, and making every decision count."
+      }
+    }
+  },
+  {
+    "node_id": "Water Genasi",
+    "data": {
+      "tagline": "Fluid and amphibious.",
+      "overview": "Water genasi descend from marids, aquatic genies from the Elemental Plane of Water. Water genasi are perfectly suited to life underwater and carry the power of the waves inside themselves.\n\nTheir skin is often shades of blue or green, sometimes a blend of the two. If they have a human skin tone, there is a glistening texture that catches the light, like water droplets or nearly invisible fish scales. Their hair can resemble seaweed, waving as if in a current, or it can even be like water itself.",
+      "definingFeature": {
+        "name": "Call to the Wave",
+        "desc": "A swim speed, amphibious breathing, acid resistance, and Shape Water."
+      }
+    }
+  },
+  {
+    "node_id": "Way of Mercy",
+    "data": {
+      "tagline": "Strike with one hand, restore with the other.",
+      "overview": "Way of Mercy turns the monk into one of the game's most flexible combat medics without sacrificing its martial identity. Rather than dedicating turns exclusively to healing, Mercy weaves restoration and debilitating strikes directly into its normal attack routine, allowing it to stabilize allies or punish enemies without abandoning the front line. Its signature abilities reward good target selection and efficient Ki usage, making it excellent at adapting to changing fights. Compared to other monks, Mercy is the least selfish—its mobility isn't just for reaching enemies, but also for reaching teammates who suddenly need help."
+    }
+  },
+  {
+    "node_id": "Way of Shadow",
+    "data": {
+      "tagline": "Win the fight before the enemy knows where you are.",
+      "overview": "Way of Shadow leans heavily into infiltration, stealth, and battlefield positioning. It expands the monk's already exceptional mobility with tools that let it bypass obstacles, disappear into darkness, and approach vulnerable targets from unexpected angles. While its direct damage isn't dramatically higher than other monks, it spends far less time trying to force fights through defended front lines. Outside combat, Shadow gains some of the strongest scouting and infiltration tools available to any martial class, making it especially rewarding in campaigns where information and positioning matter as much as combat itself."
+    }
+  },
+  {
+    "node_id": "Way of the Astral Self",
+    "data": {
+      "tagline": "Fight with spirit instead of muscle.",
+      "overview": "Astral Self summons spectral arms and eventually an entire spiritual manifestation that augments the monk's combat abilities. Rather than simply making the monk stronger, these manifestations reshape how it engages enemies by extending its reach, improving reliability, and allowing different ability scores to support its attacks. The subclass feels steadier than many monks, relying less on perfect positioning and more on maintaining an empowered combat form throughout important encounters. It's ideal for players who enjoy building momentum as a fight progresses instead of constantly darting in and out."
+    }
+  },
+  {
+    "node_id": "Way of the Drunken Master",
+    "data": {
+      "tagline": "Turn every missed attack into another opening.",
+      "overview": "Despite its name, Drunken Master isn't about drinking—it's about unpredictable movement and impossible-to-follow footwork. This subclass excels at weaving through crowded battlefields, slipping away from enemies after attacking, and positioning itself where retaliation is difficult. As fights become more chaotic, Drunken Master often becomes harder to pin down, flowing between opponents while avoiding being surrounded. It rewards players who constantly think several movements ahead and enjoy making enemy positioning work against them."
+    }
+  },
+  {
+    "node_id": "Way of the Four Elements",
+    "data": {
+      "tagline": "Trade relentless punches for a wider toolbox.",
+      "overview": "Way of the Four Elements gives the monk access to elemental techniques inspired by traditional spellcasters, allowing it to project force, manipulate the battlefield, and solve problems that pure martial characters often cannot. Rather than specializing further in mobility or melee pressure, it broadens the monk's options with ranged attacks and utility abilities fueled by the same Ki resource. This flexibility comes at a cost, however—balancing elemental techniques against the monk's core abilities creates one of the most resource-intensive playstyles in the class. Players who enjoy adapting to unusual situations may appreciate its versatility, but it demands careful planning to avoid running out of fuel too early."
+    }
+  },
+  {
+    "node_id": "Way of the Kensei",
+    "data": {
+      "tagline": "Perfect the weapon until it becomes an extension of yourself.",
+      "overview": "Kensei shifts the monk's focus from unarmed combat toward mastery of carefully chosen weapons. Rather than abandoning the monk's mobility, it combines precise weapon strikes with agile defensive techniques, creating a fighter that constantly alternates between offense and protection. The subclass is mechanically straightforward compared to many monks, emphasizing consistent performance over explosive turns. It appeals to players who like the monk's speed but prefer fighting with blades, bows, or other traditional weapons instead of relying almost entirely on their fists."
+    }
+  },
+  {
+    "node_id": "Way of the Open Hand",
+    "data": {
+      "tagline": "Master the fundamentals until every strike controls the fight.",
+      "overview": "Open Hand doubles down on the monk's original strengths instead of introducing an entirely new gimmick. Its attacks disrupt enemy positioning, knock foes off balance, deny reactions, and generally make every successful hit more impactful than simple damage alone. Rather than chasing flashy mechanics, it reinforces the monk's role as a battlefield controller who dictates where enemies can safely stand and how effectively they can respond. If the base monk represents the class in its purest form, Open Hand is that philosophy refined to its highest level."
+    }
+  },
+  {
+    "node_id": "Way of the Sun Soul",
+    "data": {
+      "tagline": "Bring the monk's speed to every range.",
+      "overview": "Sun Soul allows the monk to project radiant energy instead of relying solely on melee attacks, giving it a reliable ranged option without abandoning its martial rhythm. Rather than transforming into a dedicated spellcaster, it remains a monk first, using mobility to constantly adjust distance while peppering enemies with radiant strikes. The subclass is especially comfortable against flying or hard-to-reach opponents that frustrate most melee characters, though it generally trades some peak melee efficiency for this added flexibility. Players who enjoy staying active around the edges of combat while always threatening meaningful damage will find its toolkit especially appealing."
+    }
+  },
+  {
+    "node_id": "Wild Magic",
+    "data": {
+      "tagline": "Embrace unpredictability and let chaos decide what happens next.",
+      "overview": "Wild Magic turns every spell into a gamble, with unpredictable magical surges capable of helping or hindering anyone nearby. While experienced players can influence that randomness to some extent, chance remains an ever-present companion. Playing a Wild Magic sorcerer is less about perfect planning and more about adapting to unexpected opportunities—and surviving the occasional disaster.",
+      "definingFeature": {
+        "name": "Wild Magic Surge",
+        "desc": "Your spells can trigger a random effect from the d100 surge table."
+      }
+    }
+  },
+  {
+    "node_id": "Wizard",
+    "data": {
+      "tagline": "The scholar who masters all arcane magic.",
+      "overview": "Wizards are the ultimate students of magic, wielding the broadest and most versatile spellcasting arsenal in the game. Unlike other spellcasters who draw power from faith, bloodlines, or natural talent, Wizards earn their abilities through years of study, experimentation, and mastery of arcane knowledge. Given enough preparation, they can adapt to nearly any challenge, solving problems with carefully chosen spells instead of brute force. Regardless of specialization, every Wizard rewards planning, creativity, and an understanding that knowledge is often the greatest source of power.",
+      "definingFeature": {
+        "name": "Spellbook & Arcane Recovery",
+        "desc": "Collect spells in a book and prepare a fresh arsenal each day, recovering slots through study — the deepest toolbox of any class."
+      },
+      "lore": {
+        "role": "Controller • Utility • AoE DPS • Problem Solver\n\nWizards shape encounters more than almost any other class. They can devastate groups of enemies, lock down powerful threats, solve problems no other class can, and adapt to almost any situation through careful spell selection. While they can deal tremendous damage, their greatest strength is recognizing what a situation demands and having the right spell to answer it.",
+        "playstyle": "Playing a Wizard is about preparation, judgment, and understanding your role within the party. Unlike many classes that solve problems with a consistent set of abilities, Wizards succeed by choosing from an enormous library of spells, weighing which option will have the greatest impact, and deciding whether a problem is worth spending precious resources to solve.\n\nCombat is rarely about casting the biggest spell available. Every turn presents meaningful decisions: eliminate weaker enemies, disable the strongest threat, protect an ally, counter an enemy spellcaster, conserve spell slots, or reshape the battlefield entirely. Learning when each approach is most effective is what separates an experienced Wizard from a novice.\n\nOutside combat, Wizards continue to contribute through ritual magic, utility spells, research, and magical knowledge. Their spellbook allows them to prepare for challenges before they happen, often solving obstacles that would otherwise require entirely different approaches.",
+        "subclasses": "Every Wizard shares the same core identity: a scholar whose growing spellbook offers unmatched flexibility and answers to almost any challenge. Subclasses don't replace this identity—they simply determine the areas of magic the Wizard becomes especially proficient in. Some become exceptional battlefield controllers, others specialize in destructive magic, protection, illusion, summoning, or manipulating time, gravity, and fate. Regardless of specialization, every Wizard remains defined by careful preparation, intelligent decision-making, and an ever-expanding arsenal of spells.",
+        "is_wizard_right_for_you": "The Wizard is often considered one of the highest skill ceiling classes in D&D. While it's perfectly possible to enjoy the class with a handful of reliable spells, mastering it means understanding hundreds of spell options, planning ahead for future challenges, and recognizing which spell will have the greatest impact in any given situation.\n\nPlayers who enjoy learning systems, planning ahead, and making tactical decisions every turn will often find Wizard one of the most rewarding classes in the game. Those looking for a straightforward character that performs consistently without much preparation may find other spellcasters—or martial classes—more approachable.",
+        "the_wizard_s_responsibility": "Unlike many classes, a Wizard rarely succeeds on their own.\n\nWith limited defenses and relatively low durability, Wizards depend heavily on their party to create space, protect their concentration, and keep dangerous enemies away. In return, the Wizard is expected to solve problems that few other characters can.\n\nYour allies may hold the front line while you eliminate an entire wave of enemies with a single spell. They may protect you while you maintain a spell that completely controls the battlefield. They may rely on you to teleport the party to safety, dispel dangerous magic, identify ancient artifacts, or counter an enemy spellcaster at exactly the right moment.\n\nThis creates a unique relationship between the Wizard and the rest of the party. Your teammates help keep you alive because they trust you to make the decisions that can completely change the outcome of an encounter.",
+        "the_spellbook": "A Wizard's spellbook is more than a class feature—it's the heart of the class.\n\nUnlike most spellcasters, Wizards can continually expand their collection of spells by copying magic from scrolls, spellbooks, and other sources discovered throughout a campaign. Every new spell permanently increases the number of tools available to you, allowing your character to grow not just through leveling up, but through exploration and discovery.\n\nBuilding a spellbook means making long-term decisions about the kinds of problems you want to solve. No Wizard can prepare every spell at once, so choosing what to bring each day becomes part of the class's strategic depth."
+      }
+    }
+  },
+  {
+    "node_id": "Wood Elf",
+    "data": {
+      "tagline": "Swift and stealthy.",
+      "overview": "As a wood elf, you have keen senses and intuition, and your fleet feet carry you quickly and stealthily through your native forests. This category includes the wild elves (grugach) of Greyhawk and the Kagonesti of Dragonlance, as well as the races called wood elves in Greyhawk and the Forgotten Realms. In Faerun, wood elves (also called wild elves. green elves, or forest elves) are reclusive and distrusting of non-elves.\n\nWood elves' skin tends to be copperish in hue, sometimes with traces of green. Their hair tends toward browns and blacks, but it is occasionally blond or copper-colored. Their eyes are green, brown, or hazel.",
+      "definingFeature": {
+        "name": "Mask of the Wild",
+        "desc": "Extra speed and the ability to hide even when lightly obscured by nature."
+      }
+    }
+  }
+]

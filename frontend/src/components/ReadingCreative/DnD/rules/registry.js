@@ -19,7 +19,6 @@ import { CLASS_CASTER_PROFILE, CLASS_FEATURE_DEFAULTS, SUBCLASS_LISTS, CLASS_NAM
 import { CLASS_META } from './classes';
 import { CLASS_CREATION } from './classes/creation';
 import { RACE_ABILITY_BONUSES, SUBRACE_ABILITY_BONUSES } from './data/abilityBonuses';
-import { LORE } from './data/lore';
 
 // ── blockId tables (strings only; resolved to components in
 //    components/ClassFeatures/registry.js) ──────────────────────────────────
@@ -150,19 +149,11 @@ export const SUBCLASS_BLOCK_BY_NAME = {
   'War Domain': 'WarDomainBlock',
 };
 
-const emptyOverview = { tagline: null, overview: null, definingFeature: null, lore: null };
-
-// Pull the overview/lore layer for a node (defaults to empty when unauthored).
-function loreOf(name) {
-  const l = LORE[name];
-  if (!l) return emptyOverview;
-  return {
-    tagline: l.tagline ?? null,
-    overview: l.overview ?? null,
-    definingFeature: l.definingFeature ?? null,
-    lore: l.lore ?? null,
-  };
-}
+// Flavor prose (tagline / overview / definingFeature / lore) is no longer baked
+// into nodes here — it lives solely in the backend (dnd_rules_overrides, seeded
+// from backend/seed_data/dnd_rules_lore.json) and is fetched via useLoreOverrides,
+// then merged over the node with applyOverride at read time. The registry now
+// carries only mechanical data.
 
 // ── Node builders ───────────────────────────────────────────────────────────
 function buildClassNode(name) {
@@ -183,9 +174,7 @@ function buildClassNode(name) {
     subclassLevel: meta.subclassLevel || 3,
     helpers: {},        // P3
     creation: CLASS_CREATION[name] || null,
-    progression: CLASS_PROGRESSION[name] || [],
-    ...loreOf(name),
-  };
+    progression: CLASS_PROGRESSION[name] || [],  };
 }
 
 function buildSubclassNode(name, classNameFallback) {
@@ -198,9 +187,7 @@ function buildSubclassNode(name, classNameFallback) {
     childIds: [],
     blockId,
     implemented: progression.length > 0 || !!blockId,
-    progression,
-    ...loreOf(name),
-  };
+    progression,  };
 }
 
 function buildRaceNode(name) {
@@ -212,9 +199,7 @@ function buildRaceNode(name) {
     abilityBonuses: RACE_ABILITY_BONUSES[name] || {},
     speed: null, size: null, creatureType: null,
     blockId: null,      // racial trackers render via RacialBlock outside this dispatch
-    progression: data.traits || [],
-    ...loreOf(name),
-  };
+    progression: data.traits || [],  };
 }
 
 function buildSubraceNode(name) {
@@ -224,9 +209,7 @@ function buildSubraceNode(name) {
     parentId: data.race || null,
     childIds: [],
     abilityBonuses: SUBRACE_ABILITY_BONUSES[name] || {},
-    progression: data.traits || [],
-    ...loreOf(name),
-  };
+    progression: data.traits || [],  };
 }
 
 // ── Assemble the registry once ──────────────────────────────────────────────
