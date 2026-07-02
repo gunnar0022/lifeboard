@@ -37,6 +37,8 @@ CONTENT_TABLES = [
      "json_cols": ["benefits", "asi"]},
     {"file": "dnd_backgrounds.json", "table": "dnd_backgrounds", "order": "name",
      "json_cols": ["skill_proficiencies", "tool_proficiencies", "languages", "equipment"]},
+    {"file": "dnd_summons.json",     "table": "dnd_summons",     "order": "category, name",
+     "json_cols": ["speeds", "ability_scores", "traits", "actions", "reactions"]},
     {"file": "dnd_rules_lore.json",  "table": "dnd_rules_overrides", "order": "node_id",
      "json_cols": ["data"]},
 ]

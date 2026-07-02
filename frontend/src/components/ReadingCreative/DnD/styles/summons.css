@@ -1,0 +1,264 @@
+/* ── Summons & Companions — Combat-tab sub-tab ─────────────────────────────── */
+
+/* Inner Character / Summons switch (lives under the main tab row) */
+.dnd-sheet__subtabs {
+  display: flex; gap: 0.4rem; margin-bottom: 1rem;
+}
+.dnd-sheet__subtab {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+  border-radius: 999px; color: var(--dnd-text-dim);
+  padding: 0.3rem 0.85rem; cursor: pointer;
+  font-family: inherit; font-size: 0.82rem; font-weight: 600; transition: all 0.15s;
+}
+.dnd-sheet__subtab:hover { color: var(--dnd-text); border-color: var(--dnd-border-strong); }
+.dnd-sheet__subtab--active {
+  color: var(--dnd-bg); background: var(--dnd-accent); border-color: var(--dnd-accent);
+}
+.dnd-sheet__subtab-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.15rem; height: 1.15rem; padding: 0 0.3rem;
+  border-radius: 999px; background: var(--dnd-accent); color: var(--dnd-bg);
+  font-size: 0.68rem; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.dnd-sheet__subtab--active .dnd-sheet__subtab-badge { background: var(--dnd-bg); color: var(--dnd-accent); }
+
+/* ── Concentration chip in the StatusBar — strobing amber ──────────────────── */
+@keyframes dnd-conc-strobe {
+  0%, 100% { box-shadow: 0 0 4px 0 color-mix(in srgb, #e6b422 30%, transparent); }
+  50%      { box-shadow: 0 0 12px 3px color-mix(in srgb, #e6b422 70%, transparent); }
+}
+.dnd-statusbar__concentration {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.28rem 0.6rem; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-size: 0.78rem; color: #6a4e00;
+  background: color-mix(in srgb, #e6b422 22%, var(--dnd-surface));
+  border: 1px solid color-mix(in srgb, #e6b422 60%, var(--dnd-border));
+  animation: dnd-conc-strobe 1.8s ease-in-out infinite;
+}
+.dnd-statusbar__concentration strong { font-weight: 800; }
+.dnd-statusbar__concentration:hover { background: color-mix(in srgb, #e6b422 34%, var(--dnd-surface)); }
+[data-theme="dark"] .dnd-statusbar__concentration,
+.dark .dnd-statusbar__concentration { color: #f0d488; }
+
+/* ── Panel ─────────────────────────────────────────────────────────────────── */
+.dnd-summons__head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;
+}
+.dnd-summons__add {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--dnd-accent); color: var(--dnd-bg); border: none;
+  border-radius: 0.4rem; padding: 0.4rem 0.85rem; cursor: pointer;
+  font-family: inherit; font-size: 0.85rem; font-weight: 700; transition: filter 0.15s;
+}
+.dnd-summons__add:hover { filter: brightness(1.08); }
+
+.dnd-summons__empty {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 2.5rem 1.5rem; text-align: center; color: var(--dnd-text-muted);
+  border: 1px dashed var(--dnd-border); border-radius: 0.6rem; background: var(--dnd-surface);
+}
+.dnd-summons__empty p { margin: 0; font-weight: 700; color: var(--dnd-text-dim); }
+.dnd-summons__empty span { max-width: 32rem; font-size: 0.82rem; line-height: 1.5; }
+
+/* Each summon spans the full width; new ones stack vertically. */
+.dnd-summons__list {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+/* ── Instance card ─────────────────────────────────────────────────────────── */
+.dnd-summon-card {
+  border: 1px solid color-mix(in srgb, var(--block-accent, var(--dnd-accent)) 45%, var(--dnd-border));
+  border-radius: 0.6rem; padding: 0.8rem; background: var(--dnd-surface);
+  display: flex; flex-direction: column; gap: 0.65rem;
+}
+.dnd-summon-card--dead { opacity: 0.55; filter: grayscale(0.6); }
+
+.dnd-summon-card__header { display: flex; align-items: center; gap: 0.4rem; }
+.dnd-summon-card__name { flex: 1; font-weight: 700; }
+.dnd-summon-card__allegiance {
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border);
+  border-radius: 0.35rem; padding: 0.25rem 0.4rem; cursor: pointer;
+  font-family: inherit; font-size: 0.72rem; font-weight: 700;
+}
+.dnd-summon-card__header-btns { display: flex; gap: 0.25rem; }
+.dnd-summon-card__icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.7rem; height: 1.7rem; border-radius: 0.35rem; cursor: pointer;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border); color: var(--dnd-text-dim);
+  transition: all 0.15s;
+}
+.dnd-summon-card__icon-btn:hover { color: var(--dnd-text); border-color: var(--dnd-border-strong); }
+.dnd-summon-card__icon-btn--on { background: var(--dnd-accent); color: var(--dnd-bg); border-color: var(--dnd-accent); }
+.dnd-summon-card__icon-btn--danger:hover { color: var(--dnd-negative); border-color: var(--dnd-negative); }
+
+.dnd-summon-card__sub {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  font-size: 0.72rem; color: var(--dnd-text-muted);
+}
+.dnd-summon-card__custom-tag {
+  text-transform: uppercase; letter-spacing: 0.05em; font-weight: 800; font-size: 0.62rem;
+  color: var(--dnd-accent);
+}
+
+.dnd-summon-card__conc {
+  display: inline-flex; align-items: center; gap: 0.35rem; align-self: flex-start;
+  padding: 0.3rem 0.6rem; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-size: 0.74rem; font-weight: 600;
+  color: var(--dnd-text-dim); background: var(--dnd-bg);
+  border: 1px dashed color-mix(in srgb, #e6b422 55%, var(--dnd-border));
+}
+.dnd-summon-card__conc:hover { color: var(--dnd-text); }
+.dnd-summon-card__conc--active {
+  color: #6a4e00; border-style: solid;
+  background: color-mix(in srgb, #e6b422 22%, var(--dnd-surface));
+  animation: dnd-conc-strobe 1.8s ease-in-out infinite;
+}
+[data-theme="dark"] .dnd-summon-card__conc--active,
+.dark .dnd-summon-card__conc--active { color: #f0d488; }
+
+.dnd-summon-card__editor {
+  border: 1px solid var(--dnd-border); border-radius: 0.45rem; padding: 0.6rem;
+  background: var(--dnd-bg); max-height: 420px; overflow-y: auto;
+}
+
+.dnd-summon-card__conditions { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.dnd-summon-card__cond {
+  display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer;
+  padding: 0.2rem 0.45rem; border-radius: 0.3rem; font-size: 0.72rem;
+  background: var(--dnd-negative-bg); color: var(--dnd-negative); border: 1px solid var(--dnd-negative-border);
+}
+.dnd-summon-card__cond-add-wrap { position: relative; }
+.dnd-summon-card__cond-add {
+  display: inline-flex; align-items: center; gap: 0.2rem; cursor: pointer;
+  padding: 0.2rem 0.45rem; border-radius: 0.3rem; font-size: 0.72rem; font-family: inherit;
+  background: var(--dnd-bg); color: var(--dnd-text-dim); border: 1px dashed var(--dnd-border);
+}
+.dnd-summon-card__cond-add:hover { color: var(--dnd-text); }
+.dnd-summon-card__cond-picker {
+  position: absolute; z-index: 20; top: 100%; left: 0; margin-top: 0.3rem;
+  display: flex; flex-direction: column; min-width: 9rem; max-height: 220px; overflow-y: auto;
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border-strong);
+  border-radius: 0.4rem; box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+.dnd-summon-card__cond-picker button {
+  text-align: left; padding: 0.35rem 0.55rem; cursor: pointer; font-family: inherit; font-size: 0.76rem;
+  background: none; border: none; color: var(--dnd-text);
+}
+.dnd-summon-card__cond-picker button:hover { background: var(--dnd-surface-hover); }
+
+.dnd-summon-card__notes { width: 100%; resize: vertical; font-size: 0.78rem; }
+
+/* New CompanionStatBlock bits shared with summons */
+.dnd-companion__stat-note { font-size: 0.62rem; color: var(--dnd-text-muted); text-align: center; }
+.dnd-companion__action-range { font-size: 0.72rem; color: var(--dnd-text-muted); font-style: italic; }
+.dnd-companion__actions { display: flex; flex-direction: column; gap: 0.3rem; }
+
+/* ── Extra-wide summon stat block: roomier layout + slightly larger type ─────── */
+/* Attacks/actions flow into a 3-wide grid once there are more than three. */
+.dnd-companion__sb--wide .dnd-companion__actions--grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; align-items: start;
+}
+@media (max-width: 900px) {
+  .dnd-companion__sb--wide .dnd-companion__actions--grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .dnd-companion__sb--wide .dnd-companion__actions--grid { grid-template-columns: 1fr; }
+}
+.dnd-companion__sb--wide { gap: 0.6rem; }
+.dnd-companion__sb--wide .dnd-companion__meta { font-size: 0.82rem; }
+.dnd-companion__sb--wide .dnd-companion__stat-val { font-size: 1.15rem; }
+.dnd-companion__sb--wide .dnd-companion__stat-lbl { font-size: 0.66rem; }
+.dnd-companion__sb--wide .dnd-companion__ability-score { font-size: 0.95rem; }
+.dnd-companion__sb--wide .dnd-companion__ability-lbl { font-size: 0.62rem; }
+.dnd-companion__sb--wide .dnd-companion__ability-mod { font-size: 0.72rem; }
+.dnd-companion__sb--wide .dnd-companion__line { font-size: 0.82rem; }
+.dnd-companion__sb--wide .dnd-companion__trait { font-size: 0.82rem; }
+.dnd-companion__sb--wide .dnd-companion__group-title { font-size: 0.7rem; }
+.dnd-companion__sb--wide .dnd-companion__action-name { font-size: 0.88rem; }
+.dnd-companion__sb--wide .dnd-companion__damage { font-size: 0.82rem; }
+.dnd-companion__sb--wide .dnd-companion__action-desc { font-size: 0.76rem; }
+.dnd-companion__sb--wide .dnd-companion__action-range { font-size: 0.76rem; }
+.dnd-companion__sb--wide .dnd-companion__hit { font-size: 0.68rem; }
+.dnd-companion__sb--wide .dnd-companion__hp-num { font-size: 1.05rem; }
+
+/* Slightly larger supporting text on the wide card itself */
+.dnd-summon-card__name { font-size: 0.95rem; }
+.dnd-summon-card__sub { font-size: 0.78rem; }
+.dnd-summon-card__notes { font-size: 0.84rem; }
+
+/* ── Summon editor form ────────────────────────────────────────────────────── */
+.dnd-summon-form__speeds, .dnd-summon-form__abilities {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+}
+.dnd-summon-form__speed, .dnd-summon-form__ability {
+  display: flex; flex-direction: column; gap: 0.15rem; width: 4.6rem;
+}
+.dnd-summon-form__speed span, .dnd-summon-form__ability span {
+  font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dnd-text-dim);
+}
+.dnd-summon-form__list { margin-top: 0.6rem; border-top: 1px solid var(--dnd-border); padding-top: 0.5rem; }
+.dnd-summon-form__list-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;
+  font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dnd-text-dim);
+}
+.dnd-summon-form__add {
+  display: inline-flex; align-items: center; gap: 0.2rem; cursor: pointer;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border); border-radius: 0.3rem;
+  padding: 0.2rem 0.5rem; font-family: inherit; font-size: 0.72rem; color: var(--dnd-text-dim);
+}
+.dnd-summon-form__add:hover { color: var(--dnd-text); }
+.dnd-summon-form__row {
+  display: flex; gap: 0.4rem; align-items: flex-start; margin-bottom: 0.4rem;
+}
+.dnd-summon-form__row > input { flex: 0 0 8rem; }
+.dnd-summon-form__row > textarea { flex: 1; }
+.dnd-summon-form__row--action { flex-direction: column; }
+.dnd-summon-form__action-grid { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.dnd-summon-form__action-grid > input { flex: 1; min-width: 6rem; }
+.dnd-summon-form__row--action > textarea { width: 100%; }
+.dnd-summon-form__del {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 1.7rem; height: 1.7rem; border-radius: 0.3rem; cursor: pointer;
+  background: var(--dnd-bg); border: 1px solid var(--dnd-border); color: var(--dnd-text-muted);
+}
+.dnd-summon-form__del:hover { color: var(--dnd-negative); border-color: var(--dnd-negative); }
+.dnd-summon-form__row--action .dnd-summon-form__del { align-self: flex-end; margin-top: -1.9rem; }
+
+/* ── Picker extras (on top of op-picker skin) ──────────────────────────────── */
+.dnd-summon-picker__cats {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0 1rem 0.6rem;
+}
+.dnd-summon-picker__cats button {
+  padding: 0.22rem 0.6rem; border-radius: 999px; cursor: pointer; font-family: inherit;
+  font-size: 0.74rem; font-weight: 600; color: var(--dnd-text-dim);
+  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
+}
+.dnd-summon-picker__cats button.is-on {
+  color: var(--dnd-bg); background: var(--op-accent, var(--dnd-accent)); border-color: var(--op-accent, var(--dnd-accent));
+}
+.dnd-summon-picker__detail {
+  padding: 0.6rem 0.4rem 0.2rem; display: flex; flex-direction: column; gap: 0.6rem;
+}
+.dnd-summon-picker__spawn {
+  display: flex; align-items: flex-end; gap: 0.5rem; flex-wrap: wrap;
+}
+.dnd-summon-picker__spawn label {
+  display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.7rem; color: var(--dnd-text-dim);
+}
+.dnd-summon-picker__spawn label input { width: 4.5rem; }
+.dnd-summon-picker__spawn-name { flex: 1; }
+.dnd-summon-picker__spawn-name input { width: 100%; }
+.dnd-summon-picker__spawn-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+  background: var(--op-accent, var(--dnd-accent)); color: #fff; border: none;
+  border-radius: 0.4rem; padding: 0.45rem 0.8rem; font-family: inherit; font-size: 0.82rem; font-weight: 700;
+}
+.dnd-summon-picker__spawn-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.dnd-summon-picker__spawn-btn--ghost {
+  background: var(--dnd-surface); color: var(--dnd-text-dim); border: 1px solid var(--dnd-border);
+}
+.dnd-summon-picker__builder-actions {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;
+  padding-top: 0.8rem; border-top: 1px solid var(--dnd-border);
+}

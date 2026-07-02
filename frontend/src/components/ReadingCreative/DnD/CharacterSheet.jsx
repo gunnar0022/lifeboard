@@ -12,6 +12,7 @@ import ClassFeatureBlock from './components/ClassFeatures/ClassFeatureBlock';
 import RacialBlock from './components/ClassFeatures/RacialBlock';
 import SubclassBlock from './components/SubclassBlock';
 import SubclassPicker from './components/SubclassPicker';
+import SummonsPanel from './components/Summons/SummonsPanel';
 import SpellsTab from './components/Spellcasting/SpellsTab';
 import NotesTab from './components/CampaignNotes/NotesTab';
 import EncyclopediaTab from './components/Encyclopedia/EncyclopediaTab';
@@ -41,6 +42,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
   const [subclassPickerOpen, setSubclassPickerOpen] = useState(false);
   // Active tab persists per-character so a refresh reopens the same tab.
   const [tab, setTab] = useLocalStorageState(`lifeboard-dnd-tab-${characterId}`, 'combat');
+  // Inner Character / Summons switch within the Combat tab.
+  const [combatSub, setCombatSub] = useLocalStorageState(`lifeboard-dnd-combatsub-${characterId}`, 'character');
   const prevClassRef = useRef(null);
   const prevSubclassRef = useRef(null);
   // Tracks the class|level the HP/hit-dice auto-calc last saw, so it only fires
@@ -976,6 +979,23 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         {/* Encyclopedia has its own "Encyclopedia" heading (with the ? inline). */}
         {activeTab !== 'encyclopedia' && <TabHeader topic={activeTab} title={activeTabLabel} />}
         {activeTab === 'combat' && (
+          <>
+          <div className="dnd-sheet__subtabs">
+            <button
+              className={`dnd-sheet__subtab ${combatSub === 'character' ? 'dnd-sheet__subtab--active' : ''}`}
+              onClick={() => setCombatSub('character')}>Character</button>
+            <button
+              className={`dnd-sheet__subtab ${combatSub === 'summons' ? 'dnd-sheet__subtab--active' : ''}`}
+              onClick={() => setCombatSub('summons')}>
+              Summons
+              {(character.summons || []).length > 0 && (
+                <span className="dnd-sheet__subtab-badge">{(character.summons || []).length}</span>
+              )}
+            </button>
+          </div>
+          {combatSub === 'summons' ? (
+            <SummonsPanel character={character} onUpdate={handleUpdate} />
+          ) : (
           <div className="dnd-sheet__combat-2col">
             <div className="dnd-sheet__combat-col-left">
               <ClassFeatureBlock character={character} editMode={editMode} onUpdate={handleUpdate} />
@@ -1021,6 +1041,8 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
                 meta={meta} editMode={editMode} onUpdate={handleUpdate} />
             </div>
           </div>
+          )}
+          </>
         )}
 
         {activeTab === 'equipment' && (

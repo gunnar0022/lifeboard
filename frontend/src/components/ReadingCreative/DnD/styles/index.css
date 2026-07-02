@@ -16,3 +16,4 @@
 @import './option-picker.css';   /* Themed option-picker library modals */
 @import './subclass-picker.css'; /* Subclass chooser (master/detail) modal */
 @import './creation.css';        /* Guided character-creation flow + gate */
+@import './summons.css';         /* Summons & Companions Combat sub-tab */

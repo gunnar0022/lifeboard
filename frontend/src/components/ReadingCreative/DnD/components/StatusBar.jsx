@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Sparkles, Plus, X, ChevronUp, ChevronDown, Brain } from 'lucide-react';
 
 const CONDITIONS_5E = [
   { name: 'Blinded', desc: 'Auto-fail sight checks. Attack rolls have disadvantage, attacks against have advantage.' },
@@ -35,6 +35,16 @@ export default function StatusBar({ character, onUpdate }) {
   const inspiration = character.inspiration || false;
   const activeConditions = character.activeConditions || [];
   const exhaustionLevel = character.exhaustionLevel || 0;
+  const concentration = character.concentration || null;
+
+  // Concentration is a single character-wide slot shared with the Spells tab and
+  // the Summons sub-tab. Dropping it clears both the display slot and the spell
+  // link so the two views stay in sync.
+  const dropConcentration = () => {
+    const upd = { concentration: null };
+    if (character.spellcasting) upd.spellcasting = { concentratingOn: null };
+    onUpdate(upd);
+  };
 
   const toggleInspiration = () => {
     onUpdate({ inspiration: !inspiration });
@@ -68,6 +78,19 @@ export default function StatusBar({ character, onUpdate }) {
         <Sparkles size={14} />
         <span>Inspiration</span>
       </button>
+
+      {/* Concentration — strobing amber chip, click to drop */}
+      {concentration && (
+        <button
+          className="dnd-statusbar__concentration"
+          onClick={dropConcentration}
+          title={`Concentrating on ${concentration.name} — click to drop`}
+        >
+          <Brain size={13} />
+          <span>Concentrating: <strong>{concentration.name}</strong></span>
+          <X size={11} />
+        </button>
+      )}
 
       {/* Active Conditions */}
       {activeConditions.map(name => {

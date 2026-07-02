@@ -1,5 +1,6 @@
 import { Heart, PawPrint } from 'lucide-react';
 import CompanionStatBlock from './CompanionStatBlock';
+import { applyHpDelta } from '../../rules/shared/summons';
 
 /**
  * CompanionCard — Combat-tab wrapper around a computed companion stat block.
@@ -25,16 +26,7 @@ export default function CompanionCard({
 
   const patch = (fields) => onUpdate({ classFeature: { ...cf, companion: { ...comp, ...fields } } });
 
-  const adjustHp = (delta) => {
-    if (delta < 0) {
-      const dmg = -delta;
-      if (hpTemp > 0) {
-        if (dmg <= hpTemp) return patch({ hpTemp: hpTemp - dmg });
-        return patch({ hpTemp: 0, hpCurrent: Math.max(0, hpCurrent - (dmg - hpTemp)) });
-      }
-    }
-    patch({ hpCurrent: Math.max(0, Math.min(hpMax, hpCurrent + delta)) });
-  };
+  const adjustHp = (delta) => patch(applyHpDelta({ hpCurrent, hpTemp, hpMax }, delta));
 
   const hpSlot = (
     <div className="dnd-companion__hp">

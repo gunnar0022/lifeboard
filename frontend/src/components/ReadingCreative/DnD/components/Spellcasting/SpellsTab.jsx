@@ -116,6 +116,24 @@ export default function SpellsTab({ character, editMode, onUpdate }) {
 
   const concentratedSpell = sc.concentratingOn ? spellCache[sc.concentratingOn] : null;
 
+  // Mirror the spell's concentration into the character-wide `concentration` slot
+  // so the always-visible StatusBar chip (and the Summons sub-tab) can read it
+  // without the spell cache. A spell taking concentration owns the single slot
+  // (auto-dropping a summon's hold); dropping the spell clears only a spell-held
+  // slot, leaving a summon's concentration untouched.
+  useEffect(() => {
+    const cur = character.concentration || null;
+    if (sc.concentratingOn) {
+      const name = spellCache[sc.concentratingOn]?.name;
+      if (!name) return; // wait for the cache to resolve the name
+      if (!cur || cur.kind !== 'spell' || cur.refId !== sc.concentratingOn || cur.name !== name) {
+        onUpdate({ concentration: { name, kind: 'spell', refId: sc.concentratingOn } });
+      }
+    } else if (cur && cur.kind === 'spell') {
+      onUpdate({ concentration: null });
+    }
+  }, [sc.concentratingOn, spellCache, character.concentration, onUpdate]);
+
   // ── Concentration ──
   const handleConcentrate = useCallback((spellId) => {
     writeSc({ concentratingOn: sc.concentratingOn === spellId ? null : spellId });

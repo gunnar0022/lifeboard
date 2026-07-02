@@ -514,6 +514,40 @@ async def _create_dnd_tables(db: aiosqlite.Connection):
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(name)
         );
+
+        CREATE TABLE IF NOT EXISTS dnd_summons (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL DEFAULT 'conjuration',
+            size TEXT NOT NULL DEFAULT 'Medium',
+            creature_type TEXT NOT NULL DEFAULT 'beast',
+            cr TEXT NOT NULL DEFAULT '',
+            ac INTEGER NOT NULL DEFAULT 10,
+            ac_note TEXT NOT NULL DEFAULT '',
+            hp INTEGER NOT NULL DEFAULT 1,
+            hp_formula TEXT NOT NULL DEFAULT '',
+            hit_dice TEXT NOT NULL DEFAULT '',
+            speeds TEXT NOT NULL DEFAULT '{"walk": 30}',
+            ability_scores TEXT NOT NULL DEFAULT '{"STR": 10, "DEX": 10, "CON": 10, "INT": 10, "WIS": 10, "CHA": 10}',
+            saves TEXT NOT NULL DEFAULT '',
+            skills TEXT NOT NULL DEFAULT '',
+            senses TEXT NOT NULL DEFAULT '',
+            languages TEXT NOT NULL DEFAULT '',
+            resistances TEXT NOT NULL DEFAULT '',
+            immunities TEXT NOT NULL DEFAULT '',
+            vulnerabilities TEXT NOT NULL DEFAULT '',
+            condition_immunities TEXT NOT NULL DEFAULT '',
+            traits TEXT NOT NULL DEFAULT '[]',
+            actions TEXT NOT NULL DEFAULT '[]',
+            reactions TEXT NOT NULL DEFAULT '[]',
+            requires_concentration BOOLEAN NOT NULL DEFAULT 0,
+            source_spell TEXT NOT NULL DEFAULT '',
+            description TEXT NOT NULL DEFAULT '',
+            source TEXT NOT NULL DEFAULT 'PHB',
+            is_custom BOOLEAN NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name)
+        );
     """)
 
 

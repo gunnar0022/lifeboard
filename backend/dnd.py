@@ -795,6 +795,171 @@ async def delete_background(bg_id: int):
         await db.close()
 
 
+# ── Summons Library (conjured creatures, familiars, companions, custom) ──────
+# Reusable stat-block templates that a caster spawns into live, per-character
+# instances (tracked in the character's JSON blob, not here). Mirrors the items
+# library CRUD: searchable list + custom homebrew, upsert-by-name on create.
+
+_SUMMON_JSON_FIELDS = ("speeds", "ability_scores", "traits", "actions", "reactions")
+_SUMMON_BOOL_FIELDS = ("requires_concentration", "is_custom")
+_SUMMON_COLUMNS = (
+    "name", "category", "size", "creature_type", "cr", "ac", "ac_note",
+    "hp", "hp_formula", "hit_dice", "speeds", "ability_scores", "saves",
+    "skills", "senses", "languages", "resistances", "immunities",
+    "vulnerabilities", "condition_immunities", "traits", "actions", "reactions",
+    "requires_concentration", "source_spell", "description", "source", "is_custom",
+)
+_SUMMON_DEFAULTS = {
+    "category": "conjuration", "size": "Medium", "creature_type": "beast",
+    "cr": "", "ac": 10, "ac_note": "", "hp": 1, "hp_formula": "", "hit_dice": "",
+    "speeds": {"walk": 30},
+    "ability_scores": {"STR": 10, "DEX": 10, "CON": 10, "INT": 10, "WIS": 10, "CHA": 10},
+    "saves": "", "skills": "", "senses": "", "languages": "", "resistances": "",
+    "immunities": "", "vulnerabilities": "", "condition_immunities": "",
+    "traits": [], "actions": [], "reactions": [],
+    "requires_concentration": 0, "source_spell": "", "description": "",
+    "source": "PHB", "is_custom": 0,
+}
+
+
+def _summon_row(row):
+    """Decode a DB row into an API dict (JSON fields parsed, bools as bools)."""
+    d = dict(row)
+    for k in _SUMMON_JSON_FIELDS:
+        if isinstance(d.get(k), str):
+            try:
+                d[k] = json.loads(d[k])
+            except (ValueError, TypeError):
+                d[k] = None
+    for k in _SUMMON_BOOL_FIELDS:
+        d[k] = bool(d.get(k))
+    return d
+
+
+def _summon_value(body, col):
+    """Coerce one column's value from a request body for storage."""
+    val = body.get(col, _SUMMON_DEFAULTS.get(col))
+    if col in _SUMMON_JSON_FIELDS:
+        return json.dumps(val) if val is not None else None
+    if col in _SUMMON_BOOL_FIELDS:
+        return 1 if val else 0
+    return val
+
+
+@router.get("/summons")
+async def list_summons(q: str = "", category: str = None, limit: int = 200):
+    """Search/list summon templates (optional name/source-spell + category filter)."""
+    db = await get_db()
+    try:
+        conditions, params = [], []
+        if q:
+            conditions.append("(name LIKE ? OR source_spell LIKE ?)")
+            params.extend([f"%{q}%", f"%{q}%"])
+        if category:
+            conditions.append("category = ?")
+            params.append(category)
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        params.append(limit)
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_summons {where} ORDER BY category, name LIMIT ?", params
+        )
+        return [_summon_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
+@router.get("/summons/{summon_id}")
+async def get_summon(summon_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_summons WHERE id = ?", (summon_id,))
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(404, "Summon not found")
+        return _summon_row(row)
+    finally:
+        await db.close()
+
+
+@router.post("/summons")
+async def create_summon(body: dict):
+    """Create a summon template (upsert by name — returns existing if name matches)."""
+    name = body.get("name", "")
+    db = await get_db()
+    try:
+        cursor = await db.execute("SELECT * FROM dnd_summons WHERE name = ?", (name,))
+        existing = await cursor.fetchone()
+        if existing:
+            return _summon_row(existing)
+
+        placeholders = ", ".join("?" * len(_SUMMON_COLUMNS))
+        values = [_summon_value(body, col) for col in _SUMMON_COLUMNS]
+        cursor = await db.execute(
+            f"INSERT INTO dnd_summons ({', '.join(_SUMMON_COLUMNS)}) VALUES ({placeholders})",
+            values,
+        )
+        await db.commit()
+        cursor = await db.execute("SELECT * FROM dnd_summons WHERE id = ?", (cursor.lastrowid,))
+        return _summon_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.put("/summons/{summon_id}")
+async def update_summon(summon_id: int, body: dict):
+    """Update a summon template; only columns present in the body are changed."""
+    db = await get_db()
+    try:
+        sets, vals = [], []
+        for col in _SUMMON_COLUMNS:
+            if col in body:
+                sets.append(f"{col} = ?")
+                vals.append(_summon_value(body, col))
+        if not sets:
+            raise HTTPException(400, "No fields to update")
+        vals.append(summon_id)
+        cursor = await db.execute(
+            f"UPDATE dnd_summons SET {', '.join(sets)} WHERE id = ?", vals
+        )
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Summon not found")
+        cursor = await db.execute("SELECT * FROM dnd_summons WHERE id = ?", (summon_id,))
+        return _summon_row(await cursor.fetchone())
+    finally:
+        await db.close()
+
+
+@router.delete("/summons/{summon_id}")
+async def delete_summon(summon_id: int):
+    db = await get_db()
+    try:
+        cursor = await db.execute("DELETE FROM dnd_summons WHERE id = ?", (summon_id,))
+        await db.commit()
+        if cursor.rowcount == 0:
+            raise HTTPException(404, "Summon not found")
+        return {"success": True}
+    finally:
+        await db.close()
+
+
+@router.post("/summons/batch")
+async def batch_summons(body: dict):
+    """Resolve multiple summon templates by ID."""
+    ids = body.get("ids", [])
+    if not ids:
+        return []
+    db = await get_db()
+    try:
+        placeholders = ",".join("?" * len(ids))
+        cursor = await db.execute(
+            f"SELECT * FROM dnd_summons WHERE id IN ({placeholders})", ids
+        )
+        return [_summon_row(r) for r in await cursor.fetchall()]
+    finally:
+        await db.close()
+
+
 # ── Beast Forms ──────────────────────────────────────────
 
 @router.get("/beast-forms")
