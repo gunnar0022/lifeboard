@@ -980,14 +980,19 @@ export default function CharacterSheet({ characterId, initialEditMode, campaignI
         {activeTab !== 'encyclopedia' && <TabHeader topic={activeTab} title={activeTabLabel} />}
         {activeTab === 'combat' && (
           <>
-          <div className="dnd-sheet__subtabs">
+          <div className={`dnd-sheet__subtabs dnd-sheet__subtabs--${combatSub}`}>
+            <span className="dnd-sheet__subtabs-thumb" aria-hidden="true" />
             <button
-              className={`dnd-sheet__subtab ${combatSub === 'character' ? 'dnd-sheet__subtab--active' : ''}`}
-              onClick={() => setCombatSub('character')}>Character</button>
+              className="dnd-sheet__subtab dnd-sheet__subtab--left"
+              aria-pressed={combatSub === 'character'}
+              onClick={() => setCombatSub('character')}>
+              <span className="dnd-sheet__subtab-label">Character</span>
+            </button>
             <button
-              className={`dnd-sheet__subtab ${combatSub === 'summons' ? 'dnd-sheet__subtab--active' : ''}`}
+              className="dnd-sheet__subtab dnd-sheet__subtab--right"
+              aria-pressed={combatSub === 'summons'}
               onClick={() => setCombatSub('summons')}>
-              Summons
+              <span className="dnd-sheet__subtab-label">Summons</span>
               {(character.summons || []).length > 0 && (
                 <span className="dnd-sheet__subtab-badge">{(character.summons || []).length}</span>
               )}

@@ -1,27 +1,77 @@
 /* ── Summons & Companions — Combat-tab sub-tab ─────────────────────────────── */
 
-/* Inner Character / Summons switch (lives under the main tab row) */
+/* Inner Character / Summons switch — a full-width segmented control. The two
+   halves flip between a bright accent "thumb" (active) and a distinct muted solid
+   (inactive); the thumb is skewed so the seam reads as a diagonal "/" and slides
+   between sides when toggled. */
 .dnd-sheet__subtabs {
-  display: flex; gap: 0.4rem; margin-bottom: 1rem;
+  --sub-off: color-mix(in srgb, var(--dnd-accent) 24%, var(--dnd-surface));
+  position: relative; display: flex; width: 100%; margin-bottom: 1rem;
+  border: 1px solid var(--dnd-border-strong); border-radius: 9px; overflow: hidden;
+  background: var(--sub-off); isolation: isolate;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
 }
+/* Sliding, skewed accent thumb (a bit wider than half so the outer corner stays
+   fully covered while the inner edge cuts the diagonal near center). */
+.dnd-sheet__subtabs-thumb {
+  position: absolute; top: 0; bottom: 0; left: -7%; width: 57%; z-index: 0;
+  transform: skewX(-13deg);
+  background:
+    linear-gradient(158deg, color-mix(in srgb, var(--dnd-accent) 82%, #fff) 0%, var(--dnd-accent) 55%, var(--dnd-accent-dim) 100%);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--dnd-accent) 45%, transparent);
+  transition: left 0.3s cubic-bezier(0.34, 1.2, 0.4, 1);
+}
+.dnd-sheet__subtabs--summons .dnd-sheet__subtabs-thumb { left: 50%; }
+/* Subtle sheen sweeping across the active thumb. */
+.dnd-sheet__subtabs-thumb::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
+  transform: translateX(-120%); animation: dnd-subtab-sheen 4.5s ease-in-out 1s infinite;
+}
+@keyframes dnd-subtab-sheen {
+  0%, 55% { transform: translateX(-120%); }
+  75%, 100% { transform: translateX(120%); }
+}
+
 .dnd-sheet__subtab {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  background: var(--dnd-surface); border: 1px solid var(--dnd-border);
-  border-radius: 999px; color: var(--dnd-text-dim);
-  padding: 0.3rem 0.85rem; cursor: pointer;
-  font-family: inherit; font-size: 0.82rem; font-weight: 600; transition: all 0.15s;
+  position: relative; z-index: 1; flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  background: none; border: none; cursor: pointer;
+  padding: 0.72rem 1rem; font-family: inherit; font-size: 0.9rem; font-weight: 700;
+  letter-spacing: 0.03em; color: var(--dnd-text-dim);
+  transition: color 0.25s ease, transform 0.2s ease;
 }
-.dnd-sheet__subtab:hover { color: var(--dnd-text); border-color: var(--dnd-border-strong); }
-.dnd-sheet__subtab--active {
-  color: var(--dnd-bg); background: var(--dnd-accent); border-color: var(--dnd-accent);
+.dnd-sheet__subtab-label { transition: text-shadow 0.25s ease; }
+/* Inactive side: brighten a touch on hover. */
+.dnd-sheet__subtabs--summons .dnd-sheet__subtab--left:hover,
+.dnd-sheet__subtabs--character .dnd-sheet__subtab--right:hover {
+  color: var(--dnd-text);
 }
+/* Active side: contrasting text on the bright thumb. */
+.dnd-sheet__subtabs--character .dnd-sheet__subtab--left,
+.dnd-sheet__subtabs--summons .dnd-sheet__subtab--right {
+  color: var(--dnd-bg);
+}
+.dnd-sheet__subtabs--character .dnd-sheet__subtab--left .dnd-sheet__subtab-label,
+.dnd-sheet__subtabs--summons .dnd-sheet__subtab--right .dnd-sheet__subtab-label {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
 .dnd-sheet__subtab-badge {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 1.15rem; height: 1.15rem; padding: 0 0.3rem;
-  border-radius: 999px; background: var(--dnd-accent); color: var(--dnd-bg);
+  min-width: 1.2rem; height: 1.2rem; padding: 0 0.35rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--dnd-accent) 88%, #000); color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   font-size: 0.68rem; font-weight: 800; font-variant-numeric: tabular-nums;
 }
-.dnd-sheet__subtab--active .dnd-sheet__subtab-badge { background: var(--dnd-bg); color: var(--dnd-accent); }
+/* On the active (accent) side the badge inverts for contrast. */
+.dnd-sheet__subtabs--summons .dnd-sheet__subtab--right .dnd-sheet__subtab-badge {
+  background: var(--dnd-bg); color: var(--dnd-accent); border-color: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dnd-sheet__subtabs-thumb { transition: none; }
+  .dnd-sheet__subtabs-thumb::after { animation: none; }
+}
 
 /* ── Concentration chip in the StatusBar — strobing amber ──────────────────── */
 @keyframes dnd-conc-strobe {
