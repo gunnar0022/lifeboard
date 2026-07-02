@@ -10,9 +10,10 @@ const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 
 export default function CompanionStatBlock({ block, accent = 'var(--dnd-class-ranger)', hpSlot = null, wide = false }) {
   if (!block) return null;
-  // On the extra-wide summon card, lay attacks/actions out in a 3-column grid
-  // once there are more than three (otherwise they read fine stacked).
-  const gridActions = wide && block.actions.length > 3;
+  // On the extra-wide summon card, spread attacks/actions across the horizontal
+  // space: as many columns as there are actions, capped at 3 (4+ wrap to rows).
+  const gridActions = wide && block.actions.length > 0;
+  const actionCols = Math.min(3, block.actions.length);
   return (
     <div className={`dnd-companion__sb ${wide ? 'dnd-companion__sb--wide' : ''}`} style={{ '--block-accent': accent }}>
       <div className="dnd-companion__meta">{block.size} {block.type}</div>
@@ -70,7 +71,8 @@ export default function CompanionStatBlock({ block, accent = 'var(--dnd-class-ra
       {block.actions.length > 0 && (
         <div className="dnd-companion__group">
           <h5 className="dnd-companion__group-title">Actions</h5>
-          <div className={`dnd-companion__actions ${gridActions ? 'dnd-companion__actions--grid' : ''}`}>
+          <div className={`dnd-companion__actions ${gridActions ? 'dnd-companion__actions--grid' : ''}`}
+            style={gridActions ? { gridTemplateColumns: `repeat(${actionCols}, minmax(0, 1fr))` } : undefined}>
             {block.actions.map(a => (
               <div key={a.name} className="dnd-companion__action">
                 <div className="dnd-companion__action-head">

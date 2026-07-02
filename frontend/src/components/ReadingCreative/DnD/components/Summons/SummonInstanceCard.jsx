@@ -73,8 +73,14 @@ export default function SummonInstanceCard({
       style={{ '--block-accent': accent }}>
       {/* Header */}
       <div className="dnd-summon-card__header">
-        <input className="dnd-field dnd-summon-card__name" value={instance.name}
-          placeholder="Name this creature…" onChange={e => patch({ name: e.target.value })} />
+        {editing ? (
+          <input className="dnd-field dnd-summon-card__name" value={instance.name}
+            placeholder="Name this creature…" onChange={e => patch({ name: e.target.value })} />
+        ) : (
+          <span className="dnd-summon-card__name dnd-summon-card__name--static">
+            {instance.name || 'Unnamed summon'}
+          </span>
+        )}
         <select className="dnd-summon-card__allegiance" value={instance.allegiance}
           onChange={e => patch({ allegiance: e.target.value })}
           style={{ color: accent, borderColor: accent }}>

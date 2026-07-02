@@ -76,6 +76,7 @@
 
 .dnd-summon-card__header { display: flex; align-items: center; gap: 0.4rem; }
 .dnd-summon-card__name { flex: 1; font-weight: 700; }
+.dnd-summon-card__name--static { padding: 0.15rem 0; color: var(--dnd-text); }
 .dnd-summon-card__allegiance {
   background: var(--dnd-bg); border: 1px solid var(--dnd-border);
   border-radius: 0.35rem; padding: 0.25rem 0.4rem; cursor: pointer;
@@ -155,17 +156,30 @@
 .dnd-companion__actions { display: flex; flex-direction: column; gap: 0.3rem; }
 
 /* ── Extra-wide summon stat block: roomier layout + slightly larger type ─────── */
-/* Attacks/actions flow into a 3-wide grid once there are more than three. */
+/* Attacks/actions spread across the width (column count set inline: min(3, n)). */
 .dnd-companion__sb--wide .dnd-companion__actions--grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; align-items: start;
-}
-@media (max-width: 900px) {
-  .dnd-companion__sb--wide .dnd-companion__actions--grid { grid-template-columns: repeat(2, 1fr); }
+  display: grid; gap: 0.5rem; align-items: start;
 }
 @media (max-width: 560px) {
-  .dnd-companion__sb--wide .dnd-companion__actions--grid { grid-template-columns: 1fr; }
+  /* Collapse to a single column on narrow screens (beats the inline template). */
+  .dnd-companion__sb--wide .dnd-companion__actions--grid { grid-template-columns: 1fr !important; }
 }
 .dnd-companion__sb--wide { gap: 0.6rem; }
+
+/* Top row: standardized AC + Speed boxes flanking a stretched HP tracker so the
+   row uses the full width instead of squishing AC and ballooning Speed. */
+.dnd-companion__sb--wide .dnd-companion__topline { align-items: stretch; }
+.dnd-companion__sb--wide .dnd-companion__stat {
+  flex: 0 0 140px; justify-content: center; text-align: center;
+}
+.dnd-companion__sb--wide .dnd-companion__stat--wide {
+  flex: 0 0 140px; align-items: center; text-align: center;
+}
+.dnd-companion__sb--wide .dnd-companion__stat--wide .dnd-companion__stat-val { text-align: center; }
+.dnd-companion__sb--wide .dnd-companion__hp { flex: 1 1 auto; justify-content: center; }
+/* Center the HP number line and the adjust buttons under the wide bar. */
+.dnd-companion__sb--wide .dnd-companion__hp-head { justify-content: center; gap: 0.6rem; }
+.dnd-companion__sb--wide .dnd-companion__hp-btns { justify-content: center; }
 .dnd-companion__sb--wide .dnd-companion__meta { font-size: 0.82rem; }
 .dnd-companion__sb--wide .dnd-companion__stat-val { font-size: 1.15rem; }
 .dnd-companion__sb--wide .dnd-companion__stat-lbl { font-size: 0.66rem; }
